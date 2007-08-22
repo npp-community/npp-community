@@ -405,8 +405,12 @@ public:
 		execute(SCI_LINESCROLL, column, line);
 	};
 
+	long getCurrentPointX()const{
+		return long (execute(SCI_POINTXFROMPOSITION, 0, execute(SCI_GETCURRENTPOS)));
+	};
+
 	long getCurrentPointY()const{
-		return long (execute(SCI_POINTYFROMPOSITION,0,execute(SCI_GETCURRENTPOS)));
+		return long (execute(SCI_POINTYFROMPOSITION, 0, execute(SCI_GETCURRENTPOS)));
 	};
 
 	long getTextHeight()const{
