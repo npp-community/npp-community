@@ -7121,6 +7121,20 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			return _pluginsManager.relayPluginMessages(Message, wParam, lParam);
 		}
 
+		case NPPM_HIDETABBAR :
+		{
+			bool hide = (lParam != 0);
+			bool oldVal = _mainDocTab.setHideTabBarStatus(hide);
+			_subDocTab.setHideTabBarStatus(hide);
+			::SendMessage(_hSelf, WM_SIZE, 0, 0);
+			return oldVal;
+		}
+
+		case NPPM_ISTABBARHIDE :
+		{
+			return _mainDocTab.getHideTabBarStatus();
+		}
+
 		default:
 		{
 			if (Message == WDN_NOTIFY)
