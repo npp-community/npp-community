@@ -160,6 +160,13 @@ bool NppParameters::load(/*bool noUserPath*/)
 	strcpy(configPath, userPath);
 	PathAppend(configPath, "config.xml");
 
+	char srcConfigPath[MAX_PATH];
+	strcpy(srcConfigPath, nppPath);
+	PathAppend(srcConfigPath, "config.model.xml");
+
+	if (!::PathFileExists(configPath))
+		::CopyFile(srcConfigPath, configPath, FALSE);
+
 	_pXmlUserDoc = new TiXmlDocument(configPath);
 	loadOkay = _pXmlUserDoc->LoadFile();
 	if (!loadOkay)
@@ -167,9 +174,6 @@ bool NppParameters::load(/*bool noUserPath*/)
 		int res = ::MessageBox(NULL, "Load config.xml failed!\rDo you want to recover your config.xml?", "Configurator",MB_YESNO);
 		if (res ==IDYES)
 		{
-			char srcConfigPath[MAX_PATH];
-			strcpy(srcConfigPath, nppPath);
-			PathAppend(srcConfigPath, "config.model.xml");
 			::CopyFile(srcConfigPath, configPath, FALSE);
 
 			loadOkay = _pXmlUserDoc->LoadFile();
