@@ -1700,6 +1700,15 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 				_statusBar.setText((_pEditView->execute(SCI_GETOVERTYPE))?"OVR":"INS", STATUSBAR_TYPING_MODE);
 			}
         }
+		else if (notification->nmhdr.hwndFrom == _mainDocTab.getHSelf())
+		{
+            switchEditViewTo(MAIN_VIEW);
+		}
+        else if (notification->nmhdr.hwndFrom == _subDocTab.getHSelf())
+        {
+            switchEditViewTo(SUB_VIEW);
+        }
+
 		break;
 	}
 
@@ -3370,6 +3379,12 @@ void Notepad_plus::command(int id)
 		case IDM_ONLINEHELP:
 		{
 			::ShellExecute(NULL, "open", "http://notepad-plus.sourceforge.net/uk/generalFAQ.php", NULL, NULL, SW_SHOWNORMAL);
+			break;
+		}
+
+		case IDM_WIKIFAQ:
+		{
+			::ShellExecute(NULL, "open", "http://notepad-plus.wiki.sourceforge.net/FAQ", NULL, NULL, SW_SHOWNORMAL);
 			break;
 		}
 
