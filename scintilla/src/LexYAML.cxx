@@ -20,6 +20,10 @@
 #include "Scintilla.h"
 #include "SciLexer.h"
 
+#ifdef SCI_NAMESPACE
+using namespace Scintilla;
+#endif
+
 static const char * const yamlWordListDesc[] = {
 	"Keywords",
 	0
@@ -98,7 +102,8 @@ static void ColouriseYAMLLine(
 		if (lineBuffer[i] == '\'' || lineBuffer[i] == '\"') {
 			bInQuotes = !bInQuotes;
 		} else if (lineBuffer[i] == ':' && !bInQuotes) {
-			styler.ColourTo(startLine + i, SCE_YAML_IDENTIFIER);
+			styler.ColourTo(startLine + i - 1, SCE_YAML_IDENTIFIER);
+			styler.ColourTo(startLine + i, SCE_YAML_OPERATOR);
 			// Non-folding scalar
 			i++;
 			while ((i < lengthLine) && isspacechar(lineBuffer[i]))
@@ -126,6 +131,10 @@ static void ColouriseYAMLLine(
 					styler.ColourTo(endPos, SCE_YAML_ERROR);
 					return;
 				}
+			} else if (lineBuffer[i] == '#') {
+				styler.ColourTo(startLine + i - 1, SCE_YAML_DEFAULT);
+				styler.ColourTo(endPos, SCE_YAML_COMMENT);
+				return;
 			}
 			styler.SetLineState(currentLine, YAML_STATE_VALUE);
 			if (lineBuffer[i] == '&' || lineBuffer[i] == '*') {
