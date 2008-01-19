@@ -2949,7 +2949,7 @@ void Notepad_plus::command(int id)
 			_toReduceTabBar = !_toReduceTabBar;
 
 			//Resize the  icon
-			int iconSize = _toReduceTabBar?12:20;
+			int iconSize = _toReduceTabBar?12:18;
 
 			//Resize the tab height
 			int tabHeight = _toReduceTabBar?20:25;
@@ -3027,6 +3027,27 @@ void Notepad_plus::command(int id)
 			break;
 		}
 
+		case IDM_VIEW_DRAWTABBAR_VERTICAL :
+		{
+			TabBarPlus::setVertical(!TabBarPlus::isVertical());
+
+			RECT rc;
+			getMainClientRect(rc);
+
+			_dockingManager.reSizeTo(rc);
+			//::SendMessage(_hSelf, IDM_VIEW_REDUCETABBAR, 0, 0);
+			break;
+		}
+
+		case IDM_VIEW_DRAWTABBAR_MULTILINE :
+		{
+			TabBarPlus::setMultiLine(!TabBarPlus::isMultiLine());
+			RECT rc;
+			getMainClientRect(rc);
+            _dockingManager.reSizeTo(rc);
+			break;
+		}
+
         case IDM_VIEW_STATUSBAR:
 		{
             RECT rc;
@@ -3037,6 +3058,7 @@ void Notepad_plus::command(int id)
             ::SendMessage(_hSelf, WM_SIZE, SIZE_RESTORED, MAKELONG(rc.bottom, rc.right));
             break;
         }
+
 		case IDM_VIEW_TAB_SPACE:
 		{
 			bool isChecked = !(::GetMenuState(_mainMenuHandle, IDM_VIEW_TAB_SPACE, MF_BYCOMMAND) == MF_CHECKED);
@@ -5717,6 +5739,8 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			TabBarPlus::setDrawInactiveTab((tabBarStatus & TAB_DRAWINACTIVETAB) != 0);
 			TabBarPlus::setDrawTabCloseButton((tabBarStatus & TAB_CLOSEBUTTON) != 0);
 			TabBarPlus::setDbClk2Close((tabBarStatus & TAB_DBCLK2CLOSE) != 0);
+			TabBarPlus::setVertical((tabBarStatus & TAB_VERTICAL) != 0);
+			TabBarPlus::setMultiLine((tabBarStatus & TAB_MULTILINE) != 0);
 
             //--Splitter Section--//
 			bool isVertical = (nppGUI._splitterPos == POS_VERTICAL);
