@@ -88,6 +88,10 @@ public :
 		}
 	};
 
+	const ScintillaEditView * getView() const {
+		return _pView;
+	};
+
 private :
 	static unsigned short _nbNewTitle;
 	ScintillaEditView *_pView;
