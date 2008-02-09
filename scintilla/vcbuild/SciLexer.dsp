@@ -43,8 +43,8 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SciLexer_EXPORTS" /Yu"stdafx.h" /FD /c
-# ADD CPP /nologo /G6 /MT /W4 /O1 /I "..\include" /I "..\src" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SCI_LEXER" /Fr /FD /c
-# SUBTRACT CPP /YX /Yc /Yu
+# ADD CPP /nologo /G6 /MT /W4 /O1 /I "..\include" /I "..\src" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SCI_LEXER" /FD /c
+# SUBTRACT CPP /Fr /YX /Yc /Yu
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -114,6 +114,10 @@ SOURCE=..\src\ContractionState.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\Decoration.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\Document.cxx
 # End Source File
 # Begin Source File
@@ -142,6 +146,10 @@ SOURCE=..\src\KeyWords.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\LexAbaqus.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\LexAda.cxx
 # End Source File
 # Begin Source File
@@ -155,6 +163,10 @@ SOURCE=..\src\LexAsm.cxx
 # Begin Source File
 
 SOURCE=..\src\LexAsn1.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\LexASY.cxx
 # End Source File
 # Begin Source File
 
@@ -242,6 +254,10 @@ SOURCE=..\src\LexFortran.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\LexGAP.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\LexGui4Cli.cxx
 # End Source File
 # Begin Source File
@@ -271,6 +287,10 @@ SOURCE=..\src\LexLout.cxx
 # Begin Source File
 
 SOURCE=..\src\LexLua.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\LexMagik.cxx
 # End Source File
 # Begin Source File
 
@@ -322,7 +342,19 @@ SOURCE=..\src\LexPerl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\LexPLM.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\LexPOV.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\LexPowerShell.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\LexProgress.cxx
 # End Source File
 # Begin Source File
 
@@ -331,6 +363,10 @@ SOURCE=..\src\LexPS.cxx
 # Begin Source File
 
 SOURCE=..\src\LexPython.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\LexR.cxx
 # End Source File
 # Begin Source File
 
@@ -406,11 +442,19 @@ SOURCE=..\win32\PlatWin.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\PositionCache.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\PropSet.cxx
 # End Source File
 # Begin Source File
 
 SOURCE=..\src\RESearch.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\RunStyles.cxx
 # End Source File
 # Begin Source File
 
