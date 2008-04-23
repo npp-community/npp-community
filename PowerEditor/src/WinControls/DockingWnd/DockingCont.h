@@ -61,28 +61,14 @@ public:
 	DockingCont();
 	~DockingCont();
 
-    void init(HINSTANCE hInst, HWND hWnd) {
-		Window::init(hInst, hWnd);
-	};
-
 	HWND getTabWnd(void) {
-		HWND	hRet = NULL;
-		if (isCreated())
-			hRet = _hContTab;
-
-		return hRet;
+		return _hContTab;
 	};
 	HWND getCaptionWnd(void) {
-		HWND	hRet = NULL;
-		if (isCreated())
-		{
-			if (_isFloating == false)
-				hRet = _hCaption;
-			else
-				hRet = _hSelf;
-		}
-
-		return hRet;
+		if (_isFloating == false)
+			return _hCaption;
+		else
+			return _hSelf;
 	};
 
 	tTbData* createToolbar(tTbData data, Window **ppWin);
