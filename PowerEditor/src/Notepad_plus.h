@@ -698,7 +698,7 @@ private:
 	};
 
 	bool isWordChar(char ch) const {
-		if (ch < 0x20)
+		if ((unsigned char)ch < 0x20)
 			return false;
 
 		switch(ch)
