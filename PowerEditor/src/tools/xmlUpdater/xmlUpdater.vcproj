@@ -20,7 +20,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;E:\Sources\notepad++\PowerEditor\src\TinyXml&quot;"
+				AdditionalIncludeDirectories="..\..\TinyXml"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -36,11 +36,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/xmlUpdater.exe"
+				OutputFile="$(OutDir)/../xmlUpdater.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/xmlUpdater.pdb"
-				SubSystem="2"
+				SubSystem="1"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -71,7 +71,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;E:\Sources\notepad++\PowerEditor\src\TinyXml&quot;"
+				AdditionalIncludeDirectories="..\..\TinyXml"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				RuntimeLibrary="4"
 				UsePrecompiledHeader="0"
@@ -82,10 +82,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/xmlUpdater.exe"
+				OutputFile="$(OutDir)/../xmlUpdater.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
-				SubSystem="2"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"/>
@@ -119,16 +119,16 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\TinyXml\tinystr.cpp">
+				RelativePath="..\..\TinyXml\tinystr.cpp">
 			</File>
 			<File
-				RelativePath="..\TinyXml\tinyxml.cpp">
+				RelativePath="..\..\TinyXml\tinyxml.cpp">
 			</File>
 			<File
-				RelativePath="..\TinyXml\tinyxmlerror.cpp">
+				RelativePath="..\..\TinyXml\tinyxmlerror.cpp">
 			</File>
 			<File
-				RelativePath="..\TinyXml\tinyxmlparser.cpp">
+				RelativePath="..\..\TinyXml\tinyxmlparser.cpp">
 			</File>
 			<File
 				RelativePath=".\xmlUpdater.cpp">
@@ -139,20 +139,12 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath="..\TinyXml\tinystr.h">
+				RelativePath="..\..\TinyXml\tinystr.h">
 			</File>
 			<File
-				RelativePath="..\TinyXml\tinyxml.h">
+				RelativePath="..\..\TinyXml\tinyxml.h">
 			</File>
 		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
-		</Filter>
-		<File
-			RelativePath=".\ReadMe.txt">
-		</File>
 	</Files>
 	<Globals>
 	</Globals>
