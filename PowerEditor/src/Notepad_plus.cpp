@@ -1799,22 +1799,33 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 
 		case SCN_MODIFIED:
 		{
-			if ((notification->modificationType & SC_MOD_DELETETEXT) || (notification->modificationType & SC_MOD_INSERTTEXT))
+			static bool prevWasEdit = false;
+			if (notification->modificationType & (SC_MOD_DELETETEXT | SC_MOD_INSERTTEXT))
 			{
+				prevWasEdit = true;
 				_linkTriggered = true;
 				_isDocModifing = true;
 				::InvalidateRect(notifyView->getHSelf(), NULL, TRUE);
 			}
 			if (notification->modificationType & SC_MOD_CHANGEFOLD)
 			{
-				notifyView->foldChanged(notification->line,
-				        notification->foldLevelNow, notification->foldLevelPrev);
+				if (prevWasEdit) {
+					notifyView->foldChanged(notification->line,
+							notification->foldLevelNow, notification->foldLevelPrev);
+					prevWasEdit = false;
+				}
+			}
+			else
+			if (!(notification->modificationType & (SC_MOD_DELETETEXT | SC_MOD_INSERTTEXT)))
+			{
+				prevWasEdit = false;
 			}
 		}
 		break;
 
 		case SCN_SAVEPOINTREACHED:
-		case SCN_SAVEPOINTLEFT: {
+		case SCN_SAVEPOINTLEFT:
+		{
 			Buffer * buf = 0;
 			if (isFromPrimary) {
 				buf = _mainEditView.getCurrentBuffer();
