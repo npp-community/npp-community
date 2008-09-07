@@ -133,7 +133,6 @@ int WINAPI NppMainEntry(HINSTANCE hInstance, HINSTANCE, TCHAR * cmdLine, int nCm
 
 	ParamVector params;
 	parseCommandLine(cmdLine, params);
-
 	CmdLineParams cmdLineParams;
 	bool isMultiInst = isInList(FLAG_MULTI_INSTANCE, params);
 	cmdLineParams._isNoTab = isInList(FLAG_NOTABBAR, params);
@@ -157,6 +156,7 @@ int WINAPI NppMainEntry(HINSTANCE hInstance, HINSTANCE, TCHAR * cmdLine, int nCm
 	size_t nrFilesToOpen = params.size();
 	const TCHAR * currentFile;
 	TCHAR fullFileName[MAX_PATH];
+
 	//TODO: try merging the flenames and see if it exists, user may have typed a single spaced filename without quotes
 	for(size_t i = 0; i < nrFilesToOpen; i++)
 	{

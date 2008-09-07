@@ -79,7 +79,6 @@ Notepad_plus::Notepad_plus(): Window(), _mainWindowStatus(0), _pDocTab(NULL), _p
 	ZeroMemory(&_prevSelectedRange, sizeof(_prevSelectedRange));
 
 	_winVersion = (NppParameters::getInstance())->getWinVersion();
-
 	TiXmlDocument *nativeLangDocRoot = (NppParameters::getInstance())->getNativeLang();
 	if (nativeLangDocRoot)
 	{
@@ -293,6 +292,7 @@ void Notepad_plus::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLine, CmdL
 	scnN.nmhdr.hwndFrom = _hSelf;
 	scnN.nmhdr.idFrom = 0;
 	_pluginsManager.notify(&scnN);
+
 }
 
 
@@ -475,7 +475,6 @@ bool Notepad_plus::loadSession(Session & session)
 {
 	bool allSessionFilesLoaded = true;
 	BufferID lastOpened = BUFFER_INVALID;
-
 	size_t i = 0;
 	showView(MAIN_VIEW);
 	switchEditViewTo(MAIN_VIEW);	//open files in main
@@ -600,7 +599,6 @@ bool Notepad_plus::loadSession(Session & session)
 		hideView(otherView());
 	else if (canHideView(currentView()))
 		hideView(currentView());
-
 	return allSessionFilesLoaded;
 }
 
@@ -1399,10 +1397,7 @@ bool Notepad_plus::replaceAllFiles() {
 	if (nbTotal < 0)
 		lstrcpy(result, TEXT("The regular expression to search is formed badly"));
 	else
-	{
-		wsprintf(result, TEXT("%d"), nbTotal);
-		lstrcat(result, TEXT(" tokens are replaced."));
-	}
+		wsprintf(result, TEXT("%d occurrences were replaced."), nbTotal);
 
 	::MessageBox(_hSelf, result, TEXT(""), MB_OK);
 
@@ -6203,7 +6198,6 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			TabBarPlus::setVertical((tabBarStatus & TAB_VERTICAL) != 0);
 			drawTabbarColoursFromStylerArray();
 
-
             //--Splitter Section--//
 			bool isVertical = (nppGUI._splitterPos == POS_VERTICAL);
 
@@ -6493,7 +6487,6 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 				ContainerTabInfo & cti = dmd._containerTabInfo[i];
 				_dockingManager.setActiveTab(cti._cont, cti._activeTab);
 			}
-
 			//Load initial docs into doctab
 			loadBufferIntoView(_mainEditView.getCurrentBufferID(), MAIN_VIEW);
 			loadBufferIntoView(_subEditView.getCurrentBufferID(), SUB_VIEW);
