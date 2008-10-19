@@ -1427,7 +1427,6 @@ int ScintillaEditView::searchInTarget(const TCHAR * text2Find, int fromPos, int 
 {
 	execute(SCI_SETTARGETSTART, fromPos);
 	execute(SCI_SETTARGETEND, toPos);
-
 #ifdef UNICODE
 	WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
 	unsigned int cp = execute(SCI_GETCODEPAGE);
@@ -1438,13 +1437,6 @@ int ScintillaEditView::searchInTarget(const TCHAR * text2Find, int fromPos, int 
 	return execute(SCI_SEARCHINTARGET, (WPARAM)strlen(text2Find), (LPARAM)text2Find);
 #endif
 }
-
-/*
-void ScintillaEditView::appandText(const char * text2Append) const
-{
-	execute(SCI_APPENDTEXT, strlen(text2Append), (LPARAM)text2Append);
-}
-*/
 
 void ScintillaEditView::appandGenericText(const TCHAR * text2Append) const
 {
