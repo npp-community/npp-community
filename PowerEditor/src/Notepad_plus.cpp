@@ -3564,12 +3564,14 @@ void Notepad_plus::command(int id)
 				if (!_beforePostIt.isAlwaysOnTop)
 					::SendMessage(_hSelf, WM_COMMAND, IDM_VIEW_ALWAYSONTOP, 0);
 
+				_beforePostIt.isPostIt = false;
+
 			}
 			else // PostIt
 			{
 				NppGUI & nppGUI = (NppGUI &)pNppParam->getNppGUI();
 				// get current status before switch to postIt
-				_beforePostIt.isPostIt = false;
+				_beforePostIt.isPostIt = true;
 				_beforePostIt.isSizable = true;
 				_beforePostIt.isAlwaysOnTop = ::GetMenuState(_mainMenuHandle, IDM_VIEW_ALWAYSONTOP, MF_BYCOMMAND) == MF_CHECKED;
 				_beforePostIt.isMenuShown = ::SendMessage(_hSelf, NPPM_ISMENUHIDDEN, 0, 0) != TRUE;
@@ -7935,6 +7937,9 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 			if (_isfullScreen)	//closing, return to windowed mode
 				fullScreenToggle();
+
+			if (_beforePostIt.isPostIt)
+				::SendMessage(_hSelf, WM_COMMAND, IDM_VIEW_POSTIT, 0);
 
 			if (_configStyleDlg.isCreated() && ::IsWindowVisible(_configStyleDlg.getHSelf()))
 				_configStyleDlg.restoreGlobalOverrideValues();
