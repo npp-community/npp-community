@@ -43,8 +43,8 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SciLexer_EXPORTS" /Yu"stdafx.h" /FD /c
-# ADD CPP /nologo /G6 /MT /W4 /O1 /I "..\include" /I "..\src" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SCI_LEXER" /FD /c
-# SUBTRACT CPP /Fr /YX /Yc /Yu
+# ADD CPP /nologo /G6 /MT /W4 /O1 /I "..\include" /I "..\src" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SCI_LEXER" /Fr /FD /c
+# SUBTRACT CPP /YX /Yc /Yu
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -311,6 +311,10 @@ SOURCE=..\src\LexMPT.cxx
 # Begin Source File
 
 SOURCE=..\src\LexMSSQL.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\LexMySQL.cxx
 # End Source File
 # Begin Source File
 

@@ -97,7 +97,7 @@ static void ColouriseVerilogDoc(unsigned int startPos, int length, int initStyle
 				sc.ForwardSetState(SCE_V_DEFAULT);
 			}
 		} else if (sc.state == SCE_V_COMMENTLINE || sc.state == SCE_V_COMMENTLINEBANG) {
-			if (sc.atLineEnd) {
+			if (sc.atLineStart) {
 				sc.SetState(SCE_V_DEFAULT);
 			}
                 } else if (sc.state == SCE_V_STRING) {
@@ -245,6 +245,7 @@ static void FoldNoBoxVerilogDoc(unsigned int startPos, int length, int initStyle
                             styler.Match(j, "fork") ||
                             styler.Match(j, "table") ||
                             styler.Match(j, "task") ||
+                            styler.Match(j, "generate") ||
                             styler.Match(j, "specify") ||
                             styler.Match(j, "primitive") ||
                             styler.Match(j, "module") && foldAtModule ||
@@ -254,6 +255,7 @@ static void FoldNoBoxVerilogDoc(unsigned int startPos, int length, int initStyle
                                    styler.Match(j, "endfunction") ||
                                    styler.Match(j, "join") ||
                                    styler.Match(j, "endtask") ||
+                                   styler.Match(j, "endgenerate") ||
                                    styler.Match(j, "endtable") ||
                                    styler.Match(j, "endspecify") ||
                                    styler.Match(j, "endprimitive") ||
