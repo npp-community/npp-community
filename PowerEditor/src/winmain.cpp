@@ -40,7 +40,6 @@ void parseCommandLine(TCHAR * commandLine, ParamVector & paramVector) {
 	//params.erase(params.begin());
 	//remove the first element, since thats the path the the executable (GetCommandLine does that)
 	TCHAR stopChar = TEXT(' ');
-	int i = 0;
 	if (commandLine[0] == TEXT('\"')) {
 		stopChar = TEXT('\"');
 		commandLine++;

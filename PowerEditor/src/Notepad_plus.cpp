@@ -1002,7 +1002,6 @@ void Notepad_plus::setFileOpenSaveDlgFilters(FileDialog & fDlg)
 
 	int i = 0;
 	Lang *l = NppParameters::getInstance()->getLangFromIndex(i++);
-	LangType curl = _pEditView->getCurrentBuffer()->getLangType();
 
 	while (l)
 	{
@@ -1044,7 +1043,7 @@ void Notepad_plus::setFileOpenSaveDlgFilters(FileDialog & fDlg)
 			const TCHAR *filters = stringFilters.c_str();
 			if (filters[0])
 			{
-				int nbExt = fDlg.setExtsFilter(getLangDesc(lid, true).c_str(), filters);
+				fDlg.setExtsFilter(getLangDesc(lid, true).c_str(), filters);
 			}
 		}
 		l = (NppParameters::getInstance())->getLangFromIndex(i++);
@@ -1244,7 +1243,7 @@ bool Notepad_plus::fileSaveAs(BufferID id, bool isSaveCopy)
     }
 }
 
-bool Notepad_plus::fileRename(BufferID id, int curView)
+bool Notepad_plus::fileRename(BufferID id)
 {
 	BufferID bufferID = id;
 	if (id == BUFFER_INVALID)
@@ -1267,7 +1266,7 @@ bool Notepad_plus::fileRename(BufferID id, int curView)
 }
 
 
-bool Notepad_plus::fileDelete(BufferID id, int curView)
+bool Notepad_plus::fileDelete(BufferID id)
 {
 	BufferID bufferID = id;
 	if (id == BUFFER_INVALID)
@@ -1689,7 +1688,6 @@ bool Notepad_plus::replaceInFiles()
 	_pEditView = &_invisibleEditView;
 	Document oldDoc = _invisibleEditView.execute(SCI_GETDOCPOINTER);
 	Buffer * oldBuf = _invisibleEditView.getCurrentBuffer();	//for manually setting the buffer, so notifications can be handled properly
-	Buffer * pBuf = NULL;
 	HANDLE CancelThreadHandle = NULL;
 
 	vector<generic_string> patterns2Match;
@@ -2927,7 +2925,6 @@ void Notepad_plus::addHotSpot(bool docIsModifing)
 				int isUnderline = _pEditView->execute(SCI_STYLEGETUNDERLINE, idStyle);
 				hotspotStyle._fontStyle = (isBold?FONTSTYLE_BOLD:0) | (isItalic?FONTSTYLE_ITALIC:0) | (isUnderline?FONTSTYLE_UNDERLINE:0);
 
-				int fontStyle = (isBold?FONTSTYLE_BOLD:0) | (isItalic?FONTSTYLE_ITALIC:0) | (isUnderline?FONTSTYLE_UNDERLINE:0);
 				int urlAction = (NppParameters::getInstance())->getNppGUI()._styleURL;
 				if (urlAction == 2)
 					hotspotStyle._fontStyle |= FONTSTYLE_UNDERLINE;
@@ -4260,8 +4257,6 @@ void Notepad_plus::command(int id)
             _aboutDlg.doDialog();
 			if (isFirstTime && _nativeLangA)
 			{
-				const char *lang = (_nativeLangA->ToElement())->Attribute("name");
-
 				if (_nativeLangEncoding == CP_BIG5)
 				{
 					char *authorName = "«J¤µ§^";
@@ -4829,7 +4824,6 @@ void Notepad_plus::activateDoc(int pos)
 
 void Notepad_plus::updateStatusBar()
 {
-	Buffer * buf = _pEditView->getCurrentBuffer();
     TCHAR strLnCol[64];
 	wsprintf(strLnCol, TEXT("Ln : %d    Col : %d    Sel : %d"),\
         (_pEditView->getCurrentLineNumber() + 1), \
@@ -9559,15 +9553,11 @@ bool Notepad_plus::str2Cliboard(const TCHAR *str2cpy)
 bool Notepad_plus::emergency(generic_string emergencySavedDir)
 {
 	bool filestatus = false;
-	bool dumpstatus = false;
-	do {
-		if (::CreateDirectory(emergencySavedDir.c_str(), NULL) == FALSE && ::GetLastError() != ERROR_ALREADY_EXISTS) {
-			break;
+	{
+		if (::CreateDirectory(emergencySavedDir.c_str(), NULL) == FALSE && ::GetLastError() == ERROR_ALREADY_EXISTS) {
+			filestatus = dumpFiles(emergencySavedDir.c_str(), TEXT("File"));
 		}
-
-		filestatus = dumpFiles(emergencySavedDir.c_str(), TEXT("File"));
-
-	} while (false);
+	}
 
 	bool status = filestatus;// && dumpstatus;
 	return status;

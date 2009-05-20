@@ -328,6 +328,41 @@ ScintillaKeyDefinition scintKeyDefs[] = {	//array of accelerator keys for all po
 	//{TEXT("SCI_STYLECLEARALL"),			SCI_STYLECLEARALL,			false, false, false, 0,			0},
 	//
 };
+
+static int strVal(const TCHAR *str, int base) {
+	if (!str) return -1;
+	if (!str[0]) return 0;
+
+	TCHAR *finStr;
+	int result = generic_strtol(str, &finStr, base);
+	if (*finStr != '\0')
+		return -1;
+	return result;
+};
+
+static int decStrVal(const TCHAR *str) {
+	return strVal(str, 10);
+};
+
+static int hexStrVal(const TCHAR *str) {
+	return strVal(str, 16);
+};
+
+static int getKwClassFromName(const TCHAR *str) {
+	if (!lstrcmp(TEXT("instre1"), str)) return LANG_INDEX_INSTR;
+	if (!lstrcmp(TEXT("instre2"), str)) return LANG_INDEX_INSTR2;
+	if (!lstrcmp(TEXT("type1"), str)) return LANG_INDEX_TYPE;
+	if (!lstrcmp(TEXT("type2"), str)) return LANG_INDEX_TYPE2;
+	if (!lstrcmp(TEXT("type3"), str)) return LANG_INDEX_TYPE3;
+	if (!lstrcmp(TEXT("type4"), str)) return LANG_INDEX_TYPE4;
+	if (!lstrcmp(TEXT("type5"), str)) return LANG_INDEX_TYPE5;
+
+	if ((str[1] == '\0') && (str[0] >= '0') && (str[0] <= '8')) // up to KEYWORDSET_MAX
+		return str[0] - '0';
+
+	return -1;
+};
+
 #ifdef UNICODE
 #include "localizationString.h"
 
@@ -336,7 +371,7 @@ wstring LocalizationSwitcher::getLangFromXmlFileName(wchar_t *fn) const
 	size_t nbItem = sizeof(localizationDefs)/sizeof(LocalizationSwitcher::LocalizationDefinition);
 	for (size_t i = 0 ; i < nbItem ; i++)
 	{
-		if (wcsicmp(fn, localizationDefs[i]._xmlFileName) == 0)
+		if (_wcsicmp(fn, localizationDefs[i]._xmlFileName) == 0)
 			return localizationDefs[i]._langName;
 	}
 	return TEXT("");
@@ -346,7 +381,7 @@ wstring LocalizationSwitcher::getXmlFilePathFromLangName(wchar_t *langName) cons
 {
 	for (size_t i = 0 ; i < _localizationList.size() ; i++)
 	{
-		if (wcsicmp(langName, _localizationList[i].first.c_str()) == 0)
+		if (_wcsicmp(langName, _localizationList[i].first.c_str()) == 0)
 			return _localizationList[i].second;
 	}
 	return TEXT("");
@@ -1634,13 +1669,13 @@ void NppParameters::getActions(TiXmlNode *node, Macro & macro)
 			continue;
 
 		int msg = 0;
-		const TCHAR *msgStr = (childNode->ToElement())->Attribute(TEXT("message"), &msg);
+		(childNode->ToElement())->Attribute(TEXT("message"), &msg);
 
 		int wParam = 0;
-		const TCHAR *wParamStr = (childNode->ToElement())->Attribute(TEXT("wParam"), &wParam);
+		(childNode->ToElement())->Attribute(TEXT("wParam"), &wParam);
 
 		int lParam = 0;
-		const TCHAR *lParamStr = (childNode->ToElement())->Attribute(TEXT("lParam"), &lParam);
+		(childNode->ToElement())->Attribute(TEXT("lParam"), &lParam);
 
 		const TCHAR *sParam = (childNode->ToElement())->Attribute(TEXT("sParam"));
 		if (!sParam)
@@ -2297,9 +2332,9 @@ void StyleArray::addStyler(int styleID, TiXmlNode *styleNode)
 	{
 		TiXmlElement *element = styleNode->ToElement();
 
-		// Pour _fgColor, _bgColor :
-		// RGB() | (result & 0xFF000000) c'est pour le cas de -1 (0xFFFFFFFF)
-		// retourné par hexStrVal(str)
+		// For _fgColor, _bgColor :
+		// RGB() | (result & 0xFF000000) It's the case for -1 (0xFFFFFFFF)
+		// returned by hexStrVal(str)
 		const TCHAR *str = element->Attribute(TEXT("name"));
 		if (str)
 		{
@@ -3533,7 +3568,6 @@ bool NppParameters::writeGUIParams()
 	bool maitainIndentExist = false;
 	bool MRUExist = false;
 	bool backExist = false;
-	bool saveOpenFileInSameDirExist = false;
 	bool URLExist = false;
 	bool globalOverrideExist = false;
 	bool autocExist = false;

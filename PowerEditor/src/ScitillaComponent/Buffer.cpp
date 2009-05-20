@@ -399,7 +399,6 @@ void FileManager::closeBuffer(BufferID id, ScintillaEditView * identifier) {
 	int index = getBufferIndexByID(id);
 	Buffer * buf = getBufferByIndex(index);
 
-	int oldRefs = buf->_references;
 	int refs = buf->removeReference(identifier);
 
 	if (!refs) {	//buffer can be deallocated
@@ -459,7 +458,7 @@ BufferID FileManager::loadFile(const TCHAR * filename, Document doc) {
 		buf->setUnicodeMode(encoding);
 
 		//determine buffer properties
-		BufferID retval = _nextBufferID++;
+		_nextBufferID++;
 		return id;
 	} else {	//failed loading, release document
 		if (ownDoc)
@@ -602,7 +601,7 @@ BufferID FileManager::newEmptyDocument()
 	newBuf->_id = id;
 	_buffers.push_back(newBuf);
 	_nrBufs++;
-	BufferID retval = _nextBufferID++;
+	_nextBufferID++;
 	return id;
 }
 
@@ -618,7 +617,7 @@ BufferID FileManager::bufferFromDocument(Document doc, bool dontIncrease, bool d
 	newBuf->_id = id;
 	_buffers.push_back(newBuf);
 	_nrBufs++;
-	BufferID retval = _nextBufferID;
+	_nextBufferID;
 	if (!dontIncrease)
 		_nextBufferID++;
 	return id;

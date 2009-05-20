@@ -1059,7 +1059,6 @@ BOOL CALLBACK SymbolsStyleDialog::run_dlgProc(UINT Message, WPARAM wParam, LPARA
 		default :
 			return SharedParametersDialog::run_dlgProc(Message, wParam, lParam);
 	}
-	return FALSE;
 }
 
 int SymbolsStyleDialog::getGroupeIndexFromCheck(int ctrlID, int & fontStyleMask) const

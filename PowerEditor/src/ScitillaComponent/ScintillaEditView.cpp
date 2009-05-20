@@ -108,6 +108,29 @@ LanguageName ScintillaEditView::langNames[L_EXTERNAL+1] = {
 {TEXT("ext"),			TEXT("External"),					TEXT("External"),												L_EXTERNAL,		SCLEX_NULL}
 };
 
+
+int getNbDigits(int aNum, int base)
+{
+	int nbChiffre = 1;
+	int diviseur = base;
+
+	for (;;)
+	{
+		int result = aNum / diviseur;
+		if (!result)
+			break;
+		else
+		{
+			diviseur *= base;
+			nbChiffre++;
+		}
+	}
+	if ((base == 16) && (nbChiffre % 2 != 0))
+		nbChiffre += 1;
+
+	return nbChiffre;
+};
+
 //const int MASK_RED   = 0xFF0000;
 //const int MASK_GREEN = 0x00FF00;
 //const int MASK_BLUE  = 0x0000FF;
@@ -1430,7 +1453,7 @@ void ScintillaEditView::activateBuffer(BufferID buffer)
 	int numLines = execute(SCI_GETLINECOUNT);
 
 	char numLineStr[32];
-	itoa(numLines, numLineStr, 10);
+	_itoa(numLines, numLineStr, 10);
 	int nbDigit = strlen(numLineStr);
 
 	runMarkers(true, 0, true, false);
@@ -2275,8 +2298,8 @@ void ScintillaEditView::columnReplace(ColumnModeInfo & cmi, int initial, int inc
 		base = 2;
 
 	int endNumber = initial + incr * (cmi.size() - 1);
-	int nbEnd = getNbChiffre(endNumber, base);
-	int nbInit = getNbChiffre(initial, base);
+	int nbEnd = getNbDigits(endNumber, base);
+	int nbInit = getNbDigits(initial, base);
 	int nb = max(nbInit, nbEnd);
 
 	const int stringSize = 512;

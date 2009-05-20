@@ -147,8 +147,6 @@ tTbData* DockingCont::createToolbar(tTbData data, Window **ppWin)
 
 void DockingCont::removeToolbar(tTbData TbData)
 {
-	INT			iItemCnt	= 0;
-
 	// remove from list
 	for (size_t iTb = 0; iTb < _vTbData.size(); iTb++)
 	{
@@ -479,7 +477,7 @@ void DockingCont::drawCaptionItem(DRAWITEMSTRUCT *pDrawItemStruct)
 			::FillRect(hDc, &rc, bgbrush);
 
 			// draw grid lines
-			HPEN	hOldPen = (HPEN)::SelectObject(hDc, hPen);
+			::SelectObject(hDc, hPen);
 
 			MoveToEx(hDc, rc.left , rc.top , NULL);
 			LineTo  (hDc, rc.right, rc.top );
@@ -522,7 +520,7 @@ void DockingCont::drawCaptionItem(DRAWITEMSTRUCT *pDrawItemStruct)
 			::FillRect(hDc, &rc, bgbrush);
 
 			// draw grid lines
-			HPEN	hOldPen = (HPEN)::SelectObject(hDc, hPen);
+			::SelectObject(hDc, hPen);
 
 			MoveToEx(hDc, rc.left , rc.top , NULL);
 			LineTo  (hDc, rc.right, rc.top );

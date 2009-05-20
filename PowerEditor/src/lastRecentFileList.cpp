@@ -176,7 +176,6 @@ void LastRecentFileList::saveLRFL() {
 
 
 int LastRecentFileList::find(const TCHAR *fn) {
-	int i = 0;
 	for(int i = 0; i < _size; i++) {
 		if (!lstrcmpi(_lrfl.at(i)._name.c_str(), fn)) {
 			return i;

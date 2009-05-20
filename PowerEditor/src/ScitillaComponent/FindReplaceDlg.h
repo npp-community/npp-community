@@ -374,7 +374,6 @@ public :
 	void beginNewFilesSearch()
 	{
 		_pFinder->beginNewFilesSearch();
-		bool isUnicode = (*_ppEditView)->getCurrentBuffer()->getUnicodeMode() != uni8Bit;
 		_pFinder->addSearchLine(getText2search().c_str());
 	}
 
@@ -549,30 +548,7 @@ public :
 	virtual void destroy();
 	virtual void display(bool toShow = true) const;
 
-	void setSearchText(const TCHAR * txt2find, bool isUTF8 = false) {
-		_doSearchFromBegin = false;
-#ifdef UNICODE
-		::SendDlgItemMessage(_hSelf, IDC_INCFINDTEXT, WM_SETTEXT, 0, (LPARAM)txt2find);
-#else
-		if (!isUTF8)
-		{
-			::SendDlgItemMessage(_hSelf, IDC_INCFINDTEXT, WM_SETTEXT, 0, (LPARAM)txt2find);
-			return;
-		}
-		const int wideBufferSize = 256;
-		WCHAR wchars[wideBufferSize];
-		::MultiByteToWideChar(CP_UTF8, 0, txt2find, -1, wchars, wideBufferSize);
-		winVer winVersion = NppParameters::getInstance()->getWinVersion();
-		if (winVersion <= WV_ME) {
-			//Cannot simply take txt2find since its UTF8
-			char ansiBuffer[wideBufferSize];	//Assuming no more than 2 bytes for each wchar (SBCS or DBCS, no UTF8 and sorts)
-			::WideCharToMultiByte(CP_ACP, 0, wchars, -1, ansiBuffer, wideBufferSize, NULL, NULL);
-			::SendDlgItemMessageA(_hSelf, IDC_INCFINDTEXT, WM_SETTEXT, 0, (LPARAM)ansiBuffer);
-		} else {
-			::SendDlgItemMessageW(_hSelf, IDC_INCFINDTEXT, WM_SETTEXT, 0, (LPARAM)wchars);
-		}
-#endif
-	}
+	void setSearchText(const TCHAR * txt2find, bool isUTF8 = false);
 
 	void addToRebar(ReBar * rebar);
 private :

@@ -156,8 +156,8 @@ public:
 	bool fileSave(BufferID id = BUFFER_INVALID);
 	bool fileSaveAll();
 	bool fileSaveAs(BufferID id = BUFFER_INVALID, bool isSaveCopy = false);
-	bool fileDelete(BufferID id = BUFFER_INVALID, int curView = -1);
-	bool fileRename(BufferID id = BUFFER_INVALID, int curView = -1);
+	bool fileDelete(BufferID id = BUFFER_INVALID);
+	bool fileRename(BufferID id = BUFFER_INVALID);
 
 	bool addBufferToView(BufferID id, int whichOne);
 	bool moveBuffer(BufferID id, int whereTo);	//assumes whereFrom is otherView(whereTo)
@@ -671,7 +671,6 @@ private:
 
 		::OpenClipboard(_hSelf);
 		HANDLE clipboardData = ::GetClipboardData(clipFormat);
-		int len = ::GlobalSize(clipboardData);
 		LPVOID clipboardDataPtr = ::GlobalLock(clipboardData);
 
 		generic_string clipboardStr = (const TCHAR *)clipboardDataPtr;

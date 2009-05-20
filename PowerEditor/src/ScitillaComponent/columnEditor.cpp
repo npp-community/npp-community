@@ -152,8 +152,8 @@ BOOL CALLBACK ColumnEditorDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM l
 
 							int nbLine = endLine - cursorLine + 1;
 							int endNumber = initialNumber + increaseNumber * (nbLine - 1);
-							int nbEnd = getNbChiffre(endNumber, base);
-							int nbInit = getNbChiffre(initialNumber, base);
+							int nbEnd = getNbDigits(endNumber, base);
+							int nbInit = getNbDigits(initialNumber, base);
 							int nb = max(nbInit, nbEnd);
 
 
@@ -227,7 +227,6 @@ BOOL CALLBACK ColumnEditorDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM l
 		default :
 			return FALSE;
 	}
-	return FALSE;
 }
 
 void ColumnEditorDlg::switchTo(bool toText)

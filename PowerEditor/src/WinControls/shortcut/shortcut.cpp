@@ -434,7 +434,6 @@ BOOL CALLBACK Shortcut::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
 		default :
 			return FALSE;
 	}
-	return FALSE;
 }
 
 // return true if one of CommandShortcuts is deleted. Otherwise false.
@@ -632,7 +631,6 @@ void ScintillaAccelerator::updateKeys()
 
 void ScintillaAccelerator::updateMenuItemByID(ScintillaKeyMap skm, int id)
 {
-	NppParameters *pNppParam = NppParameters::getInstance();
 	const int commandSize = 64;
 	TCHAR cmdName[commandSize];
 	::GetMenuString(_hAccelMenu, id, cmdName, commandSize, MF_BYCOMMAND);
@@ -708,7 +706,7 @@ BOOL CALLBACK ScintillaKeyMap::run_dlgProc(UINT Message, WPARAM wParam, LPARAM l
 		case WM_INITDIALOG :
 		{
 			::SetDlgItemText(_hSelf, IDC_NAME_EDIT, _name);
-			int textlen = (int)::SendDlgItemMessage(_hSelf, IDC_NAME_EDIT, WM_GETTEXTLENGTH, 0, 0);
+			::SendDlgItemMessage(_hSelf, IDC_NAME_EDIT, WM_GETTEXTLENGTH, 0, 0);
 			_keyCombo = _keyCombos[0];
 
 			for (size_t i = 0 ; i < nrKeys ; i++)
@@ -818,6 +816,4 @@ BOOL CALLBACK ScintillaKeyMap::run_dlgProc(UINT Message, WPARAM wParam, LPARAM l
 		default :
 			return FALSE;
 	}
-
-	return FALSE;
 }
