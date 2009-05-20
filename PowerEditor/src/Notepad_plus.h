@@ -836,6 +836,13 @@ private:
 		}
 		return false;
 	};
-};
+
+	void EnableMouseWheelZoom(bool enable)
+	{
+		_subEditView.execute(SCI_SETWHEELZOOMING, enable);
+		_mainEditView.execute(SCI_SETWHEELZOOMING, enable);
+		_invisibleEditView.execute(SCI_SETWHEELZOOMING, enable);
+		_fileEditView.execute(SCI_SETWHEELZOOMING, enable);
+	}};
 
 #endif //NOTEPAD_PLUS_H

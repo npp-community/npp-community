@@ -143,6 +143,8 @@ Editor::Editor() {
 	endAtLastLine = true;
 	caretSticky = false;
 
+	enableWheelZooming = true;
+
 	pixmapLine = Surface::Allocate();
 	pixmapSelMargin = Surface::Allocate();
 	pixmapSelPattern = Surface::Allocate();
@@ -7397,6 +7399,13 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case SCI_GETZOOM:
 		return vs.zoomLevel;
+
+	case SCI_GETWHEELZOOMING:
+		return enableWheelZooming;
+
+	case SCI_SETWHEELZOOMING:
+		enableWheelZooming = (wParam != 0);
+		break;
 
 	case SCI_GETEDGECOLUMN:
 		return theEdge;
