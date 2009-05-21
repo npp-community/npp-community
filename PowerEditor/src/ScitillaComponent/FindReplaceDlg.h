@@ -324,7 +324,7 @@ public :
 		if (txt2find && txt2find[0])
 		{
 			// We got a valid search string
-			::SendMessage(hCombo, CB_SETCURSEL, -1, 0); // remove selection - to allow using down arrow to get to last searched word
+			::SendMessage(hCombo, CB_SETCURSEL, (WPARAM)-1, 0); // remove selection - to allow using down arrow to get to last searched word
 			::SetDlgItemText(_hSelf, IDFINDWHAT, txt2find);
 		}
 		::SendMessage(hCombo, CB_SETEDITSEL, 0, MAKELPARAM(0, -1)); // select all text - fast edit

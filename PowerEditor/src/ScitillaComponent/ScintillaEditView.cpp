@@ -997,7 +997,7 @@ void ScintillaEditView::defineDocType(LangType typeDoc)
     }
 
     execute(SCI_STYLECLEARALL);
-	int oldBits = execute(SCI_GETSTYLEBITSNEEDED);
+	execute(SCI_GETSTYLEBITSNEEDED);
 
 	Style *pStyle;
 	Style defaultIndicatorStyle;
@@ -1102,10 +1102,9 @@ void ScintillaEditView::defineDocType(LangType typeDoc)
         pStyle = &(stylers.getStyler(iFind));
     }
 	setSpecialIndicator(*pStyle);
-    int caretWidth = 1;
 
-    // Il faut surtout faire un test ici avant d'exécuter SCI_SETCODEPAGE
-    // Sinon y'aura un soucis de performance!
+	// You must not do a test here before we execute SCI_SETCODEPAGE
+	// Or else, there might be a performance problem!
 	if (isCJK())
 	{
 		if (getCurrentBuffer()->getUnicodeMode() == uni8Bit)
@@ -1164,8 +1163,6 @@ void ScintillaEditView::defineDocType(LangType typeDoc)
         case L_NFO :
 		{
 			LexerStyler *pStyler = (_pParameter->getLStylerArray()).getLexerStylerByName(TEXT("nfo"));
-			COLORREF bg = black;
-			COLORREF fg = liteGrey;
 			Style nfoStyle;
 			nfoStyle._styleID = STYLE_DEFAULT;
 			nfoStyle._fontName = TEXT("MS LineDraw");
@@ -1454,7 +1451,6 @@ void ScintillaEditView::activateBuffer(BufferID buffer)
 
 	char numLineStr[32];
 	_itoa(numLines, numLineStr, 10);
-	int nbDigit = strlen(numLineStr);
 
 	runMarkers(true, 0, true, false);
     return;	//all done
@@ -1734,9 +1730,9 @@ int ScintillaEditView::replaceTarget(const TCHAR * str2replace, int fromTargetPo
 	WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
 	unsigned int cp = execute(SCI_GETCODEPAGE);
 	const char *str2replaceA = wmc->wchar2char(str2replace, cp);
-	return execute(SCI_REPLACETARGET, -1, (LPARAM)str2replaceA);
+	return execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)str2replaceA);
 #else
-	return execute(SCI_REPLACETARGET, -1, (LPARAM)str2replace);
+	return execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)str2replace);
 #endif
 }
 
@@ -1751,9 +1747,9 @@ int ScintillaEditView::replaceTargetRegExMode(const TCHAR * re, int fromTargetPo
 	WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
 	unsigned int cp = execute(SCI_GETCODEPAGE);
 	const char *reA = wmc->wchar2char(re, cp);
-	return execute(SCI_REPLACETARGETRE, -1, (LPARAM)reA);
+	return execute(SCI_REPLACETARGETRE, (WPARAM)-1, (LPARAM)reA);
 #else
-	return execute(SCI_REPLACETARGETRE, -1, (LPARAM)re);
+	return execute(SCI_REPLACETARGETRE, (WPARAM)-1, (LPARAM)re);
 #endif
 }
 
@@ -2082,7 +2078,7 @@ void ScintillaEditView::convertSelectedTextTo(bool Case)
 
            execute(SCI_SETTARGETSTART, start);
            execute(SCI_SETTARGETEND, end);
-           execute(SCI_REPLACETARGET, -1, (LPARAM)srcStr);
+           execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)srcStr);
        }
 
        delete [] srcStr;
@@ -2263,9 +2259,9 @@ void ScintillaEditView::columnReplace(ColumnModeInfo & cmi, const TCHAR *str)
 		WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
 		unsigned int cp = execute(SCI_GETCODEPAGE);
 		const char *strA = wmc->wchar2char(str, cp);
-		execute(SCI_REPLACETARGET, -1, (LPARAM)strA);
+		execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)strA);
 #else
-		execute(SCI_REPLACETARGET, -1, (LPARAM)str);
+		execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)str);
 #endif
 		totalDiff += diff;
 		cmi[i].second += diff;
@@ -2322,9 +2318,9 @@ void ScintillaEditView::columnReplace(ColumnModeInfo & cmi, int initial, int inc
 		WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
 		unsigned int cp = execute(SCI_GETCODEPAGE);
 		const char *strA = wmc->wchar2char(str, cp);
-		execute(SCI_REPLACETARGET, -1, (LPARAM)strA);
+		execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)strA);
 #else
-		execute(SCI_REPLACETARGET, -1, (LPARAM)str);
+		execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)str);
 #endif
 		initial += incr;
 		totalDiff += diff;

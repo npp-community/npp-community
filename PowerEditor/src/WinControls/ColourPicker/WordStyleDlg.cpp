@@ -361,6 +361,7 @@ BOOL CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPar
 					}
 
 					default:
+					{
 						switch (HIWORD(wParam))
 						{
 							case CBN_SELCHANGE : // == case LBN_SELCHANGE :
@@ -443,7 +444,7 @@ BOOL CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPar
 								return FALSE;
 							}
 						}
-						return TRUE;
+					}
 				}
 			}
 
@@ -451,7 +452,6 @@ BOOL CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPar
 		default :
 			return FALSE;
 	}
-	return FALSE;
 }
 
 void WordStyleDlg::loadLangListFromNppParam()

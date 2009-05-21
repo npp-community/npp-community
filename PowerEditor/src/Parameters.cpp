@@ -19,12 +19,13 @@
 #include "FileDialog.h"
 #include "ScintillaEditView.h"
 #include <shlobj.h>
+#include <tchar.h>
 
 #include "keys.h"
 
 struct WinMenuKeyDefinition {	//more or less matches accelerator table definition, easy copy/paste
 	//const TCHAR * name;	//name retrieved from menu?
-	int vKey;
+	UCHAR vKey;
 	int functionId;
 	bool isCtrl;
 	bool isAlt;
@@ -39,7 +40,7 @@ struct ScintillaKeyDefinition {
 	bool isCtrl;
 	bool isAlt;
 	bool isShift;
-	int vKey;
+	UCHAR vKey;
 	int redirFunctionId;	//this gets set  when a function is being redirected through Notepad++ if Scintilla doesnt do it properly :)
 };
 
@@ -413,7 +414,10 @@ bool LocalizationSwitcher::switchToLang(wchar_t *lang2switch) const
 
 generic_string ThemeSwitcher::getThemeFromXmlFileName(const TCHAR *xmlFullPath) const
 {
-	if (xmlFullPath == TEXT("")) return xmlFullPath;
+	if ( 0 == _tcscmp(xmlFullPath, TEXT("")))
+	{
+		return xmlFullPath;
+	}
 	TCHAR fn[MAX_PATH];
 	lstrcpy(fn, ::PathFindFileName(xmlFullPath));
 	PathRemoveExtension(fn);
@@ -435,7 +439,8 @@ winVer getWindowsVersion()
 
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 
-	if( !(bOsVersionInfoEx = GetVersionEx ((OSVERSIONINFO *) &osvi)) )
+	bOsVersionInfoEx = GetVersionEx ((OSVERSIONINFO *) &osvi);
+	if( !bOsVersionInfoEx )
 	{
 		osvi.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
 		if (! GetVersionEx ( (OSVERSIONINFO *) &osvi) )
@@ -1169,7 +1174,7 @@ void NppParameters::initScintillaKeys() {
 
 	//Warning! Matching function have to be consecutive
 	ScintillaKeyDefinition skd;
-	size_t prevIndex = -1;
+	int prevIndex = -1;
 	int prevID = -1;
 	for(int i = 0; i < nrCommands; i++) {
 		skd = scintKeyDefs[i];
@@ -1774,7 +1779,7 @@ void NppParameters::feedScintKeys(TiXmlNode *node)
 		for(size_t i = 0; i < len; i++)
 		{
 			ScintillaKeyMap & skmOrig = _scintillaKeyCommands[i];
-			if (skmOrig.getScintillaKeyID() == scintKey &&skmOrig.getMenuCmdID() == menuID)
+			if (skmOrig.getScintillaKeyID() == scintKey && skmOrig.getMenuCmdID() == menuID)
 			{
 				//Found matching command
 				_scintillaKeyCommands[i].clearDups();
@@ -1805,7 +1810,8 @@ void NppParameters::feedScintKeys(TiXmlNode *node)
 					str = (nextNode->ToElement())->Attribute(TEXT("Key"), &key);
 					if (!str)
 						continue;
-					kc._key = key;
+					assert(key >= 0 && key < 256);
+					kc._key = (UCHAR)key; // safe, since => assert(key >= 0 && key < 256)
 					_scintillaKeyCommands[i].addKeyCombo(kc);
 				}
 				break;
@@ -1842,7 +1848,8 @@ bool NppParameters::getShortcuts(TiXmlNode *node, Shortcut & sc)
 	if (!keyStr)
 		return false;
 
-	sc = Shortcut(name, isCtrl, isAlt, isShift, key);
+	assert(key >= 0 && key < 256);
+	sc = Shortcut(name, isCtrl, isAlt, isShift, (UCHAR)key);
 	return true;
 }
 
@@ -2934,8 +2941,8 @@ void NppParameters::feedGUIParameters(TiXmlNode *node)
 			if (fuckUp)
 				_nppGUI._appPos = oldRect;
 
-
-			if (val = element->Attribute(TEXT("isMaximized")))
+			val = element->Attribute(TEXT("isMaximized"));
+			if (val)
 			{
 				_nppGUI._isMaximized = (lstrcmp(val, TEXT("yes")) == 0);
 			}
@@ -2952,7 +2959,8 @@ void NppParameters::feedGUIParameters(TiXmlNode *node)
 			if (element->Attribute(TEXT("lang"), &i))
 				_nppGUI._newDocDefaultSettings._lang = (LangType)i;
 
-			if (val = element->Attribute(TEXT("openAnsiAsUTF8")))
+			val = element->Attribute(TEXT("openAnsiAsUTF8"));
+			if (val)
 				_nppGUI._newDocDefaultSettings._openAnsiAsUtf8 = (lstrcmp(val, TEXT("yes")) == 0);
 
 		}
@@ -3279,7 +3287,7 @@ void NppParameters::feedGUIParameters(TiXmlNode *node)
 		else if (!lstrcmp(nm, TEXT("stylerTheme")))
 		{
 			const TCHAR *themePath = element->Attribute(TEXT("path"));
-			if (themePath != NULL && themePath != TEXT(""))
+			if (themePath != NULL && (_tcscmp(themePath, TEXT("")) != 0))
 				_nppGUI._themeName.assign(themePath);
 		}
 	}
@@ -3480,8 +3488,8 @@ void NppParameters::feedDockingManager(TiXmlNode *node)
 			dlgElement->Attribute(TEXT("prev"), &prev);
 
 			bool isVisible = false;
-			const TCHAR *val = NULL;
-			if (val = dlgElement->Attribute(TEXT("isVisible")))
+			const TCHAR *val = dlgElement->Attribute(TEXT("isVisible"));
+			if (val)
 			{
 				isVisible = (lstrcmp(val, TEXT("yes")) == 0);
 			}
@@ -4558,8 +4566,6 @@ void NppParameters::writeStyles(LexerStylerArray & lexersStylers, StyleArray & g
 
 void NppParameters::writeStyle2Element(Style & style2Wite, Style & style2Sync, TiXmlElement *element)
 {
-    const TCHAR *styleName = element->Attribute(TEXT("name"));
-
     if (HIBYTE(HIWORD(style2Wite._fgColor)) != 0xFF)
     {
         int rgbVal = RGB2int(style2Wite._fgColor);

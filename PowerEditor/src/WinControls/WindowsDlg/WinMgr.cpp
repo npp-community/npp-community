@@ -60,7 +60,8 @@ void CWinMgr::GetWindowPositions(HWND hWnd)
 			HWND HChild = GetDlgItem(hWnd, wrc->GetID());
 			if (HChild) {
 				GetWindowRect(HChild, &wrc->GetRect());
-				::ScreenToClient(hWnd, &RectToPoint(wrc->GetRect()));
+				POINT pt(RectToPoint(wrc->GetRect()));
+				::ScreenToClient(hWnd, &pt);
 			}
 		}
 	}
@@ -117,7 +118,7 @@ int CWinMgr::CountWindows()
 //////////////////
 // Find the entry for a given control ID
 //
-WINRECT* CWinMgr::FindRect(UINT nID)
+WINRECT* CWinMgr::FindRect(INT nID)
 {
 	assert(m_map);
 	for (WINRECT* w=m_map; !w->IsEnd(); w++) {

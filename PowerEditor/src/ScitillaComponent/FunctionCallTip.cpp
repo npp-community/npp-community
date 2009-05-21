@@ -157,14 +157,14 @@ bool FunctionCallTip::getCursorFunction() {
 		}
 	}
 
-	size_t vsize = tokenVector.size();
+	int vsize = (int)tokenVector.size();
 	//mind nested funcs, like |blblb a (x, b(), c);|
 	//therefore, use stack
 	std::vector<FunctionValues> valueVec;
 
 	FunctionValues curValue, newValue;
 	int scopeLevel = 0;
-	for (size_t i = 0; i < vsize; i++) {
+	for (int i = 0; i < vsize; i++) {
 		Token & curToken = tokenVector.at(i);
 		if (curToken.isIdentifier) {
 			curValue.lastIdentifier = i;
@@ -342,8 +342,8 @@ void FunctionCallTip::showCalltip() {
 	if (hasDescr)
 		bytesNeeded += lstrlen(curDescriptionText);
 
-	size_t nrParams = params.size();
-	for(size_t i = 0; i < nrParams; i++) {
+	int nrParams = (int)params.size();
+	for(int i = 0; i < nrParams; i++) {
 		bytesNeeded += lstrlen(params.at(i)) + 2;	//'param, '
 	}
 
@@ -369,7 +369,7 @@ void FunctionCallTip::showCalltip() {
 
 	int highlightstart = 0;
 	int highlightend = 0;
-	for(size_t i = 0; i < nrParams; i++) {
+	for(int i = 0; i < nrParams; i++) {
 		if (i == _currentParam) {
 			highlightstart = lstrlen(textBuffer);
 			highlightend = highlightstart + lstrlen(params.at(i));

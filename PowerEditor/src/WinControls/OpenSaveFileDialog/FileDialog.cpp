@@ -24,7 +24,7 @@ static generic_string changeExt(generic_string fn, generic_string ext)
 
 	generic_string fnExt = fn;
 
-	int index = fnExt.find_last_of(TEXT("."));
+	size_t index = fnExt.find_last_of(TEXT("."));
 	generic_string extension = TEXT(".");
 	extension += ext;
 	if (index == generic_string::npos)
@@ -416,10 +416,9 @@ UINT_PTR CALLBACK FileDialog::OFNHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
 			return pFileDialog->run(hWnd, uMsg, wParam, lParam);
 		}
     }
-    return FALSE;
 }
 
-BOOL APIENTRY FileDialog::run(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+BOOL APIENTRY FileDialog::run(HWND hWnd, UINT uMsg, WPARAM /*wParam*/, LPARAM lParam)
 {
     switch (uMsg)
     {

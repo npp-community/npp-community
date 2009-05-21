@@ -109,11 +109,11 @@ protected:
 	// data
 	RECT  rc;				// current rectangle position/size
 	WORD  flags;			// flags (see above)
-	UINT	nID;				// window ID if this WINRECT represents a window
+	INT	nID;				// window ID if this WINRECT represents a window
 	LONG	param;			// arg depends on type
 
 public:
-	WINRECT(WORD f, UINT id, LONG p);
+	WINRECT(WORD f, INT id, LONG p);
 
 	static WINRECT* InitMap(WINRECT* map, WINRECT* parent=NULL);
 
@@ -125,8 +125,8 @@ public:
 	WORD SetFlags(WORD f)	{ return flags=f; }
 	LONG GetParam()			{ return param; }
 	LONG SetParam(LONG p)	{ return param=p; }
-	UINT GetID()				{ return nID; }
-	UINT SetID(UINT id)		{ return nID=id; }
+	INT GetID()				{ return nID; }
+	INT SetID(INT id)		{ return nID=id; }
 	RECT& GetRect()					{ return rc; }
 	void SetRect(const RECT& r)	{ rc = r; }
 	WORD Type() const			{ return flags & WRCF_TYPEMASK; }
@@ -271,7 +271,7 @@ public:
 	void SetRect(UINT nID, const RECT& rc) { FindRect(nID)->SetRect(rc); }
 
 	// get WINRECT corresponding to ID
-	WINRECT* FindRect(UINT nID);
+	WINRECT* FindRect(INT nID);
 
 	// Calculate MINMAXINFO
 	void GetMinMaxInfo(HWND hWnd, MINMAXINFO* lpMMI);

@@ -172,7 +172,7 @@ void ScreenRectToClientRect(HWND hWnd, RECT* rect)
 	rect->bottom = pt.y;
 };
 
-int filter(unsigned int code, struct _EXCEPTION_POINTERS *ep)
+int filter(unsigned int code)
 {
    if (code == EXCEPTION_ACCESS_VIOLATION)
       return EXCEPTION_EXECUTE_HANDLER;
@@ -421,7 +421,7 @@ TCHAR *BuildMenuFileName(TCHAR *buffer, int len, int pos, const TCHAR *filename)
 	if (pos < 9)
 	{
 		*itr++ = '&';
-		*itr++ = '1' + pos;
+		*itr++ = '1' + (TCHAR)pos;
 	}
 	else if (pos == 9)
 	{

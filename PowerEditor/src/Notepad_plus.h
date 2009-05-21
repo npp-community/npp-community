@@ -535,7 +535,7 @@ private:
 
 	void checkLangsMenu(int id) const ;
 
-    void setLanguage(int id, LangType langType);
+    void setLanguage(LangType langType);
 
 	enum LangType menuID2LangType(int cmdID);
 

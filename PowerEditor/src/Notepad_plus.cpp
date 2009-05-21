@@ -114,9 +114,11 @@ Notepad_plus::Notepad_plus(): Window(), _mainWindowStatus(0), _pDocTab(NULL), _p
 		_toolIcons =  toolIconsDocRoot->FirstChild(TEXT("NotepadPlus"));
 		if (_toolIcons)
 		{
-			if ((_toolIcons = _toolIcons->FirstChild(TEXT("ToolBarIcons"))))
+			_toolIcons = _toolIcons->FirstChild(TEXT("ToolBarIcons"));
+			if (_toolIcons)
 			{
-				if ((_toolIcons = _toolIcons->FirstChild(TEXT("Theme"))))
+				_toolIcons = _toolIcons->FirstChild(TEXT("Theme"));
+				if (_toolIcons)
 				{
 					const TCHAR *themeDir = (_toolIcons->ToElement())->Attribute(TEXT("pathPrefix"));
 
@@ -3203,8 +3205,8 @@ void Notepad_plus::command(int id)
 				//_subEditView.execute(SCI_ENDUNDOACTION);
 
 				//::SetCursor(originalCur);
-				_mainEditView.execute(SCI_SETCURSOR, (LPARAM)SC_CURSORNORMAL);
-				_subEditView.execute(SCI_SETCURSOR, (LPARAM)SC_CURSORNORMAL);
+				_mainEditView.execute(SCI_SETCURSOR, (WPARAM)SC_CURSORNORMAL);
+				_subEditView.execute(SCI_SETCURSOR, (WPARAM)SC_CURSORNORMAL);
 
 				_recordingMacro = false;
 				_runMacroDlg.initMacroList();
@@ -4410,7 +4412,7 @@ void Notepad_plus::command(int id)
 		case IDM_LANG_YAML :
 		case IDM_LANG_USER :
 		{
-            setLanguage(id, menuID2LangType(id));
+            setLanguage(menuID2LangType(id));
 		}
         break;
 
@@ -4501,7 +4503,7 @@ void Notepad_plus::command(int id)
 			}
 			else if ((id >= IDM_LANG_EXTERNAL) && (id <= IDM_LANG_EXTERNAL_LIMIT))
 			{
-				setLanguage(id, (LangType)(id - IDM_LANG_EXTERNAL + L_EXTERNAL));
+				setLanguage((LangType)(id - IDM_LANG_EXTERNAL + L_EXTERNAL));
 			}
 			else if ((id >= ID_MACRO) && (id < ID_MACRO_LIMIT))
 			{
@@ -4615,7 +4617,7 @@ void Notepad_plus::command(int id)
 
 }
 
-void Notepad_plus::setLanguage(int id, LangType langType) {
+void Notepad_plus::setLanguage(LangType langType) {
 	//Add logic to prevent changing a language when a document is shared between two views
 	//If so, release one document
 	bool reset = false;
@@ -5550,26 +5552,30 @@ void Notepad_plus::changeMenuLang(generic_string & pluginsTrans, generic_string 
 			::ModifyMenu(_mainMenuHandle, id, MF_BYPOSITION, 0, name);
 #endif
 		}
-		else if (idName = element->Attribute("idName"))
+		else
 		{
-			const char *name = element->Attribute("name");
-			if (!strcmp(idName, "Plugins"))
+			idName = element->Attribute("idName");
+			if (idName)
 			{
+				const char *name = element->Attribute("name");
+				if (!strcmp(idName, "Plugins"))
+				{
 #ifdef UNICODE
-				const wchar_t *nameW = wmc->char2wchar(name, _nativeLangEncoding);
-				pluginsTrans = nameW;
+					const wchar_t *nameW = wmc->char2wchar(name, _nativeLangEncoding);
+					pluginsTrans = nameW;
 #else
-				pluginsTrans = name;
+					pluginsTrans = name;
 #endif
-			}
-			else if (!strcmp(idName, "Window"))
-			{
+				}
+				else if (!strcmp(idName, "Window"))
+				{
 #ifdef UNICODE
-				const wchar_t *nameW = wmc->char2wchar(name, _nativeLangEncoding);
-				windowTrans = nameW;
+					const wchar_t *nameW = wmc->char2wchar(name, _nativeLangEncoding);
+					windowTrans = nameW;
 #else
-				windowTrans = name;
+					windowTrans = name;
 #endif
+				}
 			}
 		}
 	}
@@ -8171,7 +8177,8 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			mainVerStr[j] = '\0';
 			auxVerStr[k] = '\0';
 
-			int mainVer, auxVer = 0;
+			int mainVer = 0;
+			int auxVer = 0;
 			if (mainVerStr)
 				mainVer = generic_atoi(mainVerStr);
 			if (auxVerStr)
@@ -8217,7 +8224,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 				}
 
 				_pEditView->execute(SCI_BEGINUNDOACTION);
-				while (true)
+				for(;;)
 				{
 					for (Macro::iterator step = m.begin(); step != m.end(); step++)
 						step->PlayBack(this, _pEditView);

@@ -134,7 +134,7 @@ public:
 
 
 protected:
-	size_t _nbItem;
+	int  _nbItem;
 	bool _hasImgLst;
 	HFONT _hFont;
 	HFONT _hLargeFont;

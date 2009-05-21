@@ -1168,7 +1168,7 @@ void GetVisibleColumns(HWND hWnd,int SI)
      SetScrollRange(hWnd,SB_HORZ,1,value,TRUE);
     }
 
-int GetNthVisibleColumn(HWND hWnd,int SI,int n)
+int GetNthVisibleColumn(int SI,int n)
     {
      int j,count;
      int value;
@@ -2650,7 +2650,7 @@ LRESULT CALLBACK GridProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                                     NotifyEditBegin(hWnd,SelfIndex);
                                    }
                                BGHS[SelfIndex].EDITING = TRUE;
-                               tstring[0]=wParam;
+                               tstring[0]=(TCHAR)wParam; // safe since => if((wParam >= 32)&&(wParam <= 125))
                                tstring[1]=0x00;
                                DisplayEditString(hWnd,SelfIndex,tstring);
                                break;
@@ -2712,7 +2712,7 @@ LRESULT CALLBACK GridProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                        cp=GetScrollPos(hWnd,SB_HORZ);
                        SetScrollPos(hWnd,SB_HORZ,cp+1,TRUE);
                        cp=GetScrollPos(hWnd,SB_HORZ);
-                       np=GetNthVisibleColumn(hWnd,SelfIndex,cp);
+                       np=GetNthVisibleColumn(SelfIndex,cp);
                        BGHS[SelfIndex].homecol = np;
                        SetScrollPos(hWnd,SB_HORZ,cp,TRUE);
                        RefreshGrid(hWnd);
@@ -2723,7 +2723,7 @@ LRESULT CALLBACK GridProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                        cp=GetScrollPos(hWnd,SB_HORZ);
                        SetScrollPos(hWnd,SB_HORZ,cp-1,TRUE);
                        cp=GetScrollPos(hWnd,SB_HORZ);
-                       np=GetNthVisibleColumn(hWnd,SelfIndex,cp);
+                       np=GetNthVisibleColumn(SelfIndex,cp);
                        BGHS[SelfIndex].homecol = np;
                        SetScrollPos(hWnd,SB_HORZ,cp,TRUE);
                        RefreshGrid(hWnd);
@@ -2732,7 +2732,7 @@ LRESULT CALLBACK GridProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                       {
                        int cp,np;
                        cp=HIWORD(wParam);
-                       np=GetNthVisibleColumn(hWnd,SelfIndex,cp);
+                       np=GetNthVisibleColumn(SelfIndex,cp);
                        SetScrollPos(hWnd,SB_HORZ,np,TRUE);
                        BGHS[SelfIndex].homecol = np;
                        SetScrollPos(hWnd,SB_HORZ,cp,TRUE);
@@ -3108,7 +3108,7 @@ int AddGrid( UINT menuid)
      //if grid doesn't exist, add it.  otherwise return existing index + MAX_GRIDS
      //if trying to add more than MAX_GRIDS, return -1;
      int empty_space;
-     int returnvalue;
+     int returnvalue = -1;
      int j;
      BOOL MATCH;
      MATCH=FALSE;

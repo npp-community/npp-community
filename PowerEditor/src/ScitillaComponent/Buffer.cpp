@@ -110,8 +110,8 @@ void Buffer::setFileName(const TCHAR *fn, LangType defaultLang)
 		ext += 1;
 
 		// Define User Lang firstly
-		const TCHAR *langName = NULL;
-		if ((langName = pNppParamInst->getUserDefinedLangNameFromExt(ext)))
+		const TCHAR *langName = pNppParamInst->getUserDefinedLangNameFromExt(ext);
+		if (langName)
 		{
 			newLang = L_USER;
 			lstrcpy(_userLangExt, langName);
@@ -519,7 +519,7 @@ bool FileManager::saveBuffer(BufferID id, const TCHAR * filename, bool isCopy) {
 	Buffer * buffer = getBufferByID(id);
 	bool isHidden = false;
 	bool isSys = false;
-	DWORD attrib;
+	DWORD attrib = 0;
 
 	TCHAR fullpath[MAX_PATH];
 	::GetFullPathName(filename, MAX_PATH, fullpath, NULL);
@@ -661,7 +661,7 @@ bool FileManager::loadFileData(Document doc, const TCHAR * filename, Utf8_16_Rea
 			lenConvert = UnicodeConvertor->convert(data, lenFile);
 			_pscratchTilla->execute(SCI_APPENDTEXT, lenConvert, (LPARAM)(UnicodeConvertor->getNewBuf()));
 		} while (lenFile > 0);
-	} __except(filter(GetExceptionCode(), GetExceptionInformation())) {
+	} __except(filter(GetExceptionCode())) {
 		printStr(TEXT("File is too big to be opened by Notepad++"));
 		success = false;
 	}

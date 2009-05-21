@@ -71,7 +71,7 @@ public:
 			return _hSelf;
 	};
 
-	tTbData* createToolbar(tTbData data, Window **ppWin);
+	tTbData* createToolbar(tTbData data);
 	void	 removeToolbar(tTbData data);
 	tTbData* findToolbarByWnd(HWND hClient);
 	tTbData* findToolbarByName(TCHAR* pszName);
@@ -213,7 +213,7 @@ private:
 	WNDPROC					_hDefaultTabProc;
 
 	// for moving and reordering
-	UINT					_prevItem;
+	INT						_prevItem;
 	BOOL					_beginDrag;
 	HIMAGELIST				_hImageList;
 

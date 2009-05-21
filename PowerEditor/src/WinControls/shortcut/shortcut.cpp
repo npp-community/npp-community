@@ -243,7 +243,7 @@ int ScintillaKeyMap::addKeyCombo(KeyCombo combo) {	//returns index where key is 
 		_keyCombos[0] = combo;
 		return 0;
 	}
-	for(size_t i = 0; i < size; i++) {	//if already in the list do not add it
+	for(int i = 0; i < size; i++) {	//if already in the list do not add it
 		KeyCombo & kc = _keyCombos[i];
 		if (combo._key == kc._key && combo._isCtrl == kc._isCtrl && combo._isAlt == kc._isAlt && combo._isShift == kc._isShift)
 			return i;	//already in the list
@@ -278,7 +278,7 @@ void getKeyStrFromVal(UCHAR keyVal, generic_string & str)
 		str = TEXT("Unlisted");
 }
 
-void getNameStrFromCmd(DWORD cmd, generic_string & str)
+void getNameStrFromCmd(INT cmd, generic_string & str)
 {
 	if ((cmd >= ID_MACRO) && (cmd < ID_MACRO_LIMIT))
 	{
@@ -341,7 +341,7 @@ void getNameStrFromCmd(DWORD cmd, generic_string & str)
 	return;
 }
 
-BOOL CALLBACK Shortcut::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK Shortcut::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	switch (Message)
 	{
@@ -604,18 +604,18 @@ void ScintillaAccelerator::updateKeys()
 {
 	NppParameters *pNppParam = NppParameters::getInstance();
 	vector<ScintillaKeyMap> & map = pNppParam->getScintillaKeyList();
-	size_t mapSize = map.size();
-	size_t index;
+	int mapSize = (int)map.size();
+	int index;
 
 	for(int i = 0; i < _nrScintillas; i++)
 	{
 		::SendMessage(_vScintillas[i], SCI_CLEARALLCMDKEYS, 0, 0);
-		for(size_t j = mapSize - 1; j >= 0; j--) //reverse order, top of the list has highest priority
+		for(int j = mapSize - 1; j >= 0; j--) //reverse order, top of the list has highest priority
 		{
 			ScintillaKeyMap skm = map[j];
 			if (skm.isEnabled())
 			{		//no validating, scintilla accepts more keys
-				size_t size = skm.getSize();
+				int size = skm.getSize();
 				for(index = 0; index < size; index++)
 					::SendMessage(_vScintillas[i], SCI_ASSIGNCMDKEY, skm.toKeyDef(index), skm.getScintillaKeyID());
 			}
@@ -683,7 +683,7 @@ void ScintillaKeyMap::showCurrentSettings() {
 	::SendDlgItemMessage(_hSelf, IDC_CTRL_CHECK,	BM_SETCHECK, _keyCombo._isCtrl?BST_CHECKED:BST_UNCHECKED, 0);
 	::SendDlgItemMessage(_hSelf, IDC_ALT_CHECK,		BM_SETCHECK, _keyCombo._isAlt?BST_CHECKED:BST_UNCHECKED, 0);
 	::SendDlgItemMessage(_hSelf, IDC_SHIFT_CHECK,	BM_SETCHECK, _keyCombo._isShift?BST_CHECKED:BST_UNCHECKED, 0);
-	for (size_t i = 0 ; i < nrKeys ; i++)
+	for (int i = 0 ; i < nrKeys ; i++)
 	{
 		if (_keyCombo._key == namedKeyArray[i].id)
 		{
@@ -698,7 +698,7 @@ void ScintillaKeyMap::updateListItem(int index) {
 	::SendDlgItemMessage(_hSelf, IDC_LIST_KEYS, LB_DELETESTRING, index+1, 0);
 }
 
-BOOL CALLBACK ScintillaKeyMap::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK ScintillaKeyMap::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
 {
 
 	switch (Message)
@@ -709,12 +709,12 @@ BOOL CALLBACK ScintillaKeyMap::run_dlgProc(UINT Message, WPARAM wParam, LPARAM l
 			::SendDlgItemMessage(_hSelf, IDC_NAME_EDIT, WM_GETTEXTLENGTH, 0, 0);
 			_keyCombo = _keyCombos[0];
 
-			for (size_t i = 0 ; i < nrKeys ; i++)
+			for (int i = 0 ; i < nrKeys ; i++)
 			{
 				::SendDlgItemMessage(_hSelf, IDC_KEY_COMBO, CB_ADDSTRING, 0, (LPARAM)namedKeyArray[i].name);
 			}
 
-			for(size_t i = 0; i < size; i++) {
+			for(int i = 0; i < size; i++) {
 				::SendDlgItemMessage(_hSelf, IDC_LIST_KEYS, LB_ADDSTRING, 0, (LPARAM)toString(i).c_str());
 			}
 			::SendDlgItemMessage(_hSelf, IDC_LIST_KEYS, LB_SETCURSEL, 0, 0);
@@ -763,7 +763,7 @@ BOOL CALLBACK ScintillaKeyMap::run_dlgProc(UINT Message, WPARAM wParam, LPARAM l
 					int res = addKeyCombo(_keyCombo);
 					if (res > -1) {
 						if (res == oldsize) {
-							::SendDlgItemMessage(_hSelf, IDC_LIST_KEYS, LB_INSERTSTRING, -1, (LPARAM)toString(res).c_str());
+							::SendDlgItemMessage(_hSelf, IDC_LIST_KEYS, LB_INSERTSTRING, (WPARAM)-1, (LPARAM)toString(res).c_str());
 						}else {	//update current generic_string, can happen if it was disabled
 							updateListItem(res);
 						}

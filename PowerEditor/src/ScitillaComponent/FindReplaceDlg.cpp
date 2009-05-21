@@ -94,7 +94,7 @@ int Searching::convertExtendedToString(const TCHAR * query, TCHAR * result, int 
 bool Searching::readBase(const TCHAR * str, int * value, int base, int size) {
 	int i = 0, temp = 0;
 	*value = 0;
-	TCHAR max = '0' + base - 1;
+	TCHAR max = '0' + TCHAR(base - 1);
 	TCHAR current;
 	while(i < size) {
 		current = str[i];
@@ -149,15 +149,16 @@ void Searching::displaySectionCentered(int posStart, int posEnd, ScintillaEditVi
 
 LONG FindReplaceDlg::originalFinderProc = NULL;
 
-void FindReplaceDlg::addText2Combo(const TCHAR * txt2add, HWND hCombo, bool isUTF8)
+
+#ifdef UNICODE
+void FindReplaceDlg::addText2Combo(const TCHAR * txt2add, HWND hCombo, bool /*isUTF8*/)
 {
 	if (!hCombo) return;
 	if (!lstrcmp(txt2add, TEXT(""))) return;
 
 	int i = 0;
 
-#ifdef UNICODE
-	i = ::SendMessage(hCombo, CB_FINDSTRINGEXACT, -1, (LPARAM)txt2add);
+	i = ::SendMessage(hCombo, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)txt2add);
 	if (i != CB_ERR) // found
 	{
 		::SendMessage(hCombo, CB_DELETESTRING, i, 0);
@@ -165,7 +166,16 @@ void FindReplaceDlg::addText2Combo(const TCHAR * txt2add, HWND hCombo, bool isUT
 
 	i = ::SendMessage(hCombo, CB_INSERTSTRING, 0, (LPARAM)txt2add);
 
+	::SendMessage(hCombo, CB_SETCURSEL, i, 0);
+}
 #else
+void FindReplaceDlg::addText2Combo(const TCHAR * txt2add, HWND hCombo, bool isUTF8)
+{
+	if (!hCombo) return;
+	if (!lstrcmp(txt2add, TEXT(""))) return;
+
+	int i = 0;
+
 	TCHAR text[FINDREPLACE_MAXLENGTH];
 	bool isWin9x = _winVer <= WV_ME;
 	wchar_t wchars2Add[FINDREPLACE_MAXLENGTH];
@@ -218,16 +228,22 @@ void FindReplaceDlg::addText2Combo(const TCHAR * txt2add, HWND hCombo, bool isUT
 			i = ::SendMessageA(hCombo, CB_INSERTSTRING, 0, (LPARAM)text);
 		}
 	}
-#endif
 	::SendMessage(hCombo, CB_SETCURSEL, i, 0);
 }
+#endif
 
+
+#ifdef UNICODE
+generic_string FindReplaceDlg::getTextFromCombo(HWND hCombo, bool /*isUnicode*/) const
+{
+	TCHAR str[FINDREPLACE_MAXLENGTH];
+	::SendMessage(hCombo, WM_GETTEXT, FINDREPLACE_MAXLENGTH - 1, (LPARAM)str);
+	return generic_string(str);
+}
+#else
 generic_string FindReplaceDlg::getTextFromCombo(HWND hCombo, bool isUnicode) const
 {
 	TCHAR str[FINDREPLACE_MAXLENGTH];
-#ifdef UNICODE
-	::SendMessage(hCombo, WM_GETTEXT, FINDREPLACE_MAXLENGTH - 1, (LPARAM)str);
-#else
 	bool isWin9x = _winVer <= WV_ME;
 	if (isUnicode)
 	{
@@ -249,10 +265,9 @@ generic_string FindReplaceDlg::getTextFromCombo(HWND hCombo, bool isUnicode) con
 		::SendMessage(hCombo, WM_GETTEXT, FINDREPLACE_MAXLENGTH - 1, (LPARAM)str);
 	}
 
-#endif
 	return generic_string(str);
 }
-
+#endif
 
 // important : to activate all styles
 const int STYLING_MASK = 255;
@@ -400,7 +415,6 @@ void FindReplaceDlg::saveFindHistory()
 void FindReplaceDlg::saveComboHistory(int id, int maxcount, int & oldcount, generic_string **pStrings)
 {
 	int i, count;
-	bool isUnicode = false;
 	HWND hCombo;
 	TCHAR text[FINDREPLACE_MAXLENGTH];
 
@@ -536,7 +550,7 @@ void Finder::DeleteResult()
 	_MarkingsStruct._length = _pMainMarkings->size();
 
 	assert(_pMainFoundInfos->size() == _pMainMarkings->size());
-	assert(_scintView.execute(SCI_GETLINECOUNT) == _pMainFoundInfos->size() + 1);
+	assert(_scintView.execute(SCI_GETLINECOUNT) == (int)_pMainFoundInfos->size() + 1);
 }
 
 void Finder::gotoNextFoundResult(int direction)
@@ -1122,7 +1136,6 @@ bool FindReplaceDlg::processFindNext(const TCHAR *txt2find, FindOption *options)
 		endPosition = docLength;
 	}
 
-	bool isRegExp = pOptions->_searchType == FindRegex;
 	int flags = Searching::buildSearchFlags(pOptions);
 
 	(*_ppEditView)->execute(SCI_SETSEARCHFLAGS, flags);
@@ -1219,8 +1232,7 @@ bool FindReplaceDlg::processReplace(const TCHAR *txt2find, const TCHAR *txt2repl
 		{
 			//For the rare re exp case. ex: replace ^ by AAA
 			int start = int((*_ppEditView)->execute(SCI_GETTARGETSTART));
-			int end = int((*_ppEditView)->execute(SCI_GETTARGETEND));
-			int foundTextLen = (end >= start)?end - start:start - end;
+			(*_ppEditView)->execute(SCI_GETTARGETEND);
 
 			int replacedLen = (*_ppEditView)->replaceTargetRegExMode(pTextReplace);
 
@@ -1311,7 +1323,7 @@ int FindReplaceDlg::processAll(ProcessOperation op, const TCHAR *txt2find, const
 		endPosition = cr.cpMax;
 	}
 
-	if (ProcessMarkAllExt && colourStyleID != -1)
+	if (colourStyleID != -1)
 	{
 		startPosition = 0;
 		endPosition = docLength;
@@ -1895,7 +1907,7 @@ void FindIncrementDlg::display(bool toShow) const
 	_pRebar->setIDVisible(_rbBand.wID, toShow);
 }
 
-BOOL CALLBACK FindIncrementDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK FindIncrementDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	switch (message)
 	{
@@ -1941,7 +1953,7 @@ BOOL CALLBACK FindIncrementDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM 
 						if (!isFound)
 						{
 							CharacterRange range = (*(_pFRDlg->_ppEditView))->getSelection();
-							(*(_pFRDlg->_ppEditView))->execute(SCI_SETSEL, -1, range.cpMin);
+							(*(_pFRDlg->_ppEditView))->execute(SCI_SETSEL, (WPARAM)-1, range.cpMin);
 						}
 
 						bool isHiLieAll = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_INCFINDHILITEALL, BM_GETCHECK, 0, 0));
@@ -2004,7 +2016,6 @@ void FindIncrementDlg::markSelectedTextInc(bool enable, FindOption *opt)
 void FindIncrementDlg::addToRebar(ReBar * rebar) {
 	if(_pRebar)
 		return;
-	HWND hRebar = rebar->getHSelf();
 	_pRebar = rebar;
 	RECT client;
 	getClientRect(client);

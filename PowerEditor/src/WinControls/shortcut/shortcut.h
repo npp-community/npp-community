@@ -33,7 +33,7 @@ const size_t nameLenMax = 64;
 class NppParameters;
 
 void getKeyStrFromVal(UCHAR keyVal, generic_string & str);
-void getNameStrFromCmd(DWORD cmd, generic_string & str);
+void getNameStrFromCmd(INT cmd, generic_string & str);
 static int keyTranslate(int keyIn) {
 	switch (keyIn) {
 		case VK_DOWN:		return SCK_DOWN;
@@ -179,29 +179,29 @@ protected :
 class CommandShortcut : public Shortcut {
 public:
 	CommandShortcut(Shortcut sc, long id) :	Shortcut(sc), _id(id) {};
-	unsigned long getID() const {return _id;};
-	void setID(unsigned long id) { _id = id;};
+	long getID() const {return _id;};
+	void setID(long id) { _id = id;};
 
 private :
-	unsigned long _id;
+	long _id;
 };
 
 
 class ScintillaKeyMap : public Shortcut {
 public:
-	ScintillaKeyMap(Shortcut sc, unsigned long scintillaKeyID, unsigned long id): Shortcut(sc), _menuCmdID(id), _scintillaKeyID(scintillaKeyID) {
+	ScintillaKeyMap(Shortcut sc, long scintillaKeyID, unsigned long id): Shortcut(sc), _menuCmdID(id), _scintillaKeyID(scintillaKeyID) {
 		_keyCombos.clear();
 		_keyCombos.push_back(_keyCombo);
 		_keyCombo._key = 0;
 		size = 1;
 	};
-	unsigned long getScintillaKeyID() const {return _scintillaKeyID;};
+	long getScintillaKeyID() const {return _scintillaKeyID;}
 	int getMenuCmdID() const {return _menuCmdID;};
 	int toKeyDef(int index) const {
 		KeyCombo kc = _keyCombos[index];
 		int keymod = (kc._isCtrl?SCMOD_CTRL:0) | (kc._isAlt?SCMOD_ALT:0) | (kc._isShift?SCMOD_SHIFT:0);
 		return keyTranslate((int)kc._key) + (keymod << 16);
-	};
+	}
 
 	KeyCombo getKeyComboByIndex(int index) const;
 	void ScintillaKeyMap::setKeyComboByIndex(int index, KeyCombo combo);
@@ -210,7 +210,7 @@ public:
 		if (size > 1)
 			_keyCombos.erase(_keyCombos.begin()+1, _keyCombos.end());
 		size = 1;
-	};
+	}
 	int addKeyCombo(KeyCombo combo);
 	bool isEnabled() const;
 	size_t getSize() const;
@@ -220,14 +220,14 @@ public:
 
 	int doDialog() {
 		return ::DialogBoxParam(_hInst, MAKEINTRESOURCE(IDD_SHORTCUTSCINT_DLG), _hParent,  (DLGPROC)dlgProc, (LPARAM)this);
-    };
+    }
 
 	//only compares the internal KeyCombos, nothing else
 	friend inline const bool operator==(const ScintillaKeyMap & a, const ScintillaKeyMap & b) {
 		bool equal = a.size == b.size;
 		if (!equal)
 			return false;
-		size_t i = 0;
+		int i = 0;
 		while(equal && (i < a.size)) {
 			equal =
 				(a._keyCombos[i]._isCtrl	== b._keyCombos[i]._isCtrl) &&
@@ -244,10 +244,10 @@ public:
 	};
 
 private:
-	unsigned long _scintillaKeyID;
+	long _scintillaKeyID;
 	int _menuCmdID;
 	vector<KeyCombo> _keyCombos;
-	size_t size;
+	int size;
 	void applyToCurrentIndex();
 	void validateDialog();
 	void showCurrentSettings();
@@ -307,7 +307,7 @@ private:
 class PluginCmdShortcut : public CommandShortcut {
 //friend class NppParameters;
 public:
-	PluginCmdShortcut(Shortcut sc, int id, const TCHAR *moduleName, unsigned short internalID) :\
+	PluginCmdShortcut(Shortcut sc, int id, const TCHAR *moduleName, int internalID) :
 		CommandShortcut(sc, id), _id(id), _internalID(internalID) {
 		lstrcpy(_moduleName, moduleName);
 	};
@@ -320,10 +320,10 @@ public:
 	}
 	const TCHAR * getModuleName() const {return _moduleName;};
 	int getInternalID() const {return _internalID;};
-	unsigned long getID() const {return _id;};
+	long getID() const {return _id;};
 
 private :
-	unsigned long _id;
+	long _id;
 	TCHAR _moduleName[nameLenMax];
 	int _internalID;
 };

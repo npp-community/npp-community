@@ -38,8 +38,8 @@ struct NMWINDLG : public NMHDR {
 
 	BOOL processed;
 	WinDlgNotifyType type;
-	UINT curSel;
-	UINT nItems;
+	INT curSel;
+	INT nItems;
 	UINT *Items;
 
 	// ctor: initialize to zeroes

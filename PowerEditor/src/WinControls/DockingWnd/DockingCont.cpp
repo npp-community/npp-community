@@ -116,7 +116,7 @@ void DockingCont::doDialog(bool willBeShown, bool isFloating)
 }
 
 
-tTbData* DockingCont::createToolbar(tTbData data, Window **ppWin)
+tTbData* DockingCont::createToolbar(tTbData data)
 {
 	tTbData *pTbData = new tTbData;
 
@@ -1152,7 +1152,7 @@ INT DockingCont::hideToolbar(tTbData *pTbData, BOOL hideClient)
 	// delete item
 	if (TRUE == ::SendMessage(_hContTab, TCM_DELETEITEM, iItem, 0))
 	{
-		UINT	iItemCnt = ::SendMessage(_hContTab, TCM_GETITEMCOUNT, 0, 0);
+		LRESULT	iItemCnt = ::SendMessage(_hContTab, TCM_GETITEMCOUNT, 0, 0);
 
 		if (iItemCnt != 0)
 		{

@@ -43,7 +43,8 @@ bool ToolBar::init( HINSTANCE hInst, HWND hPere, toolBarStatusType type,
 	_pTBB = new TBBUTTON[_nrTotalButtons];	//add one for the extra separator
 
 	int cmd = 0;
-	int bmpIndex = -1, style;
+	int bmpIndex = -1;
+	BYTE style;
 	size_t i = 0;
 	for (; i < _nrButtons ; i++)
 	{
