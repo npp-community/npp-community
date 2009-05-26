@@ -56,13 +56,13 @@
 	#define NppMainEntry WinMain
 	#define generic_strtol strtol
 	#define generic_strncpy strncpy
-	#define generic_stricmp stricmp
+	#define generic_stricmp _stricmp
 	#define generic_strncmp strncmp
-	#define generic_strnicmp strnicmp
+	#define generic_strnicmp _strnicmp
 	#define generic_strncat strncat
 	#define generic_strchr strchr
 	#define generic_atoi atoi
-	#define generic_itoa itoa
+	#define generic_itoa _itoa
 	#define generic_atof atof
 	#define generic_strtok strtok
 	#define generic_strftime strftime
