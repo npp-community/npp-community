@@ -47,7 +47,7 @@
 	#define generic_strftime wcsftime
 	#define generic_fprintf fwprintf
 	#define generic_sscanf swscanf_s
-	#define generic_fopen _wfopen
+	#define generic_fopen(pFile, filename, mode) if(_wfopen_s(&pFile, filename, mode) != 0){pFile = NULL;}
 	#define generic_fgets fgetws
 	#define generic_stat _wstat
 	#define generic_string wstring
@@ -68,7 +68,7 @@
 	#define generic_strftime strftime
 	#define generic_fprintf fprintf
 	#define generic_sscanf sscanf_s
-	#define generic_fopen fopen
+	#define generic_fopen(pFile, filename, mode) if(fopen_s(&pFile, filename, mode) != 0){pFile = NULL;}
 	#define generic_fgets fgets
 	#define generic_stat _stat
 	#define generic_string string

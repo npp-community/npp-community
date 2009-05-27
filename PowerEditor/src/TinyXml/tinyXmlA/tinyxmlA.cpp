@@ -713,9 +713,9 @@ bool TiXmlDocumentA::LoadFile( const char* filename )
 	// Fixed with the StringToBuffer class.
 	value = filename;
 
-	FILE* file = fopen( value.c_str (), "r" );
+	FILE* file = NULL;
 
-	if ( file )
+	if ( fopen_s( &file, value.c_str (), "r" ) == 0 )
 	{
 		// Get the file size, so we can pre-allocate the string. HUGE speed impact.
 		long length = 0;
@@ -771,7 +771,8 @@ bool TiXmlDocumentA::LoadUnicodeFilePath( const TCHAR* filename )
 	// See STL_STRING_BUG above.
 	// Fixed with the StringToBuffer class.
 
-	FILE* file = generic_fopen(filename, TEXT("r"));
+	FILE* file = NULL;
+	generic_fopen(file, filename, TEXT("r"));
 
 	if ( file )
 	{
@@ -816,8 +817,8 @@ bool TiXmlDocumentA::LoadUnicodeFilePath( const TCHAR* filename )
 bool TiXmlDocumentA::SaveFile( const char * filename ) const
 {
 	// The old c stuff lives on...
-	FILE* fp = fopen( filename, "w" );
-	if ( fp )
+	FILE* fp = NULL;
+	if ( fopen_s( &fp, filename, "w" ) == 0 )
 	{
 		Print( fp, 0 );
 		fclose( fp );

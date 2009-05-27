@@ -627,7 +627,8 @@ bool FileManager::loadFileData(Document doc, const TCHAR * filename, Utf8_16_Rea
 {
 	const int blockSize = 128 * 1024;	//128 kB
 	char data[blockSize];
-	FILE *fp = generic_fopen(filename, TEXT("rb"));
+	FILE *fp = NULL;
+	generic_fopen(fp, filename, TEXT("rb"));
 	if (!fp)
 		return false;
 
@@ -697,7 +698,8 @@ BufferID FileManager::getBufferFromDocument(Document doc) {
 }
 
 bool FileManager::createEmptyFile(const TCHAR * path) {
-	FILE * file = generic_fopen(path, TEXT("wb"));
+	FILE * file = NULL;
+	generic_fopen(file, path, TEXT("wb"));
 	if (!file)
 		return false;
 	fclose(file);

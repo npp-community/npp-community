@@ -61,7 +61,8 @@ void printStr(const TCHAR *str2print)
 
 void writeLog(const TCHAR *logFileName, const char *log2write)
 {
-	FILE *f = generic_fopen(logFileName, TEXT("a+"));
+	FILE *f = NULL;
+	generic_fopen(f, logFileName, TEXT("a+"));
 	fwrite(log2write, sizeof(log2write[0]), strlen(log2write), f);
 	fputc('\n', f);
 	fflush(f);
