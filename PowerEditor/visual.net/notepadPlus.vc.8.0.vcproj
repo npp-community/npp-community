@@ -429,6 +429,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\MISC\Exception\MiniDumper.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\MISC\PluginsManager\PluginsManager.cpp"
 					>
 				</File>
@@ -719,6 +723,10 @@
 				</File>
 				<File
 					RelativePath="..\src\MISC\FileNameStringSplitter.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\MISC\Exception\MiniDumper.h"
 					>
 				</File>
 				<File
