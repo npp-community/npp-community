@@ -52,6 +52,7 @@
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile=""
 				WarningLevel="4"
+				WarnAsError="true"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				ForcedIncludeFiles="Common.h"
@@ -144,6 +145,7 @@
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
+				WarnAsError="true"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				ForcedIncludeFiles="Common.h"
@@ -159,7 +161,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/OPT:WIN98"
 				AdditionalDependencies="comctl32.lib shlwapi.lib shell32.lib Oleacc.lib"
 				ShowProgress="2"
 				OutputFile="../bin/notepad++A.exe"
@@ -234,6 +235,7 @@
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile=""
 				WarningLevel="4"
+				WarnAsError="true"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				ForcedIncludeFiles="Common.h"
@@ -327,6 +329,7 @@
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
+				WarnAsError="true"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				ForcedIncludeFiles="Common.h"
@@ -342,7 +345,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/OPT:WIN98"
 				AdditionalDependencies="unicows.lib comctl32.lib shlwapi.lib shell32.lib Oleacc.lib"
 				ShowProgress="2"
 				OutputFile="../bin/notepad++.exe"
