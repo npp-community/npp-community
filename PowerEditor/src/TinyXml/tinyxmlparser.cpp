@@ -171,18 +171,19 @@ const TCHAR* TiXmlBase::SkipWhiteSpace( const TCHAR* p )
 	{
 		if ( !in->good() ) return false;
 
-		int c = in->peek();
+		TCHAR c = (TCHAR)in->peek();
 		if ( !IsWhiteSpace( c ) )
 			return true;
-		*tag += in->get();
+		in->get(c);
+		*tag += c;
 	}
 }
 
-/*static*/ bool TiXmlBase::StreamTo( TIXML_ISTREAM * in, int character, TIXML_STRING * tag )
+/*static*/ bool TiXmlBase::StreamTo( TIXML_ISTREAM * in, TCHAR character, TIXML_STRING * tag )
 {
 	while ( in->good() )
 	{
-		int c = in->peek();
+		TCHAR c = (TCHAR)in->peek();
 		if ( c == character )
 			return true;
 
@@ -234,7 +235,7 @@ const TCHAR* TiXmlBase::GetEntity( const TCHAR* p, TCHAR* value )
 			int val;
 			if (generic_sscanf(p+3, TEXT("%x"), &val) == 1)
 			{
-				*value = val;
+				*value = (TCHAR)val;
 				return end + 1;
 			}
 		}
@@ -245,7 +246,7 @@ const TCHAR* TiXmlBase::GetEntity( const TCHAR* p, TCHAR* value )
 	{
 		if ( generic_strncmp( entity[i].str, p, entity[i].strLength ) == 0 )
 		{
-			assert( lstrlen( entity[i].str ) == entity[i].strLength );
+			assert( lstrlen( entity[i].str ) == (int)(entity[i].strLength) );
 			*value = entity[i].chr;
 			return ( p + entity[i].strLength );
 		}
@@ -629,7 +630,7 @@ void TiXmlElement::StreamIn (TIXML_ISTREAM * in, TIXML_STRING * tag)
 				if ( !in->good() )
 					return;
 
-				int c = in->peek();
+				TCHAR c = (TCHAR)in->peek();
 
 				if ( c == '>' )
 					break;
@@ -648,7 +649,8 @@ void TiXmlElement::StreamIn (TIXML_ISTREAM * in, TIXML_STRING * tag)
 			// If it was not, the streaming will be done by the tag.
 			if ( closingTag )
 			{
-				int c = in->get();
+				TCHAR c;
+				in->get(c);
 				assert( c == '>' );
 				*tag += c;
 
@@ -858,7 +860,8 @@ void TiXmlUnknown::StreamIn( TIXML_ISTREAM * in, TIXML_STRING * tag )
 {
 	while ( in->good() )
 	{
-		int c = in->get();
+		TCHAR c;
+		in->get(c);
 		(*tag) += c;
 
 		if ( c == '>' )
@@ -910,7 +913,8 @@ void TiXmlComment::StreamIn( TIXML_ISTREAM * in, TIXML_STRING * tag )
 {
 	while ( in->good() )
 	{
-		int c = in->get();
+		TCHAR c;
+		in->get(c);
 		(*tag) += c;
 
 		if ( c == '>'
@@ -1026,7 +1030,7 @@ void TiXmlText::StreamIn( TIXML_ISTREAM * in, TIXML_STRING * tag )
 {
 	while ( in->good() )
 	{
-		int c = in->peek();
+		TCHAR c = (TCHAR)in->peek();
 		if ( c == '<' )
 			return;
 
@@ -1059,7 +1063,8 @@ void TiXmlDeclaration::StreamIn( TIXML_ISTREAM * in, TIXML_STRING * tag )
 {
 	while ( in->good() )
 	{
-		int c = in->get();
+		TCHAR c;
+		in->get(c);
 		(*tag) += c;
 
 		if ( c == '>' )

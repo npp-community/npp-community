@@ -171,18 +171,19 @@ const char* TiXmlBaseA::SkipWhiteSpace( const char* p )
 	{
 		if ( !in->good() ) return false;
 
-		int c = in->peek();
+		char c = (char)in->peek();
 		if ( !IsWhiteSpace( c ) )
 			return true;
-		*tag += in->get();
+		in->get(c);
+		*tag += c;
 	}
 }
 
-/*static*/ bool TiXmlBaseA::StreamTo( TIXMLA_ISTREAM * in, int character, TIXMLA_STRING * tag )
+/*static*/ bool TiXmlBaseA::StreamTo( TIXMLA_ISTREAM * in, char character, TIXMLA_STRING * tag )
 {
 	while ( in->good() )
 	{
-		int c = in->peek();
+		char c = (char)in->peek();
 		if ( c == character )
 			return true;
 
@@ -238,7 +239,7 @@ const char* TiXmlBaseA::GetEntity( const char* p, char* value )
 		if ( *(p+4) == ';' )
 		{
 			// Short, one value entity.
-			if ( isalpha( *(p+3) ) ) *value += ( tolower( *(p+3) ) - 'a' + 10 );
+			if ( isalpha( *(p+3) ) ) *value += ( (char)tolower( *(p+3) ) - 'a' + 10 );
 			else				     *value += ( *(p+3) - '0' );
 
 			return p+5;
@@ -246,10 +247,10 @@ const char* TiXmlBaseA::GetEntity( const char* p, char* value )
 		else
 		{
 			// two value entity
-			if ( isalpha( *(p+3) ) ) *value += ( tolower( *(p+3) ) - 'a' + 10 ) * 16;
+			if ( isalpha( *(p+3) ) ) *value += ( (char)tolower( *(p+3) ) - 'a' + 10 ) * 16;
 			else				     *value += ( *(p+3) - '0' ) * 16;
 
-			if ( isalpha( *(p+4) ) ) *value += ( tolower( *(p+4) ) - 'a' + 10 );
+			if ( isalpha( *(p+4) ) ) *value += ( (char)tolower( *(p+4) ) - 'a' + 10 );
 			else				     *value += ( *(p+4) - '0' );
 
 			return p+6;
@@ -645,7 +646,7 @@ void TiXmlElementA::StreamIn (TIXMLA_ISTREAM * in, TIXMLA_STRING * tag)
 				if ( !in->good() )
 					return;
 
-				int c = in->peek();
+				char c = (char)in->peek();
 
 				if ( c == '>' )
 					break;
@@ -664,7 +665,8 @@ void TiXmlElementA::StreamIn (TIXMLA_ISTREAM * in, TIXMLA_STRING * tag)
 			// If it was not, the streaming will be done by the tag.
 			if ( closingTag )
 			{
-				int c = in->get();
+				char c;
+				in->get(c);
 				assert( c == '>' );
 				*tag += c;
 
@@ -874,7 +876,8 @@ void TiXmlUnknownA::StreamIn( TIXMLA_ISTREAM * in, TIXMLA_STRING * tag )
 {
 	while ( in->good() )
 	{
-		int c = in->get();
+		char c;
+		in->get(c);
 		(*tag) += c;
 
 		if ( c == '>' )
@@ -926,7 +929,8 @@ void TiXmlCommentA::StreamIn( TIXMLA_ISTREAM * in, TIXMLA_STRING * tag )
 {
 	while ( in->good() )
 	{
-		int c = in->get();
+		char c;
+		in->get(c);
 		(*tag) += c;
 
 		if ( c == '>'
@@ -1042,7 +1046,7 @@ void TiXmlTextA::StreamIn( TIXMLA_ISTREAM * in, TIXMLA_STRING * tag )
 {
 	while ( in->good() )
 	{
-		int c = in->peek();
+		char c = (char)in->peek();
 		if ( c == '<' )
 			return;
 
@@ -1075,7 +1079,8 @@ void TiXmlDeclarationA::StreamIn( TIXMLA_ISTREAM * in, TIXMLA_STRING * tag )
 {
 	while ( in->good() )
 	{
-		int c = in->get();
+		char c;
+		in->get(c);
 		(*tag) += c;
 
 		if ( c == '>' )

@@ -178,13 +178,13 @@ protected:
 	};
 
 	static const char*	SkipWhiteSpace( const char* );
-	inline static bool	IsWhiteSpace( int c )		{ return ( isspace( c ) || c == '\n' || c == '\r' ); }
+	inline static bool	IsWhiteSpace( char c )		{ return ( isspace( c ) || c == '\n' || c == '\r' ); }
 
 	virtual void StreamOut (TIXMLA_OSTREAM *) const = 0;
 
 	#ifdef TIXMLA_USE_STL
 	    static bool	StreamWhiteSpace( TIXMLA_ISTREAM * in, TIXMLA_STRING * tag );
-	    static bool StreamTo( TIXMLA_ISTREAM * in, int character, TIXMLA_STRING * tag );
+	    static bool StreamTo( TIXMLA_ISTREAM * in, char character, TIXMLA_STRING * tag );
 	#endif
 
 	/*	Reads an XML name into the string provided. Returns
