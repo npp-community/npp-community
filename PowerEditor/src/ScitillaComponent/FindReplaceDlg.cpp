@@ -1618,7 +1618,7 @@ void FindReplaceDlg::findAllIn(InWhat op)
 
 		// Send the address of _MarkingsStruct to the lexer
 		char ptrword[sizeof(void*)*2+1];
-		sprintf(ptrword, "%p", &_pFinder->_MarkingsStruct);
+		sprintf_s(ptrword, sizeof(void*)*2+1, "%p", &_pFinder->_MarkingsStruct);
 		_pFinder->_scintView.execute(SCI_SETKEYWORDS, 0, (LPARAM) ptrword);
 
 		// get the width of FindDlg

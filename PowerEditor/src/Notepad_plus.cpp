@@ -1172,10 +1172,10 @@ bool Notepad_plus::fileSave(BufferID id)
 				const int temBufLen = 32;
 				TCHAR tmpbuf[temBufLen];
 				time_t ltime = time(0);
-				struct tm *today;
+				struct tm today;
 
-				today = localtime(&ltime);
-				generic_strftime(tmpbuf, temBufLen, TEXT("%Y-%m-%d_%H%M%S"), today);
+				localtime_s(&today, &ltime);
+				generic_strftime(tmpbuf, temBufLen, TEXT("%Y-%m-%d_%H%M%S"), &today);
 
 				fn_dateTime_bak += TEXT(".");
 				fn_dateTime_bak += tmpbuf;
@@ -5287,8 +5287,8 @@ void Notepad_plus::docOpenInNewInstance(FileTransferMode mode, int x, int y)
 
 	command += TEXT(" \"$(FULL_CURRENT_PATH)\" -multiInst -nosession -x");
 	TCHAR pX[10], pY[10];
-	generic_itoa(x, pX, 10);
-	generic_itoa(y, pY, 10);
+	generic_itoa(x, pX, 10, 10);
+	generic_itoa(y, pY, 10, 10);
 
 	command += pX;
 	command += TEXT(" -y");
@@ -6262,108 +6262,111 @@ void Notepad_plus::changeFindReplaceDlgLang()
 	changeDlgLang(_findReplaceDlg.getHSelf(), "Find");
 }
 
+#define TITLE_BUF_LEN 128
 void Notepad_plus::changePrefereceDlgLang()
 {
+
+
 	changeDlgLang(_preference.getHSelf(), "Preference");
 
-	char titre[128];
+	char title[TITLE_BUF_LEN];
 
 #ifdef UNICODE
 	WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
 #endif
 
-	changeDlgLang(_preference._barsDlg.getHSelf(), "Global", titre);
-	if (*titre)
+	changeDlgLang(_preference._barsDlg.getHSelf(), "Global", title, TITLE_BUF_LEN);
+	if (*title)
 	{
 #ifdef UNICODE
-		const wchar_t *nameW = wmc->char2wchar(titre, _nativeLangEncoding);
+		const wchar_t *nameW = wmc->char2wchar(title, _nativeLangEncoding);
 		_preference._ctrlTab.renameTab(TEXT("Global"), nameW);
 #else
-		_preference._ctrlTab.renameTab("Global", titre);
+		_preference._ctrlTab.renameTab("Global", title);
 #endif
 	}
-	changeDlgLang(_preference._marginsDlg.getHSelf(), "Scintillas", titre);
-	if (*titre)
+	changeDlgLang(_preference._marginsDlg.getHSelf(), "Scintillas", title, TITLE_BUF_LEN);
+	if (*title)
 	{
 #ifdef UNICODE
-		const wchar_t *nameW = wmc->char2wchar(titre, _nativeLangEncoding);
+		const wchar_t *nameW = wmc->char2wchar(title, _nativeLangEncoding);
 		_preference._ctrlTab.renameTab(TEXT("Scintillas"), nameW);
 #else
-		_preference._ctrlTab.renameTab("Scintillas", titre);
+		_preference._ctrlTab.renameTab("Scintillas", title);
 #endif
 	}
 
-	changeDlgLang(_preference._defaultNewDocDlg.getHSelf(), "NewDoc", titre);
-	if (*titre)
+	changeDlgLang(_preference._defaultNewDocDlg.getHSelf(), "NewDoc", title, TITLE_BUF_LEN);
+	if (*title)
 	{
 #ifdef UNICODE
-		const wchar_t *nameW = wmc->char2wchar(titre, _nativeLangEncoding);
+		const wchar_t *nameW = wmc->char2wchar(title, _nativeLangEncoding);
 		_preference._ctrlTab.renameTab(TEXT("NewDoc"), nameW);
 #else
-		_preference._ctrlTab.renameTab("NewDoc", titre);
+		_preference._ctrlTab.renameTab("NewDoc", title);
 #endif
 	}
 
-	changeDlgLang(_preference._fileAssocDlg.getHSelf(), "FileAssoc", titre);
-	if (*titre)
+	changeDlgLang(_preference._fileAssocDlg.getHSelf(), "FileAssoc", title, TITLE_BUF_LEN);
+	if (*title)
 	{
 #ifdef UNICODE
-		const wchar_t *nameW = wmc->char2wchar(titre, _nativeLangEncoding);
+		const wchar_t *nameW = wmc->char2wchar(title, _nativeLangEncoding);
 		_preference._ctrlTab.renameTab(TEXT("FileAssoc"), nameW);
 #else
-		_preference._ctrlTab.renameTab("FileAssoc", titre);
+		_preference._ctrlTab.renameTab("FileAssoc", title);
 #endif
 	}
 
-	changeDlgLang(_preference._langMenuDlg.getHSelf(), "LangMenu", titre);
-	if (*titre)
+	changeDlgLang(_preference._langMenuDlg.getHSelf(), "LangMenu", title, TITLE_BUF_LEN);
+	if (*title)
 	{
 #ifdef UNICODE
-		const wchar_t *nameW = wmc->char2wchar(titre, _nativeLangEncoding);
+		const wchar_t *nameW = wmc->char2wchar(title, _nativeLangEncoding);
 		_preference._ctrlTab.renameTab(TEXT("LangMenu"), nameW);
 #else
-		_preference._ctrlTab.renameTab("LangMenu", titre);
+		_preference._ctrlTab.renameTab("LangMenu", title);
 #endif
 	}
 
-	changeDlgLang(_preference._printSettingsDlg.getHSelf(), "Print1", titre);
-	if (*titre)
+	changeDlgLang(_preference._printSettingsDlg.getHSelf(), "Print1", title, TITLE_BUF_LEN);
+	if (*title)
 	{
 #ifdef UNICODE
-		const wchar_t *nameW = wmc->char2wchar(titre, _nativeLangEncoding);
+		const wchar_t *nameW = wmc->char2wchar(title, _nativeLangEncoding);
 		_preference._ctrlTab.renameTab(TEXT("Print1"), nameW);
 #else
-		_preference._ctrlTab.renameTab("Print1", titre);
+		_preference._ctrlTab.renameTab("Print1", title);
 #endif
 	}
-	changeDlgLang(_preference._printSettings2Dlg.getHSelf(), "Print2", titre);
-	if (*titre)
+	changeDlgLang(_preference._printSettings2Dlg.getHSelf(), "Print2", title, TITLE_BUF_LEN);
+	if (*title)
 	{
 #ifdef UNICODE
-		const wchar_t *nameW = wmc->char2wchar(titre, _nativeLangEncoding);
+		const wchar_t *nameW = wmc->char2wchar(title, _nativeLangEncoding);
 		_preference._ctrlTab.renameTab(TEXT("Print2"), nameW);
 #else
-		_preference._ctrlTab.renameTab("Print2", titre);
+		_preference._ctrlTab.renameTab("Print2", title);
 #endif
 	}
-	changeDlgLang(_preference._settingsDlg.getHSelf(), "MISC", titre);
-	if (*titre)
+	changeDlgLang(_preference._settingsDlg.getHSelf(), "MISC", title, TITLE_BUF_LEN);
+	if (*title)
 	{
 #ifdef UNICODE
-		const wchar_t *nameW = wmc->char2wchar(titre, _nativeLangEncoding);
+		const wchar_t *nameW = wmc->char2wchar(title, _nativeLangEncoding);
 		_preference._ctrlTab.renameTab(TEXT("MISC"), nameW);
 #else
-		_preference._ctrlTab.renameTab("MISC", titre);
+		_preference._ctrlTab.renameTab("MISC", title);
 #endif
 	}
-	changeDlgLang(_preference._backupDlg.getHSelf(), "Backup", titre);
-	if (*titre)
+	changeDlgLang(_preference._backupDlg.getHSelf(), "Backup", title, TITLE_BUF_LEN);
+	if (*title)
 	{
 #ifdef UNICODE
-		const wchar_t *nameW = wmc->char2wchar(titre, _nativeLangEncoding);
+		const wchar_t *nameW = wmc->char2wchar(title, _nativeLangEncoding);
 		_preference._ctrlTab.renameTab(TEXT("Backup"), nameW);
 #else
-		_preference._ctrlTab.renameTab("Backup", titre);
+		_preference._ctrlTab.renameTab("Backup", title);
 #endif
 	}
 }
@@ -6495,9 +6498,9 @@ TiXmlNodeA * searchDlgNode(TiXmlNodeA *node, const char *dlgTagName)
 	return NULL;
 }
 
-bool Notepad_plus::changeDlgLang(HWND hDlg, const char *dlgTagName, char *title)
+bool Notepad_plus::changeDlgLang(HWND hDlg, const char *dlgTagName, char *title, int titleBufLen)
 {
-	if (title)
+	if (title && titleBufLen > 0)
 		title[0] = '\0';
 
 	if (!_nativeLangA) return false;
@@ -6513,17 +6516,17 @@ bool Notepad_plus::changeDlgLang(HWND hDlg, const char *dlgTagName, char *title)
 #endif
 
 	// Set Title
-	const char *titre = (dlgNode->ToElement())->Attribute("title");
-	if ((titre && titre[0]) && hDlg)
+	const char *titleAttrib = (dlgNode->ToElement())->Attribute("title");
+	if ((titleAttrib && titleAttrib[0]) && hDlg)
 	{
 #ifdef UNICODE
-		const wchar_t *nameW = wmc->char2wchar(titre, _nativeLangEncoding);
+		const wchar_t *nameW = wmc->char2wchar(titleAttrib, _nativeLangEncoding);
 		::SetWindowText(hDlg, nameW);
 #else
-		::SetWindowText(hDlg, titre);
+		::SetWindowText(hDlg, titleAttrib);
 #endif
 		if (title)
-			strcpy(title, titre);
+			strcpy_s(title, titleBufLen, titleAttrib);
 	}
 
 	// Set the text of child control

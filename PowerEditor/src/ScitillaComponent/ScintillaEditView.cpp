@@ -1450,7 +1450,7 @@ void ScintillaEditView::activateBuffer(BufferID buffer)
 	int numLines = execute(SCI_GETLINECOUNT);
 
 	char numLineStr[32];
-	_itoa(numLines, numLineStr, 10);
+	_itoa_s(numLines, numLineStr, 32, 10);
 
 	runMarkers(true, 0, true, false);
     return;	//all done
