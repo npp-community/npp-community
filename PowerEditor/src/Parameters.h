@@ -18,8 +18,6 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
-#include <string>
-#include <shlwapi.h>
 #include "tinyxmlA.h"
 #include "tinyxml.h"
 

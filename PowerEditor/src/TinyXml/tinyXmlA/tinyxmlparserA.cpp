@@ -21,9 +21,9 @@ must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any source
 distribution.
 */
+#include "precompiled_headers.h"
 
 #include "tinyxmlA.h"
-#include <ctype.h>
 
 //#define DEBUG_PARSER
 

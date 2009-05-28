@@ -32,8 +32,6 @@ distribution.
 
 #pragma warning( disable : 4514 )
 
-#include <assert.h>
-#include <windows.h>
 
 /*
    TiXmlString is an emulation of the std::generic_string template.

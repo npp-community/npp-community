@@ -24,7 +24,6 @@
 #define WM_MOUSEWHEEL 0x020A
 #endif //WM_MOUSEWHEEL
 
-#include <commctrl.h>
 
 class TaskList : public Window
 {

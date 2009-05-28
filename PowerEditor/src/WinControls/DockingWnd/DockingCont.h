@@ -22,10 +22,6 @@
 #include "StaticDialog.h"
 #include "Resource.h"
 #include "Docking.h"
-#include <windows.h>
-#include <string>
-#include <vector>
-#include <commctrl.h>
 
 using namespace std;
 

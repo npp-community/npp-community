@@ -1,3 +1,4 @@
+#include "precompiled_headers.h"
 #include "URLCtrl.h"
 
 static BYTE XORMask[128] =

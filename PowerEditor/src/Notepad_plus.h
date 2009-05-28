@@ -17,7 +17,6 @@
 
 #ifndef NOTEPAD_PLUS_H
 #define NOTEPAD_PLUS_H
-#include <window.h>
 #include "Window.h"
 #include "ScintillaEditView.h"
 #include "ToolBar.h"
@@ -36,7 +35,6 @@
 #include "GoToLineDlg.h"
 #include "columnEditor.h"
 #include "WordStyleDlg.h"
-//#include "constant.h"
 #include "trayIconControler.h"
 #include "ContextMenu.h"
 #include "PluginsManager.h"

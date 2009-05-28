@@ -5,7 +5,6 @@
 //Formatting Slightly modified for N++
 
 #include "windows.h"
-#include <exception>
 
 typedef const void* ExceptionAddress; // OK on Win32 platform
 

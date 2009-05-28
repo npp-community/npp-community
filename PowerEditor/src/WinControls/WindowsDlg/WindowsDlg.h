@@ -21,8 +21,6 @@
 #include "SizeableDlg.h"
 #include "WindowsDlgRc.h"
 #include "Parameters.h"
-#include <vector>
-#include <string>
 
 class DocTabView;
 

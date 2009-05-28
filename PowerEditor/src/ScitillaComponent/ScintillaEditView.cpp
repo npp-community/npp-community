@@ -16,8 +16,7 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-#include <windows.h>
-#include <ShellAPI.h>
+#include "precompiled_headers.h"
 #include "ScintillaEditView.h"
 #include "Parameters.h"
 

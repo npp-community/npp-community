@@ -1,4 +1,4 @@
-#include <windows.h>
+#include "precompiled_headers.h"
 #include "WindowsDlg.h"
 #include "WindowsDlgRc.h"
 

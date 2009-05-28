@@ -10,6 +10,7 @@ Add WM_MOUSEWHEEL, WM_LBUTTONDBLCLK and WM_RBUTTONUP events
 Modified by Don HO <don.h@free.fr>
 */
 
+#include "precompiled_headers.h"
 #include "babygrid.h"
 #include "Common.h"
 

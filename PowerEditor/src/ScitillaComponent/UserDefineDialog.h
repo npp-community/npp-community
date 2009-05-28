@@ -20,9 +20,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef USER_DEFINE_H
 #define USER_DEFINE_H
 
-#include <string>
-#include <shlwapi.h>
-
 #include "UserDefineResource.h"
 #include "ControlsTab.h"
 #include "ColourPicker.h"

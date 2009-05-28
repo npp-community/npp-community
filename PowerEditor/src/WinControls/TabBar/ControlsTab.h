@@ -22,8 +22,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "TabBar.h"
 #include "StaticDialog.h"
-//#include "SplitterContainer.h"
-#include <vector>
 
 struct DlgInfo {
     Window *_dlg;

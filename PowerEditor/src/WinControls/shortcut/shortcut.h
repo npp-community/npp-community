@@ -17,10 +17,6 @@
 #ifndef SHORTCUTS_H
 #define SHORTCUTS_H
 
-//#include "Parameters.h"
-#include <vector>
-#include <string>
-#include <windows.h>
 #include "shortcutRc.h"
 #include "StaticDialog.h"
 #include "Scintilla.h"

@@ -22,8 +22,6 @@
 #include "Window.h"
 #include "DockingCont.h"
 #include "DockingSplitter.h"
-#include <vector>
-#include <commctrl.h>
 #include "SplitterContainer.h"
 #include "dockingResource.h"
 #include "Parameters.h"

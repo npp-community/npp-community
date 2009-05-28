@@ -23,7 +23,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "StaticDialog.h"
 #include "dockingResource.h"
 #include "Docking.h"
-#include <shlwapi.h>
 
 
 class DockingDlgInterface : public StaticDialog

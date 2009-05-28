@@ -22,6 +22,7 @@ must not be misrepresented as being the original software.
 distribution.
 */
 
+#include "precompiled_headers.h"
 #include "tinyxmlA.h"
 
 // The goal of the seperate error file is to make the first

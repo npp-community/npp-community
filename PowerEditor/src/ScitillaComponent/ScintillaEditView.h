@@ -18,8 +18,6 @@
 #ifndef SCINTILLA_EDIT_VIEW_H
 #define SCINTILLA_EDIT_VIEW_H
 
-#include <vector>
-#include "Window.h"
 #include "Scintilla.h"
 #include "ScintillaRef.h"
 #include "SciLexer.h"

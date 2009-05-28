@@ -31,12 +31,6 @@ distribution.
 #pragma warning( disable : 4786 )
 #endif
 
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-#include <windows.h>
 #include "Common.h"
 
 // Help out windows:

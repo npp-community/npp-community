@@ -54,7 +54,7 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
-				ForcedIncludeFiles="Common.h"
+				ForcedIncludeFiles=""
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -69,7 +69,7 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="/fixed:no"
 				AdditionalDependencies="comctl32.lib shlwapi.lib shell32.lib Oleacc.lib"
-				ShowProgress="2"
+				ShowProgress="0"
 				OutputFile="../bin/notepad++DebugA.exe"
 				Version="1.0"
 				LinkIncremental="1"
@@ -146,7 +146,7 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
-				ForcedIncludeFiles="Common.h"
+				ForcedIncludeFiles=""
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -161,7 +161,7 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="/OPT:WIN98"
 				AdditionalDependencies="comctl32.lib shlwapi.lib shell32.lib Oleacc.lib"
-				ShowProgress="2"
+				ShowProgress="0"
 				OutputFile="../bin/notepad++A.exe"
 				Version="1.0"
 				LinkIncremental="1"
@@ -237,7 +237,7 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
-				ForcedIncludeFiles="Common.h"
+				ForcedIncludeFiles=""
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -251,7 +251,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="unicows.lib comctl32.lib shlwapi.lib shell32.lib"
-				ShowProgress="2"
+				ShowProgress="0"
 				OutputFile="../bin/notepad++Debug.exe"
 				Version="1.0"
 				LinkIncremental="1"
@@ -330,7 +330,7 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
-				ForcedIncludeFiles="Common.h"
+				ForcedIncludeFiles=""
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -345,7 +345,7 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="/OPT:WIN98"
 				AdditionalDependencies="unicows.lib comctl32.lib shlwapi.lib shell32.lib Oleacc.lib"
-				ShowProgress="2"
+				ShowProgress="0"
 				OutputFile="../bin/notepad++.exe"
 				Version="1.0"
 				LinkIncremental="1"
@@ -439,6 +439,10 @@
 				>
 				<File
 					RelativePath="..\src\MISC\Common\Common.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\MISC\Exception\MiniDumper.cpp"
 					>
 				</File>
 				<File
@@ -542,6 +546,10 @@
 					</File>
 					<File
 						RelativePath="..\src\TinyXml\tinyXmlA\tinyxmlerrorA.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\TinyXml\tinyXmlA\tinyxmlparserA.cpp"
 						>
 					</File>
 				</Filter>
@@ -684,10 +692,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc"
 			>
 			<File
-				RelativePath="..\src\constant.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\keys.h"
 				>
 			</File>
@@ -720,7 +724,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\targetver.h"
+				RelativePath="..\src\targetver.h"
 				>
 			</File>
 			<File
@@ -740,6 +744,10 @@
 				</File>
 				<File
 					RelativePath="..\src\MISC\FileNameStringSplitter.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\MISC\Exception\MiniDumper.h"
 					>
 				</File>
 				<File
@@ -857,10 +865,6 @@
 						RelativePath="..\src\TinyXml\tinyXmlA\tinyxmlA.h"
 						>
 					</File>
-					<File
-						RelativePath="..\src\TinyXml\tinyXmlA\tinyxmlparserA.cpp"
-						>
-					</File>
 				</Filter>
 			</Filter>
 			<Filter
@@ -884,10 +888,6 @@
 				</File>
 				<File
 					RelativePath="..\src\WinControls\ColourPicker\ColourPopup.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\WinControls\DockingWnd\common_func.h"
 					>
 				</File>
 				<File

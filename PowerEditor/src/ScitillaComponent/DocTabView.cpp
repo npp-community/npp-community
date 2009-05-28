@@ -18,12 +18,7 @@
 #include "precompiled_headers.h"
 #include "DocTabView.h"
 
-#ifndef _WIN32_IE
-#define _WIN32_IE	0x0600
-#endif //_WIN32_IE
 
-#include <commctrl.h>
-#include <shlwapi.h>
 
 bool DocTabView::_hideTabBarStatus = false;
 

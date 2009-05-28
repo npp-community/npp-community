@@ -18,7 +18,6 @@
 #ifndef PRINTER_H
 #define PRINTER_H
 
-#include <windows.h>
 #include "ScintillaEditView.h"
 #include "RunDlg.h"
 #include "Parameters.h"

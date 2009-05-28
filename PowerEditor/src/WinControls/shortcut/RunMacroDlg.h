@@ -20,8 +20,6 @@
 #ifndef RUN_MACRO_DLG_H
 #define RUN_MACRO_DLG_H
 
-#include <stdlib.h>
-
 #include "StaticDialog.h"
 #include "RunMacroDlg_rc.h"
 #include "Buffer.h"

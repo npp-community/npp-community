@@ -16,6 +16,7 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
+#include "precompiled_headers.h"
 #include "ControlsTab.h"
 /*
 void ControlsTab::init(HINSTANCE hInst, HWND hwnd, bool isVertical, WindowVector & winVector)

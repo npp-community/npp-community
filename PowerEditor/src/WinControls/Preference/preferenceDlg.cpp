@@ -15,7 +15,7 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#include <windows.h>
+#include "precompiled_headers.h"
 #include "preferenceDlg.h"
 
 const int BLINKRATE_FASTEST = 50;

@@ -20,10 +20,6 @@
 
 //#define _WIN32_WINNT  0x0600
 
-#include <shlwapi.h>
-#include <windows.h>
-#include <vector>
-#include <string>
 #include "Parameters.h"
 
 const int nbExtMax = 256;

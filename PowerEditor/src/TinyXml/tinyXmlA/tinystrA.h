@@ -32,7 +32,6 @@ distribution.
 
 #pragma warning( disable : 4514 )
 
-#include <assert.h>
 
 /*
    TiXmlStringA is an emulation of the std::string template.

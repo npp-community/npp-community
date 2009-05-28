@@ -16,11 +16,10 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
+#include "precompiled_headers.h"
 #include "DockingCont.h"
 #include "DockingManager.h"
 #include "Gripper.h"
-#include <Oleacc.h>
-#include <windows.h>
 
 
 BOOL DockingManager::_isRegistered = FALSE;

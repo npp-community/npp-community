@@ -17,10 +17,10 @@
 
 // created by Daniel Volk mordorpost@volkarts.com
 
+#include "precompiled_headers.h"
 #include "RunMacroDlg.h"
 #include "ScintillaEditView.h"
 #include "Notepad_plus_msgs.h"
-//#include "constant.h"
 
 
 BOOL CALLBACK RunMacroDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)

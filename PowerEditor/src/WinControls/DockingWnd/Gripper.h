@@ -22,7 +22,6 @@
 #include "Docking.h"
 #include "DockingCont.h"
 #include "DockingManager.h"
-#include "commctrl.h"
 
 
 // Used by getRectAndStyle() to draw the drag rectangle

@@ -1,10 +1,7 @@
-#include <windows.h>
+#include "precompiled_headers.h"
 #include "WindowsDlg.h"
 #include "WindowsDlgRc.h"
 #include "DocTabView.h"
-#include <algorithm>
-#include <functional>
-#include <vector>
 
 #ifndef _countof
 #define _countof(x) (sizeof(x)/sizeof((x)[0]))

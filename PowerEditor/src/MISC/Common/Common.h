@@ -18,16 +18,6 @@
 #ifndef M30_IDE_COMMUN_H
 #define M30_IDE_COMMUN_H
 
-#include <windows.h>
-#include <string>
-#include <vector>
-#include <time.h>
-#include <Shlobj.h>
-
-#ifdef UNICODE
-#include <wchar.h>
-#endif
-
 #define CP_ANSI_LATIN_1 1252
 #define CP_BIG5 950
 
