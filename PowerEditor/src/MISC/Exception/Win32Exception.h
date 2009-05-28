@@ -4,8 +4,6 @@
 //By Bennett
 //Formatting Slightly modified for N++
 
-#include "windows.h"
-
 typedef const void* ExceptionAddress; // OK on Win32 platform
 
 class Win32Exception : public std::exception
