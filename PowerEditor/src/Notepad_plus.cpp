@@ -20,7 +20,8 @@
 
 //#define INCLUDE_DEPRECATED_FEATURES 1
 
-#include <shlwapi.h>
+#include "precompiled_headers.h"
+
 //#include "dbghelp.h"
 
 #include "Notepad_plus.h"
@@ -35,7 +36,6 @@
 #include "ShortcutMapper.h"
 #include "preferenceDlg.h"
 #include "TaskListDlg.h"
-#include <algorithm>
 #include "xmlMatchedTagsHighlighter.h"
 
 const TCHAR Notepad_plus::_className[32] = TEXT("Notepad++");

@@ -4,6 +4,7 @@
 //By Bennett
 //Formatting Slightly modified for N++
 
+#include "precompiled_headers.h"
 #include "Win32Exception.h"
 #include "eh.h"
 

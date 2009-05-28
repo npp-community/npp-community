@@ -1,8 +1,6 @@
+#include "precompiled_headers.h"
 #include "Buffer.h"
 
-#include <shlwapi.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include "Scintilla.h"
 #include "Parameters.h"
 

@@ -16,9 +16,7 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 //#include "Common.h"	//use force include
-#include <shlwapi.h>
-#include <memory>
-#include <algorithm>
+#include "precompiled_headers.h"
 #include "Common.h"
 
 

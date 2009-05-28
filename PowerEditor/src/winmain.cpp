@@ -15,11 +15,12 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+#include "precompiled_headers.h"
+
 #include "Common.h"
 #include "Notepad_plus.h"
 #include "Process.h"
 
-#include <exception>		//default C++ exception
 #include "Win32Exception.h"	//Win32 exception
 #include "MiniDumper.h"			//Write dump files
 
