@@ -313,6 +313,7 @@ LRESULT TabBarPlus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPara
                 POINT point;
 			    point.x = LOWORD(lParam);
 			    point.y = HIWORD(lParam);
+				::ClientToScreen(hwnd, &point);
 			    if(::DragDetect(hwnd, point))
 			    {
 				    // Yes, we're beginning to drag, so capture the mouse...
