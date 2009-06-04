@@ -379,6 +379,7 @@ private:
 	} _scintillaCtrls4Plugins;
 
 	vector<pair<int, int> > _hideLinesMarks;
+	StyleArray _hotspotStyles;
 
 	static LRESULT CALLBACK Notepad_plus_Proc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 	LRESULT runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
@@ -840,6 +841,7 @@ private:
 		_mainEditView.execute(SCI_SETWHEELZOOMING, enable);
 		_invisibleEditView.execute(SCI_SETWHEELZOOMING, enable);
 		_fileEditView.execute(SCI_SETWHEELZOOMING, enable);
-	}};
+	}
+};
 
 #endif //NOTEPAD_PLUS_H
