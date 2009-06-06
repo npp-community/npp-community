@@ -145,6 +145,11 @@ public:
 		{
 			delete it->second;
 		}
+
+		for (BufferHotspotOriginMap::iterator it(_hotspotOrigins.begin()); it != _hotspotOrigins.end(); ++it )
+		{
+			delete it->second;
+		}
 	};
 	virtual void destroy()
 	{
@@ -596,6 +601,12 @@ protected:
 	typedef std::map<int, Style> StyleMap;
 	typedef std::map<BufferID, StyleMap*> BufferStyleMap;
 	BufferStyleMap _hotspotStyles;
+	StyleMap* _currentHotspotStyleMap;
+
+	typedef std::map<int, int> HotspotOriginMap;
+	typedef std::map<BufferID, HotspotOriginMap*> BufferHotspotOriginMap;
+	BufferHotspotOriginMap _hotspotOrigins;
+	HotspotOriginMap* _currentHotspotOriginMap;
 
 //Lexers and Styling
 	void defineDocType(LangType typeDoc);	//setup stylers for active document
@@ -604,7 +615,11 @@ protected:
 	void setKeywords(LangType langType, const char *keywords, int index);
 	void setLexer(int lexerID, LangType langType, int whichList);
 	inline void makeStyle(LangType langType, const TCHAR **keywordArray = NULL);
-	void setHotspotStyle(Style& styleToSet);
+	void updateHotspotMaps();
+	bool IsHotspotStyleID(int styleID) const;
+	bool getHotSpotFromStyle(Style& out_hotspot, int idStyleFrom) const;
+	void createHotSpotFromStyle(Style& out_hotspot, int idStyleFrom) const;
+	void setHotspotStyle(Style& styleToSet, int originalStyleId);
 	void setStyle(Style styleToSet);			//NOT by reference	(style edited)
 	void setSpecialStyle(const Style& styleToSet);	//by reference
 	void setSpecialIndicator(const Style& styleToSet) {
@@ -813,6 +828,10 @@ protected:
 	};
 
 	bool expandWordSelection();
+
+private:
+
+	void reapplyHotspotStyles();
 };
 
 #endif //SCINTILLA_EDIT_VIEW_H

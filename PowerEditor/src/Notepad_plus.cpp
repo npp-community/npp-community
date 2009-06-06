@@ -2889,14 +2889,21 @@ void Notepad_plus::addHotSpot(bool docIsModifing)
 		else
 		{
 			int fs = -1;
-			for (size_t i = 0 ; i < hotspotStylers.size() ; i++)
+			if (_pEditView->IsHotspotStyleID(idStyle))
 			{
-				if (hotspotStylers[i].second == idStyle)
+				fs = idStyle;
+			}
+			else
+			{
+				for (size_t i = 0 ; i < hotspotStylers.size() ; i++)
 				{
-					fs = hotspotStylers[i].first;
+					if (hotspotStylers[i].second == idStyle)
+					{
+						fs = hotspotStylers[i].first;
 						break;
 					}
 				}
+			}
 
 			if (fs != -1)
 			{
@@ -2906,34 +2913,18 @@ void Notepad_plus::addHotSpot(bool docIsModifing)
 			}
 			else
 			{
-				pair<int, int> p(style_hotspot, idStyle);
-				hotspotStylers.push_back(p);
-				int activeFG = 0xFF0000;
+				pair<int, int> MyPair(style_hotspot, idStyle);
+				hotspotStylers.push_back(MyPair);
 
-				//TCHAR fontName[256];
 				Style hotspotStyle;
 
-				hotspotStyle._styleID = style_hotspot;
-				//_pEditView->execute(SCI_STYLEGETFONT, idStyle, (LPARAM)fontName);
-				hotspotStyle._fgColor = _pEditView->execute(SCI_STYLEGETFORE, idStyle);
-				hotspotStyle._bgColor = _pEditView->execute(SCI_STYLEGETBACK, idStyle);
-				hotspotStyle._fontSize = _pEditView->execute(SCI_STYLEGETSIZE, idStyle);
+				if (_pEditView->getHotSpotFromStyle(hotspotStyle, idStyle) == false)
+				{
+					hotspotStyle._styleID = style_hotspot;
+					_pEditView->createHotSpotFromStyle(hotspotStyle, idStyle);
+					_pEditView->setHotspotStyle(hotspotStyle, idStyle);
+				}
 
-				int isBold = _pEditView->execute(SCI_STYLEGETBOLD, idStyle);
-				int isItalic = _pEditView->execute(SCI_STYLEGETITALIC, idStyle);
-				int isUnderline = _pEditView->execute(SCI_STYLEGETUNDERLINE, idStyle);
-				hotspotStyle._fontStyle = (isBold?FONTSTYLE_BOLD:0) | (isItalic?FONTSTYLE_ITALIC:0) | (isUnderline?FONTSTYLE_UNDERLINE:0);
-
-				int urlAction = (NppParameters::getInstance())->getNppGUI()._styleURL;
-				if (urlAction == 2)
-					hotspotStyle._fontStyle |= FONTSTYLE_UNDERLINE;
-
-				_pEditView->setHotspotStyle(hotspotStyle);
-
-				_pEditView->execute(SCI_STYLESETHOTSPOT, style_hotspot, TRUE);
-				_pEditView->execute(SCI_SETHOTSPOTACTIVEFORE, TRUE, activeFG);
-				//_pEditView->execute(SCI_SETHOTSPOTACTIVEBACK, TRUE, activeBG);
-				_pEditView->execute(SCI_SETHOTSPOTSINGLELINE, style_hotspot, 0);
 				_pEditView->execute(SCI_STARTSTYLING, start, 0x1F);
 				_pEditView->execute(SCI_SETSTYLING, foundTextLen, style_hotspot);
 				if (style_hotspot > 1)
@@ -2943,7 +2934,6 @@ void Notepad_plus::addHotSpot(bool docIsModifing)
 
 		_pEditView->execute(SCI_SETTARGETSTART, posFound + foundTextLen);
 		_pEditView->execute(SCI_SETTARGETEND, endPos);
-
 
 		posFound = _pEditView->execute(SCI_SEARCHINTARGET, strlen(urlHttpRegExpr), (LPARAM)urlHttpRegExpr);
 	}
