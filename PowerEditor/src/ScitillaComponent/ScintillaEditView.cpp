@@ -2621,11 +2621,24 @@ void ScintillaEditView::createHotSpotFromStyle(Style& out_hotspot, int idStyleFr
 		out_hotspot._fontStyle |= FONTSTYLE_UNDERLINE;
 
 	int style_hotspot = out_hotspot._styleID;
+
+	StyleArray& stylers = NppParameters::getInstance()->getMiscStylerArray();
 	int activeFG = 0xFF0000;
+	int activeBG = 0;
+	int hotspotStyleIdx = stylers.getStylerIndexByName(TEXT("Hot spot"));
+	if (hotspotStyleIdx >= 0)
+	{
+		Style& style = stylers.getStyler(hotspotStyleIdx);
+		activeFG = style._fgColor;
+		activeBG = style._bgColor;
+	}
 
 	execute(SCI_STYLESETHOTSPOT, style_hotspot, TRUE);
 	execute(SCI_SETHOTSPOTACTIVEFORE, TRUE, activeFG);
-	//execute(SCI_SETHOTSPOTACTIVEBACK, TRUE, activeBG);
+	if (hotspotStyleIdx >= 0)
+	{
+		execute(SCI_SETHOTSPOTACTIVEBACK, TRUE, activeBG);
+	}
 	execute(SCI_SETHOTSPOTSINGLELINE, style_hotspot, 0);
 
 }
