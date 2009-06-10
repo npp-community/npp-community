@@ -675,8 +675,10 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_GETCHARACTERPOINTER 2520
 #define SCI_SETKEYSUNICODE 2521
 #define SCI_GETKEYSUNICODE 2522
+// NPPSTART Joce 06/10/09 DisableMouseWheelZoom
 #define SCI_GETWHEELZOOMING 2523
 #define SCI_SETWHEELZOOMING 2524
+// NPPEND
 #define SCI_STARTRECORD 3001
 #define SCI_STOPRECORD 3002
 #define SCI_SETLEXER 4001
