@@ -5,11 +5,14 @@
 // Copyright 1998-2001 by Andre Arpin <arpin@kingston.net>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdarg.h>
-#include <stdio.h>
+// NPPSTART Joce 06/09/09 Scintilla_precomp_headers
+#include "precompiled_headers.h"
+//#include <stdlib.h>
+//#include <string.h>
+//#include <ctype.h>
+//#include <stdarg.h>
+//#include <stdio.h>
+// NPPEND
 
 #include "Platform.h"
 

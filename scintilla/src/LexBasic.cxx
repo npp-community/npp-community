@@ -16,11 +16,14 @@
 // You may want to have a look at my ctags lexer as well, if you additionally to coloring
 // and folding need to extract things like label tags in your editor.
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <stdarg.h>
+// NPPSTART Joce 06/09/09 Scintilla_precomp_headers
+#include "precompiled_headers.h"
+//#include <stdlib.h>
+//#include <string.h>
+//#include <stdio.h>
+//#include <ctype.h>
+//#include <stdarg.h>
+// NPPEND
 
 #include "Platform.h"
 

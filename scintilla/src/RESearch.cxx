@@ -198,6 +198,10 @@
  *  matches:    foo-foo fo-fo fob-fob foobar-foobar ...
  */
 
+// NPPSTART Joce 06/09/09 Scintilla_precomp_headers
+#include "precompiled_headers.h"
+// NPPEND
+
 #include "CharClassify.h"
 #include "RESearch.h"
 

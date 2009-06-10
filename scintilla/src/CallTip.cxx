@@ -5,14 +5,20 @@
 // Copyright 1998-2001 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <stdlib.h>
-#include <string.h>
+// NPPSTART Joce 06/09/09 Scintilla_precomp_headers
+#include "precompiled_headers.h"
+//#include <stdlib.h>
+//#include <string.h>
+// NPPEND
 
 #include "Platform.h"
 
 #include "Scintilla.h"
 #include "CallTip.h"
-#include <stdio.h>
+
+// NPPSTART Joce 06/09/09 Scintilla_precomp_headers
+//#include <stdio.h>
+// NPPEND
 
 #ifdef SCI_NAMESPACE
 using namespace Scintilla;

@@ -5,18 +5,21 @@
 // Copyright 1998-2003 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <time.h>
+// NPPSTART Joce 06/09/09 Scintilla_precomp_headers
+#include "precompiled_headers.h"
+//#include <stdlib.h>
+//#include <string.h>
+//#include <ctype.h>
+//#include <stdarg.h>
+//#include <stdio.h>
+//#include <time.h>
 
-#define _WIN32_WINNT  0x0400
-#include <windows.h>
-#include <commctrl.h>
-#include <richedit.h>
-#include <windowsx.h>
+//#define _WIN32_WINNT  0x0400
+//#include <windows.h>
+//#include <commctrl.h>
+//#include <richedit.h>
+//#include <windowsx.h>
+// NPPEND
 
 #include "Platform.h"
 #include "PlatformRes.h"

@@ -19,7 +19,9 @@
 // TODO: add your specific platform header here:
 
 // Win32 example:
-#include <windows.h>
+// NPPSTART Joce 06/09/09 Scintilla_precomp_headers
+//#include <windows.h>
+// NPPEND
 
 //*******************************************************//
 

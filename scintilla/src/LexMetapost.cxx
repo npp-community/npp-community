@@ -12,11 +12,14 @@
 // This lexer is derived from the one written for the texwork environment (1999++) which in
 // turn is inspired on texedit (1991++) which finds its roots in wdt (1986).
 
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <stdarg.h>
+// NPPSTART Joce 06/09/09 Scintilla_precomp_headers
+#include "precompiled_headers.h"
+//#include <stdlib.h>
+//#include <string.h>
+//#include <ctype.h>
+//#include <stdio.h>
+//#include <stdarg.h>
+// NPPEND
 
 #include "Platform.h"
 
