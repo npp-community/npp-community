@@ -144,7 +144,9 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	bool verticalScrollBarVisible;
 	bool endAtLastLine;
 	bool caretSticky;
+	// NPPSTART Joce 06/10/09 DisableMouseWheelZoom
 	bool enableWheelZooming;
+	// NPPEND
 
 	Surface *pixmapLine;
 	Surface *pixmapSelMargin;
