@@ -26,11 +26,6 @@ distribution.
 #ifndef TINYXMLA_INCLUDED
 #define TINYXMLA_INCLUDED
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4530 )
-#pragma warning( disable : 4786 )
-#endif
-
 #include "Common.h"
 
 // Help out windows:
@@ -39,16 +34,13 @@ distribution.
 #endif
 
 #if defined( DEBUG ) && defined( _MSC_VER )
-#include <windows.h>
+//#include <windows.h>
 #define TIXMLA_LOG OutputDebugString
 #else
 #define TIXMLA_LOG printf
 #endif
 
 #ifdef TIXMLA_USE_STL
-	#include <string>
-	#include <iostream>
-    //#include <ostream>
 	#define TIXMLA_STRING	std::string
 	#define TIXMLA_ISTREAM	std::istream
 	#define TIXMLA_OSTREAM	std::ostream

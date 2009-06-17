@@ -25,10 +25,6 @@ distribution.
 #include "precompiled_headers.h"
 #include "tinyxmlA.h"
 
-#ifdef TIXMLA_USE_STL
-#include <sstream>
-#endif
-
 bool TiXmlBaseA::condenseWhiteSpace = true;
 
 void TiXmlBaseA::PutString( const TIXMLA_STRING& str, TIXMLA_OSTREAM* stream )

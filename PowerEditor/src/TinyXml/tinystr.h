@@ -30,8 +30,6 @@ distribution.
 #ifndef TIXML_STRING_INCLUDED
 #define TIXML_STRING_INCLUDED
 
-#pragma warning( disable : 4514 )
-
 
 /*
    TiXmlString is an emulation of the std::generic_string template.

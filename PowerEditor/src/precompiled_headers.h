@@ -45,3 +45,8 @@
 #include <functional>
 #include <vector>
 #include <deque>
+
+#ifdef TIXMLA_USE_STL
+#include <string>
+#include <sstream>
+#endif
