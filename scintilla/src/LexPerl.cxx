@@ -428,7 +428,9 @@ static void ColourisePerlDoc(unsigned int startPos, int length, int initStyle,
 		backPos++;
 	}
 
-	StyleContext sc(startPos, endPos - startPos, initStyle, styler, static_cast<char>(STYLE_MAX));
+	// NPPSTART Joce 06/16/09 Scintilla_clean_precomp
+	StyleContext sc(startPos, endPos - startPos, initStyle, styler, STYLE_MAX);
+	// NPPEND
 
 	for (; sc.More(); sc.Forward()) {
 

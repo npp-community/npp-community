@@ -2056,7 +2056,9 @@ double ElapsedTime::Duration(bool reset) {
 		LARGE_INTEGER lBegin;
 		lBegin.HighPart = bigBit;
 		lBegin.LowPart = littleBit;
-		double elapsed = lEnd.QuadPart - lBegin.QuadPart;
+		// NPPSTART Joce 06/16/09 Scintilla_clean_precomp
+		double elapsed = (double)(lEnd.QuadPart - lBegin.QuadPart);
+		// NPPEND
 		result = elapsed / static_cast<double>(frequency.QuadPart);
 	} else {
 		endBigBit = clock();

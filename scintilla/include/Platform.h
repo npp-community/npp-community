@@ -556,9 +556,12 @@ public:
 }
 #endif
 
-// Shut up annoying Visual C++ warnings:
-#ifdef _MSC_VER
-#pragma warning(disable: 4244 4309 4514 4710)
-#endif
+// NPPSTART Joce 06/16/09 Scintilla_clean_precomp
+// All warnings are now enabled.
+//// Shut up annoying Visual C++ warnings:
+//#ifdef _MSC_VER
+//#pragma warning(disable: 4244 4309 4514 4710)
+//#endif
+// NPPEND
 
 #endif

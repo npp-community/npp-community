@@ -201,10 +201,12 @@
 #include "CharClassify.h"
 #include "RESearch.h"
 
-// Shut up annoying Visual C++ warnings:
-#ifdef _MSC_VER
-#pragma warning(disable: 4514)
-#endif
+// NPPSTART Joce 06/16/09 Scintilla_clean_precomp
+//// Shut up annoying Visual C++ warnings:
+//#ifdef _MSC_VER
+//#pragma warning(disable: 4514)
+//#endif
+// NPPEND
 
 #ifdef SCI_NAMESPACE
 using namespace Scintilla;

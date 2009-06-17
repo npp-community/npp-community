@@ -5864,7 +5864,9 @@ void Editor::AddStyledText(char *buffer, int appendLength) {
 		for (i = 0;i < textLength;i++) {
 			text[i] = buffer[i*2+1];
 		}
-		pdoc->StartStyling(CurrentPosition(), static_cast<char>(0xff));
+		// NPPSTART Joce 06/16/09 Scintilla_clean_precomp
+		pdoc->StartStyling(CurrentPosition(), STYLE_MAX);
+		// NPPEND
 		pdoc->SetStyles(textLength, text);
 		delete []text;
 	}

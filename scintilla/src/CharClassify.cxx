@@ -9,10 +9,13 @@
 
 #include "CharClassify.h"
 
-// Shut up annoying Visual C++ warnings:
-#ifdef _MSC_VER
-#pragma warning(disable: 4514)
-#endif
+// NPPSTART Joce 06/16/09 Scintilla_clean_precomp
+// All warnings are now enabled.
+//// Shut up annoying Visual C++ warnings:
+//#ifdef _MSC_VER
+//#pragma warning(disable: 4514)
+//#endif
+// NPPEND
 
 CharClassify::CharClassify() {
 	SetDefaultCharClasses(true);
