@@ -43,8 +43,8 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SciLexer_EXPORTS" /Yu"stdafx.h" /FD /c
-# ADD CPP /nologo /G6 /MT /W4 /O1 /I "..\include" /I "..\src" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SCI_LEXER" /Fr /FD /c
-# SUBTRACT CPP /YX /Yc /Yu
+# ADD CPP /nologo /G6 /MT /W4 /O1 /I "..\include" /I "..\src" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SCI_LEXER" /FD /c
+# SUBTRACT CPP /Fr /YX /Yc /Yu
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -206,6 +206,10 @@ SOURCE=..\src\LexCmake.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\LexCOBOL.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\LexConf.cxx
 # End Source File
 # Begin Source File
@@ -318,11 +322,11 @@ SOURCE=..\src\LexMySQL.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\LexNsis.cxx
+SOURCE=..\src\LexNimrod.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\LexObjC.cxx
+SOURCE=..\src\LexNsis.cxx
 # End Source File
 # Begin Source File
 
@@ -351,6 +355,10 @@ SOURCE=..\src\LexPLM.cxx
 # Begin Source File
 
 SOURCE=..\src\LexPOV.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\LexPowerPro.cxx
 # End Source File
 # Begin Source File
 
@@ -386,11 +394,15 @@ SOURCE=..\src\LexScriptol.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\LexSearchResult.cxx
+SOURCE=..\src\LexSmalltalk.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\LexSmalltalk.cxx
+SOURCE=..\src\LexSML.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\LexSorcus.cxx
 # End Source File
 # Begin Source File
 
@@ -410,15 +422,19 @@ SOURCE=..\src\LexTADS3.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\LexTACL.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\LexTAL.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\LexTCL.cxx
 # End Source File
 # Begin Source File
 
 SOURCE=..\src\LexTeX.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=..\src\LexUser.cxx
 # End Source File
 # Begin Source File
 
@@ -439,6 +455,10 @@ SOURCE=..\src\LexYAML.cxx
 # Begin Source File
 
 SOURCE=..\src\LineMarker.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\PerLine.cxx
 # End Source File
 # Begin Source File
 
