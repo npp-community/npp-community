@@ -330,6 +330,10 @@ SOURCE=..\src\LexNsis.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\LexObjC.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\LexOpal.cxx
 # End Source File
 # Begin Source File
@@ -394,6 +398,10 @@ SOURCE=..\src\LexScriptol.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\LexSearchResult.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\LexSmalltalk.cxx
 # End Source File
 # Begin Source File
@@ -418,11 +426,11 @@ SOURCE=..\src\LexSQL.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\LexTADS3.cxx
+SOURCE=..\src\LexTACL.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\LexTACL.cxx
+SOURCE=..\src\LexTADS3.cxx
 # End Source File
 # Begin Source File
 
@@ -435,6 +443,10 @@ SOURCE=..\src\LexTCL.cxx
 # Begin Source File
 
 SOURCE=..\src\LexTeX.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\LexUser.cxx
 # End Source File
 # Begin Source File
 
