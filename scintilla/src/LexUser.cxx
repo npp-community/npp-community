@@ -43,13 +43,8 @@ const char EOString = '\0';
 const char EOLine = '\n';
 const char EOWord = ' ';
 */
-// NPPSTART Joce 06/16/09 Scintilla_clean_precomp
-// Changed the type to int (as it was always what was passed anyway)
-// and cast the value in the function.
-static bool isInOpList(WordList & opList, int in_op)
+static bool isInOpList(WordList & opList, char op)
 {
-	char op = (char)in_op;
-// NPPEND
 	for (int i = 0 ; i < opList.len ; i++)
 		if (op == *(opList.words[i]))
 			return true;
@@ -61,13 +56,13 @@ static int cmpString(const void *a1, const void *a2) {
 	return strcmp(*(char**)(a1), *(char**)(a2));
 }
 
-// NPPSTART Joce 06/16/09 Scintilla_clean_precomp
-// Unused function
+
+// NPPSTART Joce 06/25/09 Cleanup
 //static int cmpStringNoCase(const void *a1, const void *a2) {
 //	// Can't work out the correct incantation to use modern casts here
 //	return CompareCaseInsensitive(*(char**)(a1), *(char**)(a2));
 //}
-// NPPEND
+
 
 static bool isInList(WordList & list, const char *s, bool specialMode, bool ignoreCase)
 {
@@ -145,9 +140,7 @@ static bool isInList(WordList & list, const char *s, bool specialMode, bool igno
 		if (!isalpha(s[0]))
 			return false;
 
-		// NPPSTART Joce 06/16/09 Scintilla_clean_precomp
-		firstChar = (unsigned char)(isupper(s[0])?tolower(s[0]):toupper(s[0]));
-		// NPPEND
+		firstChar = isupper(s[0])?tolower(s[0]):toupper(s[0]);
 		j = list.starts[firstChar];
 		if (j >= 0)
 		{
