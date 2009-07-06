@@ -5,6 +5,10 @@ Up-to-date with Notepad++ 5.4.3
 
 On top of that:
 
+July 4 2009:
+============
+- Fixed the hotspots for ASP and other html derivatives than have a bunch of styles.
+
 June 9 2009:
 ============
 
