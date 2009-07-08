@@ -18,9 +18,237 @@
 #include "precompiled_headers.h"
 #include "preferenceDlg.h"
 
+#include "preference_rc.h"
+#include "URLCtrl.h"
+#include "regExtDlg.h"
+#include "WordStyleDlg.h"
+#include "ControlsTab.h"
+
+
 const int BLINKRATE_FASTEST = 50;
 const int BLINKRATE_SLOWEST = 2500;
 const int BLINKRATE_INTERVAL = 50;
+
+
+class SettingsDlg : public StaticDialog
+{
+public :
+	SettingsDlg() {};
+	virtual void destroy() {
+		_nbHistoryVal.destroy();
+		StaticDialog::destroy();
+	};
+private :
+	URLCtrl _nbHistoryVal;
+	bool isCheckedOrNot(int checkControlID) const {
+		return (BST_CHECKED == ::SendMessage(::GetDlgItem(_hSelf, checkControlID), BM_GETCHECK, 0, 0));
+	};
+	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
+};
+
+class BarsDlg : public StaticDialog
+{
+public :
+	BarsDlg() {};
+private :
+	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
+};
+
+class MarginsDlg : public StaticDialog
+{
+public :
+	MarginsDlg() {};
+	virtual void destroy() {
+		_tabSizeVal.destroy();
+		_verticalEdgeLineNbColVal.destroy();
+		StaticDialog::destroy();
+	};
+
+private :
+	URLCtrl _tabSizeVal;
+	URLCtrl _verticalEdgeLineNbColVal;
+	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
+	void changePanelTo(int index);
+};
+
+struct LangID_Name
+{
+	LangType _id;
+	generic_string _name;
+	LangID_Name(LangType id, generic_string name) : _id(id), _name(name){};
+};
+
+class DefaultNewDocDlg : public StaticDialog
+{
+public :
+	DefaultNewDocDlg() {};
+private :
+	std::vector<LangID_Name> _langList;
+	void makeOpenAnsiAsUtf8(bool doIt){
+		if (!doIt)
+			::SendDlgItemMessage(_hSelf, IDC_CHECK_OPENANSIASUTF8, BM_SETCHECK, BST_UNCHECKED, 0);
+		::EnableWindow(::GetDlgItem(_hSelf, IDC_CHECK_OPENANSIASUTF8), doIt);
+	};
+	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
+};
+
+class LangMenuDlg : public StaticDialog
+{
+public :
+	LangMenuDlg() {};
+private :
+	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
+	vector<LangMenuItem> _langList;
+};
+
+class PrintSettingsDlg : public StaticDialog
+{
+public :
+	PrintSettingsDlg() {};
+private :
+	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
+};
+
+class BackupDlg : public StaticDialog
+{
+public :
+	BackupDlg() {};
+private :
+	URLCtrl _nbCharVal;
+	void updateBackupGUI();
+	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
+};
+
+struct strCouple {
+	generic_string _varDesc;
+	generic_string _var;
+	strCouple(TCHAR *varDesc, TCHAR *var): _varDesc(varDesc), _var(var){};
+};
+
+class PrintSettings2Dlg : public StaticDialog
+{
+public :
+	PrintSettings2Dlg():_focusedEditCtrl(0), _selStart(0), _selEnd(0){};
+private :
+	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
+	vector<strCouple> varList;
+	int _focusedEditCtrl;
+	DWORD _selStart;
+	DWORD _selEnd;
+
+	//ColourStaticTextHooker _colourHooker;
+};
+
+struct PreferenceDlgWindows
+{
+	WindowVector _windows;
+};
+
+PreferenceDlg::PreferenceDlg():
+	_ctrlTab(new ControlsTab),
+	_wVector(new PreferenceDlgWindows),
+	_barsDlg(new BarsDlg),
+	_marginsDlg(new MarginsDlg),
+	_settingsDlg(new SettingsDlg),
+	_fileAssocDlg(new RegExtDlg),
+	_langMenuDlg(new LangMenuDlg),
+	_printSettingsDlg(new PrintSettingsDlg),
+	_printSettings2Dlg(new PrintSettings2Dlg),
+	_defaultNewDocDlg(new DefaultNewDocDlg),
+	_backupDlg(new BackupDlg)
+{}
+
+PreferenceDlg::~PreferenceDlg()
+{
+	delete _ctrlTab;
+	_ctrlTab = NULL;
+
+	delete _barsDlg;
+	_barsDlg = NULL;
+
+	delete _marginsDlg;
+	_marginsDlg = NULL;
+
+	delete _settingsDlg;
+	_settingsDlg = NULL;
+
+	delete _fileAssocDlg;
+	_fileAssocDlg = NULL;
+
+	delete _langMenuDlg;
+	_langMenuDlg = NULL;
+
+	delete _printSettingsDlg;
+	_printSettingsDlg = NULL;
+
+	delete _printSettings2Dlg;
+	_printSettings2Dlg = NULL;
+
+	delete _defaultNewDocDlg;
+	_defaultNewDocDlg = NULL;
+
+	delete _backupDlg;
+	_backupDlg = NULL;
+
+	delete _wVector;
+}
+
+void PreferenceDlg::doDialog(bool isRTL)
+{
+	if (!isCreated())
+	{
+		create(IDD_PREFERENCE_BOX, isRTL);
+		goToCenter();
+	}
+	display();
+}
+
+void PreferenceDlg::destroy()
+{
+	if (_ctrlTab)
+	{
+		_ctrlTab->destroy();
+	}
+
+	if (_barsDlg) {
+		_barsDlg->destroy();
+	}
+
+	if (_marginsDlg) {
+		_marginsDlg->destroy();
+	}
+
+	if (_settingsDlg) {
+		_settingsDlg->destroy();
+	}
+
+	if (_fileAssocDlg) {
+		_fileAssocDlg->destroy();
+	}
+
+	if (_langMenuDlg) {
+		_langMenuDlg->destroy();
+	}
+
+	if (_printSettingsDlg) {
+		_printSettingsDlg->destroy();
+	}
+
+	if (_printSettings2Dlg) {
+		_printSettings2Dlg->destroy();
+	}
+
+	if (_defaultNewDocDlg) {
+		_defaultNewDocDlg->destroy();
+	}
+
+	if (_backupDlg) {
+		_backupDlg->destroy();
+	}
+
+	StaticDialog::destroy();
+}
+
 
 BOOL CALLBACK PreferenceDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
 {
@@ -28,63 +256,64 @@ BOOL CALLBACK PreferenceDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPa
 	{
 		case WM_INITDIALOG :
 		{
-			_ctrlTab.init(_hInst, _hSelf, false, true, true);
-			_ctrlTab.setFont(TEXT("Tahoma"), 13);
+			_ctrlTab->init(_hInst, _hSelf, false, true, true);
+			_ctrlTab->setFont(TEXT("Tahoma"), 13);
 
-			_barsDlg.init(_hInst, _hSelf);
-			_barsDlg.create(IDD_PREFERENCE_BAR_BOX);
-			_barsDlg.display();
+			_barsDlg->init(_hInst, _hSelf);
+			_barsDlg->create(IDD_PREFERENCE_BAR_BOX);
+			_barsDlg->display();
 
-			_marginsDlg.init(_hInst, _hSelf);
-			_marginsDlg.create(IDD_PREFERENCE_MARGEIN_BOX);
+			_marginsDlg->init(_hInst, _hSelf);
+			_marginsDlg->create(IDD_PREFERENCE_MARGEIN_BOX);
 
-			_settingsDlg.init(_hInst, _hSelf);
-			_settingsDlg.create(IDD_PREFERENCE_SETTING_BOX);
+			_settingsDlg->init(_hInst, _hSelf);
+			_settingsDlg->create(IDD_PREFERENCE_SETTING_BOX);
 
-			_defaultNewDocDlg.init(_hInst, _hSelf);
-			_defaultNewDocDlg.create(IDD_PREFERENCE_NEWDOCSETTING_BOX);
+			_defaultNewDocDlg->init(_hInst, _hSelf);
+			_defaultNewDocDlg->create(IDD_PREFERENCE_NEWDOCSETTING_BOX);
 
-			_fileAssocDlg.init(_hInst, _hSelf);
-			_fileAssocDlg.create(IDD_REGEXT_BOX);
+			_fileAssocDlg->init(_hInst, _hSelf);
+			_fileAssocDlg->create(IDD_REGEXT_BOX);
 
-			_printSettingsDlg.init(_hInst, _hSelf);
-			_printSettingsDlg.create(IDD_PREFERENCE_PRINT_BOX);
+			_printSettingsDlg->init(_hInst, _hSelf);
+			_printSettingsDlg->create(IDD_PREFERENCE_PRINT_BOX);
 
 
-			_printSettings2Dlg.init(_hInst, _hSelf);
-			_printSettings2Dlg.create(IDD_PREFERENCE_PRINT2_BOX);
+			_printSettings2Dlg->init(_hInst, _hSelf);
+			_printSettings2Dlg->create(IDD_PREFERENCE_PRINT2_BOX);
 
-			_langMenuDlg.init(_hInst, _hSelf);
-			_langMenuDlg.create(IDD_PREFERENCE_LANG_BOX);
+			_langMenuDlg->init(_hInst, _hSelf);
+			_langMenuDlg->create(IDD_PREFERENCE_LANG_BOX);
 
-			_backupDlg.init(_hInst, _hSelf);
-			_backupDlg.create(IDD_PREFERENCE_BACKUP_BOX);
+			_backupDlg->init(_hInst, _hSelf);
+			_backupDlg->create(IDD_PREFERENCE_BACKUP_BOX);
 
-			_wVector.push_back(DlgInfo(&_barsDlg, TEXT("Global"), TEXT("Global")));
-			_wVector.push_back(DlgInfo(&_marginsDlg, TEXT("Edit Components"), TEXT("Scintillas")));
-			_wVector.push_back(DlgInfo(&_defaultNewDocDlg, TEXT("New Document/Open Save Directory"), TEXT("NewDoc")));
-			_wVector.push_back(DlgInfo(&_fileAssocDlg, TEXT("File Association"), TEXT("FileAssoc")));
-			_wVector.push_back(DlgInfo(&_langMenuDlg, TEXT("Language Menu"), TEXT("LangMenu")));
-			_wVector.push_back(DlgInfo(&_printSettingsDlg, TEXT("Print - Colour and Margin"), TEXT("Print1")));
-			_wVector.push_back(DlgInfo(&_printSettings2Dlg, TEXT("Print - Header and Footer"), TEXT("Print2")));
-			_wVector.push_back(DlgInfo(&_backupDlg, TEXT("Backup/Auto-completion"), TEXT("Backup")));
-			_wVector.push_back(DlgInfo(&_settingsDlg, TEXT("MISC"), TEXT("MISC")));
-			_ctrlTab.createTabs(_wVector);
-			_ctrlTab.display();
+
+			_wVector->_windows.push_back(DlgInfo(_barsDlg, TEXT("Global"), TEXT("Global")));
+			_wVector->_windows.push_back(DlgInfo(_marginsDlg, TEXT("Edit Components"), TEXT("Scintillas")));
+			_wVector->_windows.push_back(DlgInfo(_defaultNewDocDlg, TEXT("New Document/Open Save Directory"), TEXT("NewDoc")));
+			_wVector->_windows.push_back(DlgInfo(_fileAssocDlg, TEXT("File Association"), TEXT("FileAssoc")));
+			_wVector->_windows.push_back(DlgInfo(_langMenuDlg, TEXT("Language Menu"), TEXT("LangMenu")));
+			_wVector->_windows.push_back(DlgInfo(_printSettingsDlg, TEXT("Print - Colour and Margin"), TEXT("Print1")));
+			_wVector->_windows.push_back(DlgInfo(_printSettings2Dlg, TEXT("Print - Header and Footer"), TEXT("Print2")));
+			_wVector->_windows.push_back(DlgInfo(_backupDlg, TEXT("Backup/Auto-completion"), TEXT("Backup")));
+			_wVector->_windows.push_back(DlgInfo(_settingsDlg, TEXT("MISC"), TEXT("MISC")));
+			_ctrlTab->createTabs(_wVector->_windows);
+			_ctrlTab->display();
 			RECT rc;
 			getClientRect(rc);
-			_ctrlTab.reSizeTo(rc);
+			_ctrlTab->reSizeTo(rc);
 			rc.bottom -= 30;
 
-			_barsDlg.reSizeTo(rc);
-			_marginsDlg.reSizeTo(rc);
-			_settingsDlg.reSizeTo(rc);
-			_defaultNewDocDlg.reSizeTo(rc);
-			_fileAssocDlg.reSizeTo(rc);
-			_langMenuDlg.reSizeTo(rc);
-			_printSettingsDlg.reSizeTo(rc);
-			_printSettings2Dlg.reSizeTo(rc);
-			_backupDlg.reSizeTo(rc);
+			_barsDlg->reSizeTo(rc);
+			_marginsDlg->reSizeTo(rc);
+			_settingsDlg->reSizeTo(rc);
+			_defaultNewDocDlg->reSizeTo(rc);
+			_fileAssocDlg->reSizeTo(rc);
+			_langMenuDlg->reSizeTo(rc);
+			_printSettingsDlg->reSizeTo(rc);
+			_printSettings2Dlg->reSizeTo(rc);
+			_backupDlg->reSizeTo(rc);
 
 			NppParameters *pNppParam = NppParameters::getInstance();
 			ETDTProc enableDlgTheme = (ETDTProc)pNppParam->getEnableThemeDlgTexture();
@@ -98,9 +327,9 @@ BOOL CALLBACK PreferenceDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPa
 			NMHDR *nmhdr = (NMHDR *)lParam;
 			if (nmhdr->code == TCN_SELCHANGE)
 			{
-				if (nmhdr->hwndFrom == _ctrlTab.getHSelf())
+				if (nmhdr->hwndFrom == _ctrlTab->getHSelf())
 				{
-					_ctrlTab.clickedUpdate();
+					_ctrlTab->clickedUpdate();
 					return TRUE;
 				}
 			}

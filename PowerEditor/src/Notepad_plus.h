@@ -24,7 +24,6 @@
 #include "lastRecentFileList.h"
 #include "trayIconControler.h"
 #include "PluginsManager.h"
-#include "preferenceDlg.h"
 #include "WindowsDlg.h"
 #include "RunMacroDlg.h"
 #include "DockingManager.h"
@@ -64,6 +63,7 @@ class RunDlg;
 class GoToLineDlg;
 class ColumnEditorDlg;
 class WordStyleDlg;
+class PreferenceDlg;
 
 struct TaskListInfo;
 static TiXmlNodeA * searchDlgNode(TiXmlNodeA *node, const char *dlgTagName);
@@ -255,7 +255,7 @@ private:
     GoToLineDlg* _goToLineDlg;
 	ColumnEditorDlg* _colEditorDlg;
 	WordStyleDlg* _configStyleDlg;
-	PreferenceDlg _preference;
+	PreferenceDlg* _preferenceDlg;
 
 	// a handle list of all the Notepad++ dialogs
 	vector<HWND> _hModelessDlgs;

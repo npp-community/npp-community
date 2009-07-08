@@ -40,6 +40,8 @@
 #include "RunDlg.h"
 #include "GoToLineDlg.h"
 #include "columnEditor.h"
+#include "preferenceDlg.h"
+#include "WordStyleDlg.h"
 
 
 const TCHAR Notepad_plus::_className[32] = TEXT("Notepad++");
@@ -78,7 +80,7 @@ Notepad_plus::Notepad_plus(): Window(), _mainWindowStatus(0), _pDocTab(NULL), _p
 	_autoCompleteMain(&_mainEditView), _autoCompleteSub(&_subEditView), _smartHighlighter(_findReplaceDlg),
 	_nativeLangEncoding(CP_ACP), _isFileOpening(false),
 	_findReplaceDlg(NULL), _incrementFindDlg(NULL), _aboutDlg(NULL), _runDlg(NULL), _goToLineDlg(NULL),
-	_colEditorDlg(NULL), _configStyleDlg(NULL)
+	_colEditorDlg(NULL), _configStyleDlg(NULL), _preferenceDlg(NULL)
 {
 
 	ZeroMemory(&_prevSelectedRange, sizeof(_prevSelectedRange));
@@ -428,6 +430,12 @@ void Notepad_plus::killAllChildren()
 	{
 		delete _configStyleDlg;
 		_configStyleDlg = NULL;
+	}
+
+	if (_preferenceDlg)
+	{
+		delete _preferenceDlg;
+		_preferenceDlg = NULL;
 	}
 }
 
@@ -3126,9 +3134,10 @@ void Notepad_plus::specialCmd(int id, int param)
 
 		case IDM_SETTING_EDGE_SIZE :
 		{
+			assert(_preferenceDlg);
 			ValueDlg nbColumnEdgeDlg;
 			ScintillaViewParams & svp = (ScintillaViewParams &)pNppParam->getSVP(param == 1?SCIV_PRIMARY:SCIV_SECOND);
-			nbColumnEdgeDlg.init(_hInst, _preference.getHSelf(), svp._edgeNbColumn, TEXT("Nb of column:"));
+			nbColumnEdgeDlg.init(_hInst, _preferenceDlg->getHSelf(), svp._edgeNbColumn, TEXT("Nb of column:"));
 			nbColumnEdgeDlg.setNBNumber(3);
 
 			POINT p;
@@ -4211,9 +4220,10 @@ void Notepad_plus::command(int id)
 
 		case IDM_SETTING_TAB_SIZE:
 		{
+			assert(_preferenceDlg);
 			ValueDlg tabSizeDlg;
 			NppGUI & nppgui = (NppGUI &)(pNppParam->getNppGUI());
-			tabSizeDlg.init(_hInst, _preference.getHSelf(), nppgui._tabSize, TEXT("Tab Size : "));
+			tabSizeDlg.init(_hInst, _preferenceDlg->getHSelf(), nppgui._tabSize, TEXT("Tab Size : "));
 			POINT p;
 			::GetCursorPos(&p);
 			::ScreenToClient(_hParent, &p);
@@ -4229,12 +4239,13 @@ void Notepad_plus::command(int id)
 
 		case IDM_SETTING_AUTOCNBCHAR:
 		{
+			assert(_preferenceDlg);
 			const int NB_MIN_CHAR = 1;
 			const int NB_MAX_CHAR = 9;
 
 			ValueDlg valDlg;
 			NppGUI & nppGUI = (NppGUI &)((NppParameters::getInstance())->getNppGUI());
-			valDlg.init(_hInst, _preference.getHSelf(), nppGUI._autocFromLen, TEXT("Nb char : "));
+			valDlg.init(_hInst, _preferenceDlg->getHSelf(), nppGUI._autocFromLen, TEXT("Nb char : "));
 			POINT p;
 			::GetCursorPos(&p);
 			::ScreenToClient(_hParent, &p);
@@ -4254,9 +4265,10 @@ void Notepad_plus::command(int id)
 
 		case IDM_SETTING_HISTORY_SIZE :
 		{
+			assert(_preferenceDlg);
 			ValueDlg nbHistoryDlg;
 			NppParameters *pNppParam = NppParameters::getInstance();
-			nbHistoryDlg.init(_hInst, _preference.getHSelf(), pNppParam->getNbMaxFile(), TEXT("Max File : "));
+			nbHistoryDlg.init(_hInst, _preferenceDlg->getHSelf(), pNppParam->getNbMaxFile(), TEXT("Max File : "));
 			POINT p;
 			::GetCursorPos(&p);
 			::ScreenToClient(_hParent, &p);
@@ -4292,8 +4304,9 @@ void Notepad_plus::command(int id)
 
 		case IDM_SETTING_PREFERECE :
 		{
-			bool isFirstTime = !_preference.isCreated();
-			_preference.doDialog(_isRTL);
+			assert(_preferenceDlg);
+			bool isFirstTime = !_preferenceDlg->isCreated();
+			_preferenceDlg->doDialog(_isRTL);
 
 			if (isFirstTime)
 			{
@@ -5162,7 +5175,7 @@ bool Notepad_plus::reloadLang()
 		changeLangTabDrapContextMenu();
 	}
 
-	if (_preference.isCreated())
+	if (_preferenceDlg && _preferenceDlg->isCreated())
 	{
 		changePrefereceDlgLang();
 	}
@@ -6381,9 +6394,8 @@ void Notepad_plus::changeFindReplaceDlgLang()
 #define TITLE_BUF_LEN 128
 void Notepad_plus::changePrefereceDlgLang()
 {
-
-
-	changeDlgLang(_preference.getHSelf(), "Preference");
+	assert(_preferenceDlg);
+	changeDlgLang(_preferenceDlg->getHSelf(), "Preference");
 
 	char title[TITLE_BUF_LEN];
 
@@ -6391,98 +6403,98 @@ void Notepad_plus::changePrefereceDlgLang()
 	WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
 #endif
 
-	changeDlgLang(_preference._barsDlg.getHSelf(), "Global", title, TITLE_BUF_LEN);
+	changeDlgLang(_preferenceDlg->_barsDlg->getHSelf(), "Global", title, TITLE_BUF_LEN);
 	if (*title)
 	{
 #ifdef UNICODE
 		const wchar_t *nameW = wmc->char2wchar(title, _nativeLangEncoding);
-		_preference._ctrlTab.renameTab(TEXT("Global"), nameW);
+		_preferenceDlg->_ctrlTab->renameTab(TEXT("Global"), nameW);
 #else
-		_preference._ctrlTab.renameTab("Global", title);
+		_preferenceDlg->_ctrlTab->renameTab("Global", title);
 #endif
 	}
-	changeDlgLang(_preference._marginsDlg.getHSelf(), "Scintillas", title, TITLE_BUF_LEN);
+	changeDlgLang(_preferenceDlg->_marginsDlg->getHSelf(), "Scintillas", title, TITLE_BUF_LEN);
 	if (*title)
 	{
 #ifdef UNICODE
 		const wchar_t *nameW = wmc->char2wchar(title, _nativeLangEncoding);
-		_preference._ctrlTab.renameTab(TEXT("Scintillas"), nameW);
+		_preferenceDlg->_ctrlTab->renameTab(TEXT("Scintillas"), nameW);
 #else
-		_preference._ctrlTab.renameTab("Scintillas", title);
-#endif
-	}
-
-	changeDlgLang(_preference._defaultNewDocDlg.getHSelf(), "NewDoc", title, TITLE_BUF_LEN);
-	if (*title)
-	{
-#ifdef UNICODE
-		const wchar_t *nameW = wmc->char2wchar(title, _nativeLangEncoding);
-		_preference._ctrlTab.renameTab(TEXT("NewDoc"), nameW);
-#else
-		_preference._ctrlTab.renameTab("NewDoc", title);
+		_preferenceDlg->_ctrlTab->renameTab("Scintillas", title);
 #endif
 	}
 
-	changeDlgLang(_preference._fileAssocDlg.getHSelf(), "FileAssoc", title, TITLE_BUF_LEN);
+	changeDlgLang(_preferenceDlg->_defaultNewDocDlg->getHSelf(), "NewDoc", title, TITLE_BUF_LEN);
 	if (*title)
 	{
 #ifdef UNICODE
 		const wchar_t *nameW = wmc->char2wchar(title, _nativeLangEncoding);
-		_preference._ctrlTab.renameTab(TEXT("FileAssoc"), nameW);
+		_preferenceDlg->_ctrlTab->renameTab(TEXT("NewDoc"), nameW);
 #else
-		_preference._ctrlTab.renameTab("FileAssoc", title);
+		_preferenceDlg->_ctrlTab->renameTab("NewDoc", title);
 #endif
 	}
 
-	changeDlgLang(_preference._langMenuDlg.getHSelf(), "LangMenu", title, TITLE_BUF_LEN);
+	changeDlgLang(_preferenceDlg->_fileAssocDlg->getHSelf(), "FileAssoc", title, TITLE_BUF_LEN);
 	if (*title)
 	{
 #ifdef UNICODE
 		const wchar_t *nameW = wmc->char2wchar(title, _nativeLangEncoding);
-		_preference._ctrlTab.renameTab(TEXT("LangMenu"), nameW);
+		_preferenceDlg->_ctrlTab->renameTab(TEXT("FileAssoc"), nameW);
 #else
-		_preference._ctrlTab.renameTab("LangMenu", title);
+		_preferenceDlg->_ctrlTab->renameTab("FileAssoc", title);
 #endif
 	}
 
-	changeDlgLang(_preference._printSettingsDlg.getHSelf(), "Print1", title, TITLE_BUF_LEN);
+	changeDlgLang(_preferenceDlg->_langMenuDlg->getHSelf(), "LangMenu", title, TITLE_BUF_LEN);
 	if (*title)
 	{
 #ifdef UNICODE
 		const wchar_t *nameW = wmc->char2wchar(title, _nativeLangEncoding);
-		_preference._ctrlTab.renameTab(TEXT("Print1"), nameW);
+		_preferenceDlg->_ctrlTab->renameTab(TEXT("LangMenu"), nameW);
 #else
-		_preference._ctrlTab.renameTab("Print1", title);
+		_preferenceDlg->_ctrlTab->renameTab("LangMenu", title);
 #endif
 	}
-	changeDlgLang(_preference._printSettings2Dlg.getHSelf(), "Print2", title, TITLE_BUF_LEN);
+
+	changeDlgLang(_preferenceDlg->_printSettingsDlg->getHSelf(), "Print1", title, TITLE_BUF_LEN);
 	if (*title)
 	{
 #ifdef UNICODE
 		const wchar_t *nameW = wmc->char2wchar(title, _nativeLangEncoding);
-		_preference._ctrlTab.renameTab(TEXT("Print2"), nameW);
+		_preferenceDlg->_ctrlTab->renameTab(TEXT("Print1"), nameW);
 #else
-		_preference._ctrlTab.renameTab("Print2", title);
+		_preferenceDlg->_ctrlTab->renameTab("Print1", title);
 #endif
 	}
-	changeDlgLang(_preference._settingsDlg.getHSelf(), "MISC", title, TITLE_BUF_LEN);
+	changeDlgLang(_preferenceDlg->_printSettings2Dlg->getHSelf(), "Print2", title, TITLE_BUF_LEN);
 	if (*title)
 	{
 #ifdef UNICODE
 		const wchar_t *nameW = wmc->char2wchar(title, _nativeLangEncoding);
-		_preference._ctrlTab.renameTab(TEXT("MISC"), nameW);
+		_preferenceDlg->_ctrlTab->renameTab(TEXT("Print2"), nameW);
 #else
-		_preference._ctrlTab.renameTab("MISC", title);
+		_preferenceDlg->_ctrlTab->renameTab("Print2", title);
 #endif
 	}
-	changeDlgLang(_preference._backupDlg.getHSelf(), "Backup", title, TITLE_BUF_LEN);
+	changeDlgLang(_preferenceDlg->_settingsDlg->getHSelf(), "MISC", title, TITLE_BUF_LEN);
 	if (*title)
 	{
 #ifdef UNICODE
 		const wchar_t *nameW = wmc->char2wchar(title, _nativeLangEncoding);
-		_preference._ctrlTab.renameTab(TEXT("Backup"), nameW);
+		_preferenceDlg->_ctrlTab->renameTab(TEXT("MISC"), nameW);
 #else
-		_preference._ctrlTab.renameTab("Backup", title);
+		_preferenceDlg->_ctrlTab->renameTab("MISC", title);
+#endif
+	}
+	changeDlgLang(_preferenceDlg->_backupDlg->getHSelf(), "Backup", title, TITLE_BUF_LEN);
+	if (*title)
+	{
+#ifdef UNICODE
+		const wchar_t *nameW = wmc->char2wchar(title, _nativeLangEncoding);
+		_preferenceDlg->_ctrlTab->renameTab(TEXT("Backup"), nameW);
+#else
+		_preferenceDlg->_ctrlTab->renameTab("Backup", title);
 #endif
 	}
 }
@@ -7128,6 +7140,11 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 				_configStyleDlg = new WordStyleDlg();
 			}
 
+			if (!_preferenceDlg)
+			{
+				_preferenceDlg = new PreferenceDlg();
+			}
+
 			// Menu
 			_mainMenuHandle = ::GetMenu(_hSelf);
 			int langPos2BeRemoved = MENUINDEX_LANGUAGE+1;
@@ -7185,7 +7202,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			::SendMessage(hwnd, NPPM_INTERNAL_SETCARETBLINKRATE, 0, 0);
 
 			_configStyleDlg->init(_hInst, _hSelf);
-			_preference.init(_hInst, _hSelf);
+			_preferenceDlg->init(_hInst, _hSelf);
 
             //Marker Margin config
             _mainEditView.setMakerStyle(svp1._folderStyle);
