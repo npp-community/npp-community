@@ -537,7 +537,7 @@ BEGIN
 
     POPUP "Se&ttings"
     BEGIN
-        MENUITEM "Preferences...",             IDM_SETTING_PREFERECE
+        MENUITEM "Preferences...",             IDM_SETTING_PREFERENCE
         MENUITEM "Styler Configurator...",                     IDM_LANGSTYLE_CONFIG_DLG
     MENUITEM "Shortcut Mapper...",                     IDM_SETTING_SHORTCUT_MAPPER
     END

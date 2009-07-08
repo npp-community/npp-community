@@ -1,7 +1,7 @@
 #ifndef LASTRECENTFILELIST_H
 #define LASTRECENTFILELIST_H
 
-#include "Parameters.h"
+#include "Common.h"
 
 struct RecentItem {
 	int _id;
@@ -14,9 +14,8 @@ typedef std::deque<RecentItem> recentList;
 class LastRecentFileList
 {
 public :
-	LastRecentFileList() : _hasSeparators(false), _size(0), _locked(false) {
-		_userMax = (NppParameters::getInstance())->getNbMaxFile();
-	};
+	LastRecentFileList();
+	virtual ~LastRecentFileList();
 
 	void initMenu(HMENU hMenu, int idBase, int posBase);
 
@@ -31,9 +30,7 @@ public :
 		return _size;
 	};
 
-	int getMaxNbLRF() const {
-		return NB_MAX_LRF_FILE;
-	};
+	int getMaxNbLRF() const;
 
 	int getUserMaxNbLRF() const {
 		return _userMax;
@@ -64,7 +61,7 @@ private:
 	HMENU _hMenu;
 	int _posBase;
 	int _idBase;
-	bool _idFreeArray[NB_MAX_LRF_FILE];
+	bool* _idFreeArray;
 	bool _hasSeparators;
 	bool _locked;
 

@@ -172,7 +172,7 @@ WinMenuKeyDefinition winKeyDefs[] = {	//array of accelerator keys for all std me
 	{VK_NULL, 	IDM_FORMAT_CONV2_UCS_2BE,			false, false, false, NULL},
 	{VK_NULL, 	IDM_FORMAT_CONV2_UCS_2LE,			false, false, false, NULL},
 
-	{VK_NULL, 	IDM_SETTING_PREFERECE,				false, false, false, NULL},
+	{VK_NULL, 	IDM_SETTING_PREFERENCE,				false, false, false, NULL},
 	{VK_NULL, 	IDM_LANGSTYLE_CONFIG_DLG,			false, false, false, NULL},
 	{VK_NULL, 	IDM_SETTING_SHORTCUT_MAPPER,		false, false, false, NULL},
 

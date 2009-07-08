@@ -21,7 +21,6 @@
 #include "ToolBar.h"
 #include "DocTabView.h"
 
-#include "lastRecentFileList.h"
 #include "trayIconControler.h"
 #include "PluginsManager.h"
 #include "RunMacroDlg.h"
@@ -64,6 +63,7 @@ class ColumnEditorDlg;
 class WordStyleDlg;
 class PreferenceDlg;
 class WindowsMenu;
+class LastRecentFileList;
 
 struct TaskListInfo;
 static TiXmlNodeA * searchDlgNode(TiXmlNodeA *node, const char *dlgTagName);
@@ -260,7 +260,7 @@ private:
 	// a handle list of all the Notepad++ dialogs
 	vector<HWND> _hModelessDlgs;
 
-	LastRecentFileList _lastRecentFileList;
+	LastRecentFileList* _lastRecentFileList;
 
 	vector<iconLocator> _customIconVect;
 

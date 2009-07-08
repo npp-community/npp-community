@@ -18,7 +18,25 @@
 #include "precompiled_headers.h"
 #include "lastRecentFileList.h"
 #include "menuCmdID.h"
+#include "Parameters.h"
 
+
+LastRecentFileList::LastRecentFileList() :
+	_hasSeparators(false), _size(0), _locked(false)
+{
+	_idFreeArray = new bool[NB_MAX_LRF_FILE];
+	_userMax = (NppParameters::getInstance())->getNbMaxFile();
+}
+
+LastRecentFileList::~LastRecentFileList()
+{
+	delete [] _idFreeArray;
+}
+
+int LastRecentFileList::getMaxNbLRF() const
+{
+	return NB_MAX_LRF_FILE;
+};
 
 void LastRecentFileList::initMenu(HMENU hMenu, int idBase, int posBase) {
 	_hMenu = hMenu;

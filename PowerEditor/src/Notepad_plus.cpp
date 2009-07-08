@@ -44,6 +44,7 @@
 #include "WordStyleDlg.h"
 #include "WindowsDlg.h"
 #include "WindowsDlgRc.h"
+#include "lastRecentFileList.h"
 
 
 const TCHAR Notepad_plus::_className[32] = TEXT("Notepad++");
@@ -82,7 +83,7 @@ Notepad_plus::Notepad_plus(): Window(), _mainWindowStatus(0), _pDocTab(NULL), _p
 	_autoCompleteMain(&_mainEditView), _autoCompleteSub(&_subEditView), _smartHighlighter(_findReplaceDlg),
 	_nativeLangEncoding(CP_ACP), _isFileOpening(false),
 	_findReplaceDlg(NULL), _incrementFindDlg(NULL), _aboutDlg(NULL), _runDlg(NULL), _goToLineDlg(NULL),
-	_colEditorDlg(NULL), _configStyleDlg(NULL), _preferenceDlg(NULL), _windowsMenu(NULL)
+	_colEditorDlg(NULL), _configStyleDlg(NULL), _preferenceDlg(NULL), _lastRecentFileList(new LastRecentFileList), _windowsMenu(NULL)
 {
 
 	ZeroMemory(&_prevSelectedRange, sizeof(_prevSelectedRange));
@@ -110,7 +111,7 @@ Notepad_plus::Notepad_plus(): Window(), _mainWindowStatus(0), _pDocTab(NULL), _p
 				{
 					const char * encodingStr = declaration->Encoding();
 					_nativeLangEncoding = getCpFromStringValue(encodingStr);
-					_lastRecentFileList.setLangEncoding(_nativeLangEncoding);
+					_lastRecentFileList->setLangEncoding(_nativeLangEncoding);
 				}
 			}
 		}
@@ -202,6 +203,8 @@ Notepad_plus::~Notepad_plus()
 	(WcharMbcsConvertor::getInstance())->destroyInstance();
 	if (_pTrayIco)
 		delete _pTrayIco;
+
+	delete _lastRecentFileList;
 }
 
 void Notepad_plus::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLine, CmdLineParams *cmdLineParams)
@@ -739,7 +742,7 @@ BufferID Notepad_plus::doOpen(const TCHAR *fileName, bool isReadOnly)
 	::GetFullPathName(fileName, MAX_PATH, longFileName, NULL);
 	::GetLongPathName(longFileName, longFileName, MAX_PATH);
 
-	_lastRecentFileList.remove(longFileName);
+	_lastRecentFileList->remove(longFileName);
 
 	const TCHAR * fileName2Find;
 	generic_string gs_fileName = fileName;
@@ -981,7 +984,7 @@ void Notepad_plus::doClose(BufferID id, int whichOne) {
 	//add to recent files if its an existing file
 	if (!buf->isUntitled() && PathFileExists(buf->getFullPathName()))
 	{
-		_lastRecentFileList.add(buf->getFullPathName());
+		_lastRecentFileList->add(buf->getFullPathName());
 	}
 
 	int nrDocs = whichOne==MAIN_VIEW?(_mainDocTab.nbItem()):(_subDocTab.nbItem());
@@ -4287,7 +4290,7 @@ void Notepad_plus::command(int id)
 				if (size > NB_MAX_LRF_FILE)
 					size = NB_MAX_LRF_FILE;
 				pNppParam->setNbMaxFile(size);
-				_lastRecentFileList.setUserMaxNbLRF(size);
+				_lastRecentFileList->setUserMaxNbLRF(size);
 			}
 			break;
 		}
@@ -4310,7 +4313,7 @@ void Notepad_plus::command(int id)
 			break;
 		}
 
-		case IDM_SETTING_PREFERECE :
+		case IDM_SETTING_PREFERENCE :
 		{
 			assert(_preferenceDlg);
 			bool isFirstTime = !_preferenceDlg->isCreated();
@@ -4554,10 +4557,10 @@ void Notepad_plus::command(int id)
 
 		case IDM_OPEN_ALL_RECENT_FILE : {
 			BufferID lastOne = BUFFER_INVALID;
-			int size = _lastRecentFileList.getSize();
+			int size = _lastRecentFileList->getSize();
 			for (int i = size - 1; i >= 0; i--)
 			{
-				BufferID test = doOpen(_lastRecentFileList.getIndex(i).c_str());
+				BufferID test = doOpen(_lastRecentFileList->getIndex(i).c_str());
 				if (test != BUFFER_INVALID)
 					lastOne = test;
 			}
@@ -4567,7 +4570,7 @@ void Notepad_plus::command(int id)
 			break; }
 
 		case IDM_CLEAN_RECENT_FILE_LIST :
-			_lastRecentFileList.clear();
+			_lastRecentFileList->clear();
 			break;
 
 		case IDM_EDIT_RTL :
@@ -4604,9 +4607,9 @@ void Notepad_plus::command(int id)
 		break;
 
 		default :
-			if (id > IDM_FILEMENU_LASTONE && id < (IDM_FILEMENU_LASTONE + _lastRecentFileList.getMaxNbLRF() + 1))
+			if (id > IDM_FILEMENU_LASTONE && id < (IDM_FILEMENU_LASTONE + _lastRecentFileList->getMaxNbLRF() + 1))
 			{
-				BufferID lastOpened = doOpen(_lastRecentFileList.getItem(id).c_str());
+				BufferID lastOpened = doOpen(_lastRecentFileList->getItem(id).c_str());
 				if (lastOpened != BUFFER_INVALID) {
 					switchToFile(lastOpened);
 				}
@@ -5224,7 +5227,7 @@ bool Notepad_plus::reloadLang()
 		changeUserDefineLang();
 	}
 
-	_lastRecentFileList.setLangEncoding(_nativeLangEncoding);
+	_lastRecentFileList->setLangEncoding(_nativeLangEncoding);
 	return true;
 }
 
@@ -7400,13 +7403,13 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			int nbLRFile = pNppParam->getNbLRFile();
 			int pos = IDM_FILEMENU_LASTONE - IDM_FILE + 2;
 
-			_lastRecentFileList.initMenu(hFileMenu, IDM_FILEMENU_LASTONE + 1, pos);
+			_lastRecentFileList->initMenu(hFileMenu, IDM_FILEMENU_LASTONE + 1, pos);
 			for (int i = 0 ; i < nbLRFile ; i++)
 			{
 				generic_string * stdStr = pNppParam->getLRFile(i);
 				if (!nppGUI._checkHistoryFiles || PathFileExists(stdStr->c_str()))
 				{
-					_lastRecentFileList.add(stdStr->c_str());
+					_lastRecentFileList->add(stdStr->c_str());
 				}
 			}
 
@@ -8778,14 +8781,14 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 				getCurrentOpenedFiles(currentSession);
 				//Lock the recent file list so it isnt populated with opened files
 				//Causing them to show on restart even though they are loaded by session
-				_lastRecentFileList.setLock(true);	//only lock when the session is remembered
+				_lastRecentFileList->setLock(true);	//only lock when the session is remembered
 			}
 
 			bool allClosed = fileCloseAll();	//try closing files before doing anything else
 
 			if (nppgui._rememberLastSession)
 			{
-				_lastRecentFileList.setLock(false);	//only lock when the session is remembered
+				_lastRecentFileList->setLock(false);	//only lock when the session is remembered
 			}
 
 			if (!allClosed)
@@ -8810,7 +8813,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 			saveFindHistory();
 
-			_lastRecentFileList.saveLRFL();
+			_lastRecentFileList->saveLRFL();
 			saveScintillaParams(SCIV_PRIMARY);
 			saveScintillaParams(SCIV_SECOND);
 			saveGUIParams();
