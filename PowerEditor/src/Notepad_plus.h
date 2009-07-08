@@ -18,7 +18,6 @@
 #ifndef NOTEPAD_PLUS_H
 #define NOTEPAD_PLUS_H
 #include "ScintillaEditView.h"
-#include "ToolBar.h"
 #include "DocTabView.h"
 
 #include "trayIconControler.h"
@@ -64,6 +63,7 @@ class WordStyleDlg;
 class PreferenceDlg;
 class WindowsMenu;
 class LastRecentFileList;
+class ToolBar;
 
 struct TaskListInfo;
 static TiXmlNodeA * searchDlgNode(TiXmlNodeA *node, const char *dlgTagName);
@@ -239,7 +239,7 @@ private:
 
     ContextMenu _tabPopupMenu, _tabPopupDropMenu;
 
-	ToolBar	_toolBar;
+	ToolBar*	_toolBar;
 	IconList _docTabIconList;
 
     StatusBar _statusBar;

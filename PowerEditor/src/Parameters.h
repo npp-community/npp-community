@@ -28,6 +28,7 @@
 #include "colors.h"
 #include "shortcut.h"
 #include "ContextMenu.h"
+#include "Notepad_plus_msgs.h"
 
 using namespace std;
 

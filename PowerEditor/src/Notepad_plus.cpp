@@ -29,9 +29,7 @@
 #include "lesDlgs.h"
 #include "Utf8_16.h"
 #include "regExtDlg.h"
-#include "RunDlg.h"
 #include "ShortcutMapper.h"
-#include "preferenceDlg.h"
 #include "TaskListDlg.h"
 #include "xmlMatchedTagsHighlighter.h"
 #include "Process.h"
@@ -45,7 +43,7 @@
 #include "WindowsDlg.h"
 #include "WindowsDlgRc.h"
 #include "lastRecentFileList.h"
-
+#include "ToolBar.h"
 
 const TCHAR Notepad_plus::_className[32] = TEXT("Notepad++");
 HWND Notepad_plus::gNppHWND = NULL;
@@ -82,7 +80,7 @@ Notepad_plus::Notepad_plus(): Window(), _mainWindowStatus(0), _pDocTab(NULL), _p
 	_linkTriggered(true), _isDocModifing(false), _isHotspotDblClicked(false), _sysMenuEntering(false),
 	_autoCompleteMain(&_mainEditView), _autoCompleteSub(&_subEditView), _smartHighlighter(_findReplaceDlg),
 	_nativeLangEncoding(CP_ACP), _isFileOpening(false),
-	_findReplaceDlg(NULL), _incrementFindDlg(NULL), _aboutDlg(NULL), _runDlg(NULL), _goToLineDlg(NULL),
+	_toolBar(NULL), _findReplaceDlg(NULL), _incrementFindDlg(NULL), _aboutDlg(NULL), _runDlg(NULL), _goToLineDlg(NULL),
 	_colEditorDlg(NULL), _configStyleDlg(NULL), _preferenceDlg(NULL), _lastRecentFileList(new LastRecentFileList), _windowsMenu(NULL)
 {
 
@@ -372,7 +370,6 @@ void Notepad_plus::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLine, CmdL
 
 void Notepad_plus::killAllChildren()
 {
-	_toolBar.destroy();
 	_rebarTop.destroy();
 	_rebarBottom.destroy();
 
@@ -394,6 +391,12 @@ void Notepad_plus::killAllChildren()
 
 	_scintillaCtrls4Plugins.destroy();
 	_dockingManager.destroy();
+
+	if	(_toolBar)
+	{
+		delete _toolBar;
+		_toolBar = NULL;
+	}
 
 	if (_findReplaceDlg)
 	{
@@ -461,7 +464,7 @@ bool Notepad_plus::saveGUIParams()
 	NppGUI & nppGUI = (NppGUI &)(NppParameters::getInstance())->getNppGUI();
 	nppGUI._statusBarShow = _statusBar.isVisible();
 	nppGUI._toolbarShow = _rebarTop.getIDVisible(REBAR_BAR_TOOLBAR);
-	nppGUI._toolBarStatus = _toolBar.getState();
+	nppGUI._toolBarStatus = _toolBar->getState();
 
 	nppGUI._tabStatus = (TabBarPlus::doDragNDropOrNot()?TAB_DRAWTOPBAR:0) | \
 						(TabBarPlus::drawTopBar()?TAB_DRAGNDROP:0) | \
@@ -2006,7 +2009,8 @@ void Notepad_plus::enableCommand(int cmdID, bool doEnable, int which) const
 	}
 	if (which & TOOLBAR)
 	{
-		_toolBar.enable(cmdID, doEnable);
+		assert(_toolBar);
+		_toolBar->enable(cmdID, doEnable);
 	}
 }
 
@@ -2094,12 +2098,13 @@ void Notepad_plus::checkSyncState()
 	bool canDoSync = viewVisible(MAIN_VIEW) && viewVisible(SUB_VIEW);
 	if (!canDoSync)
 	{
+		assert(_toolBar);
 		_syncInfo._isSynScollV = false;
 		_syncInfo._isSynScollH = false;
 		checkMenuItem(IDM_VIEW_SYNSCROLLV, false);
 		checkMenuItem(IDM_VIEW_SYNSCROLLH, false);
-		_toolBar.setCheck(IDM_VIEW_SYNSCROLLV, false);
-		_toolBar.setCheck(IDM_VIEW_SYNSCROLLH, false);
+		_toolBar->setCheck(IDM_VIEW_SYNSCROLLV, false);
+		_toolBar->setCheck(IDM_VIEW_SYNSCROLLH, false);
 	}
 	enableCommand(IDM_VIEW_SYNSCROLLV, canDoSync, MENU | TOOLBAR);
 	enableCommand(IDM_VIEW_SYNSCROLLH, canDoSync, MENU | TOOLBAR);
@@ -2818,11 +2823,12 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 		//If N++ ID, use proper object
 		switch(lpnm->wID) {
 			case REBAR_BAR_TOOLBAR: {
+				assert(_toolBar);
 				POINT pt;
 				pt.x = lpnm->rc.left;
 				pt.y = lpnm->rc.bottom;
 				ClientToScreen(notifRebar->getHSelf(), &pt);
-				_toolBar.doPopop(pt);
+				_toolBar->doPopop(pt);
 				return TRUE;
 				break; }
 		}
@@ -3573,6 +3579,7 @@ void Notepad_plus::command(int id)
 
         case IDM_VIEW_USER_DLG :
         {
+			assert(_toolBar);
 		    bool isUDDlgVisible = false;
 
 		    UserDefineDialog *udd = _pEditView->getUserDefineDlg();
@@ -3637,7 +3644,7 @@ void Notepad_plus::command(int id)
 					udd->display();
 			}
 			checkMenuItem(IDM_VIEW_USER_DLG, !isUDDlgVisible);
-			_toolBar.setCheck(IDM_VIEW_USER_DLG, !isUDDlgVisible);
+			_toolBar->setCheck(IDM_VIEW_USER_DLG, !isUDDlgVisible);
 
             break;
         }
@@ -3791,11 +3798,12 @@ void Notepad_plus::command(int id)
 
 		case IDM_VIEW_TOOLBAR_REDUCE:
 		{
-            toolBarStatusType state = _toolBar.getState();
+			assert(_toolBar);
+            toolBarStatusType state = _toolBar->getState();
 
             if (state != TB_SMALL)
             {
-			    _toolBar.reduce();
+			    _toolBar->reduce();
 			    changeToolBarIcons();
             }
 		}
@@ -3803,11 +3811,12 @@ void Notepad_plus::command(int id)
 
 		case IDM_VIEW_TOOLBAR_ENLARGE:
 		{
-            toolBarStatusType state = _toolBar.getState();
+			assert(_toolBar);
+            toolBarStatusType state = _toolBar->getState();
 
             if (state != TB_LARGE)
             {
-			    _toolBar.enlarge();
+			    _toolBar->enlarge();
 			    changeToolBarIcons();
             }
 		}
@@ -3815,11 +3824,12 @@ void Notepad_plus::command(int id)
 
 		case IDM_VIEW_TOOLBAR_STANDARD:
 		{
-			toolBarStatusType state = _toolBar.getState();
+			assert(_toolBar);
+			toolBarStatusType state = _toolBar->getState();
 
             if (state != TB_STANDARD)
             {
-				_toolBar.setToUglyIcons();
+				_toolBar->setToUglyIcons();
 			}
 		}
 		break;
@@ -3919,50 +3929,55 @@ void Notepad_plus::command(int id)
 
 		case IDM_VIEW_TAB_SPACE:
 		{
+			assert(_toolBar);
 			bool isChecked = !(::GetMenuState(_mainMenuHandle, IDM_VIEW_TAB_SPACE, MF_BYCOMMAND) == MF_CHECKED);
 			::CheckMenuItem(_mainMenuHandle, IDM_VIEW_EOL, MF_BYCOMMAND | MF_UNCHECKED);
 			::CheckMenuItem(_mainMenuHandle, IDM_VIEW_ALL_CHARACTERS, MF_BYCOMMAND | MF_UNCHECKED);
 			::CheckMenuItem(_mainMenuHandle, IDM_VIEW_TAB_SPACE, MF_BYCOMMAND | (isChecked?MF_CHECKED:MF_UNCHECKED));
-			_toolBar.setCheck(IDM_VIEW_ALL_CHARACTERS, false);
+			_toolBar->setCheck(IDM_VIEW_ALL_CHARACTERS, false);
 			_pEditView->showEOL(false);
 			_pEditView->showWSAndTab(isChecked);
 			break;
 		}
 		case IDM_VIEW_EOL:
 		{
+			assert(_toolBar);
 			bool isChecked = !(::GetMenuState(_mainMenuHandle, IDM_VIEW_EOL, MF_BYCOMMAND) == MF_CHECKED);
 			::CheckMenuItem(_mainMenuHandle, IDM_VIEW_TAB_SPACE, MF_BYCOMMAND | MF_UNCHECKED);
 			::CheckMenuItem(_mainMenuHandle, IDM_VIEW_EOL, MF_BYCOMMAND | (isChecked?MF_CHECKED:MF_UNCHECKED));
 			::CheckMenuItem(_mainMenuHandle, IDM_VIEW_ALL_CHARACTERS, MF_BYCOMMAND | MF_UNCHECKED);
-			_toolBar.setCheck(IDM_VIEW_ALL_CHARACTERS, false);
+			_toolBar->setCheck(IDM_VIEW_ALL_CHARACTERS, false);
 			_pEditView->showEOL(isChecked);
 			_pEditView->showWSAndTab(false);
 			break;
 		}
 		case IDM_VIEW_ALL_CHARACTERS:
 		{
+			assert(_toolBar);
 			bool isChecked = !(::GetMenuState(_mainMenuHandle, id, MF_BYCOMMAND) == MF_CHECKED);
 			::CheckMenuItem(_mainMenuHandle, IDM_VIEW_EOL, MF_BYCOMMAND | MF_UNCHECKED);
 			::CheckMenuItem(_mainMenuHandle, IDM_VIEW_TAB_SPACE, MF_BYCOMMAND | MF_UNCHECKED);
 			::CheckMenuItem(_mainMenuHandle, IDM_VIEW_ALL_CHARACTERS, MF_BYCOMMAND | (isChecked?MF_CHECKED:MF_UNCHECKED));
 			_pEditView->showInvisibleChars(isChecked);
-			_toolBar.setCheck(IDM_VIEW_ALL_CHARACTERS, isChecked);
+			_toolBar->setCheck(IDM_VIEW_ALL_CHARACTERS, isChecked);
 			break;
 		}
 
 		case IDM_VIEW_INDENT_GUIDE:
 		{
+			assert(_toolBar);
 			_pEditView->showIndentGuideLine(!_pEditView->isShownIndentGuide());
-            _toolBar.setCheck(IDM_VIEW_INDENT_GUIDE, _pEditView->isShownIndentGuide());
+            _toolBar->setCheck(IDM_VIEW_INDENT_GUIDE, _pEditView->isShownIndentGuide());
 			checkMenuItem(IDM_VIEW_INDENT_GUIDE, _pEditView->isShownIndentGuide());
 			break;
 		}
 
 		case IDM_VIEW_WRAP:
 		{
+			assert(_toolBar);
 			bool isWraped = !_pEditView->isWrap();
 			_pEditView->wrap(isWraped);
-            _toolBar.setCheck(IDM_VIEW_WRAP, isWraped);
+            _toolBar->setCheck(IDM_VIEW_WRAP, isWraped);
 			checkMenuItem(IDM_VIEW_WRAP, isWraped);
 			break;
 		}
@@ -3995,9 +4010,10 @@ void Notepad_plus::command(int id)
 
 		case IDM_VIEW_SYNSCROLLV:
 		{
+			assert(_toolBar);
 			_syncInfo._isSynScollV = !_syncInfo._isSynScollV;
 			checkMenuItem(IDM_VIEW_SYNSCROLLV, _syncInfo._isSynScollV);
-			_toolBar.setCheck(IDM_VIEW_SYNSCROLLV, _syncInfo._isSynScollV);
+			_toolBar->setCheck(IDM_VIEW_SYNSCROLLV, _syncInfo._isSynScollV);
 
 			if (_syncInfo._isSynScollV)
 			{
@@ -4011,9 +4027,10 @@ void Notepad_plus::command(int id)
 
 		case IDM_VIEW_SYNSCROLLH:
 		{
+			assert(_toolBar);
 			_syncInfo._isSynScollH = !_syncInfo._isSynScollH;
 			checkMenuItem(IDM_VIEW_SYNSCROLLH, _syncInfo._isSynScollH);
-			_toolBar.setCheck(IDM_VIEW_SYNSCROLLH, _syncInfo._isSynScollH);
+			_toolBar->setCheck(IDM_VIEW_SYNSCROLLH, _syncInfo._isSynScollH);
 
 			if (_syncInfo._isSynScollH)
 			{
@@ -5559,6 +5576,8 @@ void Notepad_plus::bookmarkNext(bool forwardScan)
 
 void Notepad_plus::dynamicCheckMenuAndTB() const
 {
+	assert(_toolBar);
+
 	// Visibility of 3 margins
     checkMenuItem(IDM_VIEW_LINENUMBER, _pEditView->hasMarginShowed(ScintillaEditView::_SC_MARGE_LINENUMBER));
     checkMenuItem(IDM_VIEW_SYMBOLMARGIN, _pEditView->hasMarginShowed(ScintillaEditView::_SC_MARGE_SYBOLE));
@@ -5593,12 +5612,12 @@ void Notepad_plus::dynamicCheckMenuAndTB() const
 	checkMenuItem(IDM_VIEW_TAB_SPACE, onlyWS);
 	checkMenuItem(IDM_VIEW_EOL, onlyEOL);
 	checkMenuItem(IDM_VIEW_ALL_CHARACTERS, bothWSEOL);
-	_toolBar.setCheck(IDM_VIEW_ALL_CHARACTERS, bothWSEOL);
+	_toolBar->setCheck(IDM_VIEW_ALL_CHARACTERS, bothWSEOL);
 
 	// Visibility of the indentation guide line
 	bool b = _pEditView->isShownIndentGuide();
 	checkMenuItem(IDM_VIEW_INDENT_GUIDE, b);
-	_toolBar.setCheck(IDM_VIEW_INDENT_GUIDE, b);
+	_toolBar->setCheck(IDM_VIEW_INDENT_GUIDE, b);
 
 	// Edge Line
 	int mode = int(_pEditView->execute(SCI_GETEDGEMODE));
@@ -5611,7 +5630,7 @@ void Notepad_plus::dynamicCheckMenuAndTB() const
 	// Wrap
 	b = _pEditView->isWrap();
 	checkMenuItem(IDM_VIEW_WRAP, b);
-	_toolBar.setCheck(IDM_VIEW_WRAP, b);
+	_toolBar->setCheck(IDM_VIEW_WRAP, b);
 	checkMenuItem(IDM_VIEW_WRAP_SYMBOL, _pEditView->isWrapSymbolVisible());
 
 	//Format conversion
@@ -6978,10 +6997,11 @@ bool Notepad_plus::addCurrentMacro()
 
 void Notepad_plus::changeToolBarIcons()
 {
+	assert(_toolBar);
 	if (!_toolIcons)
 		return;
 	for (int i = 0 ; i < int(_customIconVect.size()) ; i++)
-		_toolBar.changeIcons(_customIconVect[i].listIndex, _customIconVect[i].iconIndex, (_customIconVect[i].iconLocation).c_str());
+		_toolBar->changeIcons(_customIconVect[i].listIndex, _customIconVect[i].iconIndex, (_customIconVect[i].iconLocation).c_str());
 }
 
 bool Notepad_plus::switchToFile(BufferID id)
@@ -7114,6 +7134,11 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		case WM_CREATE:
 		{
 			NppGUI & nppGUI = (NppGUI &)pNppParam->getNppGUI();
+
+			if (!_toolBar)
+			{
+				_toolBar = new ToolBar();
+			}
 
 			// Init dialogs and windows.
 			if(!_findReplaceDlg)
@@ -7495,13 +7520,13 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			scnN.nmhdr.idFrom = 0;
 			_pluginsManager.notify(&scnN);
 
-			_toolBar.init(_hInst, hwnd, tbStatus, toolBarIcons, sizeof(toolBarIcons)/sizeof(ToolBarButtonUnit));
+			_toolBar->init(_hInst, hwnd, tbStatus, toolBarIcons, sizeof(toolBarIcons)/sizeof(ToolBarButtonUnit));
 
 			changeToolBarIcons();
 
 			_rebarTop.init(_hInst, hwnd);
 			_rebarBottom.init(_hInst, hwnd);
-			_toolBar.addToRebar(&_rebarTop);
+			_toolBar->addToRebar(&_rebarTop);
 			_rebarTop.setIDVisible(REBAR_BAR_TOOLBAR, willBeShown);
 
 			//--Init dialogs--//
@@ -7542,7 +7567,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			// UserDefine Dialog
 
 			checkMenuItem(IDM_VIEW_USER_DLG, uddShow);
-			_toolBar.setCheck(IDM_VIEW_USER_DLG, uddShow);
+			_toolBar->setCheck(IDM_VIEW_USER_DLG, uddShow);
 
 			//launch the plugin dlg memorized at the last session
 			DockingManagerData &dmd = nppGUI._dockingData;
@@ -7630,8 +7655,9 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 		case WM_CLOSE_USERDEFINE_DLG :
 		{
+			assert(_toolBar);
 			checkMenuItem(IDM_VIEW_USER_DLG, false);
-			_toolBar.setCheck(IDM_VIEW_USER_DLG, false);
+			_toolBar->setCheck(IDM_VIEW_USER_DLG, false);
 			return TRUE;
 		}
 
@@ -8953,14 +8979,16 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 		case NPPM_ADDTOOLBARICON:
 		{
-			_toolBar.registerDynBtn((UINT)wParam, (toolbarIcons*)lParam);
+			assert(_toolBar);
+			_toolBar->registerDynBtn((UINT)wParam, (toolbarIcons*)lParam);
 			return TRUE;
 		}
 
 		case NPPM_SETMENUITEMCHECK:
 		{
+			assert(_toolBar);
 			::CheckMenuItem(_mainMenuHandle, (UINT)wParam, MF_BYCOMMAND | ((BOOL)lParam ? MF_CHECKED : MF_UNCHECKED));
-			_toolBar.setCheck((int)wParam, bool(lParam != 0));
+			_toolBar->setCheck((int)wParam, bool(lParam != 0));
 			return TRUE;
 		}
 
