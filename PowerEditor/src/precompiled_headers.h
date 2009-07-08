@@ -9,6 +9,8 @@
 #include <dlgs.h>
 #include <ShellAPI.h>
 #include <dbghelp.h>
+#include <eh.h>
+
 
 #include <exception>		//default C++ exception
 
