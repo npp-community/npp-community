@@ -50,6 +50,7 @@ public :
     virtual void destroy() {
         _emailLink.destroy();
         _pageLink.destroy();
+        StaticDialog::destroy();
     };
 
 protected :

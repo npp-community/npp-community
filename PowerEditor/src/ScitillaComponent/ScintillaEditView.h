@@ -19,13 +19,9 @@
 #define SCINTILLA_EDIT_VIEW_H
 
 #include "Scintilla.h"
-#include "ScintillaRef.h"
 #include "SciLexer.h"
 #include "Buffer.h"
-#include "colors.h"
 #include "UserDefineDialog.h"
-#include "xpm_icons.h"
-#include "resource.h"
 
 #ifndef WM_MOUSEWHEEL
 #define WM_MOUSEWHEEL 0x020A

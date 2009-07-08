@@ -61,10 +61,6 @@ public :
 
 	void doDialog(bool isRTL = false);
 
-    virtual void destroy() {
-
-    };
-
 protected :
 	virtual BOOL CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
 

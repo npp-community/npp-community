@@ -20,6 +20,176 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "precompiled_headers.h"
 #include "WordStyleDlg.h"
 
+#include "ColourPicker.h"
+#include "WordStyleDlgRes.h"
+#include "TabBar.h"
+
+
+class ColourStaticTextHooker {
+public :
+	ColourStaticTextHooker() : _colour(RGB(0x00, 0x00, 0x00))/*, _hFont(NULL)*/ {};
+
+	COLORREF setColour(COLORREF colour2Set) {
+		COLORREF oldColour = _colour;
+		_colour = colour2Set;
+		return oldColour;
+	};
+	void hookOn(HWND staticHandle) {
+		::SetWindowLongPtr(staticHandle, GWL_USERDATA, (LONG)this);
+		_oldProc = (WNDPROC)::SetWindowLongPtr(staticHandle, GWL_WNDPROC, (LONG)staticProc);
+	};
+private :
+	COLORREF _colour;
+	WNDPROC _oldProc;
+
+	static BOOL CALLBACK staticProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam){
+		ColourStaticTextHooker *pColourStaticTextHooker = reinterpret_cast<ColourStaticTextHooker *>(::GetWindowLongPtr(hwnd, GWL_USERDATA));
+		return pColourStaticTextHooker->colourStaticProc(hwnd, message, wParam, lParam);
+	};
+	BOOL CALLBACK colourStaticProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
+};
+
+WordStyleDlg::WordStyleDlg():
+	_isDirty(false),
+	_isThemeDirty(false),
+	_restoreInvalid(false),
+	_isShownGOCtrls(false),
+	_currentLexerIndex(0),
+	colourHooker(new ColourStaticTextHooker)
+{}
+
+WordStyleDlg::~WordStyleDlg()
+{
+	delete colourHooker;
+}
+
+void WordStyleDlg::doDialog(bool isRTL)
+{
+	if (!isCreated())
+	{
+		create(IDD_STYLER_DLG, isRTL);
+		prepare2Cancel();
+	}
+
+	if (!::IsWindowVisible(_hSelf))
+	{
+		prepare2Cancel();
+	}
+	display();
+}
+
+void WordStyleDlg::prepare2Cancel()
+{
+	_styles2restored = (NppParameters::getInstance())->getLStylerArray();
+	_gstyles2restored = (NppParameters::getInstance())->getGlobalStylers();
+	_gOverride2restored = (NppParameters::getInstance())->getGlobalOverrideStyle();
+};
+
+void WordStyleDlg::redraw() const
+{
+	_pFgColour->redraw();
+	_pBgColour->redraw();
+	::InvalidateRect(_hStyleInfoStaticText, NULL, TRUE);
+	::UpdateWindow(_hStyleInfoStaticText);
+}
+
+void WordStyleDlg::restoreGlobalOverrideValues()
+{
+	GlobalOverride & gOverride = (NppParameters::getInstance())->getGlobalOverrideStyle();
+	gOverride = _gOverride2restored;
+}
+
+Style & WordStyleDlg::getCurrentStyler()
+{
+	int styleIndex = ::SendDlgItemMessage(_hSelf, IDC_STYLES_LIST, LB_GETCURSEL, 0, 0);
+	if (_currentLexerIndex == 0)
+		return _globalStyles.getStyler(styleIndex);
+	else
+	{
+		LexerStyler & lexerStyler = _lsArray.getLexerFromIndex(_currentLexerIndex - 1);
+		return lexerStyler.getStyler(styleIndex);
+	}
+}
+
+int WordStyleDlg::whichTabColourIndex()
+{
+	int i = ::SendDlgItemMessage(_hSelf, IDC_STYLES_LIST, LB_GETCURSEL, 0, 0);
+	if (i == LB_ERR)
+		return -1;
+	TCHAR styleName[128];
+	::SendDlgItemMessage(_hSelf, IDC_STYLES_LIST, LB_GETTEXT, i, (LPARAM)styleName);
+
+	if (lstrcmp(styleName, TABBAR_ACTIVEFOCUSEDINDCATOR) == 0)
+		return (int)TabBarPlus::activeFocusedTop;
+
+	if (lstrcmp(styleName, TABBAR_ACTIVEUNFOCUSEDINDCATOR) == 0)
+		return (int)TabBarPlus::activeUnfocusedTop;
+
+	if (lstrcmp(styleName, TABBAR_ACTIVETEXT) == 0)
+		return (int)TabBarPlus::activeText;
+
+	if (lstrcmp(styleName, TABBAR_INACTIVETEXT) == 0)
+		return (int)TabBarPlus::inactiveText;
+
+	return -1;
+}
+
+void WordStyleDlg::enableFg(bool isEnable)
+{
+	::EnableWindow(_pFgColour->getHSelf(), isEnable);
+	::EnableWindow(_hFgColourStaticText, isEnable);
+}
+
+void WordStyleDlg::enableBg(bool isEnable)
+{
+	::EnableWindow(_pBgColour->getHSelf(), isEnable);
+	::EnableWindow(_hBgColourStaticText, isEnable);
+}
+
+void WordStyleDlg::enableFontName(bool isEnable)
+{
+	::EnableWindow(_hFontNameCombo, isEnable);
+	::EnableWindow(_hFontNameStaticText, isEnable);
+}
+
+void WordStyleDlg::enableFontSize(bool isEnable)
+{
+	::EnableWindow(_hFontSizeCombo, isEnable);
+	::EnableWindow(_hFontSizeStaticText, isEnable);
+}
+
+void WordStyleDlg::enableFontStyle(bool isEnable)
+{
+	::EnableWindow(_hCheckBold, isEnable);
+	::EnableWindow(_hCheckItalic, isEnable);
+	::EnableWindow(_hCheckUnderline, isEnable);
+}
+
+long WordStyleDlg::notifyDataModified()
+{
+	_isDirty = true;
+	_isThemeDirty = true;
+	::EnableWindow(::GetDlgItem(_hSelf, IDC_SAVECLOSE_BUTTON), TRUE);
+	return TRUE;
+}
+
+void WordStyleDlg::showGlobalOverrideCtrls(bool show)
+{
+	if (show)
+	{
+		updateGlobalOverrideCtrls();
+	}
+	::ShowWindow(::GetDlgItem(_hSelf, IDC_GLOBAL_FG_CHECK), show?SW_SHOW:SW_HIDE);
+	::ShowWindow(::GetDlgItem(_hSelf, IDC_GLOBAL_BG_CHECK), show?SW_SHOW:SW_HIDE);
+	::ShowWindow(::GetDlgItem(_hSelf, IDC_GLOBAL_FONT_CHECK), show?SW_SHOW:SW_HIDE);
+	::ShowWindow(::GetDlgItem(_hSelf, IDC_GLOBAL_FONTSIZE_CHECK), show?SW_SHOW:SW_HIDE);
+	::ShowWindow(::GetDlgItem(_hSelf, IDC_GLOBAL_BOLD_CHECK), show?SW_SHOW:SW_HIDE);
+	::ShowWindow(::GetDlgItem(_hSelf, IDC_GLOBAL_ITALIC_CHECK), show?SW_SHOW:SW_HIDE);
+	::ShowWindow(::GetDlgItem(_hSelf, IDC_GLOBAL_UNDERLINE_CHECK), show?SW_SHOW:SW_HIDE);
+	_isShownGOCtrls = show;
+}
+
+
 BOOL CALLBACK ColourStaticTextHooker::colourStaticProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	switch(Message)
@@ -86,8 +256,8 @@ BOOL CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPar
 			_hFontSizeStaticText = ::GetDlgItem(_hSelf, IDC_FONTSIZE_STATIC);
 			_hStyleInfoStaticText = ::GetDlgItem(_hSelf, IDC_STYLEDESCRIPTION_STATIC);
 
-			colourHooker.setColour(RGB(0xFF, 0x00, 0x00));
-			colourHooker.hookOn(_hStyleInfoStaticText);
+			colourHooker->setColour(RGB(0xFF, 0x00, 0x00));
+			colourHooker->hookOn(_hStyleInfoStaticText);
 
 			_currentThemeIndex = -1;
 			int defaultThemeIndex = 0;
@@ -152,10 +322,10 @@ BOOL CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPar
 			}
 
 			updateGlobalOverrideCtrls();
+			loadLangListFromNppParam();
 			setVisualFromStyleList();
 			goToCenter();
 
-			loadLangListFromNppParam();
 
 			return TRUE;
 		}
@@ -684,7 +854,7 @@ void WordStyleDlg::setVisualFromStyleList()
 
 	// PAD for fix a display glitch
 	lstrcat(str, TEXT("          "));
-	colourHooker.setColour(c);
+	colourHooker->setColour(c);
 	::SetWindowText(_hStyleInfoStaticText, str);
 
 	//-- 2 couleurs : fg et bg

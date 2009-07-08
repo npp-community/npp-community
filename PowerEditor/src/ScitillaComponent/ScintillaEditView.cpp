@@ -19,6 +19,7 @@
 #include "precompiled_headers.h"
 #include "ScintillaEditView.h"
 #include "Parameters.h"
+#include "xpm_icons.h"
 
 
 // initialize the static variable

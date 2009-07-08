@@ -150,6 +150,11 @@ void Searching::displaySectionCentered(int posStart, int posEnd, ScintillaEditVi
 
 LONG FindReplaceDlg::originalFinderProc = NULL;
 
+void FindReplaceDlg::destroy()
+{
+	_tab.destroy();
+	StaticDialog::destroy();
+}
 
 #ifdef UNICODE
 void FindReplaceDlg::addText2Combo(const TCHAR * txt2add, HWND hCombo, bool /*isUTF8*/)
@@ -1970,6 +1975,7 @@ void FindIncrementDlg::destroy()
 		_pRebar->removeBand(_rbBand.wID);
 		_pRebar = NULL;
 	}
+	StaticDialog::destroy();
 }
 
 void FindIncrementDlg::display(bool toShow) const

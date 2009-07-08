@@ -18,6 +18,17 @@
 #include "precompiled_headers.h"
 #include "StaticDialog.h"
 #include "Common.h"
+#include "Notepad_plus_msgs.h"
+
+
+StaticDialog::~StaticDialog()
+{
+	if (isCreated()) {
+		::SetWindowLongPtr(_hSelf, GWL_USERDATA, (long)NULL);	//Prevent run_dlgProc from doing anything, since its virtual
+		destroy();
+	}
+}
+
 
 void StaticDialog::goToCenter()
 {
@@ -167,3 +178,20 @@ void StaticDialog::alignWith(HWND handle, HWND handle2Align, PosAlign pos, POINT
 
     ::ScreenToClient(_hSelf, &point);
 }
+
+POINT StaticDialog::getLeftTopPoint(HWND hwnd/*, POINT & p*/) const
+{
+	RECT rc;
+	::GetWindowRect(hwnd, &rc);
+	POINT p;
+	p.x = rc.left;
+	p.y = rc.top;
+	::ScreenToClient(_hSelf, &p);
+	return p;
+};
+
+void StaticDialog::destroy()
+{
+	::SendMessage(_hParent, NPPM_MODELESSDIALOG, MODELESSDIALOGREMOVE, (WPARAM)_hSelf);
+	::DestroyWindow(_hSelf);
+};

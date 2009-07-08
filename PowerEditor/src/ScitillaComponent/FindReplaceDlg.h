@@ -264,11 +264,12 @@ public :
 		_winVer = (NppParameters::getInstance())->getWinVersion();
 	};
 	~FindReplaceDlg() {
-		_tab.destroy();
 		if (_pFinder)
 			delete _pFinder;
 		delete [] _uniFileName;
 	};
+
+	virtual void destroy();
 
 	void init(HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView) {
 		Window::init(hInst, hPere);

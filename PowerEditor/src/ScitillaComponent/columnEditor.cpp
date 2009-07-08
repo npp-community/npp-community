@@ -19,6 +19,50 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "precompiled_headers.h"
 
 #include "columnEditor.h"
+#include "columnEditor_rc.h"
+#include "ScintillaEditView.h"
+
+void ColumnEditorDlg::init(HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView)
+{
+	Window::init(hInst, hPere);
+	if (!ppEditView)
+		throw int(9900);
+	_ppEditView = ppEditView;
+}
+
+void ColumnEditorDlg::create(int dialogID, bool isRTL)
+{
+	StaticDialog::create(dialogID, isRTL);
+}
+
+void ColumnEditorDlg::doDialog(bool isRTL)
+{
+	if (!isCreated())
+		create(IDD_COLUMNEDIT, isRTL);
+	bool isTextMode = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_COL_TEXT_RADIO, BM_GETCHECK, 0, 0));
+	display();
+	::SetFocus(::GetDlgItem(_hSelf, isTextMode?IDC_COL_TEXT_EDIT:IDC_COL_INITNUM_EDIT));
+}
+
+void ColumnEditorDlg::display(bool toShow) const
+{
+	Window::display(toShow);
+	if (toShow)
+		::SetFocus(::GetDlgItem(_hSelf, ID_GOLINE_EDIT));
+}
+
+UCHAR ColumnEditorDlg::getFormat()
+{
+	bool isLeadingZeros = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_COL_LEADZERO_CHECK, BM_GETCHECK, 0, 0));
+	UCHAR f = 0; // Dec by default
+	if (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_COL_HEX_RADIO, BM_GETCHECK, 0, 0))
+		f = 1;
+	else if (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_COL_OCT_RADIO, BM_GETCHECK, 0, 0))
+		f = 2;
+	else if (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_COL_BIN_RADIO, BM_GETCHECK, 0, 0))
+		f = 3;
+	return (f | (isLeadingZeros?MASK_ZERO_LEADING:0));
+}
 
 BOOL CALLBACK ColumnEditorDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lParam*/)
 {
