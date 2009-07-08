@@ -20,7 +20,6 @@
 #define DROP_TARGET_H
 
 #include "DockingCont.h"
-#include <windows.h>
 
 
 void RegisterDropWindow(HWND hwnd, DockingCont* pCont, IDropTarget **ppDropTarget);

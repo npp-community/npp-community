@@ -1,30 +1,35 @@
 #include "precompiled_headers.h"
-#include "WindowsDlg.h"
-#include "WindowsDlgRc.h"
+#include "SizeableDlg.h"
+#include "WinMgr.h"
 
 SizeableDlg::SizeableDlg(WINRECT* pWinMap)
-	: MyBaseClass(), _winMgr(pWinMap)
+	: MyBaseClass(), _winMgr(new CWinMgr(pWinMap))
 {
+}
+
+SizeableDlg::~SizeableDlg()
+{
+	delete _winMgr;
 }
 
 BOOL SizeableDlg::onInitDialog()
 {
-	_winMgr.InitToFitSizeFromCurrent(_hSelf);
-	_winMgr.CalcLayout(_hSelf);
-	_winMgr.SetWindowPositions(_hSelf);
+	_winMgr->InitToFitSizeFromCurrent(_hSelf);
+	_winMgr->CalcLayout(_hSelf);
+	_winMgr->SetWindowPositions(_hSelf);
 	//getClientRect(_rc);
 	return TRUE;
 }
 
 void SizeableDlg::onSize(UINT /*nType*/, int cx, int cy)
 {
-	_winMgr.CalcLayout(cx,cy,_hSelf);
-	_winMgr.SetWindowPositions(_hSelf);
+	_winMgr->CalcLayout(cx,cy,_hSelf);
+	_winMgr->SetWindowPositions(_hSelf);
 }
 
 void SizeableDlg::onGetMinMaxInfo(MINMAXINFO* lpMMI)
 {
-	_winMgr.GetMinMaxInfo(_hSelf, lpMMI);
+	_winMgr->GetMinMaxInfo(_hSelf, lpMMI);
 }
 
 LRESULT SizeableDlg::onWinMgr(WPARAM /*wp*/, LPARAM /*lp*/)

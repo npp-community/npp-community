@@ -2,6 +2,8 @@
 #include "WindowsDlg.h"
 #include "WindowsDlgRc.h"
 #include "DocTabView.h"
+#include "WinMgr.h"
+
 
 #ifndef _countof
 #define _countof(x) (sizeof(x)/sizeof((x)[0]))
@@ -128,6 +130,7 @@ struct BufferEquivalent
 		return false;
 	}
 };
+
 
 //////////////////
 // Window map tells CWinMgr how to position dialog controls
@@ -436,15 +439,15 @@ bool WindowsDlg::changeDlgLang()
 
 BOOL WindowsDlg::onInitDialog()
 {
-	_winMgr.InitToFitSizeFromCurrent(_hSelf);
+	_winMgr->InitToFitSizeFromCurrent(_hSelf);
 
 	// save min size for OK/Cancel buttons
-	_szMinButton = RectToSize(_winMgr.GetRect(IDOK));
-	_szMinListCtrl = RectToSize(_winMgr.GetRect(IDC_WINDOWS_LIST));
+	_szMinButton = RectToSize(_winMgr->GetRect(IDOK));
+	_szMinListCtrl = RectToSize(_winMgr->GetRect(IDC_WINDOWS_LIST));
 	_lastSort = -1;
 
-	_winMgr.CalcLayout(_hSelf);
-	_winMgr.SetWindowPositions(_hSelf);
+	_winMgr->CalcLayout(_hSelf);
+	_winMgr->SetWindowPositions(_hSelf);
 	getClientRect(_rc);
 
 	_hList = ::GetDlgItem(_hSelf, IDC_WINDOWS_LIST);

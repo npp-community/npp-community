@@ -42,6 +42,8 @@
 #include "columnEditor.h"
 #include "preferenceDlg.h"
 #include "WordStyleDlg.h"
+#include "WindowsDlg.h"
+#include "WindowsDlgRc.h"
 
 
 const TCHAR Notepad_plus::_className[32] = TEXT("Notepad++");
@@ -80,7 +82,7 @@ Notepad_plus::Notepad_plus(): Window(), _mainWindowStatus(0), _pDocTab(NULL), _p
 	_autoCompleteMain(&_mainEditView), _autoCompleteSub(&_subEditView), _smartHighlighter(_findReplaceDlg),
 	_nativeLangEncoding(CP_ACP), _isFileOpening(false),
 	_findReplaceDlg(NULL), _incrementFindDlg(NULL), _aboutDlg(NULL), _runDlg(NULL), _goToLineDlg(NULL),
-	_colEditorDlg(NULL), _configStyleDlg(NULL), _preferenceDlg(NULL)
+	_colEditorDlg(NULL), _configStyleDlg(NULL), _preferenceDlg(NULL), _windowsMenu(NULL)
 {
 
 	ZeroMemory(&_prevSelectedRange, sizeof(_prevSelectedRange));
@@ -436,6 +438,12 @@ void Notepad_plus::killAllChildren()
 	{
 		delete _preferenceDlg;
 		_preferenceDlg = NULL;
+	}
+
+	if (_windowsMenu)
+	{
+		delete _windowsMenu;
+		_windowsMenu = NULL;
 	}
 }
 
@@ -7145,6 +7153,11 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 				_preferenceDlg = new PreferenceDlg();
 			}
 
+			if (!_windowsMenu)
+			{
+				_windowsMenu = new WindowsMenu();
+			}
+
 			// Menu
 			_mainMenuHandle = ::GetMenu(_hSelf);
 			int langPos2BeRemoved = MENUINDEX_LANGUAGE+1;
@@ -7417,7 +7430,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 				::ModifyMenu(_mainMenuHandle, MENUINDEX_PLUGINS, MF_BYPOSITION, 0, pluginsTrans.c_str());
 			}
 			//Windows menu
-			_windowsMenu.init(_hInst, _mainMenuHandle, windowTrans.c_str());
+			_windowsMenu->init(_hInst, _mainMenuHandle, windowTrans.c_str());
 
 			// Update context menu strings
 			vector<MenuItemUnit> & tmp = pNppParam->getContextMenuItems();
@@ -9148,7 +9161,8 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 		case WM_INITMENUPOPUP:
 		{
-			_windowsMenu.initPopupMenu((HMENU)wParam, _pDocTab);
+			assert(_windowsMenu);
+			_windowsMenu->initPopupMenu((HMENU)wParam, _pDocTab);
 			return TRUE;
 		}
 

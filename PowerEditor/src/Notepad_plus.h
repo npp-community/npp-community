@@ -24,7 +24,6 @@
 #include "lastRecentFileList.h"
 #include "trayIconControler.h"
 #include "PluginsManager.h"
-#include "WindowsDlg.h"
 #include "RunMacroDlg.h"
 #include "DockingManager.h"
 #include "AutoCompletion.h"
@@ -64,6 +63,7 @@ class GoToLineDlg;
 class ColumnEditorDlg;
 class WordStyleDlg;
 class PreferenceDlg;
+class WindowsMenu;
 
 struct TaskListInfo;
 static TiXmlNodeA * searchDlgNode(TiXmlNodeA *node, const char *dlgTagName);
@@ -264,7 +264,7 @@ private:
 
 	vector<iconLocator> _customIconVect;
 
-	WindowsMenu _windowsMenu;
+	WindowsMenu* _windowsMenu;
 	HMENU _mainMenuHandle;
 
 	bool _sysMenuEntering;

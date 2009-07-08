@@ -19,10 +19,10 @@
 #define WINDOWS_DLG_H
 
 #include "SizeableDlg.h"
-#include "WindowsDlgRc.h"
-#include "Parameters.h"
+#include "Common.h"
 
 class DocTabView;
+class TiXmlNodeA;
 
 typedef enum {
 	WDT_ACTIVATE = 1,
@@ -30,7 +30,6 @@ typedef enum {
 	WDT_CLOSE = 3,
 	WDT_SORT = 4,
 } WinDlgNotifyType;
-
 
 struct NMWINDLG : public NMHDR {
 
@@ -43,8 +42,6 @@ struct NMWINDLG : public NMHDR {
 	// ctor: initialize to zeroes
 	NMWINDLG() { memset(this,0,sizeof(NMWINDLG)); }
 };
-
-extern const UINT WDN_NOTIFY;
 
 
 class WindowsDlg : public SizeableDlg
@@ -93,6 +90,8 @@ protected :
 private:
 	virtual void init(HINSTANCE hInst, HWND parent);
 };
+
+extern const UINT WDN_NOTIFY;
 
 class WindowsMenu
 {
