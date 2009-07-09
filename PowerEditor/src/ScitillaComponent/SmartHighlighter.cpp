@@ -101,7 +101,7 @@ void SmartHighlighter::highlightView(ScintillaEditView * pHighlightView)
 
 	for(; currentLine < lastLine; currentLine++) {
 		int docLine = (int)pHighlightView->execute(SCI_DOCLINEFROMVISIBLE, currentLine);
-		if (docLine == prevDocLineChecked)
+		if (docLine == prevDocLineChecked || !_pFRDlg)
 			continue;	//still on same line (wordwrap)
 		prevDocLineChecked = docLine;
 		startPos = (int)pHighlightView->execute(SCI_POSITIONFROMLINE, docLine);

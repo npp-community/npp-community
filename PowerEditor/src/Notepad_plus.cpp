@@ -44,6 +44,7 @@
 #include "WindowsDlgRc.h"
 #include "lastRecentFileList.h"
 #include "ToolBar.h"
+#include "RunMacroDlg.h"
 
 const TCHAR Notepad_plus::_className[32] = TEXT("Notepad++");
 HWND Notepad_plus::gNppHWND = NULL;
@@ -81,7 +82,8 @@ Notepad_plus::Notepad_plus(): Window(), _mainWindowStatus(0), _pDocTab(NULL), _p
 	_autoCompleteMain(&_mainEditView), _autoCompleteSub(&_subEditView), _smartHighlighter(_findReplaceDlg),
 	_nativeLangEncoding(CP_ACP), _isFileOpening(false),
 	_toolBar(NULL), _findReplaceDlg(NULL), _incrementFindDlg(NULL), _aboutDlg(NULL), _runDlg(NULL), _goToLineDlg(NULL),
-	_colEditorDlg(NULL), _configStyleDlg(NULL), _preferenceDlg(NULL), _lastRecentFileList(new LastRecentFileList), _windowsMenu(NULL)
+	_colEditorDlg(NULL), _configStyleDlg(NULL), _preferenceDlg(NULL), _lastRecentFileList(new LastRecentFileList), _windowsMenu(NULL),
+	_runMacroDlg(NULL)
 {
 
 	ZeroMemory(&_prevSelectedRange, sizeof(_prevSelectedRange));
@@ -450,6 +452,12 @@ void Notepad_plus::killAllChildren()
 	{
 		delete _windowsMenu;
 		_windowsMenu = NULL;
+	}
+
+	if (_runMacroDlg)
+	{
+		delete _runMacroDlg;
+		_runMacroDlg = NULL;
 	}
 }
 
@@ -3285,10 +3293,9 @@ void Notepad_plus::command(int id)
 		case IDM_MACRO_STOPRECORDINGMACRO:
 		case IDC_EDIT_TOGGLEMACRORECORDING:
 		{
-			//static HCURSOR originalCur;
-
 			if (_recordingMacro)
 			{
+				assert(_runMacroDlg);
 				// STOP !!!
 				_mainEditView.execute(SCI_STOPRECORD);
 				//_mainEditView.execute(SCI_ENDUNDOACTION);
@@ -3300,7 +3307,7 @@ void Notepad_plus::command(int id)
 				_subEditView.execute(SCI_SETCURSOR, (WPARAM)SC_CURSORNORMAL);
 
 				_recordingMacro = false;
-				_runMacroDlg.initMacroList();
+				_runMacroDlg->initMacroList();
 			}
 			else
 			{
@@ -3338,12 +3345,13 @@ void Notepad_plus::command(int id)
 		{
 			if (!_recordingMacro) // if we're not currently recording, then playback the recorded keystrokes
 			{
-				bool isFirstTime = !_runMacroDlg.isCreated();
-				_runMacroDlg.doDialog(_isRTL);
+				assert(_runMacroDlg);
+				bool isFirstTime = !_runMacroDlg->isCreated();
+				_runMacroDlg->doDialog(_isRTL);
 
 				if (isFirstTime)
 				{
-					changeDlgLang(_runMacroDlg.getHSelf(), "MultiMacro");
+					changeDlgLang(_runMacroDlg->getHSelf(), "MultiMacro");
 				}
 				break;
 
@@ -3354,7 +3362,8 @@ void Notepad_plus::command(int id)
 		case IDM_MACRO_SAVECURRENTMACRO :
 		{
 			if (addCurrentMacro())
-				_runMacroDlg.initMacroList();
+				assert(_runMacroDlg);
+				_runMacroDlg->initMacroList();
 			break;
 		}
 		case IDM_EDIT_FULLPATHTOCLIP :
@@ -5228,9 +5237,9 @@ bool Notepad_plus::reloadLang()
 		changeDlgLang(_runDlg->getHSelf(), "Run");
 	}
 
-	if (_runMacroDlg.isCreated())
+	if (_runMacroDlg && _runMacroDlg->isCreated())
 	{
-		changeDlgLang(_runMacroDlg.getHSelf(), "MultiMacro");
+		changeDlgLang(_runMacroDlg->getHSelf(), "MultiMacro");
 	}
 
 	if (_colEditorDlg && _colEditorDlg->isCreated())
@@ -7186,6 +7195,11 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 				_windowsMenu = new WindowsMenu();
 			}
 
+			if (!_runMacroDlg)
+			{
+				_runMacroDlg = new RunMacroDlg();
+			}
+
 			// Menu
 			_mainMenuHandle = ::GetMenu(_hSelf);
 			int langPos2BeRemoved = MENUINDEX_LANGUAGE+1;
@@ -7537,7 +7551,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			_colEditorDlg->init(_hInst, hwnd, &_pEditView);
             _aboutDlg->init(_hInst, hwnd);
 			_runDlg->init(_hInst, hwnd);
-			_runMacroDlg.init(_hInst, hwnd);
+			_runMacroDlg->init(_hInst, hwnd);
 
             //--User Define Dialog Section--//
 			int uddStatus = nppGUI._userDefineDlgStatus;
@@ -8412,12 +8426,13 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		{
 			if (!_recordingMacro) // if we're not currently recording, then playback the recorded keystrokes
 			{
+				assert(_runMacroDlg);
 				int times = 1;
-				if (_runMacroDlg.getMode() == RM_RUN_MULTI)
+				if (_runMacroDlg->getMode() == RM_RUN_MULTI)
 				{
-					times = _runMacroDlg.getTimes();
+					times = _runMacroDlg->getTimes();
 				}
-				else if (_runMacroDlg.getMode() == RM_RUN_EOF)
+				else if (_runMacroDlg->getMode() == RM_RUN_EOF)
 				{
 					times = -1;
 				}
@@ -8429,7 +8444,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 				int counter = 0;
 				int lastLine = int(_pEditView->execute(SCI_GETLINECOUNT)) - 1;
 				int currLine = _pEditView->getCurrentLineNumber();
-				int indexMacro = _runMacroDlg.getMacro2Exec();
+				int indexMacro = _runMacroDlg->getMacro2Exec();
 				int deltaLastLine = 0;
 				int deltaCurrLine = 0;
 

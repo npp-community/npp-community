@@ -22,7 +22,6 @@
 
 #include "trayIconControler.h"
 #include "PluginsManager.h"
-#include "RunMacroDlg.h"
 #include "DockingManager.h"
 #include "AutoCompletion.h"
 #include "Buffer.h"
@@ -64,6 +63,7 @@ class PreferenceDlg;
 class WindowsMenu;
 class LastRecentFileList;
 class ToolBar;
+class RunMacroDlg;
 
 struct TaskListInfo;
 static TiXmlNodeA * searchDlgNode(TiXmlNodeA *node, const char *dlgTagName);
@@ -108,10 +108,10 @@ class Notepad_plus : public Window {
 	enum comment_mode {cm_comment, cm_uncomment, cm_toggle};
 public:
 	Notepad_plus();
-	virtual inline ~Notepad_plus();
+	virtual ~Notepad_plus();
 	void init(HINSTANCE, HWND, const TCHAR *cmdLine, CmdLineParams *cmdLineParams);
-	inline void killAllChildren();
-	virtual inline void destroy();
+	void killAllChildren();
+	virtual void destroy();
 
     static const TCHAR * Notepad_plus::getClassName() {
 		return _className;
@@ -131,9 +131,9 @@ public:
 	void doClose(BufferID, int whichOne);
 	//bool doDelete(const TCHAR *fileName) const {return ::DeleteFile(fileName) != 0;};
 
-	inline void fileNew();
+	void fileNew();
 	void fileOpen();
-	inline bool fileReload();
+	bool fileReload();
 	bool fileClose(BufferID id = BUFFER_INVALID, int curView = -1);	//use curView to override view to close from
 	bool fileCloseAll();
 	bool fileCloseAllButCurrent();
@@ -152,17 +152,12 @@ public:
 	void filePrint(bool showDialog);
 	bool saveScintillaParams(bool whichOne);
 
-	inline bool saveGUIParams();
-
-	inline void saveDockingParams();
-
-	inline void saveUserDefineLangs();
-
-	inline void saveShortcuts();
-
-	inline void saveSession(const Session & session);
-
-	inline void saveFindHistory();
+	bool saveGUIParams();
+	void saveDockingParams();
+	void saveUserDefineLangs();
+	void saveShortcuts();
+	void saveSession(const Session & session);
+	void saveFindHistory();
 
 	void getCurrentOpenedFiles(Session & session);
 
@@ -186,14 +181,14 @@ public:
 
 	bool doBlockComment(comment_mode currCommentMode);
 	bool doStreamComment();
-	inline void doTrimTrailing();
+	void doTrimTrailing();
 
 	inline HACCEL getAccTable() const{
 		return _accelerator.getAccTable();
 	};
 
 	bool addCurrentMacro();
-	inline void loadLastSession();
+	void loadLastSession();
 	bool loadSession(Session & session);
 	winVer getWinVersion() const {return _winVersion;};
 
@@ -277,7 +272,7 @@ private:
 	// Keystroke macro recording and playback
 	Macro _macro;
 	bool _recordingMacro;
-	RunMacroDlg _runMacroDlg;
+	RunMacroDlg* _runMacroDlg;
 
 	// For hotspot
 	bool _linkTriggered;
