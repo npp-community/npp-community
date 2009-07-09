@@ -45,6 +45,7 @@
 
 #include "lastRecentFileList.h"
 #include "SmartHighlighter.h"
+#include "AutoCompletion.h"
 
 #include "ToolBar.h"
 #include "StatusBar.h"
@@ -85,7 +86,7 @@ Notepad_plus::Notepad_plus(): Window(), _mainWindowStatus(0), _pDocTab(NULL), _p
 	_pMainSplitter(NULL),
     _recordingMacro(false), _pTrayIco(NULL), _isUDDocked(false), _isRTL(false),
 	_linkTriggered(true), _isDocModifing(false), _isHotspotDblClicked(false), _sysMenuEntering(false),
-	_autoCompleteMain(&_mainEditView), _autoCompleteSub(&_subEditView), _smartHighlighter(NULL),
+	_autoCompleteMain(new AutoCompletion(&_mainEditView)), _autoCompleteSub(new AutoCompletion(&_subEditView)), _smartHighlighter(NULL),
 	_nativeLangEncoding(CP_ACP), _isFileOpening(false), _toolBar(NULL), _statusBar(NULL), _rebarTop(NULL), _rebarBottom(NULL),
 	_findReplaceDlg(NULL), _incrementFindDlg(NULL), _aboutDlg(NULL), _runDlg(NULL), _goToLineDlg(NULL),
 	_colEditorDlg(NULL), _configStyleDlg(NULL), _preferenceDlg(NULL), _lastRecentFileList(new LastRecentFileList), _windowsMenu(NULL),
@@ -211,6 +212,8 @@ Notepad_plus::~Notepad_plus()
 		delete _pTrayIco;
 
 	delete _lastRecentFileList;
+	delete _autoCompleteMain;
+	delete _autoCompleteSub;
 }
 
 void Notepad_plus::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLine, CmdLineParams *cmdLineParams)
@@ -2683,9 +2686,11 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 
 	case SCN_CHARADDED:
 	{
+		assert(_autoCompleteMain);
+		assert(_autoCompleteSub);
 		charAdded(static_cast<TCHAR>(notification->ch));
 
-		AutoCompletion * autoC = isFromPrimary?&_autoCompleteMain:&_autoCompleteSub;
+		AutoCompletion * autoC = isFromPrimary?_autoCompleteMain:_autoCompleteSub;
 
 		autoC->update(notification->ch);
 
@@ -2706,6 +2711,8 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 
     case SCN_UPDATEUI:
 	{
+		assert(_autoCompleteMain);
+		assert(_autoCompleteSub);
 		NppParameters *nppParam = NppParameters::getInstance();
 
 		// if it's searching/replacing, then do nothing
@@ -2729,7 +2736,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 			_smartHighlighter->highlightView(notifyView);
 
 		updateStatusBar();
-		AutoCompletion * autoC = isFromPrimary?&_autoCompleteMain:&_autoCompleteSub;
+		AutoCompletion * autoC = isFromPrimary?_autoCompleteMain:_autoCompleteSub;
 		autoC->update(0);
         break;
 	}
@@ -2849,7 +2856,9 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 
 	case SCN_CALLTIPCLICK:
 	{
-		AutoCompletion * autoC = isFromPrimary?&_autoCompleteMain:&_autoCompleteSub;
+		assert(_autoCompleteMain);
+		assert(_autoCompleteSub);
+		AutoCompletion * autoC = isFromPrimary?_autoCompleteMain:_autoCompleteSub;
 		autoC->callTipClick(notification->position);
 		break;
 	}
@@ -5713,20 +5722,26 @@ void Notepad_plus::checkUnicodeMenuItems(UniMode um) const
 }
 
 void Notepad_plus::showAutoComp() {
+	assert(_autoCompleteMain);
+	assert(_autoCompleteSub);
 	bool isFromPrimary = _pEditView == &_mainEditView;
-	AutoCompletion * autoC = isFromPrimary?&_autoCompleteMain:&_autoCompleteSub;
+	AutoCompletion * autoC = isFromPrimary?_autoCompleteMain:_autoCompleteSub;
 	autoC->showAutoComplete();
 }
 
 void Notepad_plus::autoCompFromCurrentFile(bool autoInsert) {
+	assert(_autoCompleteMain);
+	assert(_autoCompleteSub);
 	bool isFromPrimary = _pEditView == &_mainEditView;
-	AutoCompletion * autoC = isFromPrimary?&_autoCompleteMain:&_autoCompleteSub;
+	AutoCompletion * autoC = isFromPrimary?_autoCompleteMain:_autoCompleteSub;
 	autoC->showWordComplete(autoInsert);
 }
 
 void Notepad_plus::showFunctionComp() {
+	assert(_autoCompleteMain);
+	assert(_autoCompleteSub);
 	bool isFromPrimary = _pEditView == &_mainEditView;
-	AutoCompletion * autoC = isFromPrimary?&_autoCompleteMain:&_autoCompleteSub;
+	AutoCompletion * autoC = isFromPrimary?_autoCompleteMain:_autoCompleteSub;
 	autoC->showFunctionComplete();
 }
 
@@ -10021,10 +10036,12 @@ void Notepad_plus::notifyBufferChanged(Buffer * buffer, int mask) {
 
 	if (mask & (BufferChangeLanguage))
 	{
+		assert(_autoCompleteMain);
+		assert(_autoCompleteSub);
 		if (mainActive)
-			_autoCompleteMain.setLanguage(buffer->getLangType());
+			_autoCompleteMain->setLanguage(buffer->getLangType());
 		if (subActive)
-			_autoCompleteSub.setLanguage(buffer->getLangType());
+			_autoCompleteSub->setLanguage(buffer->getLangType());
 	}
 
 	if ((currentView() == MAIN_VIEW) && !mainActive)
@@ -10045,12 +10062,14 @@ void Notepad_plus::notifyBufferChanged(Buffer * buffer, int mask) {
 
 	if (mask & (BufferChangeLanguage))
 	{
+		assert(_autoCompleteMain);
+		assert(_autoCompleteSub);
 		checkLangsMenu(-1);	//let N++ do search for the item
 		setLangStatus(buffer->getLangType());
 		if (_mainEditView.getCurrentBuffer() == buffer)
-			_autoCompleteMain.setLanguage(buffer->getLangType());
+			_autoCompleteMain->setLanguage(buffer->getLangType());
 		else if (_subEditView.getCurrentBuffer() == buffer)
-			_autoCompleteSub.setLanguage(buffer->getLangType());
+			_autoCompleteSub->setLanguage(buffer->getLangType());
 
 		SCNotification scnN;
 		scnN.nmhdr.code = NPPN_LANGCHANGED;
@@ -10069,14 +10088,17 @@ void Notepad_plus::notifyBufferChanged(Buffer * buffer, int mask) {
 	}
 }
 
-void Notepad_plus::notifyBufferActivated(BufferID bufid, int view) {
+void Notepad_plus::notifyBufferActivated(BufferID bufid, int view)
+{
+	assert(_autoCompleteMain);
+	assert(_autoCompleteSub);
 	Buffer * buf = MainFileManager->getBufferByID(bufid);
 	buf->increaseRecentTag();
 
 	if (view == MAIN_VIEW) {
-		_autoCompleteMain.setLanguage(buf->getLangType());
+		_autoCompleteMain->setLanguage(buf->getLangType());
 	} else if (view == SUB_VIEW) {
-		_autoCompleteSub.setLanguage(buf->getLangType());
+		_autoCompleteSub->setLanguage(buf->getLangType());
 	}
 
 	if (view != currentView()) {

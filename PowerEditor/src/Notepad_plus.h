@@ -22,7 +22,6 @@
 
 #include "PluginsManager.h"
 #include "DockingManager.h"
-#include "AutoCompletion.h"
 #include "Buffer.h"
 
 #define MENU 0x01
@@ -67,6 +66,7 @@ class ReBar;
 
 class LastRecentFileList;
 class SmartHighlighter;
+class AutoCompletion;
 
 class trayIconControler;
 
@@ -211,8 +211,8 @@ private:
     Window *_pMainWindow;
 	DockingManager _dockingManager;
 
-	AutoCompletion _autoCompleteMain;
-	AutoCompletion _autoCompleteSub;	//each Scintilla has its own autoComplete
+	AutoCompletion* _autoCompleteMain;
+	AutoCompletion* _autoCompleteSub;	//each Scintilla has its own autoComplete
 
 	SmartHighlighter* _smartHighlighter;
 

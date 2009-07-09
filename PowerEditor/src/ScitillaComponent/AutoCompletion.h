@@ -18,14 +18,19 @@
 #ifndef AUTOCOMPLETION_H
 #define AUTOCOMPLETION_H
 
-#include "ScintillaEditView.h"
-#include "FunctionCallTip.h"
-#include "tinyxml.h"
+#include "Notepad_plus_msgs.h"
+#include "Common.h"
+
+class ScintillaEditView;
+class FunctionCallTip;
+class TiXmlDocument;
+class TiXmlElement ;
 
 class AutoCompletion {
 public:
 	enum ActiveCompletion {CompletionNone = 0, CompletionAuto, CompletionWord, CompletionFunc};
 	AutoCompletion(ScintillaEditView * pEditView);
+	~AutoCompletion();
 	bool setLanguage(LangType language);
 
 	//AutoComplete from the list
@@ -42,7 +47,7 @@ private:
 	bool _funcCompletionActive;
 	ScintillaEditView * _pEditView;
 	LangType _curLang;
-	TiXmlDocument _XmlFile;
+	TiXmlDocument* _XmlFile;
 	TiXmlElement * _pXmlKeyword;
 	ActiveCompletion _activeCompletion;
 
@@ -50,7 +55,7 @@ private:
 
 	std::generic_string _keyWords;
 
-	FunctionCallTip _funcCalltip;
+	FunctionCallTip* _funcCalltip;
 	const TCHAR * getApiFileName();
 };
 
