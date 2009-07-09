@@ -25,6 +25,7 @@ class StatusBar : public Window
 public :
 	StatusBar() : Window(), _partWidthArray(NULL), _hloc(NULL), _lpParts(NULL) {};
 	virtual ~StatusBar(){
+		StatusBar::destroy();
         if (_hloc)
         {
             ::LocalUnlock(_hloc);

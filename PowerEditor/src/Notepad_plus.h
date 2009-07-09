@@ -20,12 +20,10 @@
 #include "ScintillaEditView.h"
 #include "DocTabView.h"
 
-#include "trayIconControler.h"
 #include "PluginsManager.h"
 #include "DockingManager.h"
 #include "AutoCompletion.h"
 #include "Buffer.h"
-#include "SmartHighlighter.h"
 
 #define MENU 0x01
 #define TOOLBAR 0x02
@@ -61,9 +59,16 @@ class ColumnEditorDlg;
 class WordStyleDlg;
 class PreferenceDlg;
 class WindowsMenu;
-class LastRecentFileList;
-class ToolBar;
 class RunMacroDlg;
+
+class StatusBar;
+class ToolBar;
+class ReBar;
+
+class LastRecentFileList;
+class SmartHighlighter;
+
+class trayIconControler;
 
 struct TaskListInfo;
 static TiXmlNodeA * searchDlgNode(TiXmlNodeA *node, const char *dlgTagName);
@@ -209,7 +214,7 @@ private:
 	AutoCompletion _autoCompleteMain;
 	AutoCompletion _autoCompleteSub;	//each Scintilla has its own autoComplete
 
-	SmartHighlighter _smartHighlighter;
+	SmartHighlighter* _smartHighlighter;
 
 	TiXmlNode *_toolIcons;
 	TiXmlNodeA *_nativeLangA;
@@ -237,10 +242,10 @@ private:
 	ToolBar*	_toolBar;
 	IconList _docTabIconList;
 
-    StatusBar _statusBar;
+    StatusBar* _statusBar;
 	bool _toReduceTabBar;
-	ReBar _rebarTop;
-	ReBar _rebarBottom;
+	ReBar* _rebarTop;
+	ReBar* _rebarBottom;
 
 	// Dialog
 	FindReplaceDlg* _findReplaceDlg;
@@ -404,9 +409,7 @@ private:
 
 	generic_string getLangDesc(LangType langType, bool shortDesc = false);
 
-	void setLangStatus(LangType langType){
-		_statusBar.setText(getLangDesc(langType).c_str(), STATUSBAR_DOC_TYPE);
-	};
+	void setLangStatus(LangType langType);
 
 	void setDisplayFormat(formatType f);
 

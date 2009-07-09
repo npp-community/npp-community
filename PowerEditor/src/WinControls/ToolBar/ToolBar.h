@@ -46,6 +46,7 @@ class ToolBar : public Window
 {
 public :
 	ToolBar();
+	~ToolBar();
 
 	virtual bool init(HINSTANCE hInst, HWND hPere, toolBarStatusType type,
 		ToolBarButtonUnit *buttonUnitArray, int arraySize);
@@ -105,6 +106,7 @@ class ReBar : public Window
 {
 public :
 	ReBar():Window() { usedIDs.clear(); };
+	~ReBar();
 
 	virtual void destroy() {
 		::DestroyWindow(_hSelf);

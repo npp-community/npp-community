@@ -30,6 +30,11 @@ ToolBar::ToolBar():
 	_toolBarIcons(NULL)
 {}
 
+ToolBar::~ToolBar()
+{
+	ToolBar::destroy();
+}
+
 bool ToolBar::init( HINSTANCE hInst, HWND hPere, toolBarStatusType type,
 					ToolBarButtonUnit *buttonUnitArray, int arraySize)
 {
@@ -354,6 +359,11 @@ void ToolBar::setDisableImageList() {
 	::SendMessage(_hSelf, TB_SETDISABLEDIMAGELIST, (WPARAM)0, (LPARAM)_toolBarIcons->getDisableLst());
 };
 
+
+ReBar::~ReBar()
+{
+	ReBar::destroy();
+}
 
 void ReBar::init(HINSTANCE hInst, HWND hPere)
 {

@@ -19,8 +19,6 @@
 
 #include "precompiled_headers.h"
 
-//#include "dbghelp.h"
-
 #include "Notepad_plus.h"
 #include "FileDialog.h"
 #include "resource.h"
@@ -42,9 +40,17 @@
 #include "WordStyleDlg.h"
 #include "WindowsDlg.h"
 #include "WindowsDlgRc.h"
-#include "lastRecentFileList.h"
-#include "ToolBar.h"
 #include "RunMacroDlg.h"
+#include "FindReplaceDlg.h"
+
+#include "lastRecentFileList.h"
+#include "SmartHighlighter.h"
+
+#include "ToolBar.h"
+#include "StatusBar.h"
+
+#include "trayIconControler.h"
+
 
 const TCHAR Notepad_plus::_className[32] = TEXT("Notepad++");
 HWND Notepad_plus::gNppHWND = NULL;
@@ -79,9 +85,9 @@ Notepad_plus::Notepad_plus(): Window(), _mainWindowStatus(0), _pDocTab(NULL), _p
 	_pMainSplitter(NULL),
     _recordingMacro(false), _pTrayIco(NULL), _isUDDocked(false), _isRTL(false),
 	_linkTriggered(true), _isDocModifing(false), _isHotspotDblClicked(false), _sysMenuEntering(false),
-	_autoCompleteMain(&_mainEditView), _autoCompleteSub(&_subEditView), _smartHighlighter(_findReplaceDlg),
-	_nativeLangEncoding(CP_ACP), _isFileOpening(false),
-	_toolBar(NULL), _findReplaceDlg(NULL), _incrementFindDlg(NULL), _aboutDlg(NULL), _runDlg(NULL), _goToLineDlg(NULL),
+	_autoCompleteMain(&_mainEditView), _autoCompleteSub(&_subEditView), _smartHighlighter(NULL),
+	_nativeLangEncoding(CP_ACP), _isFileOpening(false), _toolBar(NULL), _statusBar(NULL), _rebarTop(NULL), _rebarBottom(NULL),
+	_findReplaceDlg(NULL), _incrementFindDlg(NULL), _aboutDlg(NULL), _runDlg(NULL), _goToLineDlg(NULL),
 	_colEditorDlg(NULL), _configStyleDlg(NULL), _preferenceDlg(NULL), _lastRecentFileList(new LastRecentFileList), _windowsMenu(NULL),
 	_runMacroDlg(NULL)
 {
@@ -372,8 +378,17 @@ void Notepad_plus::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLine, CmdL
 
 void Notepad_plus::killAllChildren()
 {
-	_rebarTop.destroy();
-	_rebarBottom.destroy();
+	if (_rebarTop)
+	{
+		delete _rebarTop;
+		_rebarTop = NULL;
+	}
+
+	if (_rebarBottom)
+	{
+		delete _rebarBottom;
+		_rebarBottom = NULL;
+	}
 
     if (_pMainSplitter)
     {
@@ -389,15 +404,26 @@ void Notepad_plus::killAllChildren()
 	_invisibleEditView.destroy();
 
     _subSplitter.destroy();
-    _statusBar.destroy();
 
 	_scintillaCtrls4Plugins.destroy();
 	_dockingManager.destroy();
+
+	if (_statusBar)
+	{
+		delete _statusBar;
+		_statusBar = NULL;
+	}
 
 	if	(_toolBar)
 	{
 		delete _toolBar;
 		_toolBar = NULL;
+	}
+
+	if (_smartHighlighter)
+	{
+		delete _smartHighlighter;
+		_smartHighlighter = NULL;
 	}
 
 	if (_findReplaceDlg)
@@ -469,9 +495,13 @@ void Notepad_plus::destroy()
 
 bool Notepad_plus::saveGUIParams()
 {
+	assert(_rebarTop);
+	assert(_statusBar);
+	assert(_toolBar);
+
 	NppGUI & nppGUI = (NppGUI &)(NppParameters::getInstance())->getNppGUI();
-	nppGUI._statusBarShow = _statusBar.isVisible();
-	nppGUI._toolbarShow = _rebarTop.getIDVisible(REBAR_BAR_TOOLBAR);
+	nppGUI._statusBarShow = _statusBar->isVisible();
+	nppGUI._toolbarShow = _rebarTop->getIDVisible(REBAR_BAR_TOOLBAR);
 	nppGUI._toolBarStatus = _toolBar->getState();
 
 	nppGUI._tabStatus = (TabBarPlus::doDragNDropOrNot()?TAB_DRAWTOPBAR:0) | \
@@ -2175,6 +2205,10 @@ generic_string Notepad_plus::getLangDesc(LangType langType, bool shortDesc)
 	return str2Show;
 }
 
+void Notepad_plus::setLangStatus(LangType langType){
+	_statusBar->setText(getLangDesc(langType).c_str(), STATUSBAR_DOC_TYPE);
+};
+
 BOOL Notepad_plus::notify(SCNotification *notification)
 {
 	//Important, keep track of which element generated the message
@@ -2514,14 +2548,15 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 
 	case NM_CLICK :
     {
-		if (notification->nmhdr.hwndFrom == _statusBar.getHSelf())
+		assert(_statusBar);
+		if (notification->nmhdr.hwndFrom == _statusBar->getHSelf())
         {
             LPNMMOUSE lpnm = (LPNMMOUSE)notification;
 			if (lpnm->dwItemSpec == DWORD(STATUSBAR_TYPING_MODE))
 			{
 				bool isOverTypeMode = (_pEditView->execute(SCI_GETOVERTYPE) != 0);
 				_pEditView->execute(SCI_SETOVERTYPE, !isOverTypeMode);
-				_statusBar.setText((_pEditView->execute(SCI_GETOVERTYPE))?TEXT("OVR"):TEXT("INS"), STATUSBAR_TYPING_MODE);
+				_statusBar->setText((_pEditView->execute(SCI_GETOVERTYPE))?TEXT("OVR"):TEXT("INS"), STATUSBAR_TYPING_MODE);
 			}
         }
 		else if (notification->nmhdr.hwndFrom == _mainDocTab.getHSelf())
@@ -2539,7 +2574,8 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 	case NM_DBLCLK :
     {
 		assert(_goToLineDlg);
-		if (notification->nmhdr.hwndFrom == _statusBar.getHSelf())
+		assert(_statusBar);
+		if (notification->nmhdr.hwndFrom == _statusBar->getHSelf())
         {
             LPNMMOUSE lpnm = (LPNMMOUSE)notification;
 			if (lpnm->dwItemSpec == DWORD(STATUSBAR_CUR_POS))
@@ -2689,8 +2725,8 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 			xmlTagMatchHiliter.tagMatch(nppGui._enableTagAttrsHilite);
 		}
 
-		if (nppGui._enableSmartHilite)
-			_smartHighlighter.highlightView(notifyView);
+		if (nppGui._enableSmartHilite && _smartHighlighter)
+			_smartHighlighter->highlightView(notifyView);
 
 		updateStatusBar();
 		AutoCompletion * autoC = isFromPrimary?&_autoCompleteMain:&_autoCompleteSub;
@@ -2701,13 +2737,14 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 	case SCN_SCROLLED:
 	{
 		const NppGUI & nppGUI = (NppParameters::getInstance())->getNppGUI();
-		if (nppGUI._enableSmartHilite)
-			_smartHighlighter.highlightView(notifyView);
+		if (nppGUI._enableSmartHilite && _smartHighlighter)
+			_smartHighlighter->highlightView(notifyView);
 		break;
 	}
 
     case TTN_GETDISPINFO:
     {
+		assert(_rebarTop);
         LPTOOLTIPTEXT lpttt;
 
         lpttt = (LPTOOLTIPTEXT)notification;
@@ -2721,7 +2758,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 		static generic_string tip = TEXT("");
 		int id = int(lpttt->hdr.idFrom);
 
-		if (hWin == _rebarTop.getHSelf())
+		if (hWin == _rebarTop->getHSelf())
 		{
 			getNameStrFromCmd(id, tip);
 		}
@@ -2824,10 +2861,12 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 	}
 	case RBN_CHEVRONPUSHED:
 	{
+		assert(_rebarTop);
+		assert(_rebarBottom);
 		NMREBARCHEVRON * lpnm = (NMREBARCHEVRON*) notification;
-		ReBar * notifRebar = &_rebarTop;
-		if (_rebarBottom.getHSelf() == lpnm->hdr.hwndFrom)
-			notifRebar = &_rebarBottom;
+		ReBar * notifRebar = _rebarTop;
+		if (_rebarBottom->getHSelf() == lpnm->hdr.hwndFrom)
+			notifRebar = _rebarBottom;
 		//If N++ ID, use proper object
 		switch(lpnm->wID) {
 			case REBAR_BAR_TOOLBAR: {
@@ -4973,18 +5012,19 @@ void Notepad_plus::activateDoc(int pos)
 
 void Notepad_plus::updateStatusBar()
 {
+	assert(_statusBar);
     TCHAR strLnCol[64];
 	wsprintf(strLnCol, TEXT("Ln : %d    Col : %d    Sel : %d"),\
         (_pEditView->getCurrentLineNumber() + 1), \
 		(_pEditView->getCurrentColumnNumber() + 1),\
 		(_pEditView->getSelectedByteNumber()));
 
-    _statusBar.setText(strLnCol, STATUSBAR_CUR_POS);
+    _statusBar->setText(strLnCol, STATUSBAR_CUR_POS);
 
 	TCHAR strDonLen[64];
     wsprintf(strDonLen, TEXT("nb char : %d    nb line : %d"), _pEditView->getCurrentDocLen(), _pEditView->execute(SCI_GETLINECOUNT));
-	_statusBar.setText(strDonLen, STATUSBAR_DOC_SIZE);
-    _statusBar.setText(_pEditView->execute(SCI_GETOVERTYPE) ? TEXT("OVR") : TEXT("INS"), STATUSBAR_TYPING_MODE);
+	_statusBar->setText(strDonLen, STATUSBAR_DOC_SIZE);
+    _statusBar->setText(_pEditView->execute(SCI_GETOVERTYPE) ? TEXT("OVR") : TEXT("INS"), STATUSBAR_TYPING_MODE);
 }
 
 
@@ -5043,9 +5083,12 @@ void Notepad_plus::checkModifiedDocument()
 
 void Notepad_plus::getMainClientRect(RECT &rc) const
 {
+	assert(_rebarTop);
+	assert(_rebarBottom);
+	assert(_statusBar);
     getClientRect(rc);
-	rc.top += _rebarTop.getHeight();
-	rc.bottom -= rc.top + _rebarBottom.getHeight() + _statusBar.getHeight();
+	rc.top += _rebarTop->getHeight();
+	rc.bottom -= rc.top + _rebarBottom->getHeight() + _statusBar->getHeight();
 }
 
 void Notepad_plus::showView(int whichOne) {
@@ -7149,6 +7192,21 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 				_toolBar = new ToolBar();
 			}
 
+			if (!_statusBar)
+			{
+				_statusBar = new StatusBar();
+			}
+
+			if (!_rebarTop)
+			{
+				_rebarTop = new ReBar();
+			}
+
+			if (!_rebarBottom)
+			{
+				_rebarBottom = new ReBar();
+			}
+
 			// Init dialogs and windows.
 			if(!_findReplaceDlg)
 			{
@@ -7198,6 +7256,11 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			if (!_runMacroDlg)
 			{
 				_runMacroDlg = new RunMacroDlg();
+			}
+
+			if (!_smartHighlighter)
+			{
+				_smartHighlighter = new SmartHighlighter(_findReplaceDlg);
 			}
 
 			// Menu
@@ -7328,13 +7391,13 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
             //--Status Bar Section--//
 			bool willBeShown = nppGUI._statusBarShow;
-            _statusBar.init(_hInst, hwnd, 6);
-			_statusBar.setPartWidth(STATUSBAR_DOC_SIZE, 250);
-			_statusBar.setPartWidth(STATUSBAR_CUR_POS, 250);
-			_statusBar.setPartWidth(STATUSBAR_EOF_FORMAT, 80);
-			_statusBar.setPartWidth(STATUSBAR_UNICODE_TYPE, 100);
-			_statusBar.setPartWidth(STATUSBAR_TYPING_MODE, 30);
-            _statusBar.display(willBeShown);
+            _statusBar->init(_hInst, hwnd, 6);
+			_statusBar->setPartWidth(STATUSBAR_DOC_SIZE, 250);
+			_statusBar->setPartWidth(STATUSBAR_CUR_POS, 250);
+			_statusBar->setPartWidth(STATUSBAR_EOF_FORMAT, 80);
+			_statusBar->setPartWidth(STATUSBAR_UNICODE_TYPE, 100);
+			_statusBar->setPartWidth(STATUSBAR_TYPING_MODE, 30);
+            _statusBar->display(willBeShown);
 
             _pMainWindow = &_mainDocTab;
 
@@ -7538,15 +7601,15 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 			changeToolBarIcons();
 
-			_rebarTop.init(_hInst, hwnd);
-			_rebarBottom.init(_hInst, hwnd);
-			_toolBar->addToRebar(&_rebarTop);
-			_rebarTop.setIDVisible(REBAR_BAR_TOOLBAR, willBeShown);
+			_rebarTop->init(_hInst, hwnd);
+			_rebarBottom->init(_hInst, hwnd);
+			_toolBar->addToRebar(_rebarTop);
+			_rebarTop->setIDVisible(REBAR_BAR_TOOLBAR, willBeShown);
 
 			//--Init dialogs--//
             _findReplaceDlg->init(_hInst, hwnd, &_pEditView);
 			_incrementFindDlg->init(_hInst, hwnd, _findReplaceDlg, _isRTL);
-			_incrementFindDlg->addToRebar(&_rebarBottom);
+			_incrementFindDlg->addToRebar(_rebarBottom);
             _goToLineDlg->init(_hInst, hwnd, &_pEditView);
 			_colEditorDlg->init(_hInst, hwnd, &_pEditView);
             _aboutDlg->init(_hInst, hwnd);
@@ -7881,19 +7944,21 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 		case WM_SIZE:
 		{
+			assert(_rebarTop);
+			assert(_statusBar);
 			RECT rc;
 			getClientRect(rc);
 			if (lParam == 0) {
 				lParam = MAKELPARAM(rc.right - rc.left, rc.bottom - rc.top);
 			}
 
-			::MoveWindow(_rebarTop.getHSelf(), 0, 0, rc.right, _rebarTop.getHeight(), TRUE);
-			_statusBar.adjustParts(rc.right);
-			::SendMessage(_statusBar.getHSelf(), WM_SIZE, wParam, lParam);
+			::MoveWindow(_rebarTop->getHSelf(), 0, 0, rc.right, _rebarTop->getHeight(), TRUE);
+			_statusBar->adjustParts(rc.right);
+			::SendMessage(_statusBar->getHSelf(), WM_SIZE, wParam, lParam);
 
-			int rebarBottomHeight = _rebarBottom.getHeight();
-			int statusBarHeight = _statusBar.getHeight();
-			::MoveWindow(_rebarBottom.getHSelf(), 0, rc.bottom - rebarBottomHeight - statusBarHeight, rc.right, rebarBottomHeight, TRUE);
+			int rebarBottomHeight = _rebarBottom->getHeight();
+			int statusBarHeight = _statusBar->getHeight();
+			::MoveWindow(_rebarBottom->getHSelf(), 0, rc.bottom - rebarBottomHeight - statusBarHeight, rc.right, rebarBottomHeight, TRUE);
 
 			getMainClientRect(rc);
 			_dockingManager.reSizeTo(rc);
@@ -8543,7 +8608,8 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 				case STATUSBAR_EOF_FORMAT :
 				case STATUSBAR_UNICODE_TYPE :
 				case STATUSBAR_TYPING_MODE :
-					_statusBar.setText(str2set, wParam);
+					assert(_statusBar);
+					_statusBar->setText(str2set, wParam);
 					return TRUE;
 				default :
 					return FALSE;
@@ -9076,15 +9142,16 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 		case NPPM_HIDETOOLBAR :
 		{
+			assert(_rebarTop);
 			bool show = (lParam != TRUE);
-			bool currentStatus = _rebarTop.getIDVisible(REBAR_BAR_TOOLBAR);
+			bool currentStatus = _rebarTop->getIDVisible(REBAR_BAR_TOOLBAR);
 			if (show != currentStatus)
-				_rebarTop.setIDVisible(REBAR_BAR_TOOLBAR, show);
+				_rebarTop->setIDVisible(REBAR_BAR_TOOLBAR, show);
 			return currentStatus;
 		}
 		case NPPM_ISTOOLBARHIDDEN :
 		{
-			return !_rebarTop.getIDVisible(REBAR_BAR_TOOLBAR);
+			return !_rebarTop->getIDVisible(REBAR_BAR_TOOLBAR);
 		}
 
 		case NPPM_HIDEMENU :
@@ -9110,6 +9177,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 		case NPPM_HIDESTATUSBAR:
 		{
+			assert(_statusBar);
 			bool show = (lParam != TRUE);
 			NppGUI & nppGUI = (NppGUI &)pNppParam->getNppGUI();
 			bool oldVal = nppGUI._statusBarShow;
@@ -9121,7 +9189,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			getClientRect(rc);
 
 			nppGUI._statusBarShow = show;
-            _statusBar.display(nppGUI._statusBarShow);
+            _statusBar->display(nppGUI._statusBarShow);
             ::SendMessage(_hSelf, WM_SIZE, SIZE_RESTORED, MAKELONG(rc.bottom, rc.right));
             return oldVal;
         }
@@ -9135,25 +9203,28 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 /*
 		case NPPM_ADDREBAR :
 		{
+			assert(_rebarTop);
 			if (!lParam)
 				return FALSE;
-			_rebarTop.addBand((REBARBANDINFO*)lParam, false);
+			_rebarTop->addBand((REBARBANDINFO*)lParam, false);
 			return TRUE;
 		}
 
 		case NPPM_UPDATEREBAR :
 		{
+			assert(_rebarTop);
 			if (!lParam || wParam < REBAR_BAR_EXTERNAL)
 				return FALSE;
-			_rebarTop.reNew((int)wParam, (REBARBANDINFO*)lParam);
+			_rebarTop->reNew((int)wParam, (REBARBANDINFO*)lParam);
 			return TRUE;
 		}
 
 		case NPPM_REMOVEREBAR :
 		{
+			assert(_rebarTop);
 			if (wParam < REBAR_BAR_EXTERNAL)
 				return FALSE;
-			_rebarTop.removeBand((int)wParam);
+			_rebarTop->removeBand((int)wParam);
 			return TRUE;
 		}
 */
@@ -9317,6 +9388,8 @@ LRESULT CALLBACK Notepad_plus::Notepad_plus_Proc(HWND hwnd, UINT Message, WPARAM
 
 void Notepad_plus::fullScreenToggle()
 {
+	assert(_rebarTop);
+	assert(_rebarBottom);
 	if (!_beforeSpecialView.isFullScreen)	//toggle fullscreen on
 	{
 		_beforeSpecialView._winPlace.length = sizeof(_beforeSpecialView._winPlace);
@@ -9353,8 +9426,8 @@ void Notepad_plus::fullScreenToggle()
 				::SendMessage(_hSelf, NPPM_HIDEMENU, 0, TRUE);
 
 			//Hide rebar
-			_rebarTop.display(false);
-			_rebarBottom.display(false);
+			_rebarTop->display(false);
+			_rebarBottom->display(false);
 		}
 
 		//Hide window so windows can properly update it
@@ -9387,8 +9460,8 @@ void Notepad_plus::fullScreenToggle()
 				::SendMessage(_hSelf, NPPM_HIDEMENU, 0, FALSE);
 
 			//Show rebar
-			_rebarTop.display(true);
-			_rebarBottom.display(true);
+			_rebarTop->display(true);
+			_rebarBottom->display(true);
 		}
 
 		//Set old style if not fullscreen
@@ -9424,6 +9497,8 @@ void Notepad_plus::fullScreenToggle()
 
 void Notepad_plus::postItToggle()
 {
+	assert(_rebarTop);
+	assert(_rebarBottom);
 	NppParameters * pNppParam = NppParameters::getInstance();
 	if (!_beforeSpecialView.isPostIt)	// PostIt disabled, enable it
 	{
@@ -9449,8 +9524,8 @@ void Notepad_plus::postItToggle()
 				::SendMessage(_hSelf, NPPM_HIDEMENU, 0, TRUE);
 
 			//Hide rebar
-			_rebarTop.display(false);
-			_rebarBottom.display(false);
+			_rebarTop->display(false);
+			_rebarBottom->display(false);
 		}
 
 		// PostIt!
@@ -9479,8 +9554,8 @@ void Notepad_plus::postItToggle()
 				::SendMessage(_hSelf, NPPM_HIDEMENU, 0, FALSE);
 
 			//Show rebar
-			_rebarTop.display(true);
-			_rebarBottom.display(true);
+			_rebarTop->display(true);
+			_rebarBottom->display(true);
 		}
 		//Do this GUI config always
 		if (_beforeSpecialView.isStatusbarShown)
@@ -10201,6 +10276,7 @@ void Notepad_plus::enableConvertMenuItems(formatType f) const
 
 void Notepad_plus::setDisplayFormat(formatType f)
 {
+	assert(_statusBar);
 	std::generic_string str;
 	switch (f)
 	{
@@ -10213,11 +10289,12 @@ void Notepad_plus::setDisplayFormat(formatType f)
 		default :
 			str = TEXT("Dos\\Windows");
 	}
-	_statusBar.setText(str.c_str(), STATUSBAR_EOF_FORMAT);
+	_statusBar->setText(str.c_str(), STATUSBAR_EOF_FORMAT);
 };
 
 void Notepad_plus::setUniModeText(UniMode um)
 {
+	assert(_statusBar);
 	TCHAR *uniModeText;
 	switch (um)
 	{
@@ -10236,7 +10313,7 @@ void Notepad_plus::setUniModeText(UniMode um)
 		default :
 			uniModeText = TEXT("ANSI");
 	}
-	_statusBar.setText(uniModeText, STATUSBAR_UNICODE_TYPE);
+	_statusBar->setText(uniModeText, STATUSBAR_UNICODE_TYPE);
 }
 
 int Notepad_plus::getFolderMarginStyle() const
