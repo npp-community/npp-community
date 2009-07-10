@@ -18,6 +18,8 @@
 #include "precompiled_headers.h"
 #include "TabBar.h"
 #include "Common.h"
+#include "menuCmdID.h"
+#include "resource.h"
 
 const COLORREF blue      	            = RGB(0,       0, 0xFF);
 const COLORREF black     	            = RGB(0,       0,    0);
@@ -46,6 +48,65 @@ COLORREF TabBarPlus::_inactiveBgColour = RGB(192, 192, 192);
 
 HWND TabBarPlus::_hwndArray[nbCtrlMax] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 int TabBarPlus::_nbCtrl = 0;
+
+
+struct CloseButtonZone {
+
+	CloseButtonZone(): _width(11), _hight(11), _fromTop(5), _fromRight(3){};
+
+	bool isHit(int x, int y, const RECT & testZone) const {
+		if (((x + _width + _fromRight) < testZone.right) || (x > (testZone.right - _fromRight)))
+			return false;
+
+		if (((y - _hight - _fromTop) > testZone.top) || (y < (testZone.top + _fromTop)))
+			return false;
+
+		return true;
+	};
+
+	RECT getButtonRectFrom(const RECT & tabItemRect) const {
+		RECT rect;
+		rect.right = tabItemRect.right - _fromRight;
+		rect.left = rect.right - _width;
+		rect.top = tabItemRect.top + _fromTop;
+		rect.bottom = rect.top + _hight;
+
+		return rect;
+	};
+
+	int _width;
+	int _hight;
+
+	int _fromTop; // distance from top in pixzl
+	int _fromRight; // distance from right in pixzl
+};
+
+TabBar::~TabBar()
+{
+	if (_hSelf)
+	{
+		TabBar::destroy();
+	}
+};
+
+void TabBar::destroy()
+{
+	if (_hFont)
+		DeleteObject(_hFont);
+
+	if (_hLargeFont)
+		DeleteObject(_hLargeFont);
+
+	if (_hVerticalFont)
+		DeleteObject(_hVerticalFont);
+
+	if (_hVerticalLargeFont)
+		DeleteObject(_hVerticalLargeFont);
+
+	::DestroyWindow(_hSelf);
+	_hSelf = NULL;
+};
+
 
 void TabBar::init(HINSTANCE hInst, HWND parent, bool isVertical, bool isTraditional, bool isMultiLine)
 {
@@ -95,6 +156,18 @@ int TabBar::insertAtEnd(const TCHAR *subTabName)
 	return int(::SendMessage(_hSelf, TCM_INSERTITEM, _nbItem++, reinterpret_cast<LPARAM>(&tie)));
 }
 
+void TabBar::activateAt(int index) const
+{
+	if (getCurrentTabIndex() != index) {
+		::SendMessage(_hSelf, TCM_SETCURSEL, index, 0);}
+	TBHDR nmhdr;
+	nmhdr.hdr.hwndFrom = _hSelf;
+	nmhdr.hdr.code = TCN_SELCHANGE;
+	nmhdr.hdr.idFrom = reinterpret_cast<unsigned int>(this);
+	nmhdr.tabOrigin = index;
+
+}
+
 void TabBar::getCurrentTitle(TCHAR *title, int titleLen)
 {
 	TCITEM tci;
@@ -104,29 +177,67 @@ void TabBar::getCurrentTitle(TCHAR *title, int titleLen)
 	::SendMessage(_hSelf, TCM_GETITEM, getCurrentTabIndex(), reinterpret_cast<LPARAM>(&tci));
 }
 
-void TabBar::deletItemAt(int index) {
-		if ((index == _nbItem-1)) {
-			//prevent invisible tabs. If last visible tab is removed, other tabs are put in view but not redrawn
-			//Therefore, scroll one tab to the left if only one tab visible
-			if (_nbItem > 1) {
-				RECT itemRect;
-				::SendMessage(_hSelf, TCM_GETITEMRECT, (WPARAM)index, (LPARAM)&itemRect);
-				if (itemRect.left < 5) {	//if last visible tab, scroll left once (no more than 5px away should be safe, usually 2px depending on the drawing)
-					//To scroll the tab control to the left, use the WM_HSCROLL notification
-					//Doesn't really seem to be documented anywhere, but the values do match the message parameters
-					//The up/down control really is just some sort of scrollbar
-					//There seems to be no negative effect on any internal state of the tab control or the up/down control
-					int wParam = MAKEWPARAM(SB_THUMBPOSITION, index - 1);
-					::SendMessage(_hSelf, WM_HSCROLL, wParam, 0);
+int TabBar::getCurrentTabIndex() const
+{
+	return ::SendMessage(_hSelf, TCM_GETCURSEL, 0, 0);
+};
 
-					wParam = MAKEWPARAM(SB_ENDSCROLL, index - 1);
-					::SendMessage(_hSelf, WM_HSCROLL, wParam, 0);
-				}
+void TabBar::deletAllItem()
+{
+	::SendMessage(_hSelf, TCM_DELETEALLITEMS, 0, 0);
+	_nbItem = 0;
+};
+
+void TabBar::setImageList(HIMAGELIST himl)
+{
+	_hasImgLst = true;
+	::SendMessage(_hSelf, TCM_SETIMAGELIST, 0, (LPARAM)himl);
+};
+
+void TabBar::setFont(TCHAR *fontName, size_t fontSize)
+{
+	if (_hFont)
+	{
+		::DeleteObject(_hFont);
+	}
+
+	_hFont = ::CreateFont( fontSize, 0,
+		(_isVertical) ? 900:0,
+		(_isVertical) ? 900:0,
+		FW_NORMAL,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		fontName);
+	if (_hFont)
+	{
+		::SendMessage(_hSelf, WM_SETFONT, reinterpret_cast<WPARAM>(_hFont), 0);
+	}
+}
+
+void TabBar::deletItemAt(int index)
+{
+	if ((index == _nbItem-1)) {
+		//prevent invisible tabs. If last visible tab is removed, other tabs are put in view but not redrawn
+		//Therefore, scroll one tab to the left if only one tab visible
+		if (_nbItem > 1) {
+			RECT itemRect;
+			::SendMessage(_hSelf, TCM_GETITEMRECT, (WPARAM)index, (LPARAM)&itemRect);
+			if (itemRect.left < 5) {	//if last visible tab, scroll left once (no more than 5px away should be safe, usually 2px depending on the drawing)
+				//To scroll the tab control to the left, use the WM_HSCROLL notification
+				//Doesn't really seem to be documented anywhere, but the values do match the message parameters
+				//The up/down control really is just some sort of scrollbar
+				//There seems to be no negative effect on any internal state of the tab control or the up/down control
+				int wParam = MAKEWPARAM(SB_THUMBPOSITION, index - 1);
+				::SendMessage(_hSelf, WM_HSCROLL, wParam, 0);
+
+				wParam = MAKEWPARAM(SB_ENDSCROLL, index - 1);
+				::SendMessage(_hSelf, WM_HSCROLL, wParam, 0);
 			}
 		}
-		::SendMessage(_hSelf, TCM_DELETEITEM, index, 0);
-		_nbItem--;
-	};
+	}
+	::SendMessage(_hSelf, TCM_DELETEITEM, index, 0);
+	_nbItem--;
+}
 
 void TabBar::reSizeTo(RECT & rc2Ajust)
 {
@@ -171,6 +282,25 @@ void TabBar::reSizeTo(RECT & rc2Ajust)
 		rc2Ajust.right	-= 10;
 	}
 }
+
+long TabBar::getRowCount() const
+{
+	return long(::SendMessage(_hSelf, TCM_GETROWCOUNT, 0, 0));
+}
+
+TabBarPlus::TabBarPlus() :
+	TabBar(), _isDragging(false), _tabBarDefaultProc(NULL), _currentHoverTabItem(-1),
+	_isCloseHover(false), _whichCloseClickDown(-1), _lmbdHit(false), _closeButtonZone(new CloseButtonZone())
+{
+
+}
+
+
+TabBarPlus::~TabBarPlus()
+{
+	delete _closeButtonZone;
+}
+
 
 void TabBarPlus::init(HINSTANCE hInst, HWND parent, bool isVertical, bool isTraditional, bool isMultiLine)
 {
@@ -293,7 +423,7 @@ LRESULT TabBarPlus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPara
 				int xPos = LOWORD(lParam);
 				int yPos = HIWORD(lParam);
 
-				if (_closeButtonZone.isHit(xPos, yPos, _currentHoverTabRect))
+				if (_closeButtonZone->isHit(xPos, yPos, _currentHoverTabRect))
 				{
 					_whichCloseClickDown = getTabIndexAt(xPos, yPos);
 					::SendMessage(_hParent, WM_COMMAND, IDM_VIEW_REFRESHTABAR, 0);
@@ -373,7 +503,7 @@ LRESULT TabBarPlus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPara
 					::SendMessage(_hSelf, TCM_GETITEMRECT, index, (LPARAM)&_currentHoverTabRect);
 					::SendMessage(_hSelf, TCM_GETITEMRECT, oldIndex, (LPARAM)&oldRect);
 					_currentHoverTabItem = index;
-					_isCloseHover = _closeButtonZone.isHit(xPos, yPos, _currentHoverTabRect);
+					_isCloseHover = _closeButtonZone->isHit(xPos, yPos, _currentHoverTabRect);
 
 					if (oldVal != _isCloseHover)
 					{
@@ -411,7 +541,7 @@ LRESULT TabBarPlus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPara
 
 			if (_drawTabCloseButton)
 			{
-				if ((_whichCloseClickDown == currentTabOn) && _closeButtonZone.isHit(xPos, yPos, _currentHoverTabRect))
+				if ((_whichCloseClickDown == currentTabOn) && _closeButtonZone->isHit(xPos, yPos, _currentHoverTabRect))
 				{
 					TBHDR nmhdr;
 					nmhdr.hdr.hwndFrom = _hSelf;
@@ -561,7 +691,7 @@ void TabBarPlus::drawItem(DRAWITEMSTRUCT *pDrawItemStruct)
 
 	if (_drawTabCloseButton)
 	{
-		RECT closeButtonRect = _closeButtonZone.getButtonRectFrom(rect);
+		RECT closeButtonRect = _closeButtonZone->getButtonRectFrom(rect);
 		if (isSelected)
 		{
 			if (!_isVertical)
@@ -810,3 +940,77 @@ void TabBarPlus::exchangeItemData(POINT point)
 	}
 
 }
+
+void TabBarPlus::doOwnerDrawTab()
+{
+	::SendMessage(_hwndArray[0], TCM_SETPADDING, 0, MAKELPARAM(6, 0));
+	for (int i = 0 ; i < _nbCtrl ; i++)
+	{
+		if (_hwndArray[i])
+		{
+			DWORD style = ::GetWindowLongPtr(_hwndArray[i], GWL_STYLE);
+			if (isOwnerDrawTab())
+				style |= TCS_OWNERDRAWFIXED;
+			else
+				style &= ~TCS_OWNERDRAWFIXED;
+
+			::SetWindowLongPtr(_hwndArray[i], GWL_STYLE, style);
+			::InvalidateRect(_hwndArray[i], NULL, TRUE);
+
+			const int base = 6;
+			::SendMessage(_hwndArray[i], TCM_SETPADDING, 0, MAKELPARAM(_drawTabCloseButton?base+3:base, 0));
+		}
+	}
+}
+
+void TabBarPlus::doVertical()
+{
+	for (int i = 0 ; i < _nbCtrl ; i++)
+	{
+		if (_hwndArray[i])
+			SendMessage(_hwndArray[i], WM_TABSETSTYLE, isVertical(), TCS_VERTICAL);
+	}
+}
+
+void TabBarPlus::doMultiLine()
+{
+	for (int i = 0 ; i < _nbCtrl ; i++)
+	{
+		if (_hwndArray[i])
+			SendMessage(_hwndArray[i], WM_TABSETSTYLE, isMultiLine(), TCS_MULTILINE);
+	}
+}
+
+void TabBarPlus::setColour(COLORREF colour2Set, tabColourIndex i)
+{
+	switch (i)
+	{
+	case activeText:
+		_activeTextColour = colour2Set;
+		break;
+	case activeFocusedTop:
+		_activeTopBarFocusedColour = colour2Set;
+		break;
+	case activeUnfocusedTop:
+		_activeTopBarUnfocusedColour = colour2Set;
+		break;
+	case inactiveText:
+		_inactiveTextColour = colour2Set;
+		break;
+	case inactiveBg :
+		_inactiveBgColour = colour2Set;
+		break;
+	default :
+		return;
+	}
+	doOwnerDrawTab();
+}
+
+int TabBarPlus::getTabIndexAt(int x, int y)
+{
+	TCHITTESTINFO hitInfo;
+	hitInfo.pt.x = x;
+	hitInfo.pt.y = y;
+
+	return ::SendMessage(_hSelf, TCM_HITTEST, 0, (LPARAM)&hitInfo);
+};

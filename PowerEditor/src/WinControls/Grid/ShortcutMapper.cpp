@@ -19,7 +19,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
 #include "ShortcutMapper.h"
-#include "Notepad_plus.h"
+#include "Parameters.h"
+#include "PluginInterface.h"
 
 void ShortcutMapper::initTabs() {
 	HWND hTab = _hTabCtrl = ::GetDlgItem(_hSelf, IDC_BABYGRID_TABBAR);

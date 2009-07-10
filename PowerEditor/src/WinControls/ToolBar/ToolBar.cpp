@@ -32,7 +32,10 @@ ToolBar::ToolBar():
 
 ToolBar::~ToolBar()
 {
-	ToolBar::destroy();
+	if (_hSelf)
+	{
+		ToolBar::destroy();
+	}
 }
 
 bool ToolBar::init( HINSTANCE hInst, HWND hPere, toolBarStatusType type,
@@ -362,7 +365,10 @@ void ToolBar::setDisableImageList() {
 
 ReBar::~ReBar()
 {
-	ReBar::destroy();
+	if (_hSelf)
+	{
+		ReBar::destroy();
+	}
 }
 
 void ReBar::init(HINSTANCE hInst, HWND hPere)

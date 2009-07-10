@@ -21,6 +21,7 @@
 #include "ScintillaEditView.h"
 
 #include "keys.h"
+#include "MenuCmdID.h"
 
 struct WinMenuKeyDefinition {	//more or less matches accelerator table definition, easy copy/paste
 	//const TCHAR * name;	//name retrieved from menu?

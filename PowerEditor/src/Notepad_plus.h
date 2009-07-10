@@ -18,7 +18,6 @@
 #ifndef NOTEPAD_PLUS_H
 #define NOTEPAD_PLUS_H
 #include "ScintillaEditView.h"
-#include "DocTabView.h"
 
 #include "PluginsManager.h"
 #include "DockingManager.h"
@@ -63,6 +62,9 @@ class RunMacroDlg;
 class StatusBar;
 class ToolBar;
 class ReBar;
+
+class DocTabView;
+class IconList;
 
 class LastRecentFileList;
 class SmartHighlighter;
@@ -221,8 +223,8 @@ private:
 
 	int _nativeLangEncoding;
 
-    DocTabView _mainDocTab;
-    DocTabView _subDocTab;
+    DocTabView* _mainDocTab;
+    DocTabView* _subDocTab;
     DocTabView *_pDocTab;
 	DocTabView *_pNonDocTab;
 
@@ -240,7 +242,7 @@ private:
     ContextMenu _tabPopupMenu, _tabPopupDropMenu;
 
 	ToolBar*	_toolBar;
-	IconList _docTabIconList;
+	IconList* _docTabIconList;
 
     StatusBar* _statusBar;
 	bool _toReduceTabBar;
@@ -423,15 +425,9 @@ private:
 
     int getFolderMarginStyle() const;
 
-	void checkFolderMarginStyleMenu(int id2Check) const {
-		::CheckMenuRadioItem(_mainMenuHandle, IDM_VIEW_FOLDERMAGIN_SIMPLE, IDM_VIEW_FOLDERMAGIN_BOX, id2Check, MF_BYCOMMAND);
-	};
-
+	void checkFolderMarginStyleMenu(int id2Check) const;
     int getFolderMaginStyleIDFrom(folderStyle fStyle) const;
-
-	void checkMenuItem(int itemID, bool willBeChecked) const {
-		::CheckMenuItem(_mainMenuHandle, itemID, MF_BYCOMMAND | (willBeChecked?MF_CHECKED:MF_UNCHECKED));
-	};
+	void checkMenuItem(int itemID, bool willBeChecked) const;
 	void charAdded(TCHAR chAdded);
 	void MaintainIndentation(TCHAR ch);
 

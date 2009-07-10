@@ -20,7 +20,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __TOOLTIP_H__
 #define __TOOLTIP_H__
 
-#include "Notepad_plus.h"
 #include "Window.h"
 
 

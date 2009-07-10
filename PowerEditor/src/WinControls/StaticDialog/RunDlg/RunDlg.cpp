@@ -18,12 +18,10 @@
 #include "precompiled_headers.h"
 #include "RunDlg.h"
 #include "FileDialog.h"
-//#include "resource.h"
+#include "resource.h"
 #include "Notepad_plus_msgs.h"
 #include "shortcut.h"
 #include "Parameters.h"
-#include "Notepad_plus.h"
-
 
 void Command::extractArgs(TCHAR *cmd2Exec, TCHAR *args, const TCHAR *cmdEntier)
 {

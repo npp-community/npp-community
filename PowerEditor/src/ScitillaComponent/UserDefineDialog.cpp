@@ -21,6 +21,7 @@
 #include "Parameters.h"
 #include "resource.h"
 #include "Notepad_plus_msgs.h"
+#include "menuCmdID.h"
 
 UserLangContainer * SharedParametersDialog::_pUserLang = NULL;
 ScintillaEditView * SharedParametersDialog::_pScintilla = NULL;

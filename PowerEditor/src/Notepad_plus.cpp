@@ -47,11 +47,14 @@
 #include "SmartHighlighter.h"
 #include "AutoCompletion.h"
 
+#include "DocTabView.h"
+
 #include "ToolBar.h"
 #include "StatusBar.h"
 
 #include "trayIconControler.h"
 
+#include "MenuCmdID.h"
 
 const TCHAR Notepad_plus::_className[32] = TEXT("Notepad++");
 HWND Notepad_plus::gNppHWND = NULL;
@@ -67,10 +70,10 @@ struct SortTaskListPred
 {
 	DocTabView *_views[2];
 
-	SortTaskListPred(DocTabView &p, DocTabView &s)
+	SortTaskListPred(DocTabView* p, DocTabView* s)
 	{
-		_views[MAIN_VIEW] = &p;
-		_views[SUB_VIEW] = &s;
+		_views[MAIN_VIEW] = p;
+		_views[SUB_VIEW] = s;
 	}
 
 	bool operator()(const TaskLstFnStatus &l, const TaskLstFnStatus &r) const {
@@ -87,7 +90,9 @@ Notepad_plus::Notepad_plus(): Window(), _mainWindowStatus(0), _pDocTab(NULL), _p
     _recordingMacro(false), _pTrayIco(NULL), _isUDDocked(false), _isRTL(false),
 	_linkTriggered(true), _isDocModifing(false), _isHotspotDblClicked(false), _sysMenuEntering(false),
 	_autoCompleteMain(new AutoCompletion(&_mainEditView)), _autoCompleteSub(new AutoCompletion(&_subEditView)), _smartHighlighter(NULL),
-	_nativeLangEncoding(CP_ACP), _isFileOpening(false), _toolBar(NULL), _statusBar(NULL), _rebarTop(NULL), _rebarBottom(NULL),
+	_mainDocTab(NULL), _subDocTab(NULL),
+	_nativeLangEncoding(CP_ACP), _isFileOpening(false), _docTabIconList(NULL),
+	_toolBar(NULL), _statusBar(NULL), _rebarTop(NULL), _rebarBottom(NULL),
 	_findReplaceDlg(NULL), _incrementFindDlg(NULL), _aboutDlg(NULL), _runDlg(NULL), _goToLineDlg(NULL),
 	_colEditorDlg(NULL), _configStyleDlg(NULL), _preferenceDlg(NULL), _lastRecentFileList(new LastRecentFileList), _windowsMenu(NULL),
 	_runMacroDlg(NULL)
@@ -397,10 +402,20 @@ void Notepad_plus::killAllChildren()
     {
         _pMainSplitter->destroy();
         delete _pMainSplitter;
+        _pMainSplitter = NULL;
     }
 
-    _mainDocTab.destroy();
-    _subDocTab.destroy();
+	if (_mainDocTab)
+	{
+		delete _mainDocTab;
+		_mainDocTab = NULL;
+	}
+
+	if (_subDocTab)
+	{
+		delete _subDocTab;
+		_subDocTab = NULL;
+	}
 
 	_mainEditView.destroy();
     _subEditView.destroy();
@@ -487,6 +502,12 @@ void Notepad_plus::killAllChildren()
 	{
 		delete _runMacroDlg;
 		_runMacroDlg = NULL;
+	}
+
+	if (_docTabIconList)
+	{
+		delete _docTabIconList;
+		_docTabIconList = NULL;
 	}
 }
 
@@ -644,6 +665,8 @@ void Notepad_plus::saveDockingParams()
 // return false if one or more sessions files fail to load (and session is modify to remove invalid files)
 bool Notepad_plus::loadSession(Session & session)
 {
+	assert(_mainDocTab);
+	assert(_subDocTab);
 	bool allSessionFilesLoaded = true;
 	BufferID lastOpened = BUFFER_INVALID;
 	size_t i = 0;
@@ -710,7 +733,7 @@ bool Notepad_plus::loadSession(Session & session)
 		if (PathFileExists(pFn)) {
 			lastOpened = doOpen(pFn);
 			//check if already open in main. If so, clone
-			if (_mainDocTab.getIndexByBuffer(lastOpened) != -1) {
+			if (_mainDocTab->getIndexByBuffer(lastOpened) != -1) {
 				loadBufferIntoView(lastOpened, SUB_VIEW);
 			}
 		} else {
@@ -761,11 +784,11 @@ bool Notepad_plus::loadSession(Session & session)
 	_mainEditView.restoreCurrentPos();
 	_subEditView.restoreCurrentPos();
 
-	if (session._activeMainIndex < (size_t)_mainDocTab.nbItem())//session.nbMainFiles())
-		activateBuffer(_mainDocTab.getBufferByIndex(session._activeMainIndex), MAIN_VIEW);
+	if (session._activeMainIndex < (size_t)_mainDocTab->nbItem())//session.nbMainFiles())
+		activateBuffer(_mainDocTab->getBufferByIndex(session._activeMainIndex), MAIN_VIEW);
 
-	if (session._activeSubIndex < (size_t)_subDocTab.nbItem())//session.nbSubFiles())
-		activateBuffer(_subDocTab.getBufferByIndex(session._activeSubIndex), SUB_VIEW);
+	if (session._activeSubIndex < (size_t)_subDocTab->nbItem())//session.nbSubFiles())
+		activateBuffer(_subDocTab->getBufferByIndex(session._activeSubIndex), SUB_VIEW);
 
 	if ((session.nbSubFiles() > 0) && (session._activeView == MAIN_VIEW || session._activeView == SUB_VIEW))
 		switchEditViewTo(session._activeView);
@@ -1015,7 +1038,10 @@ bool Notepad_plus::doSave(BufferID id, const TCHAR * filename, bool isCopy)
 	return res;
 }
 
-void Notepad_plus::doClose(BufferID id, int whichOne) {
+void Notepad_plus::doClose(BufferID id, int whichOne)
+{
+	assert(_mainDocTab);
+	assert(_subDocTab);
 	Buffer * buf = MainFileManager->getBufferByID(id);
 
 	// Notify plugins that current file is about to be closed
@@ -1031,7 +1057,7 @@ void Notepad_plus::doClose(BufferID id, int whichOne) {
 		_lastRecentFileList->add(buf->getFullPathName());
 	}
 
-	int nrDocs = whichOne==MAIN_VIEW?(_mainDocTab.nbItem()):(_subDocTab.nbItem());
+	int nrDocs = whichOne==MAIN_VIEW?(_mainDocTab->nbItem()):(_subDocTab->nbItem());
 
 	//Do all the works
 	removeBufferFromView(id, whichOne);
@@ -1302,15 +1328,17 @@ bool Notepad_plus::fileSave(BufferID id)
 
 bool Notepad_plus::fileSaveAll() {
 	if (viewVisible(MAIN_VIEW)) {
-		for(int i = 0; i < _mainDocTab.nbItem(); i++) {
-			BufferID idToSave = _mainDocTab.getBufferByIndex(i);
+		assert(_mainDocTab);
+		for(int i = 0; i < _mainDocTab->nbItem(); i++) {
+			BufferID idToSave = _mainDocTab->getBufferByIndex(i);
 			fileSave(idToSave);
 		}
 	}
 
 	if (viewVisible(SUB_VIEW)) {
-		for(int i = 0; i < _subDocTab.nbItem(); i++) {
-			BufferID idToSave = _subDocTab.getBufferByIndex(i);
+		assert(_subDocTab);
+		for(int i = 0; i < _subDocTab->nbItem(); i++) {
+			BufferID idToSave = _subDocTab->getBufferByIndex(i);
 			fileSave(idToSave);
 		}
 	}
@@ -1448,12 +1476,14 @@ bool Notepad_plus::fileClose(BufferID id, int curView)
 
 bool Notepad_plus::fileCloseAll()
 {
+	assert(_mainDocTab);
+	assert(_subDocTab);
 	//closes all documents, makes the current view the only one visible
 
 	//first check if we need to save any file
-	for(int i = 0; i < _mainDocTab.nbItem(); i++)
+	for(int i = 0; i < _mainDocTab->nbItem(); i++)
 	{
-		BufferID id = _mainDocTab.getBufferByIndex(i);
+		BufferID id = _mainDocTab->getBufferByIndex(i);
 		Buffer * buf = MainFileManager->getBufferByID(id);
 		if (buf->isUntitled() && buf->docLength() == 0)
 		{
@@ -1473,9 +1503,9 @@ bool Notepad_plus::fileCloseAll()
 			}
 		}
 	}
-	for(int i = 0; i < _subDocTab.nbItem(); i++)
+	for(int i = 0; i < _subDocTab->nbItem(); i++)
 	{
-		BufferID id = _subDocTab.getBufferByIndex(i);
+		BufferID id = _subDocTab->getBufferByIndex(i);
 		Buffer * buf = MainFileManager->getBufferByID(id);
 		if (buf->isUntitled() && buf->docLength() == 0)
 		{
@@ -1517,13 +1547,15 @@ bool Notepad_plus::fileCloseAll()
 
 bool Notepad_plus::fileCloseAllButCurrent()
 {
+	assert(_mainDocTab);
+	assert(_subDocTab);
 	BufferID current = _pEditView->getCurrentBufferID();
 	int active = _pDocTab->getCurrentTabIndex();
 	//closes all documents, makes the current view the only one visible
 
 	//first check if we need to save any file
-	for(int i = 0; i < _mainDocTab.nbItem(); i++) {
-		BufferID id = _mainDocTab.getBufferByIndex(i);
+	for(int i = 0; i < _mainDocTab->nbItem(); i++) {
+		BufferID id = _mainDocTab->getBufferByIndex(i);
 		if (id == current)
 			continue;
 		Buffer * buf = MainFileManager->getBufferByID(id);
@@ -1545,9 +1577,9 @@ bool Notepad_plus::fileCloseAllButCurrent()
 			}
 		}
 	}
-	for(int i = 0; i < _subDocTab.nbItem(); i++)
+	for(int i = 0; i < _subDocTab->nbItem(); i++)
 	{
-		BufferID id = _subDocTab.getBufferByIndex(i);
+		BufferID id = _subDocTab->getBufferByIndex(i);
 		Buffer * buf = MainFileManager->getBufferByID(id);
 		if (id == current)
 			continue;
@@ -1607,9 +1639,10 @@ bool Notepad_plus::replaceAllFiles() {
 
     if (_mainWindowStatus & WindowMainActive)
     {
-		for (int i = 0 ; i < _mainDocTab.nbItem() ; i++)
+		assert(_mainDocTab);
+		for (int i = 0 ; i < _mainDocTab->nbItem() ; i++)
 	    {
-			pBuf = MainFileManager->getBufferByID(_mainDocTab.getBufferByIndex(i));
+			pBuf = MainFileManager->getBufferByID(_mainDocTab->getBufferByIndex(i));
 			if (pBuf->isReadOnly())
 				continue;
 			_invisibleEditView.execute(SCI_SETDOCPOINTER, 0, pBuf->getDocument());
@@ -1623,9 +1656,10 @@ bool Notepad_plus::replaceAllFiles() {
 
 	if (_mainWindowStatus & WindowSubActive)
     {
-		for (int i = 0 ; i < _subDocTab.nbItem() ; i++)
+		assert(_subDocTab);
+		for (int i = 0 ; i < _subDocTab->nbItem() ; i++)
 	    {
-			pBuf = MainFileManager->getBufferByID(_subDocTab.getBufferByIndex(i));
+			pBuf = MainFileManager->getBufferByID(_subDocTab->getBufferByIndex(i));
 			if (pBuf->isReadOnly())
 				continue;
 			_invisibleEditView.execute(SCI_SETDOCPOINTER, 0, pBuf->getDocument());
@@ -1967,9 +2001,10 @@ bool Notepad_plus::findInOpenedFiles()
 
     if (_mainWindowStatus & WindowMainActive)
     {
-		for (int i = 0 ; i < _mainDocTab.nbItem() ; i++)
+		assert(_mainDocTab);
+		for (int i = 0 ; i < _mainDocTab->nbItem() ; i++)
 	    {
-			pBuf = MainFileManager->getBufferByID(_mainDocTab.getBufferByIndex(i));
+			pBuf = MainFileManager->getBufferByID(_mainDocTab->getBufferByIndex(i));
 			_invisibleEditView.execute(SCI_SETDOCPOINTER, 0, pBuf->getDocument());
 			_invisibleEditView.execute(SCI_SETCODEPAGE, pBuf->getUnicodeMode() == uni8Bit ? 0 : SC_CP_UTF8);
 			nbTotal += _findReplaceDlg->processAll(ProcessFindAll, NULL, NULL, isEntireDoc, pBuf->getFullPathName());
@@ -1978,9 +2013,10 @@ bool Notepad_plus::findInOpenedFiles()
 
     if (_mainWindowStatus & WindowSubActive)
     {
-		for (int i = 0 ; i < _subDocTab.nbItem() ; i++)
+		assert(_subDocTab);
+		for (int i = 0 ; i < _subDocTab->nbItem() ; i++)
 	    {
-			pBuf = MainFileManager->getBufferByID(_subDocTab.getBufferByIndex(i));
+			pBuf = MainFileManager->getBufferByID(_subDocTab->getBufferByIndex(i));
 			_invisibleEditView.execute(SCI_SETDOCPOINTER, 0, pBuf->getDocument());
 			_invisibleEditView.execute(SCI_SETCODEPAGE, pBuf->getUnicodeMode() == uni8Bit ? 0 : SC_CP_UTF8);
 			nbTotal += _findReplaceDlg->processAll(ProcessFindAll, NULL, NULL, isEntireDoc, pBuf->getFullPathName());
@@ -2214,11 +2250,13 @@ void Notepad_plus::setLangStatus(LangType langType){
 
 BOOL Notepad_plus::notify(SCNotification *notification)
 {
+	assert(_mainDocTab);
+	assert(_subDocTab);
 	//Important, keep track of which element generated the message
-	bool isFromPrimary = (_mainEditView.getHSelf() == notification->nmhdr.hwndFrom || _mainDocTab.getHSelf() == notification->nmhdr.hwndFrom);
-	bool isFromSecondary = !isFromPrimary && (_subEditView.getHSelf() == notification->nmhdr.hwndFrom || _subDocTab.getHSelf() == notification->nmhdr.hwndFrom);
+	bool isFromPrimary = (_mainEditView.getHSelf() == notification->nmhdr.hwndFrom || _mainDocTab->getHSelf() == notification->nmhdr.hwndFrom);
+	bool isFromSecondary = !isFromPrimary && (_subEditView.getHSelf() == notification->nmhdr.hwndFrom || _subDocTab->getHSelf() == notification->nmhdr.hwndFrom);
 	ScintillaEditView * notifyView = isFromPrimary?&_mainEditView:&_subEditView;
-	DocTabView *notifyDocTab = isFromPrimary?&_mainDocTab:&_subDocTab;
+	DocTabView *notifyDocTab = isFromPrimary?_mainDocTab:_subDocTab;
 	TBHDR * tabNotification = (TBHDR*) notification;
 	switch (notification->nmhdr.code)
 	{
@@ -2528,11 +2566,13 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 	case TCN_SELCHANGE:
 	{
 		int iView = -1;
-        if (notification->nmhdr.hwndFrom == _mainDocTab.getHSelf())
+		assert(_mainDocTab);
+		assert(_subDocTab);
+        if (notification->nmhdr.hwndFrom == _mainDocTab->getHSelf())
 		{
 			iView = MAIN_VIEW;
 		}
-		else if (notification->nmhdr.hwndFrom == _subDocTab.getHSelf())
+		else if (notification->nmhdr.hwndFrom == _subDocTab->getHSelf())
 		{
 			iView = SUB_VIEW;
 		}
@@ -2552,6 +2592,8 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 	case NM_CLICK :
     {
 		assert(_statusBar);
+		assert(_mainDocTab);
+		assert(_subDocTab);
 		if (notification->nmhdr.hwndFrom == _statusBar->getHSelf())
         {
             LPNMMOUSE lpnm = (LPNMMOUSE)notification;
@@ -2562,11 +2604,11 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 				_statusBar->setText((_pEditView->execute(SCI_GETOVERTYPE))?TEXT("OVR"):TEXT("INS"), STATUSBAR_TYPING_MODE);
 			}
         }
-		else if (notification->nmhdr.hwndFrom == _mainDocTab.getHSelf())
+		else if (notification->nmhdr.hwndFrom == _mainDocTab->getHSelf())
 		{
             switchEditViewTo(MAIN_VIEW);
 		}
-        else if (notification->nmhdr.hwndFrom == _subDocTab.getHSelf())
+        else if (notification->nmhdr.hwndFrom == _subDocTab->getHSelf())
         {
             switchEditViewTo(SUB_VIEW);
         }
@@ -2594,11 +2636,13 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 
     case NM_RCLICK :
     {
-		if (notification->nmhdr.hwndFrom == _mainDocTab.getHSelf())
+		assert(_mainDocTab);
+		assert(_subDocTab);
+		if (notification->nmhdr.hwndFrom == _mainDocTab->getHSelf())
 		{
             switchEditViewTo(MAIN_VIEW);
 		}
-        else if (notification->nmhdr.hwndFrom == _subDocTab.getHSelf())
+        else if (notification->nmhdr.hwndFrom == _subDocTab->getHSelf())
         {
             switchEditViewTo(SUB_VIEW);
         }
@@ -2752,6 +2796,9 @@ BOOL Notepad_plus::notify(SCNotification *notification)
     case TTN_GETDISPINFO:
     {
 		assert(_rebarTop);
+		assert(_mainDocTab);
+		assert(_subDocTab);
+
         LPTOOLTIPTEXT lpttt;
 
         lpttt = (LPTOOLTIPTEXT)notification;
@@ -2769,15 +2816,15 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 		{
 			getNameStrFromCmd(id, tip);
 		}
-		else if (hWin == _mainDocTab.getHSelf())
+		else if (hWin == _mainDocTab->getHSelf())
 		{
-			BufferID idd = _mainDocTab.getBufferByIndex(id);
+			BufferID idd = _mainDocTab->getBufferByIndex(id);
 			Buffer * buf = MainFileManager->getBufferByID(idd);
 			tip = buf->getFullPathName();
 		}
-		else if (hWin == _subDocTab.getHSelf())
+		else if (hWin == _subDocTab->getHSelf())
 		{
-			BufferID idd = _subDocTab.getBufferByIndex(id);
+			BufferID idd = _subDocTab->getBufferByIndex(id);
 			Buffer * buf = MainFileManager->getBufferByID(idd);
 			tip = buf->getFullPathName();
 		}
@@ -3893,6 +3940,10 @@ void Notepad_plus::command(int id)
 
 		case IDM_VIEW_REDUCETABBAR :
 		{
+			assert(_docTabIconList);
+			assert(_mainDocTab);
+			assert(_subDocTab);
+
 			_toReduceTabBar = !_toReduceTabBar;
 
 			//Resize the  icon
@@ -3900,9 +3951,9 @@ void Notepad_plus::command(int id)
 
 			//Resize the tab height
 			int tabHeight = _toReduceTabBar?20:25;
-			TabCtrl_SetItemSize(_mainDocTab.getHSelf(), 45, tabHeight);
-			TabCtrl_SetItemSize(_subDocTab.getHSelf(), 45, tabHeight);
-			_docTabIconList.setIconSize(iconSize);
+			TabCtrl_SetItemSize(_mainDocTab->getHSelf(), 45, tabHeight);
+			TabCtrl_SetItemSize(_subDocTab->getHSelf(), 45, tabHeight);
+			_docTabIconList->setIconSize(iconSize);
 
 			//change the font
 			int stockedFont = _toReduceTabBar?DEFAULT_GUI_FONT:SYSTEM_FONT;
@@ -3910,8 +3961,8 @@ void Notepad_plus::command(int id)
 
 			if (hf)
 			{
-				::SendMessage(_mainDocTab.getHSelf(), WM_SETFONT, (WPARAM)hf, MAKELPARAM(TRUE, 0));
-				::SendMessage(_subDocTab.getHSelf(), WM_SETFONT, (WPARAM)hf, MAKELPARAM(TRUE, 0));
+				::SendMessage(_mainDocTab->getHSelf(), WM_SETFONT, (WPARAM)hf, MAKELPARAM(TRUE, 0));
+				::SendMessage(_subDocTab->getHSelf(), WM_SETFONT, (WPARAM)hf, MAKELPARAM(TRUE, 0));
 			}
 
 			::SendMessage(_hSelf, WM_SIZE, 0, 0);
@@ -3935,7 +3986,6 @@ void Notepad_plus::command(int id)
 		case IDM_VIEW_DRAWTABBAR_INACIVETAB:
 		{
 			TabBarPlus::setDrawInactiveTab(!TabBarPlus::drawInactiveTab());
-			//TabBarPlus::setDrawInactiveTab(!TabBarPlus::drawInactiveTab(), _subDocTab.getHSelf());
 			break;
 		}
 		case IDM_VIEW_DRAWTABBAR_TOPBAR:
@@ -3946,13 +3996,15 @@ void Notepad_plus::command(int id)
 
 		case IDM_VIEW_DRAWTABBAR_CLOSEBOTTUN :
 		{
+			assert(_mainDocTab);
+			assert(_subDocTab);
 			TabBarPlus::setDrawTabCloseButton(!TabBarPlus::drawTabCloseButton());
 
 			// This part is just for updating (redraw) the tabs
 			{
 				int tabHeight = TabBarPlus::drawTabCloseButton()?21:20;
-				TabCtrl_SetItemSize(_mainDocTab.getHSelf(), 45, tabHeight);
-				TabCtrl_SetItemSize(_subDocTab.getHSelf(), 45, tabHeight);
+				TabCtrl_SetItemSize(_mainDocTab->getHSelf(), 45, tabHeight);
+				TabCtrl_SetItemSize(_subDocTab->getHSelf(), 45, tabHeight);
 			}
 			::SendMessage(_hSelf, WM_SIZE, 0, 0);
 			break;
@@ -4605,8 +4657,10 @@ void Notepad_plus::command(int id)
         case IDC_PREV_DOC :
         case IDC_NEXT_DOC :
         {
-			int nbDoc = viewVisible(MAIN_VIEW)?_mainDocTab.nbItem():0;
-			nbDoc += viewVisible(SUB_VIEW)?_subDocTab.nbItem():0;
+			assert(_mainDocTab);
+			assert(_subDocTab);
+			int nbDoc = viewVisible(MAIN_VIEW)?_mainDocTab->nbItem():0;
+			nbDoc += viewVisible(SUB_VIEW)?_subDocTab->nbItem():0;
 
 			bool doTaskList = ((NppParameters::getInstance())->getNppGUI())._doTaskList;
 			if (nbDoc > 1)
@@ -4619,8 +4673,9 @@ void Notepad_plus::command(int id)
 				}
 				else
 				{
+					assert(_docTabIconList);
 					TaskListDlg tld;
-					HIMAGELIST hImgLst = _docTabIconList.getHandle();
+					HIMAGELIST hImgLst = _docTabIconList->getHandle();
 					tld.init(_hInst, _hSelf, hImgLst, direction);
 					tld.doDialog();
 				}
@@ -5041,15 +5096,17 @@ void Notepad_plus::dropFiles(HDROP hdrop)
 {
 	if (hdrop)
 	{
+		assert(_mainDocTab);
+		assert(_subDocTab);
 		// Determinate in which view the file(s) is (are) dropped
 		POINT p;
 		::DragQueryPoint(hdrop, &p);
 		HWND hWin = ::RealChildWindowFromPoint(_hSelf, p);
 		if (!hWin) return;
 
-		if ((_mainEditView.getHSelf() == hWin) || (_mainDocTab.getHSelf() == hWin))
+		if ((_mainEditView.getHSelf() == hWin) || (_mainDocTab->getHSelf() == hWin))
 			switchEditViewTo(MAIN_VIEW);
-		else if ((_subEditView.getHSelf() == hWin) || (_subDocTab.getHSelf() == hWin))
+		else if ((_subEditView.getHSelf() == hWin) || (_subDocTab->getHSelf() == hWin))
 			switchEditViewTo(SUB_VIEW);
 		else
 		{
@@ -5112,11 +5169,13 @@ void Notepad_plus::showView(int whichOne) {
 	}
 
 	if (whichOne == MAIN_VIEW) {
+		assert(_mainDocTab);
 		_mainEditView.display(true);
-		_mainDocTab.display(true);
+		_mainDocTab->display(true);
 	} else if (whichOne == SUB_VIEW) {
+		assert(_subDocTab);
 		_subEditView.display(true);
-		_subDocTab.display(true);
+		_subDocTab->display(true);
 	}
 	_pMainWindow->display(true);
 
@@ -5141,7 +5200,10 @@ void Notepad_plus::hideView(int whichOne)
 	if (!(bothActive()))	//cannot close if not both views visible
 		return;
 
-	Window * windowToSet = (whichOne == MAIN_VIEW)?&_subDocTab:&_mainDocTab;
+	assert(_mainDocTab);
+	assert(_subDocTab);
+
+	Window * windowToSet = (whichOne == MAIN_VIEW)?_subDocTab:_mainDocTab;
 	if (_mainWindowStatus & WindowUserActive)
 	{
 		_pMainSplitter->setWin0(windowToSet);
@@ -5153,10 +5215,10 @@ void Notepad_plus::hideView(int whichOne)
 	//hide scintilla and doctab
 	if (whichOne == MAIN_VIEW) {
 		_mainEditView.display(false);
-		_mainDocTab.display(false);
+		_mainDocTab->display(false);
 	} else if (whichOne == SUB_VIEW) {
 		_subEditView.display(false);
-		_subDocTab.display(false);
+		_subDocTab->display(false);
 	}
 
 	// resize the main window
@@ -5315,14 +5377,22 @@ bool Notepad_plus::canHideView(int whichOne)
 		return false;	//cannot hide hidden view
 	if (!bothActive())
 		return false;	//cannot hide only window
-	DocTabView * tabToCheck = (whichOne == MAIN_VIEW)?&_mainDocTab:&_subDocTab;
+
+	assert(_mainDocTab);
+	assert(_subDocTab);
+
+	DocTabView * tabToCheck = (whichOne == MAIN_VIEW)?_mainDocTab:_subDocTab;
 	Buffer * buf = MainFileManager->getBufferByID(tabToCheck->getBufferByIndex(0));
 	bool canHide = ((tabToCheck->nbItem() == 1) && !buf->isDirty() && buf->isUntitled());
 	return canHide;
 }
 
-void Notepad_plus::loadBufferIntoView(BufferID id, int whichOne, bool dontClose) {
-	DocTabView * tabToOpen = (whichOne == MAIN_VIEW)?&_mainDocTab:&_subDocTab;
+void Notepad_plus::loadBufferIntoView(BufferID id, int whichOne, bool dontClose)
+{
+	assert(_mainDocTab);
+	assert(_subDocTab);
+
+	DocTabView * tabToOpen = (whichOne == MAIN_VIEW)?_mainDocTab:_subDocTab;
 	ScintillaEditView * viewToOpen = (whichOne == MAIN_VIEW)?&_mainEditView:&_subEditView;
 
 	//check if buffer exists
@@ -5351,8 +5421,12 @@ void Notepad_plus::loadBufferIntoView(BufferID id, int whichOne, bool dontClose)
 	}
 }
 
-void Notepad_plus::removeBufferFromView(BufferID id, int whichOne) {
-	DocTabView * tabToClose = (whichOne == MAIN_VIEW)?&_mainDocTab:&_subDocTab;
+void Notepad_plus::removeBufferFromView(BufferID id, int whichOne)
+{
+	assert(_mainDocTab);
+	assert(_subDocTab);
+
+	DocTabView * tabToClose = (whichOne == MAIN_VIEW)?_mainDocTab:_subDocTab;
 	ScintillaEditView * viewToClose = (whichOne == MAIN_VIEW)?&_mainEditView:&_subEditView;
 
 	//check if buffer exists
@@ -5576,14 +5650,16 @@ bool Notepad_plus::activateBuffer(BufferID id, int whichOne)
 	}
 	if (whichOne == MAIN_VIEW)
 	{
-		if (_mainDocTab.activateBuffer(id))	//only activate if possible
+		assert(_mainDocTab);
+		if (_mainDocTab->activateBuffer(id))	//only activate if possible
 			_mainEditView.activateBuffer(id);
 		else
 			return false;
 	}
 	else
 	{
-		if (_subDocTab.activateBuffer(id))
+		assert(_subDocTab);
+		if (_subDocTab->activateBuffer(id))
 			_subEditView.activateBuffer(id);
 		else
 			return false;
@@ -7278,6 +7354,21 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 				_smartHighlighter = new SmartHighlighter(_findReplaceDlg);
 			}
 
+			if (!_docTabIconList)
+			{
+				_docTabIconList = new IconList();
+			}
+
+			if (!_mainDocTab)
+			{
+				_mainDocTab = new DocTabView();
+			}
+
+			if (!_subDocTab)
+			{
+				_subDocTab = new DocTabView();
+			}
+
 			// Menu
 			_mainMenuHandle = ::GetMenu(_hSelf);
 			int langPos2BeRemoved = MENUINDEX_LANGUAGE+1;
@@ -7286,9 +7377,9 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			::RemoveMenu(_mainMenuHandle, langPos2BeRemoved, MF_BYPOSITION);
 
 			//Views
-            _pDocTab = &_mainDocTab;
+            _pDocTab = _mainDocTab;
             _pEditView = &_mainEditView;
-			_pNonDocTab = &_subDocTab;
+			_pNonDocTab = _subDocTab;
 			_pNonEditView = &_subEditView;
 
 			_mainEditView.init(_hInst, hwnd);
@@ -7308,10 +7399,10 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 			int tabBarStatus = nppGUI._tabStatus;
 			_toReduceTabBar = ((tabBarStatus & TAB_REDUCE) != 0);
-			_docTabIconList.create(_toReduceTabBar?13:20, _hInst, docTabIconIDs, sizeof(docTabIconIDs)/sizeof(int));
+			_docTabIconList->create(_toReduceTabBar?13:20, _hInst, docTabIconIDs, sizeof(docTabIconIDs)/sizeof(int));
 
-			_mainDocTab.init(_hInst, hwnd, &_mainEditView, &_docTabIconList);
-			_subDocTab.init(_hInst, hwnd, &_subEditView, &_docTabIconList);
+			_mainDocTab->init(_hInst, hwnd, &_mainEditView, _docTabIconList);
+			_subDocTab->init(_hInst, hwnd, &_subEditView, _docTabIconList);
 
 			_mainEditView.display();
 
@@ -7381,13 +7472,13 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 				if (hf)
 				{
-					::SendMessage(_mainDocTab.getHSelf(), WM_SETFONT, (WPARAM)hf, MAKELPARAM(TRUE, 0));
-					::SendMessage(_subDocTab.getHSelf(), WM_SETFONT, (WPARAM)hf, MAKELPARAM(TRUE, 0));
+					::SendMessage(_mainDocTab->getHSelf(), WM_SETFONT, (WPARAM)hf, MAKELPARAM(TRUE, 0));
+					::SendMessage(_subDocTab->getHSelf(), WM_SETFONT, (WPARAM)hf, MAKELPARAM(TRUE, 0));
 				}
-				TabCtrl_SetItemSize(_mainDocTab.getHSelf(), 45, 20);
-				TabCtrl_SetItemSize(_subDocTab.getHSelf(), 45, 20);
+				TabCtrl_SetItemSize(_mainDocTab->getHSelf(), 45, 20);
+				TabCtrl_SetItemSize(_subDocTab->getHSelf(), 45, 20);
 			}
-			_mainDocTab.display();
+			_mainDocTab->display();
 
 
 			TabBarPlus::doDragNDrop((tabBarStatus & TAB_DRAGNDROP) != 0);
@@ -7402,7 +7493,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			bool isVertical = (nppGUI._splitterPos == POS_VERTICAL);
 
             _subSplitter.init(_hInst, _hSelf);
-            _subSplitter.create(&_mainDocTab, &_subDocTab, 8, DYNAMIC, 50, isVertical);
+            _subSplitter.create(_mainDocTab, _subDocTab, 8, DYNAMIC, 50, isVertical);
 
             //--Status Bar Section--//
 			bool willBeShown = nppGUI._statusBarShow;
@@ -7414,7 +7505,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			_statusBar->setPartWidth(STATUSBAR_TYPING_MODE, 30);
             _statusBar->display(willBeShown);
 
-            _pMainWindow = &_mainDocTab;
+            _pMainWindow = _mainDocTab;
 
 			_dockingManager.init(_hInst, hwnd, &_pMainWindow);
 
@@ -7902,9 +7993,11 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		{
 			DocTabView * pView = NULL;
 			if (lParam == MAIN_VIEW) {
-				pView = &_mainDocTab;
+				assert(_mainDocTab);
+				pView = _mainDocTab;
 			} else if (lParam == SUB_VIEW) {
-				pView = &_subDocTab;
+				assert(_subDocTab);
+				pView = _subDocTab;
 			} else {
 				return (LRESULT)BUFFER_INVALID;
 			}
@@ -8225,8 +8318,10 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 		case NPPM_GETNBOPENFILES :
 		{
-			int nbDocPrimary = _mainDocTab.nbItem();
-			int nbDocSecond = _subDocTab.nbItem();
+			assert(_mainDocTab);
+			assert(_subDocTab);
+			int nbDocPrimary = _mainDocTab->nbItem();
+			int nbDocSecond = _subDocTab->nbItem();
 			if (lParam == ALL_OPEN_FILES)
 				return nbDocPrimary + nbDocSecond;
 			else if (lParam == PRIMARY_VIEW)
@@ -8246,17 +8341,19 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 			int j = 0;
 			if (Message != NPPM_GETOPENFILENAMESSECOND) {
-				for (int i = 0 ; i < _mainDocTab.nbItem() && j < nbFileNames ; i++)
+				assert(_mainDocTab);
+				for (int i = 0 ; i < _mainDocTab->nbItem() && j < nbFileNames ; i++)
 				{
-					BufferID id = _mainDocTab.getBufferByIndex(i);
+					BufferID id = _mainDocTab->getBufferByIndex(i);
 					Buffer * buf = MainFileManager->getBufferByID(id);
 					lstrcpy(fileNames[j++], buf->getFullPathName());
 				}
 			}
 			if (Message != NPPM_GETOPENFILENAMESPRIMARY) {
-				for (int i = 0 ; i < _subDocTab.nbItem() && j < nbFileNames ; i++)
+				assert(_subDocTab);
+				for (int i = 0 ; i < _subDocTab->nbItem() && j < nbFileNames ; i++)
 				{
-					BufferID id = _subDocTab.getBufferByIndex(i);
+					BufferID id = _subDocTab->getBufferByIndex(i);
 					Buffer * buf = MainFileManager->getBufferByID(id);
 					lstrcpy(fileNames[j++], buf->getFullPathName());
 				}
@@ -8272,6 +8369,8 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 			if (NppParameters::getInstance()->getNppGUI()._styleMRU)
 			{
+				assert(_mainDocTab);
+				assert(_subDocTab);
 				tli->_currentIndex = 0;
 				std::sort(tli->_tlfsLst.begin(),tli->_tlfsLst.end(),SortTaskListPred(_mainDocTab,_subDocTab));
 			}
@@ -8309,8 +8408,10 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			{
 				case APPCOMMAND_BROWSER_BACKWARD :
 				case APPCOMMAND_BROWSER_FORWARD :
-					int nbDoc = viewVisible(MAIN_VIEW)?_mainDocTab.nbItem():0;
-					nbDoc += viewVisible(SUB_VIEW)?_subDocTab.nbItem():0;
+					assert(_mainDocTab);
+					assert(_subDocTab);
+					int nbDoc = viewVisible(MAIN_VIEW)?_mainDocTab->nbItem():0;
+					nbDoc += viewVisible(SUB_VIEW)?_subDocTab->nbItem():0;
 					if (nbDoc > 1)
 						activateNextDoc((GET_APPCOMMAND_LPARAM(lParam) == APPCOMMAND_BROWSER_FORWARD)?dirDown:dirUp);
 					_linkTriggered = true;
@@ -8454,11 +8555,13 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 			if (Message == NPPM_TRIGGERTABBARCONTEXTMENU)
 			{
+				assert(_mainDocTab);
+				assert(_subDocTab);
 				// open here tab menu
 				NMHDR	nmhdr;
 				nmhdr.code = NM_RCLICK;
 
-				nmhdr.hwndFrom = (whichView == MAIN_VIEW)?_mainDocTab.getHSelf():_subDocTab.getHSelf();
+				nmhdr.hwndFrom = (whichView == MAIN_VIEW)?_mainDocTab->getHSelf():_subDocTab->getHSelf();
 
 				nmhdr.idFrom = ::GetDlgCtrlID(nmhdr.hwndFrom);
 				::SendMessage(_hSelf, WM_NOTIFY, nmhdr.idFrom, (LPARAM)&nmhdr);
@@ -8597,15 +8700,17 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		{
 			if (lParam == SUB_VIEW)
 			{
+				assert(_subDocTab);
 				if (!viewVisible(SUB_VIEW))
 					return -1;
-				return _subDocTab.getCurrentTabIndex();
+				return _subDocTab->getCurrentTabIndex();
 			}
 			else //MAIN_VIEW
 			{
+				assert(_mainDocTab);
 				if (!viewVisible(MAIN_VIEW))
 					return -1;
-				return _mainDocTab.getCurrentTabIndex();
+				return _mainDocTab->getCurrentTabIndex();
 			}
 		}
 
@@ -8826,13 +8931,15 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		{
 			int i;
 
-			if ((i = _mainDocTab.getIndexByBuffer((BufferID)wParam)) != -1)
+			assert(_mainDocTab);
+			assert(_subDocTab);
+			if ((i = _mainDocTab->getIndexByBuffer((BufferID)wParam)) != -1)
 			{
 				long view = MAIN_VIEW;
 				view <<= 30;
 				return view|i;
 			}
-			if ((i = _subDocTab.getIndexByBuffer((BufferID)wParam)) != -1)
+			if ((i = _subDocTab->getIndexByBuffer((BufferID)wParam)) != -1)
 			{
 				long view = SUB_VIEW;
 				view <<= 30;
@@ -9151,7 +9258,8 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		}
 		case NPPM_ISTABBARHIDDEN :
 		{
-			return _mainDocTab.getHideTabBarStatus();
+			assert(_mainDocTab);
+			return _mainDocTab->getHideTabBarStatus();
 		}
 
 
@@ -9245,7 +9353,9 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 */
 		case NPPM_INTERNAL_ISFOCUSEDTAB :
 		{
-			HWND hTabToTest = (currentView() == MAIN_VIEW)?_mainDocTab.getHSelf():_subDocTab.getHSelf();
+			assert(_mainDocTab);
+			assert(_subDocTab);
+			HWND hTabToTest = (currentView() == MAIN_VIEW)?_mainDocTab->getHSelf():_subDocTab->getHSelf();
 			return (HWND)lParam == hTabToTest;
 		}
 
@@ -9274,11 +9384,13 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		case NPPM_INTERNAL_SWITCHVIEWFROMHWND :
 		{
 			HWND handle = (HWND)lParam;
-			if (_mainEditView.getHSelf() == handle || _mainDocTab.getHSelf() == handle)
+			assert(_mainDocTab);
+			assert(_subDocTab);
+			if (_mainEditView.getHSelf() == handle || _mainDocTab->getHSelf() == handle)
 			{
 				switchEditViewTo(MAIN_VIEW);
 			}
-			else if (_subEditView.getHSelf() == handle || _subDocTab.getHSelf() == handle)
+			else if (_subEditView.getHSelf() == handle || _subDocTab->getHSelf() == handle)
 			{
 				switchEditViewTo(SUB_VIEW);
 			}
@@ -9693,20 +9805,22 @@ bool Notepad_plus::getIntegralDockingData(tTbData & dockData, int & iCont, bool 
 
 void Notepad_plus::getCurrentOpenedFiles(Session & session)
 {
+	assert(_mainDocTab);
+	assert(_subDocTab);
 	_mainEditView.saveCurrentPos();	//save position so itll be correct in the session
 	_subEditView.saveCurrentPos();	//both views
 	session._activeView = currentView();
-	session._activeMainIndex = _mainDocTab.getCurrentTabIndex();
-	session._activeSubIndex = _subDocTab.getCurrentTabIndex();
+	session._activeMainIndex = _mainDocTab->getCurrentTabIndex();
+	session._activeSubIndex = _subDocTab->getCurrentTabIndex();
 
 	//Use _invisibleEditView to temporarily open documents to retrieve markers
 	//Buffer * mainBuf = _mainEditView.getCurrentBuffer();
 	//Buffer * subBuf = _subEditView.getCurrentBuffer();
 	Document oldDoc = _invisibleEditView.execute(SCI_GETDOCPOINTER);
 
-	for (int i = 0 ; i < _mainDocTab.nbItem() ; i++)
+	for (int i = 0 ; i < _mainDocTab->nbItem() ; i++)
 	{
-		BufferID bufID = _mainDocTab.getBufferByIndex(i);
+		BufferID bufID = _mainDocTab->getBufferByIndex(i);
 		Buffer * buf = MainFileManager->getBufferByID(bufID);
 		if (!buf->isUntitled() && PathFileExists(buf->getFullPathName()))
 		{
@@ -9729,9 +9843,9 @@ void Notepad_plus::getCurrentOpenedFiles(Session & session)
 		}
 	}
 
-	for (int i = 0 ; i < _subDocTab.nbItem() ; i++)
+	for (int i = 0 ; i < _subDocTab->nbItem() ; i++)
 	{
-		BufferID bufID = _subDocTab.getBufferByIndex(i);
+		BufferID bufID = _subDocTab->getBufferByIndex(i);
 		Buffer * buf = MainFileManager->getBufferByID(bufID);
 		if (!buf->isUntitled() && PathFileExists(buf->getFullPathName()))
 		{
@@ -9945,14 +10059,18 @@ void Notepad_plus::drawTabbarColoursFromStylerArray()
 		TabBarPlus::setColour(stInact->_bgColor, TabBarPlus::inactiveBg);
 }
 
-void Notepad_plus::notifyBufferChanged(Buffer * buffer, int mask) {
+void Notepad_plus::notifyBufferChanged(Buffer * buffer, int mask)
+{
+	assert(_mainDocTab);
+	assert(_subDocTab);
+
 	NppParameters *pNppParam = NppParameters::getInstance();
 	const NppGUI & nppGUI = pNppParam->getNppGUI();
 
 	_mainEditView.bufferUpdated(buffer, mask);
 	_subEditView.bufferUpdated(buffer, mask);
-	_mainDocTab.bufferUpdated(buffer, mask);
-	_subDocTab.bufferUpdated(buffer, mask);
+	_mainDocTab->bufferUpdated(buffer, mask);
+	_subDocTab->bufferUpdated(buffer, mask);
 
 	bool mainActive = (_mainEditView.getCurrentBuffer() == buffer);
 	bool subActive = (_subEditView.getCurrentBuffer() == buffer);
@@ -10092,6 +10210,9 @@ void Notepad_plus::notifyBufferActivated(BufferID bufid, int view)
 {
 	assert(_autoCompleteMain);
 	assert(_autoCompleteSub);
+	assert(_mainDocTab);
+	assert(_subDocTab);
+
 	Buffer * buf = MainFileManager->getBufferByID(bufid);
 	buf->increaseRecentTag();
 
@@ -10119,8 +10240,8 @@ void Notepad_plus::notifyBufferActivated(BufferID bufid, int view)
 	setWorkingDir(dir);
 	setTitle();
 	//Make sure the colors of the tab controls match
-	::InvalidateRect(_mainDocTab.getHSelf(), NULL, FALSE);
-	::InvalidateRect(_subDocTab.getHSelf(), NULL, FALSE);
+	::InvalidateRect(_mainDocTab->getHSelf(), NULL, FALSE);
+	::InvalidateRect(_subDocTab->getHSelf(), NULL, FALSE);
 
 	SCNotification scnN;
 	scnN.nmhdr.code = NPPN_BUFFERACTIVATED;
@@ -10594,7 +10715,9 @@ Style * Notepad_plus::getStyleFromName(const TCHAR *styleName)
 
 bool Notepad_plus::noOpenedDoc() const
 {
-	if (_mainDocTab.isVisible() && _subDocTab.isVisible())
+	assert(_mainDocTab);
+	assert(_subDocTab);
+	if (_mainDocTab->isVisible() && _subDocTab->isVisible())
 		return false;
 	if (_pDocTab->nbItem() == 1)
 	{
@@ -10612,6 +10735,16 @@ void Notepad_plus::EnableMouseWheelZoom(bool enable)
 	_mainEditView.execute(SCI_SETWHEELZOOMING, enable);
 	_invisibleEditView.execute(SCI_SETWHEELZOOMING, enable);
 	_fileEditView.execute(SCI_SETWHEELZOOMING, enable);
+}
+
+void Notepad_plus::checkFolderMarginStyleMenu(int id2Check) const
+{
+	::CheckMenuRadioItem(_mainMenuHandle, IDM_VIEW_FOLDERMAGIN_SIMPLE, IDM_VIEW_FOLDERMAGIN_BOX, id2Check, MF_BYCOMMAND);
+}
+
+void Notepad_plus::checkMenuItem(int itemID, bool willBeChecked) const
+{
+	::CheckMenuItem(_mainMenuHandle, itemID, MF_BYCOMMAND | (willBeChecked?MF_CHECKED:MF_UNCHECKED));
 }
 
 void Notepad_plus::ScintillaCtrls::init(HINSTANCE hInst, HWND hNpp)

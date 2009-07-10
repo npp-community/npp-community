@@ -17,10 +17,29 @@
 
 #include "precompiled_headers.h"
 #include "DocTabView.h"
-
+#include "ScintillaEditView.h"
+#include "ImageListSet.h"
 
 
 bool DocTabView::_hideTabBarStatus = false;
+
+DocTabView::~DocTabView()
+{
+	if (_hSelf)
+	{
+		DocTabView::destroy();
+	}
+}
+
+void DocTabView::init(HINSTANCE hInst, HWND parent, ScintillaEditView * pView, IconList *pIconList)
+{
+	TabBarPlus::init(hInst, parent);
+	_pView = pView;
+	if (pIconList)
+		TabBar::setImageList(pIconList->getHandle());
+	return;
+};
+
 
 void DocTabView::addBuffer(BufferID buffer) {
 	if (buffer == BUFFER_INVALID)	//valid only
@@ -140,3 +159,19 @@ void DocTabView::setBuffer(int index, BufferID id) {
 
 	::SendMessage(_hParent, WM_SIZE, 0, 0);
 }
+
+void DocTabView::reSizeTo(RECT & rc)
+{
+	if (_hideTabBarStatus)
+	{
+		RECT rcTmp = rc;
+
+		TabBar::reSizeTo(rcTmp);
+		_pView->reSizeTo(rc);
+	}
+	else
+	{
+		TabBar::reSizeTo(rc);
+		_pView->reSizeTo(rc);
+	}
+};

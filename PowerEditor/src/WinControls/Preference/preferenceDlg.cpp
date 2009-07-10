@@ -23,7 +23,8 @@
 #include "regExtDlg.h"
 #include "WordStyleDlg.h"
 #include "ControlsTab.h"
-
+#include "menuCmdID.h"
+#include "resource.h"
 
 const int BLINKRATE_FASTEST = 50;
 const int BLINKRATE_SLOWEST = 2500;
