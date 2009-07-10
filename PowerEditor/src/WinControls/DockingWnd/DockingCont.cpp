@@ -115,11 +115,11 @@ void DockingCont::doDialog(bool willBeShown, bool isFloating)
 }
 
 
-tTbData* DockingCont::createToolbar(tTbData data)
+tTbData* DockingCont::createToolbar(tTbData* data)
 {
 	tTbData *pTbData = new tTbData;
 
-	*pTbData = data;
+	*pTbData = *data;
 
 	// force window style of client window
 	::SetWindowLongPtr(pTbData->hClient, GWL_STYLE, CHILD_STYLES);
@@ -144,12 +144,12 @@ tTbData* DockingCont::createToolbar(tTbData data)
 }
 
 
-void DockingCont::removeToolbar(tTbData TbData)
+void DockingCont::removeToolbar(tTbData* TbData)
 {
 	// remove from list
 	for (size_t iTb = 0; iTb < _vTbData.size(); iTb++)
 	{
-		if (_vTbData[iTb]->hClient == TbData.hClient)
+		if (_vTbData[iTb]->hClient == TbData->hClient)
 		{
 			// remove tab
 			removeTab(_vTbData[iTb]);

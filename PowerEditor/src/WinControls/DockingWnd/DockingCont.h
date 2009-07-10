@@ -68,8 +68,8 @@ public:
 			return _hSelf;
 	};
 
-	tTbData* createToolbar(tTbData data);
-	void	 removeToolbar(tTbData data);
+	tTbData* createToolbar(tTbData* data);
+	void	 removeToolbar(tTbData* data);
 	tTbData* findToolbarByWnd(HWND hClient);
 	tTbData* findToolbarByName(TCHAR* pszName);
 

@@ -47,6 +47,8 @@
 #include "SmartHighlighter.h"
 #include "AutoCompletion.h"
 
+#include "DockingManager.h"
+#include "DockingCont.h"
 #include "DocTabView.h"
 
 #include "ToolBar.h"
@@ -55,6 +57,7 @@
 #include "trayIconControler.h"
 
 #include "MenuCmdID.h"
+
 
 const TCHAR Notepad_plus::_className[32] = TEXT("Notepad++");
 HWND Notepad_plus::gNppHWND = NULL;
@@ -86,7 +89,7 @@ struct SortTaskListPred
 };
 
 Notepad_plus::Notepad_plus(): Window(), _mainWindowStatus(0), _pDocTab(NULL), _pEditView(NULL),
-	_pMainSplitter(NULL),
+	_pMainSplitter(NULL), _dockingManager(NULL),
     _recordingMacro(false), _pTrayIco(NULL), _isUDDocked(false), _isRTL(false),
 	_linkTriggered(true), _isDocModifing(false), _isHotspotDblClicked(false), _sysMenuEntering(false),
 	_autoCompleteMain(new AutoCompletion(&_mainEditView)), _autoCompleteSub(new AutoCompletion(&_subEditView)), _smartHighlighter(NULL),
@@ -424,7 +427,12 @@ void Notepad_plus::killAllChildren()
     _subSplitter.destroy();
 
 	_scintillaCtrls4Plugins.destroy();
-	_dockingManager.destroy();
+
+	if (_dockingManager)
+	{
+		delete _dockingManager;
+		_dockingManager = NULL;
+	}
 
 	if (_statusBar)
 	{
@@ -562,13 +570,15 @@ bool Notepad_plus::saveGUIParams()
 
 void Notepad_plus::saveDockingParams()
 {
+	assert(_dockingManager);
+
 	NppGUI & nppGUI = (NppGUI &)(NppParameters::getInstance())->getNppGUI();
 
 	// Save the docking information
-	nppGUI._dockingData._leftWidth		= _dockingManager.getDockedContSize(CONT_LEFT);
-	nppGUI._dockingData._rightWidth		= _dockingManager.getDockedContSize(CONT_RIGHT);
-	nppGUI._dockingData._topHeight		= _dockingManager.getDockedContSize(CONT_TOP);
-	nppGUI._dockingData._bottomHight	= _dockingManager.getDockedContSize(CONT_BOTTOM);
+	nppGUI._dockingData._leftWidth		= _dockingManager->getDockedContSize(CONT_LEFT);
+	nppGUI._dockingData._rightWidth		= _dockingManager->getDockedContSize(CONT_RIGHT);
+	nppGUI._dockingData._topHeight		= _dockingManager->getDockedContSize(CONT_TOP);
+	nppGUI._dockingData._bottomHight	= _dockingManager->getDockedContSize(CONT_BOTTOM);
 
 	// clear the conatainer tab information (active tab)
 	nppGUI._dockingData._containerTabInfo.clear();
@@ -578,7 +588,7 @@ void Notepad_plus::saveDockingParams()
 	vector<FloatingWindowInfo>		vFloatingWindowInfo;
 
 	// save every container
-	vector<DockingCont*> vCont = _dockingManager.getContainerInfo();
+	vector<DockingCont*> vCont = _dockingManager->getContainerInfo();
 
 	for (size_t i = 0 ; i < vCont.size() ; i++)
 	{
@@ -7270,13 +7280,19 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 	{
 		case WM_NCACTIVATE:
 		{
+			assert(_dockingManager);
 			// Note: lParam is -1 to prevent endless loops of calls
-			::SendMessage(_dockingManager.getHSelf(), WM_NCACTIVATE, wParam, (LPARAM)-1);
+			::SendMessage(_dockingManager->getHSelf(), WM_NCACTIVATE, wParam, (LPARAM)-1);
 			return ::DefWindowProc(hwnd, Message, wParam, lParam);
 		}
 		case WM_CREATE:
 		{
 			NppGUI & nppGUI = (NppGUI &)pNppParam->getNppGUI();
+
+			if (!_dockingManager)
+			{
+				_dockingManager = new DockingManager();
+			}
 
 			if (!_toolBar)
 			{
@@ -7507,7 +7523,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
             _pMainWindow = _mainDocTab;
 
-			_dockingManager.init(_hInst, hwnd, &_pMainWindow);
+			_dockingManager->init(_hInst, hwnd, &_pMainWindow);
 
 			if (nppGUI._isMinimizedToTray)
 				_pTrayIco = new trayIconControler(_hSelf, IDI_M30ICON, IDC_MINIMIZED_TRAY, ::LoadIcon(_hInst, MAKEINTRESOURCE(IDI_M30ICON)), TEXT(""));
@@ -7755,10 +7771,10 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			//launch the plugin dlg memorized at the last session
 			DockingManagerData &dmd = nppGUI._dockingData;
 
-			_dockingManager.setDockedContSize(CONT_LEFT  , nppGUI._dockingData._leftWidth);
-			_dockingManager.setDockedContSize(CONT_RIGHT , nppGUI._dockingData._rightWidth);
-			_dockingManager.setDockedContSize(CONT_TOP	 , nppGUI._dockingData._topHeight);
-			_dockingManager.setDockedContSize(CONT_BOTTOM, nppGUI._dockingData._bottomHight);
+			_dockingManager->setDockedContSize(CONT_LEFT  , nppGUI._dockingData._leftWidth);
+			_dockingManager->setDockedContSize(CONT_RIGHT , nppGUI._dockingData._rightWidth);
+			_dockingManager->setDockedContSize(CONT_TOP	 , nppGUI._dockingData._topHeight);
+			_dockingManager->setDockedContSize(CONT_BOTTOM, nppGUI._dockingData._bottomHight);
 
 			for (size_t i = 0 ; i < dmd._pluginDockInfo.size() ; i++)
 			{
@@ -7771,7 +7787,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			for (size_t i = 0 ; i < dmd._containerTabInfo.size() ; i++)
 			{
 				ContainerTabInfo & cti = dmd._containerTabInfo[i];
-				_dockingManager.setActiveTab(cti._cont, cti._activeTab);
+				_dockingManager->setActiveTab(cti._cont, cti._activeTab);
 			}
 			//Load initial docs into doctab
 			loadBufferIntoView(_mainEditView.getCurrentBufferID(), MAIN_VIEW);
@@ -8054,6 +8070,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		{
 			assert(_rebarTop);
 			assert(_statusBar);
+			assert(_dockingManager);
 			RECT rc;
 			getClientRect(rc);
 			if (lParam == 0) {
@@ -8069,7 +8086,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			::MoveWindow(_rebarBottom->getHSelf(), 0, rc.bottom - rebarBottomHeight - statusBarHeight, rc.right, rebarBottomHeight, TRUE);
 
 			getMainClientRect(rc);
-			_dockingManager.reSizeTo(rc);
+			_dockingManager->reSizeTo(rc);
 
 			result = TRUE;
 		}
@@ -9122,47 +9139,57 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 		case NPPM_DMMSHOW:
 		{
-			_dockingManager.showDockableDlg((HWND)lParam, SW_SHOW);
+			assert(_dockingManager);
+			_dockingManager->showDockableDlg((HWND)lParam, SW_SHOW);
 			return TRUE;
 		}
 
 		case NPPM_DMMHIDE:
 		{
-			_dockingManager.showDockableDlg((HWND)lParam, SW_HIDE);
+			assert(_dockingManager);
+			_dockingManager->showDockableDlg((HWND)lParam, SW_HIDE);
 			return TRUE;
 		}
 
 		case NPPM_DMMUPDATEDISPINFO:
 		{
 			if (::IsWindowVisible((HWND)lParam))
-				_dockingManager.updateContainerInfo((HWND)lParam);
+			{
+				assert(_dockingManager);
+				_dockingManager->updateContainerInfo((HWND)lParam);
+			}
 			return TRUE;
 		}
 
 		case NPPM_DMMREGASDCKDLG:
 		{
+			assert(_dockingManager);
+
 			tTbData *pData	= (tTbData *)lParam;
 			int		iCont	= -1;
 			bool	isVisible	= false;
 
 			getIntegralDockingData(*pData, iCont, isVisible);
-			_dockingManager.createDockableDlg(*pData, iCont, isVisible);
+			_dockingManager->createDockableDlg(pData, iCont, isVisible);
 			return TRUE;
 		}
 
 		case NPPM_DMMVIEWOTHERTAB:
 		{
-			_dockingManager.showDockableDlg((TCHAR*)lParam, SW_SHOW);
+			assert(_dockingManager);
+			_dockingManager->showDockableDlg((TCHAR*)lParam, SW_SHOW);
 			return TRUE;
 		}
 
 		case NPPM_DMMGETPLUGINHWNDBYNAME : //(const TCHAR *windowName, const TCHAR *moduleName)
 		{
+			assert(_dockingManager);
+
 			if (!lParam) return NULL;
 
 			TCHAR *moduleName = (TCHAR *)lParam;
 			TCHAR *windowName = (TCHAR *)wParam;
-			vector<DockingCont *> dockContainer = _dockingManager.getContainerInfo();
+			vector<DockingCont *> dockContainer = _dockingManager->getContainerInfo();
 			for (size_t i = 0 ; i < dockContainer.size() ; i++)
 			{
 				vector<tTbData *> tbData = dockContainer[i]->getDataOfAllTb();

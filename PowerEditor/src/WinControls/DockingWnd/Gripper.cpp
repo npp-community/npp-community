@@ -20,6 +20,7 @@
 #include "dockingResource.h"
 #include "Docking.h"
 #include "Gripper.h"
+#include "Parameters.h"
 
 #ifndef WH_KEYBOARD_LL
 #define WH_KEYBOARD_LL 13

@@ -20,8 +20,9 @@
 #include "ScintillaEditView.h"
 
 #include "PluginsManager.h"
-#include "DockingManager.h"
 #include "Buffer.h"
+
+#include "SplitterContainer.h"
 
 #define MENU 0x01
 #define TOOLBAR 0x02
@@ -48,6 +49,8 @@ enum Views {
 */
 
 // Forward declarations.
+class DockingManager;
+
 class FindReplaceDlg;
 class FindIncrementDlg;
 class AboutDlg;
@@ -73,6 +76,9 @@ class AutoCompletion;
 class trayIconControler;
 
 struct TaskListInfo;
+
+struct tTbData;
+
 static TiXmlNodeA * searchDlgNode(TiXmlNodeA *node, const char *dlgTagName);
 
 struct iconLocator {
@@ -211,7 +217,7 @@ private:
 	static const TCHAR _className[32];
 	TCHAR _nppPath[MAX_PATH];
     Window *_pMainWindow;
-	DockingManager _dockingManager;
+	DockingManager* _dockingManager;
 
 	AutoCompletion* _autoCompleteMain;
 	AutoCompletion* _autoCompleteSub;	//each Scintilla has its own autoComplete
