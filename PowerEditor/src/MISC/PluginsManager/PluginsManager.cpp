@@ -17,6 +17,9 @@
 
 #include "precompiled_headers.h"
 #include "PluginsManager.h"
+#include "Parameters.h"
+#include "resource.h"
+
 
 const TCHAR * USERMSG = TEXT("This plugin is not compatible with current version of Notepad++.\n\n\
 Do you want to remove this plugin from plugins directory to prevent this message from the next launch time?");

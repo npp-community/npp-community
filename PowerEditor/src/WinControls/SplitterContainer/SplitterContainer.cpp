@@ -21,6 +21,29 @@
 
 bool SplitterContainer::_isRegistered = false;
 
+SplitterContainer::SplitterContainer():
+	Window(), _x(0), _y(0), _hPopupMenu(NULL),
+	_dwSplitterStyle(SV_ENABLERDBLCLK | SV_ENABLELDBLCLK | SV_RESIZEWTHPERCNT)
+{
+}
+
+SplitterContainer::~SplitterContainer()
+{
+	if (_hSelf)
+	{
+		SplitterContainer::destroy();
+	}
+}
+
+void SplitterContainer::destroy()
+{
+	if (_hPopupMenu)
+		::DestroyMenu(_hPopupMenu);
+	_splitter.destroy();
+	::DestroyWindow(_hSelf);
+	_hSelf = NULL;
+}
+
 void SplitterContainer::create(Window *pWin0, Window *pWin1, int splitterSize,
                                SplitterMode mode, int ratio, bool isVertical)
 {

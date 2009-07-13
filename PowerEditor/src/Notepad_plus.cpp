@@ -46,10 +46,12 @@
 #include "lastRecentFileList.h"
 #include "SmartHighlighter.h"
 #include "AutoCompletion.h"
+#include "PluginsManager.h"
 
 #include "DockingManager.h"
 #include "DockingCont.h"
 #include "DocTabView.h"
+#include "SplitterContainer.h"
 
 #include "ToolBar.h"
 #include "StatusBar.h"
@@ -89,15 +91,15 @@ struct SortTaskListPred
 };
 
 Notepad_plus::Notepad_plus(): Window(), _mainWindowStatus(0), _pDocTab(NULL), _pEditView(NULL),
-	_pMainSplitter(NULL), _dockingManager(NULL),
-    _recordingMacro(false), _pTrayIco(NULL), _isUDDocked(false), _isRTL(false),
+	_pMainSplitter(NULL), _subSplitter(NULL), _dockingManager(NULL),
+	_recordingMacro(false), _pTrayIco(NULL), _pluginsManager(new PluginsManager()), _isUDDocked(false), _isRTL(false),
 	_linkTriggered(true), _isDocModifing(false), _isHotspotDblClicked(false), _sysMenuEntering(false),
 	_autoCompleteMain(new AutoCompletion(&_mainEditView)), _autoCompleteSub(new AutoCompletion(&_subEditView)), _smartHighlighter(NULL),
 	_mainDocTab(NULL), _subDocTab(NULL),
 	_nativeLangEncoding(CP_ACP), _isFileOpening(false), _docTabIconList(NULL),
 	_toolBar(NULL), _statusBar(NULL), _rebarTop(NULL), _rebarBottom(NULL),
 	_findReplaceDlg(NULL), _incrementFindDlg(NULL), _aboutDlg(NULL), _runDlg(NULL), _goToLineDlg(NULL),
-	_colEditorDlg(NULL), _configStyleDlg(NULL), _preferenceDlg(NULL), _lastRecentFileList(new LastRecentFileList), _windowsMenu(NULL),
+	_colEditorDlg(NULL), _configStyleDlg(NULL), _preferenceDlg(NULL), _lastRecentFileList(new LastRecentFileList()), _windowsMenu(NULL),
 	_runMacroDlg(NULL)
 {
 
@@ -222,6 +224,7 @@ Notepad_plus::~Notepad_plus()
 	delete _lastRecentFileList;
 	delete _autoCompleteMain;
 	delete _autoCompleteSub;
+	delete _pluginsManager;
 }
 
 void Notepad_plus::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLine, CmdLineParams *cmdLineParams)
@@ -253,7 +256,7 @@ void Notepad_plus::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLine, CmdL
 	const NppGUI & nppGUI = pNppParams->getNppGUI();
 
 	if (cmdLineParams->_isNoPlugin)
-		_pluginsManager.disable();
+		_pluginsManager->disable();
 
 	_hSelf = ::CreateWindowEx(
 					WS_EX_ACCEPTFILES | (_isRTL?WS_EX_LAYOUTRTL:0),\
@@ -382,7 +385,7 @@ void Notepad_plus::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLine, CmdL
 	scnN.nmhdr.code = NPPN_READY;
 	scnN.nmhdr.hwndFrom = _hSelf;
 	scnN.nmhdr.idFrom = 0;
-	_pluginsManager.notify(&scnN);
+	_pluginsManager->notify(&scnN);
 }
 
 
@@ -403,7 +406,6 @@ void Notepad_plus::killAllChildren()
 
     if (_pMainSplitter)
     {
-        _pMainSplitter->destroy();
         delete _pMainSplitter;
         _pMainSplitter = NULL;
     }
@@ -424,7 +426,11 @@ void Notepad_plus::killAllChildren()
     _subEditView.destroy();
 	_invisibleEditView.destroy();
 
-    _subSplitter.destroy();
+	if (_subSplitter)
+	{
+		delete _subSplitter;
+		_subSplitter = NULL;
+	}
 
 	_scintillaCtrls4Plugins.destroy();
 
@@ -530,6 +536,7 @@ bool Notepad_plus::saveGUIParams()
 	assert(_rebarTop);
 	assert(_statusBar);
 	assert(_toolBar);
+	assert(_subSplitter);
 
 	NppGUI & nppGUI = (NppGUI &)(NppParameters::getInstance())->getNppGUI();
 	nppGUI._statusBarShow = _statusBar->isVisible();
@@ -545,7 +552,7 @@ bool Notepad_plus::saveGUIParams()
 						(TabBarPlus::isVertical() ? TAB_VERTICAL:0) | \
 						(TabBarPlus::isMultiLine() ? TAB_MULTILINE:0) |\
 						(nppGUI._tabStatus & TAB_HIDE);
-	nppGUI._splitterPos = _subSplitter.isVertical()?POS_VERTICAL:POS_HORIZOTAL;
+	nppGUI._splitterPos = _subSplitter->isVertical()?POS_VERTICAL:POS_HORIZOTAL;
 	UserDefineDialog *udd = _pEditView->getUserDefineDlg();
 	bool b = udd->isDocked();
 	nppGUI._userDefineDlgStatus = (b?UDD_DOCKED:0) | (udd->isVisible()?UDD_SHOW:0);
@@ -898,7 +905,7 @@ BufferID Notepad_plus::doOpen(const TCHAR *fileName, bool isReadOnly)
 	scnN.nmhdr.code = NPPN_FILEBEFORELOAD;
 	scnN.nmhdr.hwndFrom = _hSelf;
 	scnN.nmhdr.idFrom = NULL;
-	_pluginsManager.notify(&scnN);
+	_pluginsManager->notify(&scnN);
 
 	BufferID buffer = MainFileManager->loadFile(longFileName);
 	if (buffer != BUFFER_INVALID)
@@ -913,7 +920,7 @@ BufferID Notepad_plus::doOpen(const TCHAR *fileName, bool isReadOnly)
 		// Notify plugins that current file is about to open
 		scnN.nmhdr.code = NPPN_FILEBEFOREOPEN;
 		scnN.nmhdr.idFrom = (uptr_t)buffer;
-		_pluginsManager.notify(&scnN);
+		_pluginsManager->notify(&scnN);
 
 
 		loadBufferIntoView(buffer, currentView());
@@ -935,7 +942,7 @@ BufferID Notepad_plus::doOpen(const TCHAR *fileName, bool isReadOnly)
 
 		// Notify plugins that current file is just opened
 		scnN.nmhdr.code = NPPN_FILEOPENED;
-		_pluginsManager.notify(&scnN);
+		_pluginsManager->notify(&scnN);
 
 		return buffer;
 	}
@@ -970,7 +977,7 @@ BufferID Notepad_plus::doOpen(const TCHAR *fileName, bool isReadOnly)
 			_isFileOpening = false;
 
 			scnN.nmhdr.code = NPPN_FILELOADFAILED;
-			_pluginsManager.notify(&scnN);
+			_pluginsManager->notify(&scnN);
 		}
 		return BUFFER_INVALID;
 	}
@@ -1032,7 +1039,7 @@ bool Notepad_plus::doSave(BufferID id, const TCHAR * filename, bool isCopy)
 		scnN.nmhdr.code = NPPN_FILEBEFORESAVE;
 		scnN.nmhdr.hwndFrom = _hSelf;
 		scnN.nmhdr.idFrom = (uptr_t)id;
-		_pluginsManager.notify(&scnN);
+		_pluginsManager->notify(&scnN);
 	}
 
 	bool res = MainFileManager->saveBuffer(id, filename, isCopy);
@@ -1040,7 +1047,7 @@ bool Notepad_plus::doSave(BufferID id, const TCHAR * filename, bool isCopy)
 	if (!isCopy)
 	{
 		scnN.nmhdr.code = NPPN_FILESAVED;
-		_pluginsManager.notify(&scnN);
+		_pluginsManager->notify(&scnN);
 	}
 
 	if (!res)
@@ -1059,7 +1066,7 @@ void Notepad_plus::doClose(BufferID id, int whichOne)
 	scnN.nmhdr.code = NPPN_FILEBEFORECLOSE;
 	scnN.nmhdr.hwndFrom = _hSelf;
 	scnN.nmhdr.idFrom = (uptr_t)id;
-	_pluginsManager.notify(&scnN);
+	_pluginsManager->notify(&scnN);
 
 	//add to recent files if its an existing file
 	if (!buf->isUntitled() && PathFileExists(buf->getFullPathName()))
@@ -1078,7 +1085,7 @@ void Notepad_plus::doClose(BufferID id, int whichOne)
 
 	// Notify plugins that current file is closed
 	scnN.nmhdr.code = NPPN_FILECLOSED;
-	_pluginsManager.notify(&scnN);
+	_pluginsManager->notify(&scnN);
 
 	return;
 }
@@ -3713,10 +3720,11 @@ void Notepad_plus::command(int id)
 
 				if ((isUDDlgDocked)&&(isUDDlgVisible))
 				{
+					assert(_subSplitter);
 					::ShowWindow(_pMainSplitter->getHSelf(), SW_HIDE);
 
 					if (bothActive())
-						_pMainWindow = &_subSplitter;
+						_pMainWindow = _subSplitter;
 					else
 						_pMainWindow = _pDocTab;
 
@@ -3727,6 +3735,7 @@ void Notepad_plus::command(int id)
 				}
 				else if ((isUDDlgDocked)&&(!isUDDlgVisible))
 				{
+					assert(_subSplitter);
                     if (!_pMainSplitter)
                     {
                         _pMainSplitter = new SplitterContainer;
@@ -3734,7 +3743,7 @@ void Notepad_plus::command(int id)
 
                         Window *pWindow;
                         if (bothActive())
-                            pWindow = &_subSplitter;
+                            pWindow = _subSplitter;
                         else
                             pWindow = _pDocTab;
 
@@ -4788,7 +4797,7 @@ void Notepad_plus::command(int id)
 			else if ((id >= ID_PLUGINS_CMD) && (id < ID_PLUGINS_CMD_LIMIT))
 			{
 				int i = id - ID_PLUGINS_CMD;
-				_pluginsManager.runPluginCommand(i);
+				_pluginsManager->runPluginCommand(i);
 			}
 			else if ((id >= IDM_WINDOW_MRU_FIRST) && (id <= IDM_WINDOW_MRU_LIMIT))
 			{
@@ -5171,11 +5180,13 @@ void Notepad_plus::showView(int whichOne) {
 	if (viewVisible(whichOne))	//no use making visible view visible
 		return;
 
+	assert(_subSplitter);
+
 	if (_mainWindowStatus & WindowUserActive) {
-		 _pMainSplitter->setWin0(&_subSplitter);
+		 _pMainSplitter->setWin0(_subSplitter);
 		 _pMainWindow = _pMainSplitter;
 	} else {
-		_pMainWindow = &_subSplitter;
+		_pMainWindow = _subSplitter;
 	}
 
 	if (whichOne == MAIN_VIEW) {
@@ -5212,6 +5223,7 @@ void Notepad_plus::hideView(int whichOne)
 
 	assert(_mainDocTab);
 	assert(_subDocTab);
+	assert(_subSplitter);
 
 	Window * windowToSet = (whichOne == MAIN_VIEW)?_subDocTab:_mainDocTab;
 	if (_mainWindowStatus & WindowUserActive)
@@ -5221,7 +5233,7 @@ void Notepad_plus::hideView(int whichOne)
 	else // otherwise the main window is the spltter container that we just created
 		_pMainWindow = windowToSet;
 
-	_subSplitter.display(false);	//hide splitter
+	_subSplitter->display(false);	//hide splitter
 	//hide scintilla and doctab
 	if (whichOne == MAIN_VIEW) {
 		_mainEditView.display(false);
@@ -5289,7 +5301,7 @@ bool Notepad_plus::reloadLang()
 
 	int indexWindow = ::GetMenuItemCount(_mainMenuHandle) - 3;
 
-	if (_pluginsManager.hasPlugins() && pluginsTrans != TEXT(""))
+	if (_pluginsManager->hasPlugins() && pluginsTrans != TEXT(""))
 	{
 		::ModifyMenu(_mainMenuHandle, indexWindow - 1, MF_BYPOSITION, 0, pluginsTrans.c_str());
 	}
@@ -5507,6 +5519,7 @@ int Notepad_plus::switchEditViewTo(int gid)
 
 void Notepad_plus::dockUserDlg()
 {
+	assert(_subSplitter);
     if (!_pMainSplitter)
     {
         _pMainSplitter = new SplitterContainer;
@@ -5514,7 +5527,7 @@ void Notepad_plus::dockUserDlg()
 
         Window *pWindow;
 		if (_mainWindowStatus & (WindowMainActive | WindowSubActive))
-            pWindow = &_subSplitter;
+            pWindow = _subSplitter;
         else
             pWindow = _pDocTab;
 
@@ -5522,7 +5535,7 @@ void Notepad_plus::dockUserDlg()
     }
 
     if (bothActive())
-        _pMainSplitter->setWin0(&_subSplitter);
+        _pMainSplitter->setWin0(_subSplitter);
     else
         _pMainSplitter->setWin0(_pDocTab);
 
@@ -5540,9 +5553,14 @@ void Notepad_plus::undockUserDlg()
     ::ShowWindow(_pMainSplitter->getHSelf(), SW_HIDE);
 
     if (bothActive())
-        _pMainWindow = &_subSplitter;
+    {
+		assert(_subSplitter);
+        _pMainWindow = _subSplitter;
+    }
     else
+    {
         _pMainWindow = _pDocTab;
+    }
 
     ::SendMessage(_hSelf, WM_SIZE, 0, 0);
 
@@ -7385,6 +7403,11 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 				_subDocTab = new DocTabView();
 			}
 
+			if (!_subSplitter)
+			{
+				_subSplitter = new SplitterContainer();
+			}
+
 			// Menu
 			_mainMenuHandle = ::GetMenu(_hSelf);
 			int langPos2BeRemoved = MENUINDEX_LANGUAGE+1;
@@ -7508,8 +7531,8 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
             //--Splitter Section--//
 			bool isVertical = (nppGUI._splitterPos == POS_VERTICAL);
 
-            _subSplitter.init(_hInst, _hSelf);
-            _subSplitter.create(_mainDocTab, _subDocTab, 8, DYNAMIC, 50, isVertical);
+            _subSplitter->init(_hInst, _hSelf);
+            _subSplitter->create(_mainDocTab, _subDocTab, 8, DYNAMIC, 50, isVertical);
 
             //--Status Bar Section--//
 			bool willBeShown = nppGUI._statusBarShow;
@@ -7537,11 +7560,11 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			nppData._scintillaSecondHandle = _subEditView.getHSelf();
 
 			_scintillaCtrls4Plugins.init(_hInst, hwnd);
-			_pluginsManager.init(nppData);
-			_pluginsManager.loadPlugins();
+			_pluginsManager->init(nppData);
+			_pluginsManager->loadPlugins();
 			const TCHAR *appDataNpp = pNppParam->getAppDataNppDir();
 			if (appDataNpp[0])
-				_pluginsManager.loadPlugins(appDataNpp);
+				_pluginsManager->loadPlugins(appDataNpp);
 
 			// ------------ //
 			// Menu Section //
@@ -7638,7 +7661,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			}
 
 			//Plugin menu
-			_pluginsManager.setMenu(_mainMenuHandle, NULL);
+			_pluginsManager->setMenu(_mainMenuHandle, NULL);
 
 			//Main menu is loaded, now load context menu items
 			pNppParam->getContextMenuFromXmlTree(_mainMenuHandle);
@@ -7652,7 +7675,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			generic_string pluginsTrans, windowTrans;
 			changeMenuLang(pluginsTrans, windowTrans);
 
-			if (_pluginsManager.hasPlugins() && pluginsTrans != TEXT(""))
+			if (_pluginsManager->hasPlugins() && pluginsTrans != TEXT(""))
 			{
 				::ModifyMenu(_mainMenuHandle, MENUINDEX_PLUGINS, MF_BYPOSITION, 0, pluginsTrans.c_str());
 			}
@@ -7717,7 +7740,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			scnN.nmhdr.code = NPPN_TBMODIFICATION;
 			scnN.nmhdr.hwndFrom = _hSelf;
 			scnN.nmhdr.idFrom = 0;
-			_pluginsManager.notify(&scnN);
+			_pluginsManager->notify(&scnN);
 
 			_toolBar->init(_hInst, hwnd, tbStatus, toolBarIcons, sizeof(toolBarIcons)/sizeof(ToolBarButtonUnit));
 
@@ -7781,7 +7804,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 				PlugingDlgDockingInfo & pdi = dmd._pluginDockInfo[i];
 
 				if (pdi._isVisible)
-					_pluginsManager.runPluginCommand(pdi._name, pdi._internalID);
+					_pluginsManager->runPluginCommand(pdi._name, pdi._internalID);
 			}
 
 			for (size_t i = 0 ; i < dmd._containerTabInfo.size() ; i++)
@@ -8198,7 +8221,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			scnN.nmhdr.code = NPPN_SHORTCUTREMAPPED;
 			scnN.nmhdr.hwndFrom = (void *)lParam; // ShortcutKey structure
 			scnN.nmhdr.idFrom = (uptr_t)wParam; // cmdID
-			_pluginsManager.notify(&scnN);
+			_pluginsManager->notify(&scnN);
 		}
 		return TRUE;
 
@@ -8207,7 +8230,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			int cmdID = wParam; // cmdID
 			ShortcutKey *sk = (ShortcutKey *)lParam; // ShortcutKey structure
 
-			return _pluginsManager.getShortcutByCmdID(cmdID, sk);
+			return _pluginsManager->getShortcutByCmdID(cmdID, sk);
 		}
 
 		case NPPM_MENUCOMMAND :
@@ -8756,7 +8779,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		case NPPM_GETMENUHANDLE :
 		{
 			if (wParam == NPPPLUGINMENU)
-				return (LRESULT)_pluginsManager.getMenuHandle();
+				return (LRESULT)_pluginsManager->getMenuHandle();
 			else
 				return NULL;
 		}
@@ -8909,7 +8932,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			checkClipboard();
 			checkUndoState();
 			checkMacroState();
-			_pluginsManager.notify(reinterpret_cast<SCNotification *>(lParam));
+			_pluginsManager->notify(reinterpret_cast<SCNotification *>(lParam));
 			return notify(reinterpret_cast<SCNotification *>(lParam));
 		}
 
@@ -9012,7 +9035,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			scnN.nmhdr.code = NPPN_WORDSTYLESUPDATED;
 			scnN.nmhdr.hwndFrom = _hSelf;
 			scnN.nmhdr.idFrom = (uptr_t) _pEditView->getCurrentBufferID();
-			_pluginsManager.notify(&scnN);
+			_pluginsManager->notify(&scnN);
 			return TRUE;
 		}
 
@@ -9055,7 +9078,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			scnN.nmhdr.code = NPPN_SHUTDOWN;
 			scnN.nmhdr.hwndFrom = _hSelf;
 			scnN.nmhdr.idFrom = 0;
-			_pluginsManager.notify(&scnN);
+			_pluginsManager->notify(&scnN);
 
 			saveFindHistory();
 
@@ -9263,7 +9286,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 		case NPPM_MSGTOPLUGIN :
 		{
-			return _pluginsManager.relayPluginMessages(Message, wParam, lParam);
+			return _pluginsManager->relayPluginMessages(Message, wParam, lParam);
 		}
 
 		case NPPM_HIDETABBAR :
@@ -9512,7 +9535,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		}
 	}
 
-	_pluginsManager.relayNppMessages(Message, wParam, lParam);
+	_pluginsManager->relayNppMessages(Message, wParam, lParam);
 	return result;
 }
 
@@ -10170,7 +10193,7 @@ void Notepad_plus::notifyBufferChanged(Buffer * buffer, int mask)
 		scnN.nmhdr.hwndFrom = (void *)buffer->getID();
 		scnN.nmhdr.idFrom = (uptr_t)  ((isSysReadOnly || isUserReadOnly? DOCSTAUS_READONLY : 0) | (isDirty ? DOCSTAUS_BUFFERDIRTY : 0));
 		scnN.nmhdr.code = NPPN_READONLYCHANGED;
-		_pluginsManager.notify(&scnN);
+		_pluginsManager->notify(&scnN);
 
 	}
 
@@ -10220,7 +10243,7 @@ void Notepad_plus::notifyBufferChanged(Buffer * buffer, int mask)
 		scnN.nmhdr.code = NPPN_LANGCHANGED;
 		scnN.nmhdr.hwndFrom = _hSelf;
 		scnN.nmhdr.idFrom = (uptr_t)_pEditView->getCurrentBufferID();
-		_pluginsManager.notify(&scnN);
+		_pluginsManager->notify(&scnN);
 	}
 
 	if (mask & (BufferChangeFormat|BufferChangeLanguage|BufferChangeUnicode))
@@ -10274,7 +10297,7 @@ void Notepad_plus::notifyBufferActivated(BufferID bufid, int view)
 	scnN.nmhdr.code = NPPN_BUFFERACTIVATED;
 	scnN.nmhdr.hwndFrom = _hSelf;
 	scnN.nmhdr.idFrom = (uptr_t)bufid;
-	_pluginsManager.notify(&scnN);
+	_pluginsManager->notify(&scnN);
 
 	_linkTriggered = true;
 }

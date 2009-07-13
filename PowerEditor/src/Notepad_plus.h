@@ -19,10 +19,7 @@
 #define NOTEPAD_PLUS_H
 #include "ScintillaEditView.h"
 
-#include "PluginsManager.h"
 #include "Buffer.h"
-
-#include "SplitterContainer.h"
 
 #define MENU 0x01
 #define TOOLBAR 0x02
@@ -72,6 +69,8 @@ class IconList;
 class LastRecentFileList;
 class SmartHighlighter;
 class AutoCompletion;
+class PluginsManager;
+class SplitterContainer;
 
 class trayIconControler;
 
@@ -243,7 +242,7 @@ private:
 	ScintillaEditView *_pNonEditView;
 
     SplitterContainer *_pMainSplitter;
-    SplitterContainer _subSplitter;
+    SplitterContainer *_subSplitter;
 
     ContextMenu _tabPopupMenu, _tabPopupDropMenu;
 
@@ -321,7 +320,7 @@ private:
 	Accelerator _accelerator;
 	ScintillaAccelerator _scintaccelerator;
 
-	PluginsManager _pluginsManager;
+	PluginsManager* _pluginsManager;
 
 	bool _isRTL;
 	winVer _winVersion;
