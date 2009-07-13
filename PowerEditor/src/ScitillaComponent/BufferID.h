@@ -1,4 +1,4 @@
-// This file is part of notepad++
+// this file is part of notepad++
 // Copyright (C)2009 The Notepad++ Team
 //
 // This program is free software; you can redistribute it and/or
@@ -15,5 +15,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#include "precompiled_headers.h"
+#ifndef BUFFERID_H
+#define BUFFERID_H
 
+class Buffer;
+typedef Buffer * BufferID;	//each buffer has unique ID by which it can be retrieved
+#define BUFFER_INVALID	(BufferID)0
+
+#endif // BUFFERID_H

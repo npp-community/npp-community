@@ -20,8 +20,14 @@
 
 #include "Scintilla.h"
 #include "SciLexer.h"
-#include "Buffer.h"
+#include "BufferID.h"
 #include "UserDefineDialog.h"
+
+// Temporary added #includes that where included "on the side" by Buffer.h.
+// Will disappear during a subsequent cleanup.
+#include "Notepad_plus_msgs.h"
+#include "ScintillaRef.h"
+#include "Parameters.h"
 
 #ifndef WM_MOUSEWHEEL
 #define WM_MOUSEWHEEL 0x020A
@@ -84,7 +90,7 @@ const bool fold_collapse = false;
 const bool UPPERCASE = true;
 const bool LOWERCASE = false;
 
-typedef vector<pair<int, int> > ColumnModeInfo;
+typedef std::vector<std::pair<int, int> > ColumnModeInfo;
 const UCHAR MASK_FORMAT = 0x03;
 const UCHAR MASK_ZERO_LEADING = 0x04;
 const UCHAR BASE_10 = 0x00; // Dec

@@ -20,10 +20,14 @@
 
 #include "StaticDialog.h"
 #include "FindReplaceDlg_rc.h"
-#include "Buffer.h"
+#include "BufferID.h"
 #include "ScintillaEditView.h"
 #include "StatusBar.h"
 #include "DockingDlgInterface.h"
+
+// Temporary added #include that was included "on the side" by ScintillaEditView.h.
+// Will disappear during a subsequent cleanup.
+#include "Buffer.h"
 
 
 #define FIND_RECURSIVE 1

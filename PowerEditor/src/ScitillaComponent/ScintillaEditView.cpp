@@ -20,6 +20,7 @@
 #include "ScintillaEditView.h"
 #include "Parameters.h"
 #include "xpm_icons.h"
+#include "Buffer.h"
 
 
 // initialize the static variable

@@ -20,9 +20,7 @@
 
 #include "Utf8_16.h"
 
-class Buffer;
-typedef Buffer * BufferID;	//each buffer has unique ID by which it can be retrieved
-#define BUFFER_INVALID	(BufferID)0
+#include "BufferID.h"
 
 typedef sptr_t Document;
 

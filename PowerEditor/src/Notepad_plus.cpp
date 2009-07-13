@@ -60,6 +60,7 @@
 
 #include "MenuCmdID.h"
 
+#include "Buffer.h"
 
 const TCHAR Notepad_plus::_className[32] = TEXT("Notepad++");
 HWND Notepad_plus::gNppHWND = NULL;

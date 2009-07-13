@@ -19,7 +19,7 @@
 #define NOTEPAD_PLUS_H
 #include "ScintillaEditView.h"
 
-#include "Buffer.h"
+#include "BufferID.h"
 
 #define MENU 0x01
 #define TOOLBAR 0x02

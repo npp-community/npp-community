@@ -18,6 +18,7 @@
 #include "precompiled_headers.h"
 #include "xmlMatchedTagsHighlighter.h"
 #include "ScintillaEditView.h"
+#include "Buffer.h"
 
 int XmlMatchedTagsHighlighter::getFirstTokenPosFrom(int targetStart, int targetEnd, const char *token, pair<int, int> & foundPos)
 {

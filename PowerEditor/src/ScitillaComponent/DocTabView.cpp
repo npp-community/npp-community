@@ -19,6 +19,7 @@
 #include "DocTabView.h"
 #include "ScintillaEditView.h"
 #include "ImageListSet.h"
+#include "Buffer.h"
 
 
 bool DocTabView::_hideTabBarStatus = false;

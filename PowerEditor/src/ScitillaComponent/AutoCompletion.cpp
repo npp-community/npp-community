@@ -20,6 +20,7 @@
 #include "FunctionCallTip.h"
 #include "ScintillaEditView.h"
 #include "tinyxml.h"
+#include "Buffer.h"
 
 static bool isInList(generic_string word, const vector<generic_string> & wordArray)
 {

@@ -19,7 +19,7 @@
 #define DOCTABVIEW_H
 
 #include "TabBar.h"
-#include "Buffer.h"
+#include "BufferID.h"
 
 const int SAVED_IMG_INDEX = 0;
 const int UNSAVED_IMG_INDEX = 1;

@@ -24,6 +24,8 @@
 #include "Win32Exception.h"	//Win32 exception
 #include "MiniDumper.h"			//Write dump files
 
+#include "Buffer.h"
+
 typedef std::vector<const TCHAR*> ParamVector;
 
 bool checkSingleFile(const TCHAR * commandLine) {
