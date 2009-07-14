@@ -20,14 +20,15 @@
 
 //#define _WIN32_WINNT  0x0600
 
-#include "Parameters.h"
+#include "common.h"
+#include "Notepad_plus_msgs.h"
 
 const int nbExtMax = 256;
 const int extLenMax = 64;
 
 using namespace std;
 
-typedef vector<generic_string> stringVector;
+typedef std::vector<std::generic_string> stringVector;
 //const bool styleOpen = true;
 //const bool styleSave = false;
 

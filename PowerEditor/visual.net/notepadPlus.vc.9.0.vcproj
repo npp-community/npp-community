@@ -406,6 +406,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\Parameters_def.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\precompiled_headers.cpp"
 				>
 				<FileConfiguration

@@ -20,7 +20,7 @@
 #include "ScintillaEditView.h"
 #include "Buffer.h"
 #include "SciLexer.h"
-
+#include "Parameters.h"
 
 int XmlMatchedTagsHighlighter::getFirstTokenPosFrom(int targetStart, int targetEnd, const char *token, pair<int, int> & foundPos)
 {

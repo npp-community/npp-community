@@ -21,6 +21,13 @@
 #include "Utf8_16.h"
 
 #include "BufferID.h"
+#include "scintilla.h"
+#include "Notepad_plus_msgs.h"
+
+struct Position;
+struct Lang;
+class ScintillaEditView;
+class Notepad_plus;
 
 typedef sptr_t Document;
 
@@ -133,27 +140,7 @@ public :
 	//Load the document into Scintilla/add to TabBar
 	//The entire lifetime if the buffer, the Document has reference count of _atleast_ one
 	//Destructor makes sure its purged
-	Buffer(FileManager * pManager, BufferID id, Document doc, DocFileStatus type, const TCHAR *fileName)	//type must be either DOC_REGULAR or DOC_UNNAMED
-		: _pManager(pManager), _id(id), _isDirty(false), _doc(doc), _isFileReadOnly(false), _isUserReadOnly(false), _recentTag(-1), _references(0),
-		_canNotify(false), _timeStamp(0), _needReloading(false)
-	{
-		NppParameters *pNppParamInst = NppParameters::getInstance();
-		const NewDocDefaultSettings & ndds = (pNppParamInst->getNppGUI()).getNewDocDefaultSettings();
-		_format = ndds._format;
-		_unicodeMode = ndds._encoding;
-
-		_userLangExt[0] = 0;
-		_fullPathName[0] = 0;
-		_fileName = NULL;
-		setFileName(fileName, ndds._lang);
-		updateTimeStamp();
-		checkFileState();
-		_currentStatus = type;
-		_isDirty = false;
-
-		_needLexer = false;	//new buffers do not need lexing, Scintilla takes care of that
-		_canNotify = true;
-	};
+	Buffer(FileManager * pManager, BufferID id, Document doc, DocFileStatus type, const TCHAR *fileName);	//type must be either DOC_REGULAR or DOC_UNNAMED
 
 	LangType getLangFromExt(const TCHAR *ext);
 
@@ -226,16 +213,7 @@ public :
 		return _lang;
 	};
 
-	void setLangType(LangType lang, const TCHAR * userLangName = TEXT("")) {
-		if (lang == _lang && lang != L_USER)
-			return;
-		_lang = lang;
-		if (_lang == L_USER) {
-			lstrcpy(_userLangExt, userLangName);
-		}
-		_needLexer = true;	//change of lang means lexern eeds updating
-		doNotify(BufferChangeLanguage|BufferChangeLexing);
-	};
+	void setLangType(LangType lang, const TCHAR * userLangName = TEXT(""));
 
 	UniMode getUnicodeMode() const {
 		return _unicodeMode;
@@ -275,27 +253,11 @@ public :
 		return _userLangExt;
 	};
 
-	const TCHAR * getCommentLineSymbol() const {
-		Lang *l = getCurrentLang();
-		if (!l)
-			return NULL;
-		return l->_pCommentLineSymbol;
+	const TCHAR * getCommentLineSymbol() const;;
 
-	};
+	const TCHAR * getCommentStart() const;;
 
-	const TCHAR * getCommentStart() const {
-		Lang *l = getCurrentLang();
-		if (!l)
-			return NULL;
-		return l->_pCommentStart;
-	};
-
-    const TCHAR * getCommentEnd() const {
-		Lang *l = getCurrentLang();
-		if (!l)
-			return NULL;
-		return l->_pCommentEnd;
-	};
+    const TCHAR * getCommentEnd() const;;
 
 	bool getNeedsLexing() const {
 		return _needLexer;
@@ -348,9 +310,9 @@ private :
 	bool _needLexer;	//initially true
 	//these properties have to be duplicated because of multiple references
 	//All the vectors must have the same size at all times
-	vector< ScintillaEditView * > _referees;
-	vector< Position > _positions;
-	vector< vector<HeaderLineState> > _foldStates;
+	std::vector< ScintillaEditView * > _referees;
+	std::vector< Position > _positions;
+	std::vector< std::vector<HeaderLineState> > _foldStates;
 
 	//vector< pair<size_t, pair<size_t, bool> > > _linesUndoState;
 
@@ -375,10 +337,7 @@ private :
 		doNotify(BufferChangeStatus);
 	}
 
-	void doNotify(int mask) {
-		if (_canNotify)
-			_pManager->beNotifiedOfBufferChange(this, mask);
-	};
+	void doNotify(int mask);;
 };
 
 #endif //BUFFER_H

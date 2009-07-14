@@ -4,6 +4,7 @@
 #include "DocTabView.h"
 #include "WinMgr.h"
 #include "Buffer.h"
+#include "Parameters.h"
 
 #ifndef _countof
 #define _countof(x) (sizeof(x)/sizeof((x)[0]))

@@ -21,8 +21,9 @@
 #include "ScintillaEditView.h"
 #include "tinyxml.h"
 #include "Buffer.h"
+#include "Parameters.h"
 
-static bool isInList(generic_string word, const vector<generic_string> & wordArray)
+static bool isInList(std::generic_string word, const std::vector<std::generic_string> & wordArray)
 {
 	for (size_t i = 0 ; i < wordArray.size() ; i++)
 		if (wordArray[i] == word)
@@ -101,7 +102,7 @@ bool AutoCompletion::showWordComplete(bool autoInsert)
 
 	_pEditView->getGenericText(beginChars, startPos, curPos);
 
-	generic_string expr(TEXT("\\<"));
+	std::generic_string expr(TEXT("\\<"));
 	expr += beginChars;
 	expr += TEXT("[^ \\t.,;:\"()=<>'+!\\[\\]]*");
 
@@ -110,7 +111,7 @@ bool AutoCompletion::showWordComplete(bool autoInsert)
 	int flags = SCFIND_WORDSTART | SCFIND_MATCHCASE | SCFIND_REGEXP | SCFIND_POSIX;
 
 	_pEditView->execute(SCI_SETSEARCHFLAGS, flags);
-	vector<generic_string> wordArray;
+	std::vector<std::generic_string> wordArray;
 	int posFind = _pEditView->searchInTarget(expr.c_str(), 0, docLength);
 
 	while (posFind != -1)
@@ -141,7 +142,7 @@ bool AutoCompletion::showWordComplete(bool autoInsert)
 	}
 
 	sort(wordArray.begin(), wordArray.end());
-	generic_string words(TEXT(""));
+	std::generic_string words(TEXT(""));
 
 	for (size_t i = 0 ; i < wordArray.size() ; i++)
 	{

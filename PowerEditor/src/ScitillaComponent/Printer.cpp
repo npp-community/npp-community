@@ -20,6 +20,7 @@
 #include "Buffer.h"
 #include "ScintillaEditView.h"
 #include "RunDlg.h"
+#include "Parameters.h"
 
 void replaceStr(generic_string & str, generic_string str2BeReplaced, generic_string replacement)
 {

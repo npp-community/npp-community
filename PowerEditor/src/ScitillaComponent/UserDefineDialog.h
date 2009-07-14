@@ -24,7 +24,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ControlsTab.h"
 #include "ColourPicker.h"
 #include "UserDefineLangReference.h"
-//#include "Parameters.h"
 
 #ifdef __GNUC__
 

@@ -25,12 +25,15 @@
 #include "StatusBar.h"
 #include "DockingDlgInterface.h"
 
+#include "common.h"
+
 // Temporary added #include that was included "on the side" by ScintillaEditView.h.
 // Will disappear during a subsequent cleanup.
 #include "Buffer.h"
 #include "SciLexer.h"
 #include "TabBar.h"
 #include "resource.h"
+#include "Parameters.h"
 
 
 #define FIND_RECURSIVE 1
@@ -110,7 +113,7 @@ public:
 	};
 
 	void addSearchLine(const TCHAR *searchName) {
-		generic_string str = TEXT("Search \"");
+		std::generic_string str = TEXT("Search \"");
 		str += searchName;
 		str += TEXT("\"\r\n");
 
@@ -124,7 +127,7 @@ public:
 	};
 
 	void addFileNameTitle(const TCHAR * fileName) {
-		generic_string str = TEXT("  ");
+		std::generic_string str = TEXT("  ");
 		str += fileName;
 		str += TEXT("\r\n");
 
@@ -346,7 +349,7 @@ public :
 	};
 	const TCHAR * getDir2Search() const {return _directory.c_str();};
 
-	void getPatterns(vector<generic_string> & patternVect);
+	void getPatterns(std::vector<std::generic_string> & patternVect);
 
 	void launchFindInFilesDlg() {
 		doDialog(FINDINFILES_DLG);
@@ -365,12 +368,12 @@ public :
 		}
 	};
 
-	generic_string getText2search() const {
+	std::generic_string getText2search() const {
 		return getTextFromCombo(::GetDlgItem(_hSelf, IDFINDWHAT));
 	};
 
-	const generic_string & getFilters() const {return _filters;};
-	const generic_string & getDirectory() const {return _directory;};
+	const std::generic_string & getFilters() const {return _filters;};
+	const std::generic_string & getDirectory() const {return _directory;};
 	const FindOption & getCurrentOptions() const {return _options;};
 	bool isRecursive() const { return _isRecursive; };
 	bool isInHiddenDir() const { return _isInHiddenDir; };
@@ -417,7 +420,7 @@ public :
 protected :
 	virtual BOOL CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
 	void addText2Combo(const TCHAR * txt2add, HWND comboID, bool isUTF8 = false);
-	generic_string getTextFromCombo(HWND hCombo, bool isUnicode = false) const;
+	std::generic_string getTextFromCombo(HWND hCombo, bool isUnicode = false) const;
 	static LONG originalFinderProc;
 
 	// Window procedure for the finder
@@ -458,8 +461,8 @@ private :
 	int _findAllResult;
 	TCHAR _findAllResultStr[1024];
 
-	generic_string _filters;
-	generic_string _directory;
+	std::generic_string _filters;
+	std::generic_string _directory;
 	bool _isRecursive;
 	bool _isInHiddenDir;
 
@@ -539,8 +542,8 @@ private :
 		addText2Combo(getTextFromCombo(hCombo, isUnicode).c_str(), hCombo, isUnicode);
 	};
 	void fillFindHistory();
-	void fillComboHistory(int id, int count, generic_string **pStrings);
-	void saveComboHistory(int id, int maxcount, int& oldcount, generic_string **pStrings);
+	void fillComboHistory(int id, int count, std::generic_string **pStrings);
+	void saveComboHistory(int id, int maxcount, int& oldcount, std::generic_string **pStrings);
 };
 
 //FindIncrementDlg: incremental search dialog, docked in rebar
