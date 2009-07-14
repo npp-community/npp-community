@@ -19,37 +19,21 @@
 #define GOTILINE_DLG_H
 
 #include "StaticDialog.h"
-#include "..\resource.h"
 
-#include "ScintillaEditView.h"
+class ScintillaEditView;
 
 class GoToLineDlg : public StaticDialog
 {
 public :
 	GoToLineDlg() : StaticDialog(), _mode(go2line) {};
 
-	void init(HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView) {
-		Window::init(hInst, hPere);
-		if (!ppEditView)
-			throw int(9900);
-		_ppEditView = ppEditView;
-	};
+	void init(HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView);;
 
-	virtual void create(int dialogID, bool isRTL = false) {
-		StaticDialog::create(dialogID, isRTL);
-	};
+	virtual void create(int dialogID, bool isRTL = false);;
 
-	void doDialog(bool isRTL = false) {
-		if (!isCreated())
-			create(IDD_GOLINE, isRTL);
-		display();
-	};
+	void doDialog(bool isRTL = false);;
 
-    virtual void display(bool toShow = true) const {
-        Window::display(toShow);
-        if (toShow)
-            ::SetFocus(::GetDlgItem(_hSelf, ID_GOLINE_EDIT));
-    };
+    virtual void display(bool toShow = true) const;;
 
 protected :
 	enum mode {go2line, go2offsset};
@@ -60,33 +44,11 @@ private :
 
     ScintillaEditView **_ppEditView;
 
-    void updateLinesNumbers() const {
-		unsigned int current = 0;
-		unsigned int limit = 0;
+    void updateLinesNumbers() const;;
 
-		if (_mode == go2line)
-		{
-			current = (unsigned int)((*_ppEditView)->getCurrentLineNumber() + 1);
-			limit = (unsigned int)((*_ppEditView)->execute(SCI_GETLINECOUNT));
-		}
-		else
-		{
-			current = (unsigned int)(*_ppEditView)->execute(SCI_GETCURRENTPOS);
-			limit = (unsigned int)((*_ppEditView)->getCurrentDocLen() - 1);
-		}
-        ::SetDlgItemInt(_hSelf, ID_CURRLINE, current, FALSE);
-        ::SetDlgItemInt(_hSelf, ID_LASTLINE, limit, FALSE);
-    };
+    void cleanLineEdit() const;;
 
-    void cleanLineEdit() const {
-        ::SetDlgItemText(_hSelf, ID_GOLINE_EDIT, TEXT(""));
-    };
-
-    int getLine() const {
-        BOOL isSuccessful;
-        int line = ::GetDlgItemInt(_hSelf, ID_GOLINE_EDIT, &isSuccessful, FALSE);
-        return (isSuccessful?line:-1);
-    };
+    int getLine() const;;
 
 };
 

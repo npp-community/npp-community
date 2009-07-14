@@ -2,8 +2,6 @@
 #include "Buffer.h"
 
 #include "Scintilla.h"
-#include "Parameters.h"
-
 
 #include "Notepad_plus.h"
 #include "ScintillaEditView.h"

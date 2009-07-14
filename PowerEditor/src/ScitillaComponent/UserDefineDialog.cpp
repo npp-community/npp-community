@@ -23,6 +23,8 @@
 #include "Notepad_plus_msgs.h"
 #include "menuCmdID.h"
 #include "Buffer.h"
+#include "SciLexer.h"
+
 
 UserLangContainer * SharedParametersDialog::_pUserLang = NULL;
 ScintillaEditView * SharedParametersDialog::_pScintilla = NULL;

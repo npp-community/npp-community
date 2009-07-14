@@ -28,6 +28,9 @@
 // Temporary added #include that was included "on the side" by ScintillaEditView.h.
 // Will disappear during a subsequent cleanup.
 #include "Buffer.h"
+#include "SciLexer.h"
+#include "TabBar.h"
+#include "resource.h"
 
 
 #define FIND_RECURSIVE 1

@@ -743,6 +743,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\Parameters_def.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\precompiled_headers.h"
 				>
 			</File>

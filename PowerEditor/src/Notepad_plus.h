@@ -17,9 +17,16 @@
 
 #ifndef NOTEPAD_PLUS_H
 #define NOTEPAD_PLUS_H
-#include "ScintillaEditView.h"
 
 #include "BufferID.h"
+#include "Parameters_def.h"
+#include "Common.h"
+#include "Scintilla.h"
+
+// To be removed later.  Need to be included since Parameters.h was removed from ScintillaEditView.h
+#include "ContextMenu.h"
+#include "Shortcut.h"
+#include "Parameters.h"  // For StyleArray
 
 #define MENU 0x01
 #define TOOLBAR 0x02
@@ -63,20 +70,29 @@ class StatusBar;
 class ToolBar;
 class ReBar;
 
+class ScintillaEditView;
 class DocTabView;
 class IconList;
+class trayIconControler;
+class SplitterContainer;
 
 class LastRecentFileList;
 class SmartHighlighter;
 class AutoCompletion;
 class PluginsManager;
-class SplitterContainer;
+class ShortcutMapper;
 
-class trayIconControler;
 
 struct TaskListInfo;
 
 struct tTbData;
+
+class TiXmlNodeA;
+class TiXmlNode;
+
+// Stuff from Parameters.h
+struct CmdLineParams;
+struct Session;
 
 static TiXmlNodeA * searchDlgNode(TiXmlNodeA *node, const char *dlgTagName);
 
@@ -181,7 +197,7 @@ public:
 	void changeFindReplaceDlgLang();
 	void changeConfigLang();
 	void changeUserDefineLang();
-	void changeMenuLang(generic_string & pluginsTrans, generic_string & windowTrans);
+	void changeMenuLang(std::generic_string & pluginsTrans, std::generic_string & windowTrans);
 	void changeLangTabContextMenu();
 	void changeLangTabDrapContextMenu();
 	void changePrefereceDlgLang();
@@ -195,16 +211,14 @@ public:
 	bool doStreamComment();
 	void doTrimTrailing();
 
-	inline HACCEL getAccTable() const{
-		return _accelerator.getAccTable();
-	};
+	HACCEL getAccTable() const;
 
 	bool addCurrentMacro();
 	void loadLastSession();
 	bool loadSession(Session & session);
 	winVer getWinVersion() const {return _winVersion;};
 
-	bool emergency(generic_string emergencySavedDir);
+	bool emergency(std::generic_string emergencySavedDir);
 
 	void notifyBufferChanged(Buffer * buffer, int mask);
 	bool findInFiles();
@@ -218,9 +232,6 @@ private:
     Window *_pMainWindow;
 	DockingManager* _dockingManager;
 
-	AutoCompletion* _autoCompleteMain;
-	AutoCompletion* _autoCompleteSub;	//each Scintilla has its own autoComplete
-
 	SmartHighlighter* _smartHighlighter;
 
 	TiXmlNode *_toolIcons;
@@ -233,16 +244,21 @@ private:
     DocTabView *_pDocTab;
 	DocTabView *_pNonDocTab;
 
-    ScintillaEditView _subEditView;
-    ScintillaEditView _mainEditView;
-	ScintillaEditView _invisibleEditView;	//for searches
-	ScintillaEditView _fileEditView;		//for FileManager
+    ScintillaEditView* _subEditView;
+    ScintillaEditView* _mainEditView;
+	ScintillaEditView* _invisibleEditView;	//for searches
+	ScintillaEditView* _fileEditView;		//for FileManager
 
     ScintillaEditView *_pEditView;
 	ScintillaEditView *_pNonEditView;
 
     SplitterContainer *_pMainSplitter;
     SplitterContainer *_subSplitter;
+
+	// AutoCompletions need to be after ScintillaEditViews, since their constructor depends on them.
+	// If you shuffle them, you'll get a crash on startup.
+	AutoCompletion* _autoCompleteMain;
+	AutoCompletion* _autoCompleteSub;	//each Scintilla has its own autoComplete
 
     ContextMenu _tabPopupMenu, _tabPopupDropMenu;
 
@@ -265,11 +281,11 @@ private:
 	PreferenceDlg* _preferenceDlg;
 
 	// a handle list of all the Notepad++ dialogs
-	vector<HWND> _hModelessDlgs;
+	std::vector<HWND> _hModelessDlgs;
 
 	LastRecentFileList* _lastRecentFileList;
 
-	vector<iconLocator> _customIconVect;
+	std::vector<iconLocator> _customIconVect;
 
 	WindowsMenu* _windowsMenu;
 	HMENU _mainMenuHandle;
@@ -335,12 +351,12 @@ private:
 		bool destroyScintilla(HWND handle2Destroy);
 		void destroy();
 	private:
-		vector<ScintillaEditView *> _scintVector;
+		std::vector<ScintillaEditView *> _scintVector;
 		HINSTANCE _hInst;
 		HWND _hParent;
 	} _scintillaCtrls4Plugins;
 
-	vector<pair<int, int> > _hideLinesMarks;
+	std::vector<std::pair<int, int> > _hideLinesMarks;
 	StyleArray _hotspotStyles;
 
 	static LRESULT CALLBACK Notepad_plus_Proc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
@@ -414,7 +430,7 @@ private:
 
 	void checkUnicodeMenuItems(UniMode um) const;
 
-	generic_string getLangDesc(LangType langType, bool shortDesc = false);
+	std::generic_string getLangDesc(LangType langType, bool shortDesc = false);
 
 	void setLangStatus(LangType langType);
 
@@ -443,9 +459,7 @@ private:
     bool bookmarkPresent(int lineno) const;
     void bookmarkToggle(int lineno) const;
     void bookmarkNext(bool forwardScan);
-	void bookmarkClearAll() const {
-		_pEditView->execute(SCI_MARKERDELETEALL, MARK_BOOKMARK);
-	};
+	void bookmarkClearAll() const;
 
 	void copyMarkedLines();
 	void cutMarkedLines();
@@ -453,7 +467,7 @@ private:
 	void pasteToMarkedLines();
 	void deleteMarkedline(int ln);
 	void replaceMarkedline(int ln, const TCHAR *str);
-	generic_string getMarkedLine(int ln);
+	std::generic_string getMarkedLine(int ln);
 
     void findMatchingBracePos(int & braceAtCaret, int & braceOpposite);
     void braceMatch();
@@ -472,8 +486,8 @@ private:
 	bool findInOpenedFiles();
 	bool findInCurrentFile();
 
-	bool matchInList(const TCHAR *fileName, const vector<generic_string> & patterns);
-	void getMatchedFileNames(const TCHAR *dir, const vector<generic_string> & patterns, vector<generic_string> & fileNames, bool isRecursive, bool isInHiddenDir);
+	bool matchInList(const TCHAR *fileName, const std::vector<std::generic_string> & patterns);
+	void getMatchedFileNames(const TCHAR *dir, const std::vector<std::generic_string> & patterns, std::vector<std::generic_string> & fileNames, bool isRecursive, bool isInHiddenDir);
 
 	void doSynScorll(HWND hW);
 	void setWorkingDir(TCHAR *dir);
@@ -484,7 +498,7 @@ private:
 
 	int getLangFromMenuName(const TCHAR * langName);
 
-	generic_string getLangFromMenu(const Buffer * buf);
+	std::generic_string getLangFromMenu(const Buffer * buf);
 
 	void setFileOpenSaveDlgFilters(FileDialog & fDlg);
 	void markSelectedTextInc(bool enable);

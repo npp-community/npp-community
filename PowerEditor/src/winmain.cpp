@@ -24,6 +24,7 @@
 #include "Win32Exception.h"	//Win32 exception
 #include "MiniDumper.h"			//Write dump files
 
+#include "resource.h"
 #include "Buffer.h"
 
 typedef std::vector<const TCHAR*> ParamVector;

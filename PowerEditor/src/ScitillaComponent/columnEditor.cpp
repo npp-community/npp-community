@@ -22,6 +22,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "columnEditor_rc.h"
 #include "ScintillaEditView.h"
 
+#include "Parameters.h"
+
+#include "resource.h"
+
 void ColumnEditorDlg::init(HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView)
 {
 	Window::init(hInst, hPere);

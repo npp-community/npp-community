@@ -17,7 +17,9 @@
 
 #include "precompiled_headers.h"
 #include "GoToLineDlg.h"
-
+#include "ScintillaEditView.h"
+#include "resource.h"
+#include "Scintilla.h"
 
 BOOL CALLBACK GoToLineDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lParam*/)
 {
@@ -101,4 +103,60 @@ BOOL CALLBACK GoToLineDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lPa
 	}
 }
 
+void GoToLineDlg::init( HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView )
+{
+	Window::init(hInst, hPere);
+	if (!ppEditView)
+		throw int(9900);
+	_ppEditView = ppEditView;
+}
 
+void GoToLineDlg::create( int dialogID, bool isRTL)
+{
+	StaticDialog::create(dialogID, isRTL);
+}
+
+void GoToLineDlg::doDialog( bool isRTL /*= false*/ )
+{
+	if (!isCreated())
+		create(IDD_GOLINE, isRTL);
+	display();
+}
+
+void GoToLineDlg::display( bool toShow /*= true*/ ) const
+{
+	Window::display(toShow);
+	if (toShow)
+		::SetFocus(::GetDlgItem(_hSelf, ID_GOLINE_EDIT));
+}
+
+void GoToLineDlg::updateLinesNumbers() const
+{
+	unsigned int current = 0;
+	unsigned int limit = 0;
+
+	if (_mode == go2line)
+	{
+		current = (unsigned int)((*_ppEditView)->getCurrentLineNumber() + 1);
+		limit = (unsigned int)((*_ppEditView)->execute(SCI_GETLINECOUNT));
+	}
+	else
+	{
+		current = (unsigned int)(*_ppEditView)->execute(SCI_GETCURRENTPOS);
+		limit = (unsigned int)((*_ppEditView)->getCurrentDocLen() - 1);
+	}
+	::SetDlgItemInt(_hSelf, ID_CURRLINE, current, FALSE);
+	::SetDlgItemInt(_hSelf, ID_LASTLINE, limit, FALSE);
+}
+
+void GoToLineDlg::cleanLineEdit() const
+{
+	::SetDlgItemText(_hSelf, ID_GOLINE_EDIT, TEXT(""));
+}
+
+int GoToLineDlg::getLine() const
+{
+	BOOL isSuccessful;
+	int line = ::GetDlgItemInt(_hSelf, ID_GOLINE_EDIT, &isSuccessful, FALSE);
+	return (isSuccessful?line:-1);
+}

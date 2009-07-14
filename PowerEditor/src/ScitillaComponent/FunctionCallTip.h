@@ -18,9 +18,10 @@
 #ifndef FUNCTIONCALLTIP_H
 #define FUNCTIONCALLTIP_H
 
-#include "ScintillaEditView.h"
-
 typedef std::vector<const TCHAR *> stringVec;
+
+class ScintillaEditView;
+class TiXmlElement;
 
 class FunctionCallTip {
 	 friend class AutoCompletion;
@@ -35,7 +36,7 @@ public:
 	bool updateCalltip(int ch, bool needShown = false);	//Ch is character typed, or 0 if another event occured. NeedShown is true if calltip should be attempted to displayed. Return true if calltip was made visible
 	void showNextOverload();							//show next overlaoded parameters
 	void showPrevOverload();							//show prev overlaoded parameters
-	bool isVisible() { return _pEditView?_pEditView->execute(SCI_CALLTIPACTIVE) == TRUE:false; };	//true if calltip visible
+	bool isVisible();;	//true if calltip visible
 	void close();					//Close calltip if visible
 
 private:
@@ -49,7 +50,7 @@ private:
 	//cache some XML values n stuff
 	TCHAR * _funcName;				//name of function
 	stringVec _retVals;				//vector of overload return values/types
-	vector<stringVec> _overloads;	//vector of overload params (=vector)
+	std::vector<stringVec> _overloads;	//vector of overload params (=vector)
 	stringVec _descriptions;		//vecotr of function descriptions
 	int _currentNrOverloads;		//current amount of overloads
 	int _currentOverload;			//current chosen overload

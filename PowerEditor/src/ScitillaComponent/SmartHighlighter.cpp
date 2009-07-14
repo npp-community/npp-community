@@ -32,7 +32,8 @@ SmartHighlighter::SmartHighlighter(FindReplaceDlg * pFRDlg)
 void SmartHighlighter::highlightView(ScintillaEditView * pHighlightView)
 {
 	//Get selection
-	CharacterRange range = pHighlightView->getSelection();
+	CharacterRange range;
+	pHighlightView->getSelection(range);
 
 	//Clear marks
 	pHighlightView->clearIndicator(SCE_UNIVERSAL_FOUND_STYLE_2);

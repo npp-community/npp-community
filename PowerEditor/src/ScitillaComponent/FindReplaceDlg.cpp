@@ -677,7 +677,8 @@ BOOL CALLBACK FindReplaceDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 		{
 			if (LOWORD(wParam) == WA_ACTIVE || LOWORD(wParam) == WA_CLICKACTIVE)
 			{
-				CharacterRange cr = (*_ppEditView)->getSelection();
+				CharacterRange cr;
+				(*_ppEditView)->getSelection(cr);
 				int nbSelected = cr.cpMax - cr.cpMin;
 
 				_isInSelection = isCheckedOrNot(IDC_IN_SELECTION_CHECK)?1:0;
@@ -1136,7 +1137,8 @@ bool FindReplaceDlg::processFindNext(const TCHAR *txt2find, FindOption *options,
 	}
 
 	int docLength = int((*_ppEditView)->execute(SCI_GETLENGTH));
-	CharacterRange cr = (*_ppEditView)->getSelection();
+	CharacterRange cr;
+	(*_ppEditView)->getSelection(cr);
 
 	//The search "zone" is relative to the selection, so search happens 'outside'
 	int startPosition = cr.cpMax;
@@ -1260,7 +1262,8 @@ bool FindReplaceDlg::processReplace(const TCHAR *txt2find, const TCHAR *txt2repl
 
 	bool isRegExp = pOptions->_searchType == FindRegex;
 	int flags = Searching::buildSearchFlags(pOptions);
-	CharacterRange cr = (*_ppEditView)->getSelection();
+	CharacterRange cr;
+	(*_ppEditView)->getSelection(cr);
 
 	(*_ppEditView)->execute(SCI_SETSEARCHFLAGS, flags);
 	int posFind = (*_ppEditView)->searchInTarget(pTextFind, cr.cpMin, cr.cpMax);
@@ -1323,7 +1326,8 @@ int FindReplaceDlg::processAll(ProcessOperation op, const TCHAR *txt2find, const
 {
 	FindOption *pOptions = opt?opt:&_options;
 
-	CharacterRange cr = (*_ppEditView)->getSelection();
+	CharacterRange cr;
+	(*_ppEditView)->getSelection(cr);
 	int docLength = int((*_ppEditView)->execute(SCI_GETLENGTH));
 
 	// Default :
@@ -2071,7 +2075,8 @@ BOOL CALLBACK FindIncrementDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM 
 					setFindStatus(findStatus);
 					if (!isFound)
 					{
-						CharacterRange range = (*(_pFRDlg->_ppEditView))->getSelection();
+						CharacterRange range;
+						(*(_pFRDlg->_ppEditView))->getSelection(range);
 						(*(_pFRDlg->_ppEditView))->execute(SCI_SETSEL, (WPARAM)-1, range.cpMin);
 					}
 				}
@@ -2126,7 +2131,8 @@ void FindIncrementDlg::markSelectedTextInc(bool enable, FindOption *opt)
 		return;
 
 	//Get selection
-	CharacterRange range = (*(_pFRDlg->_ppEditView))->getSelection();
+	CharacterRange range;
+	(*(_pFRDlg->_ppEditView))->getSelection(range);
 
 	//If nothing selected, dont mark anything
 	if (range.cpMin == range.cpMax)
