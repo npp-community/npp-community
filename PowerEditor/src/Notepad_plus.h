@@ -21,7 +21,6 @@
 #include "BufferID.h"
 #include "Parameters_def.h"
 #include "Common.h"
-#include "Scintilla.h"
 
 // To be removed later.  Need to be included since Parameters.h was removed from ScintillaEditView.h
 #include "ContextMenu.h"

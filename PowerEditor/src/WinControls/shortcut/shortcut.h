@@ -19,7 +19,6 @@
 
 #include "shortcutRc.h"
 #include "StaticDialog.h"
-#include "Scintilla.h"
 #include "Common.h"
 
 using namespace std;

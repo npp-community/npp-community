@@ -21,7 +21,6 @@
 #include "Utf8_16.h"
 
 #include "BufferID.h"
-#include "scintilla.h"
 #include "Notepad_plus_msgs.h"
 
 struct Position;

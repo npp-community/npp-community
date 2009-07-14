@@ -19,8 +19,6 @@
 #include "precompiled_headers.h"
 #include "ScintillaEditView.h"
 
-#include "Scintilla.h"
-#include "SciLexer.h"
 #include "ScintillaRef.h"
 #include "UserDefineDialog.h"
 

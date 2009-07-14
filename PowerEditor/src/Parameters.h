@@ -21,7 +21,6 @@
 #include "tinyxmlA.h"
 #include "tinyxml.h"
 
-#include "Scintilla.h"
 #include "ScintillaRef.h"
 #include "ToolBar.h"
 #include "UserDefineLangReference.h"

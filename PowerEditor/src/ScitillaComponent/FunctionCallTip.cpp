@@ -19,7 +19,6 @@
 #include "FunctionCallTip.h"
 #include "ScintillaEditView.h"
 
-#include "Scintilla.h"
 #include "common.h"
 #include "tinyxml.h"
 

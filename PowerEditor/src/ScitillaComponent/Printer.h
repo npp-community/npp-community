@@ -18,8 +18,6 @@
 #ifndef PRINTER_H
 #define PRINTER_H
 
-#include "Scintilla.h"
-
 class ScintillaEditView;
 
 struct RangeToFormat {

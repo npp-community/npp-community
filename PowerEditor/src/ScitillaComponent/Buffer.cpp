@@ -1,8 +1,6 @@
 #include "precompiled_headers.h"
 #include "Buffer.h"
 
-#include "Scintilla.h"
-
 #include "Notepad_plus.h"
 #include "ScintillaEditView.h"
 

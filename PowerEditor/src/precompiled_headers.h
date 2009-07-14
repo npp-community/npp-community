@@ -70,3 +70,7 @@
 #include <string>
 #include <sstream>
 #endif
+
+// Scintilla
+#include "Scintilla.h"
+#include "SciLexer.h"

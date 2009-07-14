@@ -19,7 +19,6 @@
 #include "GoToLineDlg.h"
 #include "ScintillaEditView.h"
 #include "resource.h"
-#include "Scintilla.h"
 
 BOOL CALLBACK GoToLineDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lParam*/)
 {

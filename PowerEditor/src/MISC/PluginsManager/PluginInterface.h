@@ -18,7 +18,6 @@
 #ifndef PLUGININTERFACE_H
 #define PLUGININTERFACE_H
 
-#include "Scintilla.h"
 #include "Notepad_plus_msgs.h"
 
 const int nbChar = 64;
