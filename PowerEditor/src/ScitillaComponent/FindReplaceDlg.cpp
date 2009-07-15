@@ -19,9 +19,42 @@
 
 #include "FindReplaceDlg.h"
 #include "ScintillaEditView.h"
-#include "Notepad_plus_msgs.h"
 #include "UniConversion.h"
 #include "Buffer.h"
+#include "DockingDlgInterface.h"
+#include "resource.h"
+
+#include "TabBar.h"
+#include "Toolbar.h"
+
+#include "Parameters.h"
+
+
+struct FoundInfo {
+	FoundInfo(int start, int end, const TCHAR *fullPath)
+		: _start(start), _end(end), _fullPath(fullPath) {};
+	int _start;
+	int _end;
+	std::generic_string _fullPath;
+};
+
+//This class contains generic search functions as static functions for easy access
+class Searching {
+public:
+	static int convertExtendedToString(const TCHAR * query, TCHAR * result, int length);
+	static TargetRange t;
+	static int buildSearchFlags(FindOption * option) {
+		return	(option->_isWholeWord ? SCFIND_WHOLEWORD : 0) |
+			(option->_isMatchCase ? SCFIND_MATCHCASE : 0) |
+			(option->_searchType == FindRegex ? SCFIND_REGEXP|SCFIND_POSIX : 0);
+	};
+	static void displaySectionCentered(int posStart, int posEnd, ScintillaEditView * pEditView, bool isDownwards = true);
+
+private:
+	static bool readBase(const TCHAR * str, int * value, int base, int size);
+
+};
+
 
 int Searching::convertExtendedToString(const TCHAR * query, TCHAR * result, int length) {	//query may equal to result, since it always gets smaller
 	int i = 0, j = 0;
@@ -153,7 +186,11 @@ LONG FindReplaceDlg::originalFinderProc = NULL;
 
 void FindReplaceDlg::destroy()
 {
-	_tab.destroy();
+	if (_tab)
+	{
+		delete _tab;
+		_tab = NULL;
+	}
 	StaticDialog::destroy();
 }
 
@@ -289,8 +326,14 @@ void FindReplaceDlg::create(int dialogID, bool isRTL)
 	RECT rect;
 	//::GetWindowRect(_hSelf, &rect);
 	getClientRect(rect);
-	_tab.init(_hInst, _hSelf, false, false, true);
-	_tab.setFont(TEXT("Tahoma"), 13);
+
+	if (!_tab)
+	{
+		_tab = new TabBar();
+	}
+
+	_tab->init(_hInst, _hSelf, false, false, true);
+	_tab->setFont(TEXT("Tahoma"), 13);
 
 	const TCHAR *find = TEXT("Find");
 	const TCHAR *replace = TEXT("Replace");
@@ -304,12 +347,12 @@ void FindReplaceDlg::create(int dialogID, bool isRTL)
 		replace = fdTitles._replace.c_str();
 		findInFiles = fdTitles._findInFiles.c_str();
 	}
-	_tab.insertAtEnd(find);
-	_tab.insertAtEnd(replace);
-	_tab.insertAtEnd(findInFiles);
+	_tab->insertAtEnd(find);
+	_tab->insertAtEnd(replace);
+	_tab->insertAtEnd(findInFiles);
 
-	_tab.reSizeTo(rect);
-	_tab.display();
+	_tab->reSizeTo(rect);
+	_tab->display();
 
 	ETDTProc enableDlgTheme = (ETDTProc)::SendMessage(_hParent, NPPM_GETENABLETHEMETEXTUREFUNC, 0, 0);
 	if (enableDlgTheme)
@@ -445,6 +488,175 @@ void FindReplaceDlg::updateCombos()
 	updateCombo(IDREPLACEWITH);
 	updateCombo(IDFINDWHAT);
 }
+
+//Finder: Dockable window that contains search results
+class Finder : public DockingDlgInterface {
+	friend class FindReplaceDlg;
+public:
+	Finder() : DockingDlgInterface(IDD_FINDRESULT), _pMainFoundInfos(&_foundInfos1), _pMainMarkings(&_markings1) {
+		_MarkingsStruct._length = 0;
+		_MarkingsStruct._markings = NULL;
+	};
+
+	~Finder() {
+		_scintView.destroy();
+	}
+	void init(HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView) {
+		DockingDlgInterface::init(hInst, hPere);
+		_ppEditView = ppEditView;
+	};
+
+	void addSearchLine(const TCHAR *searchName) {
+		std::generic_string str = TEXT("Search \"");
+		str += searchName;
+		str += TEXT("\"\r\n");
+
+		setFinderReadOnly(false);
+		_scintView.addGenericText(str.c_str());
+		setFinderReadOnly(true);
+		_lastSearchHeaderPos = _scintView.execute(SCI_GETCURRENTPOS) - 2;
+
+		_pMainFoundInfos->push_back(EmptyFoundInfo);
+		_pMainMarkings->push_back(EmptySearchResultMarking);
+	};
+
+	void addFileNameTitle(const TCHAR * fileName) {
+		std::generic_string str = TEXT("  ");
+		str += fileName;
+		str += TEXT("\r\n");
+
+		setFinderReadOnly(false);
+		_scintView.addGenericText(str.c_str());
+		setFinderReadOnly(true);
+		_lastFileHeaderPos = _scintView.execute(SCI_GETCURRENTPOS) - 2;
+
+		_pMainFoundInfos->push_back(EmptyFoundInfo);
+		_pMainMarkings->push_back(EmptySearchResultMarking);
+	};
+
+	void addFileHitCount(int count) {
+		TCHAR text[20];
+		wsprintf(text, TEXT(" (%i hits)"), count);
+		setFinderReadOnly(false);
+		_scintView.insertGenericTextFrom(_lastFileHeaderPos, text);
+		setFinderReadOnly(true);
+		nFoundFiles++;
+	};
+
+	void addSearchHitCount(int count) {
+		TCHAR text[50];
+		wsprintf(text, TEXT(" (%i hits in %i files)"), count, nFoundFiles);
+		setFinderReadOnly(false);
+		_scintView.insertGenericTextFrom(_lastSearchHeaderPos, text);
+		setFinderReadOnly(true);
+	};
+
+
+	void add(FoundInfo fi, SearchResultMarking mi, const TCHAR* foundline, int lineNb) {
+		_pMainFoundInfos->push_back(fi);
+		std::generic_string str = TEXT("\tLine ");
+
+		TCHAR lnb[16];
+		wsprintf(lnb, TEXT("%d"), lineNb);
+		str += lnb;
+		str += TEXT(": ");
+		mi._start += str.length();
+		mi._end += str.length();
+		str += foundline;
+
+		if (str.length() >= SC_SEARCHRESULT_LINEBUFFERMAXLENGTH)
+		{
+			const TCHAR * endOfLongLine = TEXT("...\r\n");
+			str = str.substr(0, SC_SEARCHRESULT_LINEBUFFERMAXLENGTH - lstrlen(endOfLongLine) - 1);
+			str += endOfLongLine;
+		}
+		setFinderReadOnly(false);
+		_scintView.addGenericText(str.c_str(), &mi._start, &mi._end);
+		setFinderReadOnly(true);
+		_pMainMarkings->push_back(mi);
+	};
+
+	void setFinderStyle();
+
+	void removeAll() {
+		_pMainFoundInfos->clear();
+		_pMainMarkings->clear();
+		setFinderReadOnly(false);
+		_scintView.execute(SCI_CLEARALL);
+		setFinderReadOnly(true);
+	};
+
+	void beginNewFilesSearch() {
+		_scintView.execute(SCI_SETLEXER, SCLEX_NULL);
+
+		_scintView.execute(SCI_SETCURRENTPOS, 0);
+		_pMainFoundInfos = _pMainFoundInfos == &_foundInfos1 ? &_foundInfos2 : &_foundInfos1;
+		_pMainMarkings = _pMainMarkings == &_markings1 ? &_markings2 : &_markings1;
+		nFoundFiles = 0;
+
+		// fold all old searches (1st level only)
+		_scintView.collapse(searchHeaderLevel - SC_FOLDLEVELBASE, fold_collapse);
+	};
+
+	void finishFilesSearch(int count) {
+		std::vector<FoundInfo>* _pOldFoundInfos;
+		std::vector<SearchResultMarking>* _pOldMarkings;
+		_pOldFoundInfos = _pMainFoundInfos == &_foundInfos1 ? &_foundInfos2 : &_foundInfos1;
+		_pOldMarkings = _pMainMarkings == &_markings1 ? &_markings2 : &_markings1;
+
+		_pOldFoundInfos->insert(_pOldFoundInfos->begin(), _pMainFoundInfos->begin(), _pMainFoundInfos->end());
+		_pOldMarkings->insert(_pOldMarkings->begin(), _pMainMarkings->begin(), _pMainMarkings->end());
+		_pMainFoundInfos->clear();
+		_pMainMarkings->clear();
+		_pMainFoundInfos = _pOldFoundInfos;
+		_pMainMarkings = _pOldMarkings;
+
+		_MarkingsStruct._length = _pMainMarkings->size();
+		_MarkingsStruct._markings = &((*_pMainMarkings)[0]);
+
+		addSearchHitCount(count);
+		_scintView.execute(SCI_SETSEL, 0, 0);
+
+		_scintView.execute(SCI_SETLEXER, SCLEX_SEARCHRESULT);
+	};
+
+
+	void gotoNextFoundResult(int direction);
+	void GotoFoundLine();
+	void DeleteResult();
+
+protected :
+	virtual BOOL CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
+	bool notify(SCNotification *notification);
+
+private:
+
+	enum { searchHeaderLevel = SC_FOLDLEVELBASE + 1, fileHeaderLevel, resultLevel };
+
+	ScintillaEditView **_ppEditView;
+	std::vector<FoundInfo> _foundInfos1;
+	std::vector<FoundInfo> _foundInfos2;
+	std::vector<FoundInfo>* _pMainFoundInfos;
+	std::vector<SearchResultMarking> _markings1;
+	std::vector<SearchResultMarking> _markings2;
+	std::vector<SearchResultMarking>* _pMainMarkings;
+	SearchResultMarkings _MarkingsStruct;
+
+	ScintillaEditView _scintView;
+	unsigned int nFoundFiles;
+
+	int _lastFileHeaderPos;
+	int _lastSearchHeaderPos;
+
+	void setFinderReadOnly(bool isReadOnly) {
+		_scintView.execute(SCI_SETREADONLY, isReadOnly);
+	};
+
+	static FoundInfo EmptyFoundInfo;
+	static SearchResultMarking EmptySearchResultMarking;
+};
+
+
 
 FoundInfo Finder::EmptyFoundInfo(0, 0, TEXT(""));
 SearchResultMarking Finder::EmptySearchResultMarking;
@@ -662,7 +874,8 @@ BOOL CALLBACK FindReplaceDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 			NMHDR *nmhdr = (NMHDR *)lParam;
 			if (nmhdr->code == TCN_SELCHANGE)
 			{
-				HWND tabHandle = _tab.getHSelf();
+				assert(_tab);
+				HWND tabHandle = _tab->getHSelf();
 				if (nmhdr->hwndFrom == tabHandle)
 				{
 					int indexClicked = int(::SendMessage(tabHandle, TCM_GETCURSEL, 0, 0));
@@ -1704,6 +1917,8 @@ void FindReplaceDlg::findAllIn(InWhat op)
 
 void FindReplaceDlg::enableReplaceFunc(bool isEnable)
 {
+	assert(_tab);
+
 	_currentStatus = isEnable?REPLACE_DLG:FIND_DLG;
 	int hideOrShow = isEnable?SW_SHOW:SW_HIDE;
 	RECT *pClosePos = isEnable?&_replaceClosePos:&_findClosePos;
@@ -1735,7 +1950,7 @@ void FindReplaceDlg::enableReplaceFunc(bool isEnable)
 	::MoveWindow(::GetDlgItem(_hSelf, IDCANCEL), pClosePos->left, pClosePos->top, pClosePos->right, pClosePos->bottom, TRUE);
 
 	TCHAR label[MAX_PATH];
-	_tab.getCurrentTitle(label, MAX_PATH);
+	_tab->getCurrentTitle(label, MAX_PATH);
 	::SetWindowText(_hSelf, label);
 
 	setDefaultButton(IDOK);
@@ -1837,6 +2052,122 @@ void FindReplaceDlg::combo2ExtendedMode(int comboID)
 
 		delete [] newBuffer;
     }
+}
+
+FindReplaceDlg::~FindReplaceDlg()
+{
+	if (_pFinder)
+		delete _pFinder;
+	delete [] _uniFileName;
+}
+
+void FindReplaceDlg::gotoNextFoundResult( int direction /*= 0*/ )
+{
+	if (_pFinder) _pFinder->gotoNextFoundResult(direction);
+}
+
+void FindReplaceDlg::beginNewFilesSearch()
+{
+	_pFinder->beginNewFilesSearch();
+	_pFinder->addSearchLine(getText2search().c_str());
+}
+
+void FindReplaceDlg::finishFilesSearch( int count )
+{
+	_pFinder->finishFilesSearch(count);
+}
+
+void FindReplaceDlg::focusOnFinder()
+{
+	// Show finder and set focus
+	if (_pFinder)
+	{
+		::SendMessage(_hParent, NPPM_DMMSHOW, 0, (LPARAM)_pFinder->getHSelf());
+		_pFinder->_scintView.getFocus();
+	}
+}
+
+HWND FindReplaceDlg::getHFindResults()
+{
+	if (_pFinder)
+		return _pFinder->_scintView.getHSelf();
+	return NULL;
+}
+
+void FindReplaceDlg::updateFinderScintilla()
+{
+	if (_pFinder && _pFinder->isCreated() && _pFinder->isVisible())
+	{
+		_pFinder->setFinderStyle();
+	}
+}
+
+LRESULT FAR PASCAL FindReplaceDlg::finderProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
+{
+	if (message == WM_KEYDOWN && (wParam == VK_DELETE || wParam == VK_RETURN))
+	{
+		ScintillaEditView *pScint = (ScintillaEditView *)(::GetWindowLongPtr(hwnd, GWL_USERDATA));
+		Finder *pFinder = (Finder *)(::GetWindowLongPtr(pScint->getHParent(), GWL_USERDATA));
+		if (wParam == VK_RETURN)
+			pFinder->GotoFoundLine();
+		else // VK_DELETE
+			pFinder->DeleteResult();
+		return 0;
+	}
+	else
+		// Call default (original) window procedure
+		return CallWindowProc((WNDPROC) originalFinderProc, hwnd, message, wParam, lParam);
+}
+
+void FindReplaceDlg::updateCombo( int comboID )
+{
+	bool isUnicode = (*_ppEditView)->getCurrentBuffer()->getUnicodeMode() != uni8Bit;
+	HWND hCombo = ::GetDlgItem(_hSelf, comboID);
+	addText2Combo(getTextFromCombo(hCombo, isUnicode).c_str(), hCombo, isUnicode);
+}
+
+FindReplaceDlg::FindReplaceDlg() :
+	StaticDialog(),
+	_pFinder(NULL), _isRTL(false), _isRecursive(true),_isInHiddenDir(false), _fileNameLenMax(1024),
+	_tab(NULL)
+{
+	_uniFileName = new char[(_fileNameLenMax + 3) * 2];
+	_winVer = (NppParameters::getInstance())->getWinVersion();
+}
+
+void FindReplaceDlg::changeTabName( DIALOG_TYPE index, const TCHAR *name2change )
+{
+	assert(_tab);
+	TCITEM tie;
+	tie.mask = TCIF_TEXT;
+	tie.pszText = (TCHAR *)name2change;
+	TabCtrl_SetItem(_tab->getHSelf(), index, &tie);
+}
+
+void FindReplaceDlg::enableFindInFilesFunc()
+{
+	assert(_tab);
+	enableFindInFilesControls();
+
+	_currentStatus = FINDINFILES_DLG;
+	gotoCorrectTab();
+	::MoveWindow(::GetDlgItem(_hSelf, IDCANCEL), _findInFilesClosePos.left, _findInFilesClosePos.top, _findInFilesClosePos.right, _findInFilesClosePos.bottom, TRUE);
+
+	TCHAR label[MAX_PATH];
+	_tab->getCurrentTitle(label, MAX_PATH);
+	::SetWindowText(_hSelf, label);
+
+	setDefaultButton(IDD_FINDINFILES_FIND_BUTTON);
+}
+
+void FindReplaceDlg::gotoCorrectTab()
+{
+	assert(_tab);
+	int currentIndex = _tab->getCurrentTabIndex();
+	if (currentIndex != _currentStatus)
+	{
+		_tab->activateAt(_currentStatus);
+	}
 }
 
 void Finder::setFinderStyle()

@@ -17,7 +17,6 @@
 
 #include "precompiled_headers.h"
 #include "SplitterContainer.h"
-#include "Common.h"
 
 bool SplitterContainer::_isRegistered = false;
 

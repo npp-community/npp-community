@@ -21,6 +21,7 @@
 #include "ScintillaEditView.h"
 #include "resource.h"
 #include "Notepad_plus.h"
+#include "shortcutRc.h"
 
 #include "keys.h"
 const int KEY_STR_LEN = 16;
@@ -437,6 +438,10 @@ BOOL CALLBACK Shortcut::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam
 	}
 }
 
+int Shortcut::doDialog()
+{
+	return ::DialogBoxParam(_hInst, MAKEINTRESOURCE(IDD_SHORTCUT_DLG), _hParent,  (DLGPROC)dlgProc, (LPARAM)this);
+}
 // return true if one of CommandShortcuts is deleted. Otherwise false.
 void Accelerator::updateShortcuts()
 {
@@ -595,7 +600,7 @@ void recordedMacroStep::PlayBack(Window* pNotepad, ScintillaEditView *pEditView)
 	}
 }
 
-void ScintillaAccelerator::init(vector<HWND> * vScintillas, HMENU hMenu, HWND menuParent) {
+void ScintillaAccelerator::init(std::vector<HWND> * vScintillas, HMENU hMenu, HWND menuParent) {
 	_hAccelMenu = hMenu;
 	_hMenuParent = menuParent;
 	size_t nr = vScintillas->size();
@@ -821,4 +826,9 @@ BOOL CALLBACK ScintillaKeyMap::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /
 		default :
 			return FALSE;
 	}
+}
+
+int ScintillaKeyMap::doDialog()
+{
+	return ::DialogBoxParam(_hInst, MAKEINTRESOURCE(IDD_SHORTCUTSCINT_DLG), _hParent,  (DLGPROC)dlgProc, (LPARAM)this);
 }

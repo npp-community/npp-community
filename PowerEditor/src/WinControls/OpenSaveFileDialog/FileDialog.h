@@ -20,7 +20,6 @@
 
 //#define _WIN32_WINNT  0x0600
 
-#include "common.h"
 #include "Notepad_plus_msgs.h"
 
 const int nbExtMax = 256;

@@ -18,8 +18,6 @@
 #ifndef PROCESSUS_H
 #define PROCESSUS_H
 
-#include "Common.h"
-
 using namespace std;
 
 enum progType {WIN32_PROG, CONSOLE_PROG};

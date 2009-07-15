@@ -17,7 +17,6 @@
 
 #include "precompiled_headers.h"
 
-#include "Common.h"
 #include "Notepad_plus.h"
 #include "Process.h"
 

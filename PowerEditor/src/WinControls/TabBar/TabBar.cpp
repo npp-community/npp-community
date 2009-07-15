@@ -17,7 +17,6 @@
 
 #include "precompiled_headers.h"
 #include "TabBar.h"
-#include "Common.h"
 #include "menuCmdID.h"
 #include "resource.h"
 

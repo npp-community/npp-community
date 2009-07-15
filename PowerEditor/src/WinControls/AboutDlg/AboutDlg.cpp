@@ -18,6 +18,27 @@
 #include "precompiled_headers.h"
 #include "AboutDlg.h"
 #include "Parameters.h"
+#include "resource.h"
+
+#include "URLCtrl.h"
+
+#define LICENCE_TXT \
+	TEXT("This program is free software; you can redistribute it and/or \
+modify it under the terms of the GNU General Public License \
+as published by the Free Software Foundation; either \
+version 2 of the License, or (at your option) any later version.\r\n\
+\r\n\
+This program is distributed in the hope that it will be useful, \
+but WITHOUT ANY WARRANTY; without even the implied warranty of \
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the \
+GNU General Public License for more details. \r\n\
+\r\n\
+You should have received a copy of the GNU General Public License \
+along with this program; if not, write to the Free Software \
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.")
+
+
+
 
 BOOL CALLBACK AboutDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -45,12 +66,15 @@ BOOL CALLBACK AboutDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
             HWND licenceEditHandle = ::GetDlgItem(_hSelf, IDC_LICENCE_EDIT);
             ::SendMessage(licenceEditHandle, WM_SETTEXT, 0, (LPARAM)LICENCE_TXT);
 
-            _emailLink.init(_hInst, _hSelf);
-			//_emailLink.create(::GetDlgItem(_hSelf, IDC_AUTHOR_NAME), TEXT("mailto:don.h@free.fr"));
-			_emailLink.create(::GetDlgItem(_hSelf, IDC_AUTHOR_NAME), TEXT("http://sourceforge.net/project/memberlist.php?group_id=95717"));
+			_emailLink = new URLCtrl();
+			_pageLink = new URLCtrl();
 
-            _pageLink.init(_hInst, _hSelf);
-            _pageLink.create(::GetDlgItem(_hSelf, IDC_HOME_ADDR), TEXT("http://notepad-plus.sourceforge.net/"));
+            _emailLink->init(_hInst, _hSelf);
+			//_emailLink.create(::GetDlgItem(_hSelf, IDC_AUTHOR_NAME), TEXT("mailto:don.h@free.fr"));
+			_emailLink->create(::GetDlgItem(_hSelf, IDC_AUTHOR_NAME), TEXT("http://sourceforge.net/project/memberlist.php?group_id=95717"));
+
+            _pageLink->init(_hInst, _hSelf);
+            _pageLink->create(::GetDlgItem(_hSelf, IDC_HOME_ADDR), TEXT("http://notepad-plus.sourceforge.net/"));
 
 			//_onLineHelp.init(_hInst, _hSelf);
             //_onLineHelp.create(::GetDlgItem(_hSelf, IDC_ONLINEHELP_ADDR), TEXT("http://notepad-plus.sourceforge.net/uk/generalFAQ.php"));
@@ -107,3 +131,20 @@ void AboutDlg::doDialog()
 	goToCenter();
 };
 
+void AboutDlg::destroy()
+{
+	if (_emailLink)
+	{
+		_emailLink->destroy();
+		delete 	_emailLink;
+		_emailLink = NULL;
+	}
+
+	if (_pageLink)
+	{
+		_pageLink->destroy();
+		delete _pageLink;
+		_pageLink = NULL;
+	}
+	StaticDialog::destroy();
+}

@@ -18,7 +18,6 @@
 
 #include "precompiled_headers.h"
 #include "Splitter.h"
-#include "Common.h"
 
 bool Splitter::_isHorizontalRegistered = false;
 bool Splitter::_isVerticalRegistered = false;

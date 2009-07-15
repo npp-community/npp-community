@@ -22,7 +22,6 @@
 #include "StaticDialog.h"
 #include "Resource.h"
 #include "Docking.h"
-#include "Common.h"
 
 using namespace std;
 

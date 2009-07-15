@@ -24,7 +24,6 @@
 #include "WindowInterface.h"
 #include "ToolTip.h"
 #include "Parameters.h"
-#include "Common.h"
 
 #ifndef WH_MOUSE_LL
 #define WH_MOUSE_LL 14

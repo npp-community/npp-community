@@ -19,7 +19,6 @@
 #include "FunctionCallTip.h"
 #include "ScintillaEditView.h"
 
-#include "common.h"
 #include "tinyxml.h"
 
 struct Token {

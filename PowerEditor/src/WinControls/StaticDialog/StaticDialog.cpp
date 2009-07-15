@@ -17,7 +17,6 @@
 
 #include "precompiled_headers.h"
 #include "StaticDialog.h"
-#include "Common.h"
 #include "Notepad_plus_msgs.h"
 
 

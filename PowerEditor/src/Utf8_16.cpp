@@ -19,8 +19,6 @@
 #include "precompiled_headers.h"
 #include "Utf8_16.h"
 
-#include "common.h"
-
 const Utf8_16::utf8 Utf8_16::k_Boms[][3] = {
 	{0x00, 0x00, 0x00},  // Unknown
 	{0xEF, 0xBB, 0xBF},  // UTF8

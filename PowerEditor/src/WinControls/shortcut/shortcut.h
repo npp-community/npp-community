@@ -17,18 +17,14 @@
 #ifndef SHORTCUTS_H
 #define SHORTCUTS_H
 
-#include "shortcutRc.h"
 #include "StaticDialog.h"
-#include "Common.h"
-
-using namespace std;
 
 const size_t nameLenMax = 64;
 
 class NppParameters;
 
-void getKeyStrFromVal(UCHAR keyVal, generic_string & str);
-void getNameStrFromCmd(INT cmd, generic_string & str);
+void getKeyStrFromVal(UCHAR keyVal, std::generic_string & str);
+void getNameStrFromCmd(INT cmd, std::generic_string & str);
 static int keyTranslate(int keyIn) {
 	switch (keyIn) {
 		case VK_DOWN:		return SCK_DOWN;
@@ -120,9 +116,7 @@ public:
 		return !(a == b);
 	};
 
-	virtual int doDialog() {
-		return ::DialogBoxParam(_hInst, MAKEINTRESOURCE(IDD_SHORTCUT_DLG), _hParent,  (DLGPROC)dlgProc, (LPARAM)this);
-    };
+	virtual int doDialog();;
 
 	virtual bool isValid() const { //valid should only be used in cases where the shortcut isEnabled().
 		if (_keyCombo._key == 0)
@@ -139,9 +133,9 @@ public:
 		return (_keyCombo._key != 0);
 	};
 
-	virtual generic_string toString() const;					//the hotkey part
-	generic_string toMenuItemString() const {					//generic_string suitable for menu
-		generic_string str = _menuName;
+	virtual std::generic_string toString() const;					//the hotkey part
+	std::generic_string toMenuItemString() const {					//std::generic_string suitable for menu
+		std::generic_string str = _menuName;
 		if(isEnabled())
 		{
 			str += TEXT("\t");
@@ -210,12 +204,10 @@ public:
 	bool isEnabled() const;
 	size_t getSize() const;
 
-	generic_string toString() const;
-	generic_string toString(int index) const;
+	std::generic_string toString() const;
+	std::generic_string toString(int index) const;
 
-	int doDialog() {
-		return ::DialogBoxParam(_hInst, MAKEINTRESOURCE(IDD_SHORTCUTSCINT_DLG), _hParent,  (DLGPROC)dlgProc, (LPARAM)this);
-    }
+	int doDialog();
 
 	//only compares the internal KeyCombos, nothing else
 	friend inline const bool operator==(const ScintillaKeyMap & a, const ScintillaKeyMap & b) {
@@ -241,7 +233,7 @@ public:
 private:
 	long _scintillaKeyID;
 	int _menuCmdID;
-	vector<KeyCombo> _keyCombos;
+	std::vector<KeyCombo> _keyCombos;
 	int size;
 	void applyToCurrentIndex();
 	void validateDialog();
@@ -261,7 +253,7 @@ struct recordedMacroStep {
 	int message;
 	long wParameter;
 	long lParameter;
-	generic_string sParameter;
+	std::generic_string sParameter;
 	MacroTypeIndex MacroType;
 
 	recordedMacroStep(int iMessage, long wParam, long lParam);
@@ -278,7 +270,7 @@ struct recordedMacroStep {
 	void PlayBack(Window* pNotepad, ScintillaEditView *pEditView);
 };
 
-typedef vector<recordedMacroStep> Macro;
+typedef std::vector<recordedMacroStep> Macro;
 
 class MacroShortcut : public CommandShortcut {
 friend class NppParameters;
@@ -296,7 +288,7 @@ public:
 	UserCommand(Shortcut sc, const TCHAR *cmd, int id) : CommandShortcut(sc, id), _cmd(cmd) {_canModifyName = true;};
 	const TCHAR* getCmd() const {return _cmd.c_str();};
 private:
-	generic_string _cmd;
+	std::generic_string _cmd;
 };
 
 class PluginCmdShortcut : public CommandShortcut {
@@ -361,13 +353,13 @@ private:
 class ScintillaAccelerator {	//Handles accelerator keys for scintilla
 public:
 	ScintillaAccelerator() : _nrScintillas(0) {};
-	void init(vector<HWND> * vScintillas, HMENU hMenu, HWND menuParent);
+	void init(std::vector<HWND> * vScintillas, HMENU hMenu, HWND menuParent);
 	void updateKeys();
 	void updateKey(ScintillaKeyMap skmOld, ScintillaKeyMap skm);
 private:
 	HMENU _hAccelMenu;
 	HWND _hMenuParent;
-	vector<HWND> _vScintillas;
+	std::vector<HWND> _vScintillas;
 	int _nrScintillas;
 
 	void updateMenuItemByID(ScintillaKeyMap skm, int id);

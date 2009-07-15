@@ -19,7 +19,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "precompiled_headers.h"
 #include "regExtDlg.h"
 #include "resource.h"
-#include "Common.h"
 
 const TCHAR *nppName = TEXT("Notepad++_file");
 const TCHAR *nppBackup = TEXT("Notepad++_backup");

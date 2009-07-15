@@ -20,66 +20,31 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef CONTEXTMENU
 #define CONTEXTMENU
 
-using namespace std;
-
 struct MenuItemUnit {
 	unsigned long _cmdID;
-	generic_string _itemName;
-	generic_string _subMenuName;
-	MenuItemUnit() : _cmdID(0), _itemName(TEXT("")), _subMenuName(TEXT("")) {};
-	MenuItemUnit(unsigned long cmdID, generic_string itemName, generic_string subMenuName=TEXT("")) : _cmdID(cmdID), _itemName(itemName), _subMenuName(subMenuName) {};
-	MenuItemUnit(unsigned long cmdID, const TCHAR *itemName, const TCHAR *subMenuName=NULL) : _cmdID(cmdID){
-		if (!itemName)
-			_itemName = TEXT("");
-		else
-			_itemName = itemName;
-
-		if (!subMenuName)
-			_subMenuName = TEXT("");
-		else
-			_subMenuName = subMenuName;
-	};
+	std::generic_string _itemName;
+	std::generic_string _subMenuName;
+	MenuItemUnit();
+	MenuItemUnit(unsigned long cmdID, std::generic_string itemName, std::generic_string subMenuName=TEXT(""));
+	MenuItemUnit(unsigned long cmdID, const TCHAR *itemName, const TCHAR *subMenuName=NULL);;
 };
 
 class ContextMenu {
 public:
-	ContextMenu() : _hParent(NULL), _hMenu(NULL) {};
-	~ContextMenu() {
-		if (isCreated())
-			::DestroyMenu(_hMenu);
-	};
-	void create(HWND hParent, const vector<MenuItemUnit> & menuItemArray) {
-		_hParent = hParent;
-		_hMenu = ::CreatePopupMenu();
-		for (size_t i = 0 ; i < menuItemArray.size() ; i++)
-		{
-			unsigned int flag = MF_BYPOSITION | ((menuItemArray[i]._cmdID == 0)?MF_SEPARATOR:0);
-			::InsertMenu(_hMenu, i, flag, menuItemArray[i]._cmdID, menuItemArray[i]._itemName.c_str());
-		}
-	};
-	bool isCreated() const {return _hMenu != NULL;};
+	ContextMenu();
+	~ContextMenu();
+	void create(HWND hParent, const std::vector<MenuItemUnit> & menuItemArray);
+	bool isCreated() const {return _hMenu != NULL;}
 
-	void display(const POINT & p) const {
-		::TrackPopupMenu(_hMenu, TPM_LEFTALIGN, p.x, p.y, 0, _hParent, NULL);
-	};
+	void display(const POINT & p) const;
+	void enableItem(int cmdID, bool doEnable) const;
+	void checkItem(int cmdID, bool doCheck) const;
 
-	void enableItem(int cmdID, bool doEnable) const {
-		int flag = doEnable?MF_ENABLED | MF_BYCOMMAND:MF_DISABLED | MF_GRAYED | MF_BYCOMMAND;
-		::EnableMenuItem(_hMenu, cmdID, flag);
-	};
-
-	void checkItem(int cmdID, bool doCheck) const {
-		::CheckMenuItem(_hMenu, cmdID, MF_BYCOMMAND | (doCheck?MF_CHECKED:MF_UNCHECKED));
-	};
-
-	HMENU getMenuHandle() {
-		return _hMenu;
-	};
+	HMENU getMenuHandle() {return _hMenu;}
 
 private:
 	HWND _hParent;
 	HMENU _hMenu;
-
 };
 
 #endif //CONTEXTMENU

@@ -16,8 +16,6 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "Common.h"
-
 
 WcharMbcsConvertor * WcharMbcsConvertor::_pSelf = new WcharMbcsConvertor;
 
@@ -248,6 +246,19 @@ std::generic_string purgeMenuItemString(const TCHAR * menuItemStr, bool keepAmpe
 	cleanedName[j] = 0;
 	return cleanedName;
 };
+
+WcharMbcsConvertor::WcharMbcsConvertor() :
+	_multiByteStr(NULL), _wideCharStr(NULL), _multiByteAllocLen(0), _wideCharAllocLen(0), initSize(1024)
+{
+}
+
+WcharMbcsConvertor::~WcharMbcsConvertor()
+{
+	if (_multiByteStr)
+		delete [] _multiByteStr;
+	if (_wideCharStr)
+		delete [] _wideCharStr;
+}
 
 const wchar_t * WcharMbcsConvertor::char2wchar(const char * mbcs2Convert, UINT codepage)
 {

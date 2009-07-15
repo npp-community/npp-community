@@ -17,7 +17,6 @@
 
 #include "precompiled_headers.h"
 #include "StatusBar.h"
-#include "Common.h"
 
 //#define IDC_STATUSBAR 789
 

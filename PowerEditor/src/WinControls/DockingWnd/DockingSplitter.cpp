@@ -18,7 +18,6 @@
 
 #include "precompiled_headers.h"
 #include "DockingSplitter.h"
-#include "Common.h"
 #include "Notepad_plus_msgs.h"
 #include "Parameters.h"
 

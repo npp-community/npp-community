@@ -19,9 +19,6 @@
 #ifndef DROP_TARGET_H
 #define DROP_TARGET_H
 
-#include "DockingCont.h"
-
-
 void RegisterDropWindow(HWND hwnd, DockingCont* pCont, IDropTarget **ppDropTarget);
 void UnregisterDropWindow(HWND hwnd, IDropTarget *pDropTarget);
 

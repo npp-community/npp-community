@@ -1,8 +1,6 @@
 #ifndef LASTRECENTFILELIST_H
 #define LASTRECENTFILELIST_H
 
-#include "Common.h"
-
 struct RecentItem {
 	int _id;
 	std::generic_string _name;

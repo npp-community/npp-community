@@ -74,3 +74,6 @@
 // Scintilla
 #include "Scintilla.h"
 #include "SciLexer.h"
+
+// Power Editor
+#include "Common.h"

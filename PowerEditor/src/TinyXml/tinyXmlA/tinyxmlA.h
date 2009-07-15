@@ -26,7 +26,6 @@ distribution.
 #ifndef TINYXMLA_INCLUDED
 #define TINYXMLA_INCLUDED
 
-#include "Common.h"
 
 // Help out windows:
 #if defined( _DEBUG ) && !defined( DEBUG )

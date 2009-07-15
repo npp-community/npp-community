@@ -609,6 +609,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\WinControls\ContextMenu\ContextMenu.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\WinControls\TabBar\ControlsTab.cpp"
 					>
 				</File>
@@ -735,6 +739,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\localizationString.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\menuCmdID.h"
 				>
 			</File>
@@ -768,6 +776,10 @@
 			</File>
 			<File
 				RelativePath="..\src\Utf8_16.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\xpm_icons.h"
 				>
 			</File>
 			<Filter
@@ -870,6 +882,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\ScitillaComponent\ScintillaRef.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\ScitillaComponent\SmartHighlighter.h"
 					>
 				</File>
@@ -938,6 +954,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\WinControls\ColourPicker\ColourPopupResource.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\WinControls\ContextMenu\ContextMenu.h"
 					>
 				</File>
@@ -970,6 +990,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\WinControls\DockingWnd\DropData.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\WinControls\OpenSaveFileDialog\FileDialog.h"
 					>
 				</File>
@@ -979,6 +1003,10 @@
 				</File>
 				<File
 					RelativePath="..\src\WinControls\ImageListSet\ImageListSet.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\WinControls\Preference\preference_rc.h"
 					>
 				</File>
 				<File
@@ -1091,6 +1119,10 @@
 				</File>
 				<File
 					RelativePath="..\src\WinControls\ColourPicker\WordStyleDlg.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\WinControls\ColourPicker\WordStyleDlgRes.h"
 					>
 				</File>
 			</Filter>
