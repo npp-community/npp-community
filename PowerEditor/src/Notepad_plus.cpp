@@ -54,6 +54,7 @@
 #include "DocTabView.h"
 #include "SplitterContainer.h"
 
+#include "ContextMenu.h"
 #include "ScintillaEditView.h"
 #include "ToolBar.h"
 #include "StatusBar.h"
@@ -103,8 +104,8 @@ Notepad_plus::Notepad_plus(): Window(), _mainWindowStatus(0), _pDocTab(NULL), _p
 	// Since _autoCompleteMain and _autoCompleteSub rely on the views to be initialized, maybe we can push all these guys to the
 	// WM_CREATE.
 	_subEditView(new ScintillaEditView()), _mainEditView(new ScintillaEditView()), _invisibleEditView(new ScintillaEditView()), _fileEditView(new ScintillaEditView()),
-	_autoCompleteMain(new AutoCompletion(_mainEditView)), _autoCompleteSub(new AutoCompletion(_subEditView)), _smartHighlighter(NULL),
-	_mainDocTab(NULL), _subDocTab(NULL),
+	_autoCompleteMain(new AutoCompletion(_mainEditView)), _autoCompleteSub(new AutoCompletion(_subEditView)), _tabPopupMenu(NULL), _tabPopupDropMenu(NULL),
+	_smartHighlighter(NULL),_mainDocTab(NULL), _subDocTab(NULL),
 	_nativeLangEncoding(CP_ACP), _isFileOpening(false), _docTabIconList(NULL),
 	_toolBar(NULL), _statusBar(NULL), _rebarTop(NULL), _rebarBottom(NULL),
 	_findReplaceDlg(NULL), _incrementFindDlg(NULL), _aboutDlg(NULL), _runDlg(NULL), _goToLineDlg(NULL),
@@ -546,6 +547,18 @@ void Notepad_plus::killAllChildren()
 	{
 		delete _docTabIconList;
 		_docTabIconList = NULL;
+	}
+
+	if (_tabPopupMenu)
+	{
+		delete _tabPopupMenu;
+		_tabPopupMenu = NULL;
+	}
+
+	if (_tabPopupDropMenu)
+	{
+		delete _tabPopupDropMenu;
+		_tabPopupDropMenu = NULL;
 	}
 }
 
@@ -2511,17 +2524,22 @@ BOOL Notepad_plus::notify(SCNotification *notification)
             HWND hWin = ::WindowFromPoint(p);
 			if (hWin == _pEditView->getHSelf()) // In the same view group
 			{
-				if (!_tabPopupDropMenu.isCreated())
+				if (!_tabPopupDropMenu)
+				{
+					_tabPopupDropMenu = new ContextMenu();
+				}
+
+				if (!_tabPopupDropMenu->isCreated())
 				{
 					TCHAR goToView[32] = TEXT("Move to other view");
 					TCHAR cloneToView[32] = TEXT("Clone to other View");
 					vector<MenuItemUnit> itemUnitArray;
 					itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_GOTO_ANOTHER_VIEW, goToView));
 					itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_CLONE_TO_ANOTHER_VIEW, cloneToView));
-					_tabPopupDropMenu.create(_hSelf, itemUnitArray);
+					_tabPopupDropMenu->create(_hSelf, itemUnitArray);
 					changeLangTabDrapContextMenu();
 				}
-				_tabPopupDropMenu.display(p);
+				_tabPopupDropMenu->display(p);
 			}
 			else if ((hWin == _pNonDocTab->getHSelf()) ||
 				     (hWin == _pNonEditView->getHSelf())) // In the another view group
@@ -2694,7 +2712,12 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 		POINT p;
 		::GetCursorPos(&p);
 
-		if (!_tabPopupMenu.isCreated())
+		if (!_tabPopupMenu)
+		{
+			_tabPopupMenu = new ContextMenu();
+		}
+
+		if (!_tabPopupMenu->isCreated())
 		{
 			vector<MenuItemUnit> itemUnitArray;
 			itemUnitArray.push_back(MenuItemUnit(IDM_FILE_CLOSE, TEXT("Close me")));
@@ -2717,31 +2740,31 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 			itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_GOTO_NEW_INSTANCE, TEXT("Move to new instance")));
 			itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_LOAD_IN_NEW_INSTANCE, TEXT("Open in new instance")));
 
-			_tabPopupMenu.create(_hSelf, itemUnitArray);
+			_tabPopupMenu->create(_hSelf, itemUnitArray);
 			changeLangTabContextMenu();
 		}
 
 		bool isEnable = ((::GetMenuState(_mainMenuHandle, IDM_FILE_SAVE, MF_BYCOMMAND)&MF_DISABLED) == 0);
-		_tabPopupMenu.enableItem(IDM_FILE_SAVE, isEnable);
+		_tabPopupMenu->enableItem(IDM_FILE_SAVE, isEnable);
 
 		Buffer * buf = _pEditView->getCurrentBuffer();
 		bool isUserReadOnly = buf->getUserReadOnly();
-		_tabPopupMenu.checkItem(IDM_EDIT_SETREADONLY, isUserReadOnly);
+		_tabPopupMenu->checkItem(IDM_EDIT_SETREADONLY, isUserReadOnly);
 
 		bool isSysReadOnly = buf->getFileReadOnly();
-		_tabPopupMenu.enableItem(IDM_EDIT_SETREADONLY, !isSysReadOnly);
-		_tabPopupMenu.enableItem(IDM_EDIT_CLEARREADONLY, isSysReadOnly);
+		_tabPopupMenu->enableItem(IDM_EDIT_SETREADONLY, !isSysReadOnly);
+		_tabPopupMenu->enableItem(IDM_EDIT_CLEARREADONLY, isSysReadOnly);
 
 		bool isFileExisting = PathFileExists(buf->getFullPathName()) != FALSE;
-		_tabPopupMenu.enableItem(IDM_FILE_DELETE, isFileExisting);
-		_tabPopupMenu.enableItem(IDM_FILE_RENAME, isFileExisting);
+		_tabPopupMenu->enableItem(IDM_FILE_DELETE, isFileExisting);
+		_tabPopupMenu->enableItem(IDM_FILE_RENAME, isFileExisting);
 
 		bool isDirty = buf->isDirty();
 		bool isUntitled = buf->isUntitled();
-		_tabPopupMenu.enableItem(IDM_VIEW_GOTO_NEW_INSTANCE, !(isDirty||isUntitled));
-		_tabPopupMenu.enableItem(IDM_VIEW_LOAD_IN_NEW_INSTANCE, !(isDirty||isUntitled));
+		_tabPopupMenu->enableItem(IDM_VIEW_GOTO_NEW_INSTANCE, !(isDirty||isUntitled));
+		_tabPopupMenu->enableItem(IDM_VIEW_LOAD_IN_NEW_INSTANCE, !(isDirty||isUntitled));
 
-		_tabPopupMenu.display(p);
+		_tabPopupMenu->display(p);
 		return TRUE;
     }
 
@@ -5363,11 +5386,11 @@ bool Notepad_plus::reloadLang()
 	_scintaccelerator.updateKeys();
 
 
-	if (_tabPopupMenu.isCreated())
+	if (_tabPopupMenu && _tabPopupMenu->isCreated())
 	{
 		changeLangTabContextMenu();
 	}
-	if (_tabPopupDropMenu.isCreated())
+	if (_tabPopupDropMenu && _tabPopupDropMenu->isCreated())
 	{
 		changeLangTabDrapContextMenu();
 	}
@@ -5408,7 +5431,7 @@ bool Notepad_plus::reloadLang()
 	}
 
 	UserDefineDialog *udd = _pEditView->getUserDefineDlg();
-	if (udd->isCreated())
+	if (udd && udd->isCreated())
 	{
 		changeUserDefineLang();
 	}
@@ -6069,7 +6092,8 @@ void Notepad_plus::changeLangTabContextMenu()
 			}
 		}
 	}
-	HMENU hCM = _tabPopupMenu.getMenuHandle();
+	assert(_tabPopupMenu);
+	HMENU hCM = _tabPopupMenu->getMenuHandle();
 
 #ifdef UNICODE
 	WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
@@ -6280,7 +6304,8 @@ void Notepad_plus::changeLangTabDrapContextMenu()
 					cloneToViewA = element->Attribute("name");
 			}
 		}
-		HMENU hCM = _tabPopupDropMenu.getMenuHandle();
+		assert(_tabPopupDropMenu);
+		HMENU hCM = _tabPopupDropMenu->getMenuHandle();
 #ifdef UNICODE
 		WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
 		if (goToViewA && goToViewA[0])

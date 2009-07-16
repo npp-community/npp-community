@@ -22,7 +22,6 @@
 #include "Parameters_def.h"
 
 // To be removed later.  Need to be included since Parameters.h was removed from ScintillaEditView.h
-#include "ContextMenu.h"
 #include "Shortcut.h"
 #include "Parameters.h"  // For StyleArray
 
@@ -64,6 +63,7 @@ class PreferenceDlg;
 class WindowsMenu;
 class RunMacroDlg;
 
+class ContextMenu;
 class StatusBar;
 class ToolBar;
 class ReBar;
@@ -258,7 +258,8 @@ private:
 	AutoCompletion* _autoCompleteMain;
 	AutoCompletion* _autoCompleteSub;	//each Scintilla has its own autoComplete
 
-    ContextMenu _tabPopupMenu, _tabPopupDropMenu;
+    ContextMenu* _tabPopupMenu;
+    ContextMenu* _tabPopupDropMenu;
 
 	ToolBar*	_toolBar;
 	IconList* _docTabIconList;
