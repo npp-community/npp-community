@@ -22,8 +22,7 @@
 #include "Parameters_def.h"
 
 // To be removed later.  Need to be included since Parameters.h was removed from ScintillaEditView.h
-#include "Shortcut.h"
-#include "Parameters.h"  // For StyleArray
+#include "Parameters.h"  // For StyleArray, etc.
 
 #define MENU 0x01
 #define TOOLBAR 0x02

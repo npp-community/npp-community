@@ -36,7 +36,7 @@ LRESULT CALLBACK FocusWndProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	if (nCode == HC_ACTION && hWndServer) {
 		DockingManager *pDockingManager = (DockingManager *)::GetWindowLongPtr(hWndServer, GWL_USERDATA);
 		if (pDockingManager) {
-			vector<DockingCont*> & vcontainer = pDockingManager->getContainerInfo();
+			std::vector<DockingCont*> & vcontainer = pDockingManager->getContainerInfo();
 			CWPSTRUCT * pCwp = (CWPSTRUCT*)lParam;
 			if (pCwp->message == WM_KILLFOCUS) {
 				for (int i = 0; i < DOCKCONT_MAX; i++)
@@ -769,7 +769,7 @@ DockingCont* DockingManager::toggleActiveTb(DockingCont* pContSrc, UINT message,
 
 DockingCont* DockingManager::toggleVisTb(DockingCont* pContSrc, UINT message, LPRECT prcFloat)
 {
-	vector<tTbData*>	vTbData		= pContSrc->getDataOfVisTb();
+	std::vector<tTbData*>	vTbData		= pContSrc->getDataOfVisTb();
 	tTbData*			pTbData		= pContSrc->getDataOfActiveTb();
 
 	int					iContSrc	= GetContainer(pContSrc);
@@ -835,7 +835,7 @@ void DockingManager::toggleActiveTb(DockingCont* pContSrc, DockingCont* pContTgt
 
 void DockingManager::toggleVisTb(DockingCont* pContSrc, DockingCont* pContTgt)
 {
-	vector<tTbData*>	vTbData		= pContSrc->getDataOfVisTb();
+	std::vector<tTbData*>	vTbData		= pContSrc->getDataOfVisTb();
 	tTbData*			pTbData		= pContSrc->getDataOfActiveTb();
 
 	/* at first hide container and resize */
@@ -977,7 +977,7 @@ int DockingManager::FindEmptyContainer()
     /* search for used floated containers */
     for (size_t iCont = 0; iCont < DOCKCONT_MAX; iCont++)
     {
-        vector<tTbData*>    vTbData = _vContainer[iCont]->getDataOfAllTb();
+        std::vector<tTbData*>    vTbData = _vContainer[iCont]->getDataOfAllTb();
 
         for (size_t iTb = 0; iTb < vTbData.size(); iTb++)
         {

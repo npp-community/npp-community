@@ -16,12 +16,9 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
+#include "DockingCont.h"
 #include "dockingResource.h"
 #include "Docking.h"
-#include "DockingCont.h"
-#include "DropData.h"
-#include "SplitterContainer.h"
-#include "WindowInterface.h"
 #include "ToolTip.h"
 #include "Parameters.h"
 
@@ -1405,3 +1402,30 @@ LPARAM DockingCont::NotifyParent(UINT message)
 	return ::SendMessage(_hParent, message, 0, (LPARAM)this);
 }
 
+BOOL DockingCont::updateInfo( HWND hClient )
+{
+	for (size_t iTb = 0; iTb < _vTbData.size(); iTb++)
+	{
+		if (_vTbData[iTb]->hClient == hClient)
+		{
+			updateCaption();
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+void DockingCont::setCaptionTop( BOOL isTopCaption )
+{
+	_isTopCaption = (isTopCaption == CAPTION_TOP);
+	onSize();
+}
+
+void DockingCont::destroy()
+{
+	for (INT iTb = _vTbData.size(); iTb > 0; iTb--)
+	{
+		delete _vTbData[iTb-1];
+	}
+	::DestroyWindow(_hSelf);
+}

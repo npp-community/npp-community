@@ -20,11 +20,6 @@
 #define DOCKINGCONT
 
 #include "StaticDialog.h"
-#include "Resource.h"
-#include "Docking.h"
-
-using namespace std;
-
 
 // window styles
 #define POPUP_STYLES		(WS_POPUP|WS_CLIPSIBLINGS|WS_CAPTION|WS_SYSMENU|WS_THICKFRAME|WS_MAXIMIZEBOX)
@@ -49,7 +44,7 @@ enum eMousePos {
 #define CLOSEBTN_POS_TOP	3
 
 
-
+struct tTbData;
 
 class DockingCont : public StaticDialog
 {
@@ -74,26 +69,16 @@ public:
 
 	void showToolbar(tTbData *pTbData, BOOL state);
 
-	BOOL updateInfo(HWND hClient) {
-		for (size_t iTb = 0; iTb < _vTbData.size(); iTb++)
-		{
-			if (_vTbData[iTb]->hClient == hClient)
-			{
-				updateCaption();
-				return TRUE;
-			}
-		}
-		return FALSE;
-	};
+	BOOL updateInfo(HWND hClient);;
 
 	void setActiveTb(tTbData* pTbData);
 	void setActiveTb(INT iItem);
 	INT getActiveTb();
 	tTbData* getDataOfActiveTb();
-	vector<tTbData *> getDataOfAllTb() {
+	std::vector<tTbData *> getDataOfAllTb() {
 		return _vTbData;
 	};
-	vector<tTbData *> getDataOfVisTb();
+	std::vector<tTbData *> getDataOfVisTb();
 	bool isTbVis(tTbData* data);
 
 	void doDialog(bool willBeShown = true, bool isFloating = false);
@@ -113,10 +98,7 @@ public:
 		return dragFromTabTemp;
 	};
 
-	void setCaptionTop(BOOL isTopCaption) {
-		_isTopCaption = (isTopCaption == CAPTION_TOP);
-		onSize();
-	};
+	void setCaptionTop(BOOL isTopCaption);;
 
 	void focusClient();
 
@@ -130,13 +112,7 @@ public:
 		RedrawWindow(_hContTab, NULL, NULL, 0);
 	};
 
-    virtual void destroy() {
-		for (INT iTb = _vTbData.size(); iTb > 0; iTb--)
-		{
-			delete _vTbData[iTb-1];
-		}
-		::DestroyWindow(_hSelf);
-	};
+    virtual void destroy();;
 
 protected :
 
@@ -222,7 +198,7 @@ private:
 	eMousePos				_hoverMPos;
 
 	// data of added windows
-	vector<tTbData *>		_vTbData;
+	std::vector<tTbData *>		_vTbData;
 };
 
 

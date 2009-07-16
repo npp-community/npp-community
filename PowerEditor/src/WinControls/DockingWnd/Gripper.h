@@ -18,11 +18,7 @@
 #ifndef GRIPPER_H
 #define GRIPPER_H
 
-#include "Resource.h"
 #include "Docking.h"
-#include "DockingCont.h"
-#include "DockingManager.h"
-
 
 // Used by getRectAndStyle() to draw the drag rectangle
 static const WORD DotPattern[] =
@@ -30,9 +26,10 @@ static const WORD DotPattern[] =
 	0x00aa, 0x0055, 0x00aa, 0x0055, 0x00aa, 0x0055, 0x00aa, 0x0055
 };
 
-
 #define MDLG_CLASS_NAME TEXT("moveDlg")
 
+class DockingManager;
+class DockingCont;
 
 class Gripper
 {
@@ -131,7 +128,5 @@ private:
 	/* is class registered */
 	static BOOL		_isRegistered;
 };
-
-
 
 #endif // GRIPPER_H

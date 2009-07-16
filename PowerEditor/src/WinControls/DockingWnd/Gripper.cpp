@@ -17,9 +17,13 @@
 
 
 #include "precompiled_headers.h"
-#include "dockingResource.h"
-#include "Docking.h"
+
+
 #include "Gripper.h"
+
+#include "dockingResource.h"
+#include "DockingManager.h"
+#include "DockingCont.h"
 #include "Parameters.h"
 
 #ifndef WH_KEYBOARD_LL
@@ -785,4 +789,3 @@ void Gripper::initTabInformation()
 	_tcItem.cchTextMax	= 64;
 	::SendMessage(_hTabSource, TCM_GETITEM, _iItem, (LPARAM)&_tcItem);
 }
-

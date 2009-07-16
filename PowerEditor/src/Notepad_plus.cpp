@@ -50,6 +50,7 @@
 #include "PluginsManager.h"
 
 #include "DockingManager.h"
+#include "Docking.h"
 #include "DockingCont.h"
 #include "DocTabView.h"
 #include "SplitterContainer.h"
