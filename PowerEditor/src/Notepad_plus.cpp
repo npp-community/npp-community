@@ -44,6 +44,7 @@
 #include "FindReplaceDlg.h"
 #include "UserDefineDialog.h"
 
+#include "ImageListSet.h"
 #include "lastRecentFileList.h"
 #include "SmartHighlighter.h"
 #include "AutoCompletion.h"
