@@ -21,6 +21,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ShortcutMapper.h"
 #include "Parameters.h"
 #include "PluginInterface.h"
+#include "resource.h"
+#include "BabyGrid.h"
 
 void ShortcutMapper::initTabs() {
 	HWND hTab = _hTabCtrl = ::GetDlgItem(_hSelf, IDC_BABYGRID_TABBAR);

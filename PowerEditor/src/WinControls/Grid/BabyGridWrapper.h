@@ -19,63 +19,36 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef BABYGRIDWRAPPER
 #define BABYGRIDWRAPPER
 
-#include "babygrid.h"
 #include "Window.h"
 
 class BabyGridWrapper : public Window
 {
 public :
 	BabyGridWrapper() : Window(){};
-    ~BabyGridWrapper(){};
+    ~BabyGridWrapper();
 	virtual void init(HINSTANCE hInst, HWND parent, int id);
-	virtual void destroy() {
-		::DestroyWindow(_hSelf);
-	};
-	void setLineColNumber(size_t nbRow, size_t nbCol) {
-		::SendMessage(_hSelf, BGM_SETGRIDDIM, nbRow, nbCol);
-	};
+	virtual void destroy();
+	void setLineColNumber(size_t nbRow, size_t nbCol);
 
-	void setCursorColour(COLORREF coulour) {
-		::SendMessage(_hSelf, BGM_SETCURSORCOLOR, (UINT)coulour, 0);
-	};
+	void setCursorColour(COLORREF coulour);
 
 	void hideCursor() {
 		setCursorColour(RGB(0, 0, 0));
 	};
 
-	void setColsNumbered(bool isNumbered = true) {
-		::SendMessage(_hSelf, BGM_SETCOLSNUMBERED, isNumbered?TRUE:FALSE, 0);
-	}
+	void setColsNumbered(bool isNumbered = true);
 
-	void setText(size_t row, size_t col, const TCHAR *text) {
-		_BGCELL cell;
-		cell.row = row;
-		cell.col = col;
-		::SendMessage(_hSelf, BGM_SETCELLDATA, (UINT)&cell, (long)text);
-	};
+	void setText(size_t row, size_t col, const TCHAR *text);
 
-	void makeColAutoWidth(bool autoWidth = true) {
-		::SendMessage(_hSelf, BGM_SETCOLAUTOWIDTH, autoWidth?TRUE:FALSE, 0);
-	};
+	void makeColAutoWidth(bool autoWidth = true);
 
-	int getSelectedRow() {
-		return ::SendMessage(_hSelf, BGM_GETROW, 0, 0);
-	};
+	int getSelectedRow();
 
-	void deleteCell(int row, int col) {
-		_BGCELL cell;
-		cell.row = row;
-		cell.col = col;
-		::SendMessage(_hSelf, BGM_DELETECELL, (UINT)&cell, 0);
-	};
+	void deleteCell(int row, int col);
 
-	void setColWidth(unsigned int col, unsigned int width) {
-		::SendMessage(_hSelf, BGM_SETCOLWIDTH, col, width);
-	};
+	void setColWidth(unsigned int col, unsigned int width);
 
-	void clear() {
-		::SendMessage(_hSelf, BGM_CLEARGRID, 0, 0);
-	};
+	void clear();
 
 private :
 	static bool _isRegistered;

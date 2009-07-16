@@ -19,6 +19,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
 #include "BabyGridWrapper.h"
+
+#include "babygrid.h"
+
+
 const TCHAR *babyGridClassName = TEXT("BABYGRID");
 
 bool BabyGridWrapper::_isRegistered = false;
@@ -39,4 +43,69 @@ void BabyGridWrapper::init(HINSTANCE hInst, HWND parent, int id)
 					(HMENU)id,\
 					_hInst,\
 					(LPVOID)/*this*/NULL);
+}
+
+BabyGridWrapper::~BabyGridWrapper()
+{
+	BabyGridWrapper::destroy();
+}
+
+void BabyGridWrapper::destroy()
+{
+	if (_hSelf)
+	{
+		::DestroyWindow(_hSelf);
+		_hSelf = NULL;
+	}
+}
+
+void BabyGridWrapper::setLineColNumber( size_t nbRow, size_t nbCol )
+{
+	::SendMessage(_hSelf, BGM_SETGRIDDIM, nbRow, nbCol);
+}
+
+void BabyGridWrapper::setCursorColour( COLORREF coulour )
+{
+	::SendMessage(_hSelf, BGM_SETCURSORCOLOR, (UINT)coulour, 0);
+}
+
+void BabyGridWrapper::setColsNumbered( bool isNumbered /*= true*/ )
+{
+	::SendMessage(_hSelf, BGM_SETCOLSNUMBERED, isNumbered?TRUE:FALSE, 0);
+}
+
+void BabyGridWrapper::setText( size_t row, size_t col, const TCHAR *text )
+{
+	_BGCELL cell;
+	cell.row = row;
+	cell.col = col;
+	::SendMessage(_hSelf, BGM_SETCELLDATA, (UINT)&cell, (long)text);
+}
+
+void BabyGridWrapper::makeColAutoWidth( bool autoWidth /*= true*/ )
+{
+	::SendMessage(_hSelf, BGM_SETCOLAUTOWIDTH, autoWidth?TRUE:FALSE, 0);
+}
+
+int BabyGridWrapper::getSelectedRow()
+{
+	return ::SendMessage(_hSelf, BGM_GETROW, 0, 0);
+}
+
+void BabyGridWrapper::deleteCell( int row, int col )
+{
+	_BGCELL cell;
+	cell.row = row;
+	cell.col = col;
+	::SendMessage(_hSelf, BGM_DELETECELL, (UINT)&cell, 0);
+}
+
+void BabyGridWrapper::setColWidth( unsigned int col, unsigned int width )
+{
+	::SendMessage(_hSelf, BGM_SETCOLWIDTH, col, width);
+}
+
+void BabyGridWrapper::clear()
+{
+	::SendMessage(_hSelf, BGM_CLEARGRID, 0, 0);
 }
