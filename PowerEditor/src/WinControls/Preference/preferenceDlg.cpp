@@ -21,6 +21,7 @@
 #include "preference_rc.h"
 #include "URLCtrl.h"
 #include "regExtDlg.h"
+#include "regExtDlgRc.h"
 #include "WordStyleDlg.h"
 #include "ControlsTab.h"
 #include "menuCmdID.h"

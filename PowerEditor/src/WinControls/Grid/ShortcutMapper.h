@@ -20,36 +20,19 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef SHORTCUTMAPPER
 #define SHORTCUTMAPPER
 
+#include "StaticDialog.h"
+
 #include "BabyGridWrapper.h"
-#include "ShortcutMapper_rc.h"
-#include "shortcut.h"
 #include "ContextMenu.h"
 
 enum GridState {STATE_MENU, STATE_MACRO, STATE_USER, STATE_PLUGIN, STATE_SCINTILLA};
 
 class ShortcutMapper : public StaticDialog {
 public:
-	ShortcutMapper() : _currentState(STATE_MENU), StaticDialog() {
-		generic_strncpy(tabNames[0], TEXT("Main menu"), maxTabName);
-		generic_strncpy(tabNames[1], TEXT("Macros"), maxTabName);
-		generic_strncpy(tabNames[2], TEXT("Run commands"), maxTabName);
-		generic_strncpy(tabNames[3], TEXT("Plugin commands"), maxTabName);
-		generic_strncpy(tabNames[4], TEXT("Scintilla commands"), maxTabName);
-	};
-	~ShortcutMapper() {};
+	ShortcutMapper();
 	//void init(HINSTANCE hInst, HWND parent) {};
 	void destroy() {};
-	void doDialog(bool isRTL = false) {
-		if (isRTL)
-		{
-			DLGTEMPLATE *pMyDlgTemplate = NULL;
-			HGLOBAL hMyDlgTemplate = makeRTLResource(IDD_SHORTCUTMAPPER_DLG, &pMyDlgTemplate);
-			::DialogBoxIndirectParam(_hInst, pMyDlgTemplate, _hParent,  (DLGPROC)dlgProc, (LPARAM)this);
-			::GlobalFree(hMyDlgTemplate);
-		}
-		else
-			::DialogBoxParam(_hInst, MAKEINTRESOURCE(IDD_SHORTCUTMAPPER_DLG), _hParent, (DLGPROC)dlgProc, (LPARAM)this);
-	};
+	void doDialog(bool isRTL = false);;
 	void getClientRect(RECT & rc) const {
 		Window::getClientRect(rc);
 		rc.top += 40;

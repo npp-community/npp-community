@@ -454,6 +454,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\ValueDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\winmain.cpp"
 				>
 				<FileConfiguration
@@ -739,10 +743,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\lesDlgs.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\localizationString.h"
 				>
 			</File>
@@ -780,6 +780,10 @@
 			</File>
 			<File
 				RelativePath="..\src\Utf8_16.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\ValueDlg.h"
 				>
 			</File>
 			<File
