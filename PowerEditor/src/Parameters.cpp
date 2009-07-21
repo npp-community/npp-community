@@ -369,7 +369,7 @@ static int getKwClassFromName(const TCHAR *str) {
 #ifdef UNICODE
 #include "localizationString.h"
 
-wstring LocalizationSwitcher::getLangFromXmlFileName(wchar_t *fn) const
+std::wstring LocalizationSwitcher::getLangFromXmlFileName(wchar_t *fn) const
 {
 	size_t nbItem = sizeof(localizationDefs)/sizeof(LocalizationSwitcher::LocalizationDefinition);
 	for (size_t i = 0 ; i < nbItem ; i++)
@@ -380,7 +380,7 @@ wstring LocalizationSwitcher::getLangFromXmlFileName(wchar_t *fn) const
 	return TEXT("");
 }
 
-wstring LocalizationSwitcher::getXmlFilePathFromLangName(wchar_t *langName) const
+std::wstring LocalizationSwitcher::getXmlFilePathFromLangName(wchar_t *langName) const
 {
 	for (size_t i = 0 ; i < _localizationList.size() ; i++)
 	{
@@ -390,13 +390,13 @@ wstring LocalizationSwitcher::getXmlFilePathFromLangName(wchar_t *langName) cons
 	return TEXT("");
 }
 
-bool LocalizationSwitcher::addLanguageFromXml(wstring xmlFullPath)
+bool LocalizationSwitcher::addLanguageFromXml(std::wstring xmlFullPath)
 {
 	wchar_t * fn = ::PathFindFileNameW(xmlFullPath.c_str());
-	wstring foundLang = getLangFromXmlFileName(fn);
+	std::wstring foundLang = getLangFromXmlFileName(fn);
 	if (foundLang != TEXT(""))
 	{
-		_localizationList.push_back(pair<wstring, wstring>(foundLang, xmlFullPath));
+		_localizationList.push_back(std::pair<std::wstring, std::wstring>(foundLang, xmlFullPath));
 		return true;
 	}
 	return false;
@@ -404,7 +404,7 @@ bool LocalizationSwitcher::addLanguageFromXml(wstring xmlFullPath)
 
 bool LocalizationSwitcher::switchToLang(wchar_t *lang2switch) const
 {
-	wstring langPath = getXmlFilePathFromLangName(lang2switch);
+	std::wstring langPath = getXmlFilePathFromLangName(lang2switch);
 	if (langPath == TEXT(""))
 		return false;
 
@@ -414,7 +414,7 @@ bool LocalizationSwitcher::switchToLang(wchar_t *lang2switch) const
 #endif
 
 
-generic_string ThemeSwitcher::getThemeFromXmlFileName(const TCHAR *xmlFullPath) const
+std::generic_string ThemeSwitcher::getThemeFromXmlFileName(const TCHAR *xmlFullPath) const
 {
 	if ( 0 == _tcscmp(xmlFullPath, TEXT("")))
 	{
@@ -1241,7 +1241,7 @@ bool NppParameters::getContextMenuFromXmlTree(HMENU mainMenuHadle)
 						::GetMenuString(mainMenuHadle, i, menuEntryString, 64, MF_BYPOSITION);
 						if (generic_stricmp(menuEntryName, purgeMenuItemString(menuEntryString).c_str()) == 0)
 						{
-							std::vector< pair<HMENU, int> > parentMenuPos;
+							std::vector< std::pair<HMENU, int> > parentMenuPos;
 							HMENU topMenu = ::GetSubMenu(mainMenuHadle, i);
 							int maxTopMenuPos = ::GetMenuItemCount(topMenu);
 							HMENU currMenu = topMenu;
@@ -1253,7 +1253,7 @@ bool NppParameters::getContextMenuFromXmlTree(HMENU mainMenuHadle)
 							do {
 								if ( ::GetSubMenu( currMenu, currMenuPos ) ) {
 									//  Go into sub menu
-									parentMenuPos.push_back( ::make_pair( currMenu, currMenuPos ) );
+									parentMenuPos.push_back( std::make_pair( currMenu, currMenuPos ) );
 									currMenu = ::GetSubMenu( currMenu, currMenuPos );
 									currMenuPos = 0;
 									currMaxMenuPos = ::GetMenuItemCount(currMenu);

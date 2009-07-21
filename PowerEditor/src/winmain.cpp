@@ -69,7 +69,7 @@ void parseCommandLine(TCHAR * commandLine, ParamVector & paramVector) {
 		switch(commandLine[i]) {
 			case '\"': {										//quoted filename, ignore any following whitespace
 				if (!isInFile) {	//" will always be treated as start or end of param, in case the user forgot to add an space
-					paramVector.push_back(commandLine+i+1);	//add next param(since zero terminated generic_string original, no overflow of +1)
+					paramVector.push_back(commandLine+i+1);	//add next param(since zero terminated std::generic_string original, no overflow of +1)
 				}
 				isInFile = !isInFile;
 				isInWhiteSpace = false;
@@ -90,7 +90,7 @@ void parseCommandLine(TCHAR * commandLine, ParamVector & paramVector) {
 				break; }
 		}
 	}
-	//the commandline generic_string is now a list of zero terminated strings concatenated, and the vector contains all the substrings
+	//the commandline std::generic_string is now a list of zero terminated strings concatenated, and the vector contains all the substrings
 }
 
 bool isInList(const TCHAR *token2Find, ParamVector & params) {
@@ -106,7 +106,7 @@ bool isInList(const TCHAR *token2Find, ParamVector & params) {
 	return false;
 };
 
-bool getParamVal(TCHAR c, ParamVector & params, generic_string & value) {
+bool getParamVal(TCHAR c, ParamVector & params, std::generic_string & value) {
 	value = TEXT("");
 	int nrItems = params.size();
 
@@ -123,14 +123,14 @@ bool getParamVal(TCHAR c, ParamVector & params, generic_string & value) {
 }
 
 LangType getLangTypeFromParam(ParamVector & params) {
-	generic_string langStr;
+	std::generic_string langStr;
 	if (!getParamVal('l', params, langStr))
 		return L_EXTERNAL;
 	return NppParameters::getLangIDFromStr(langStr.c_str());
 };
 
 int getNumberFromParam(char paramName, ParamVector & params, bool & isParamePresent) {
-	generic_string numStr;
+	std::generic_string numStr;
 	if (!getParamVal(paramName, params, numStr))
 	{
 		isParamePresent = false;
@@ -141,14 +141,14 @@ int getNumberFromParam(char paramName, ParamVector & params, bool & isParamePres
 };
 /*
 int getLn2GoFromParam(ParamVector & params) {
-	generic_string lineNumStr;
+	std::generic_string lineNumStr;
 	if (!getParamVal('n', params, lineNumStr))
 		return -1;
 	return generic_atoi(lineNumStr.c_str());
 };
 
 int getPointXFromParam(ParamVector & params) {
-	generic_string pointXStr;
+	std::generic_string pointXStr;
 	if (!getParamVal('x', params, pointXStr))
 		return -1;
 	return generic_atoi(pointXStr.c_str());
@@ -199,7 +199,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 		cmdLineParams._isNoSession = true;
 	}
 
-	generic_string quotFileName = TEXT("");
+	std::generic_string quotFileName = TEXT("");
     // tell the running instance the FULL path to the new files to load
 	size_t nrFilesToOpen = params.size();
 	const TCHAR * currentFile;
@@ -279,12 +279,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 
 	NppGUI & nppGui = (NppGUI &)pNppParameters->getNppGUI();
 
-	generic_string updaterDir = pNppParameters->getNppPath();
+	std::generic_string updaterDir = pNppParameters->getNppPath();
 	updaterDir += TEXT("\\updater\\");
 
-	generic_string updaterFullPath = updaterDir + TEXT("gup.exe");
+	std::generic_string updaterFullPath = updaterDir + TEXT("gup.exe");
 
-	generic_string version = TEXT("-v");
+	std::generic_string version = TEXT("-v");
 	version += VERSION_VALUE;
 
 	winVer curWinVer = notepad_plus_plus.getWinVersion();
@@ -374,12 +374,12 @@ void doException(Notepad_plus & notepad_plus_plus) {
 
 	TCHAR tmpDir[1024];
 	GetTempPath(1024, tmpDir);
-	generic_string emergencySavedDir = tmpDir;
+	std::generic_string emergencySavedDir = tmpDir;
 	emergencySavedDir += TEXT("\\N++RECOV");
 
 	bool res = notepad_plus_plus.emergency(emergencySavedDir);
 	if (res) {
-		generic_string displayText = TEXT("Notepad++ was able to successfully recover some unsaved documents, or nothing to be saved could be found.\r\nYou can find the results at :\r\n");
+		std::generic_string displayText = TEXT("Notepad++ was able to successfully recover some unsaved documents, or nothing to be saved could be found.\r\nYou can find the results at :\r\n");
 		displayText += emergencySavedDir;
 		::MessageBox(Notepad_plus::gNppHWND, displayText.c_str(), TEXT("Recovery success"), MB_OK | MB_ICONINFORMATION);
 	} else {

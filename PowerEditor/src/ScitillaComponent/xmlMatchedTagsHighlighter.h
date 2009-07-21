@@ -18,8 +18,6 @@
 #ifndef XMLMATCHEDTAGSHIGHLIGHTER_H
 #define XMLMATCHEDTAGSHIGHLIGHTER_H
 
-using namespace std;
-
 class ScintillaEditView;
 
 enum TagCateg {tagOpen, tagClose, inSingleTag, outOfTag, invalidTag, unknownPb};
@@ -43,10 +41,10 @@ private:
 
 	int getFirstTokenPosFrom(int targetStart, int targetEnd, const char *token, std::pair<int, int> & foundPos);
 	TagCateg getTagCategory(XmlMatchedTagsPos & tagsPos, int curPos);
-	bool getMatchedTagPos(int searchStart, int searchEnd, const char *tag2find, const char *oppositeTag2find, vector<int> oppositeTagFound, XmlMatchedTagsPos & tagsPos);
+	bool getMatchedTagPos(int searchStart, int searchEnd, const char *tag2find, const char *oppositeTag2find, std::vector<int> oppositeTagFound, XmlMatchedTagsPos & tagsPos);
 	bool getXmlMatchedTagsPos(XmlMatchedTagsPos & tagsPos);
-	vector< pair<int, int> > getAttributesPos(int start, int end);
-	bool isInList(int element, vector<int> elementList) {
+	std::vector< std::pair<int, int> > getAttributesPos(int start, int end);
+	bool isInList(int element, std::vector<int> elementList) {
 		for (size_t i = 0 ; i < elementList.size() ; i++)
 			if (element == elementList[i])
 				return true;

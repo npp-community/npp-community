@@ -21,7 +21,7 @@
 #include "Buffer.h"
 #include "Parameters.h"
 
-int XmlMatchedTagsHighlighter::getFirstTokenPosFrom(int targetStart, int targetEnd, const char *token, pair<int, int> & foundPos)
+int XmlMatchedTagsHighlighter::getFirstTokenPosFrom(int targetStart, int targetEnd, const char *token, std::pair<int, int> & foundPos)
 {
 	//int start = currentPos;
 	//int end = (direction == DIR_LEFT)?0:_pEditView->getCurrentDocLen();
@@ -40,7 +40,7 @@ int XmlMatchedTagsHighlighter::getFirstTokenPosFrom(int targetStart, int targetE
 
 TagCateg XmlMatchedTagsHighlighter::getTagCategory(XmlMatchedTagsPos & tagsPos, int curPos)
 {
-	pair<int, int> foundPos;
+	std::pair<int, int> foundPos;
 
 	int docLen = _pEditView->getCurrentDocLen();
 
@@ -106,14 +106,14 @@ TagCateg XmlMatchedTagsHighlighter::getTagCategory(XmlMatchedTagsPos & tagsPos, 
 	return outOfTag;
 }
 
-bool XmlMatchedTagsHighlighter::getMatchedTagPos(int searchStart, int searchEnd, const char *tag2find, const char *oppositeTag2find, vector<int> oppositeTagFound, XmlMatchedTagsPos & tagsPos)
+bool XmlMatchedTagsHighlighter::getMatchedTagPos(int searchStart, int searchEnd, const char *tag2find, const char *oppositeTag2find, std::vector<int> oppositeTagFound, XmlMatchedTagsPos & tagsPos)
 {
 	const bool search2Left = false;
 	const bool search2Right = true;
 
 	bool direction = searchEnd > searchStart;
 
-	pair<int, int> foundPos;
+	std::pair<int, int> foundPos;
 	int ltPosOnR = getFirstTokenPosFrom(searchStart, searchEnd, tag2find, foundPos);
 	if (ltPosOnR == -1)
 		return false;
@@ -143,7 +143,7 @@ bool XmlMatchedTagsHighlighter::getMatchedTagPos(int searchStart, int searchEnd,
 		}
 	}
 
-	pair<int, int> oppositeTagPos;
+	std::pair<int, int> oppositeTagPos;
 	int s = foundPos.first;
 	int e = tagsPos.tagOpenEnd;
 	if (direction == search2Left)
@@ -289,17 +289,17 @@ bool XmlMatchedTagsHighlighter::getXmlMatchedTagsPos(XmlMatchedTagsPos & tagsPos
 
 			_pEditView->getText(tagName, startPos, endPos);
 
-			basic_string<char> closeTag = "</";
+			std::basic_string<char> closeTag = "</";
 			closeTag += tagName;
 			closeTag += "[ 	]*>";
 
-			basic_string<char> openTag = "<";
+			std::basic_string<char> openTag = "<";
 			openTag += tagName;
 			openTag += "[ 	>]";
 
 			delete [] tagName;
 
-			vector<int> passedTagList;
+			std::vector<int> passedTagList;
 			return getMatchedTagPos(tagsPos.tagOpenEnd, docLen, closeTag.c_str(), openTag.c_str(), passedTagList, tagsPos);
 		}
 
@@ -313,17 +313,17 @@ bool XmlMatchedTagsHighlighter::getXmlMatchedTagsPos(XmlMatchedTagsPos & tagsPos
 			char * tagName = new char[endPos-startPos+1];
 			_pEditView->getText(tagName, startPos, endPos);
 
-			basic_string<char> openTag = "<";
+			std::basic_string<char> openTag = "<";
 			openTag += tagName;
 			openTag += "[ 	>]";
 
-			basic_string<char> closeTag = "</";
+			std::basic_string<char> closeTag = "</";
 			closeTag += tagName;
 			closeTag += "[ 	]*>";
 
 			delete [] tagName;
 
-			vector<int> passedTagList;
+			std::vector<int> passedTagList;
 			bool isFound = getMatchedTagPos(tagsPos.tagCloseStart, 0, openTag.c_str(), closeTag.c_str(), passedTagList, tagsPos);
 			if (isFound)
 				tagsPos.tagNameEnd = tagsPos.tagOpenStart + 1 + (endPos - startPos);
@@ -348,9 +348,9 @@ bool XmlMatchedTagsHighlighter::getXmlMatchedTagsPos(XmlMatchedTagsPos & tagsPos
 	}
 }
 
-vector< pair<int, int> > XmlMatchedTagsHighlighter::getAttributesPos(int start, int end)
+std::vector< std::pair<int, int> > XmlMatchedTagsHighlighter::getAttributesPos(int start, int end)
 {
-	vector< pair<int, int> > attributes;
+	std::vector< std::pair<int, int> > attributes;
 
 	int bufLen = end - start + 1;
 	char *buf = new char[bufLen+1];
@@ -427,12 +427,12 @@ vector< pair<int, int> > XmlMatchedTagsHighlighter::getAttributesPos(int start, 
 
 		if (state == attr_valid)
 		{
-			attributes.push_back(pair<int, int>(start+startPos, start+i+oneMoreChar));
+			attributes.push_back(std::pair<int, int>(start+startPos, start+i+oneMoreChar));
 			state = attr_invalid;
 		}
 	}
 	if (state == attr_value)
-		attributes.push_back(pair<int, int>(start+startPos, start+i-1));
+		attributes.push_back(std::pair<int, int>(start+startPos, start+i-1));
 
 	delete [] buf;
 	return attributes;
@@ -478,7 +478,7 @@ void XmlMatchedTagsHighlighter::tagMatch(bool doHiliteAttr)
 
 		if (doHiliteAttr)
 		{
-			vector< pair<int, int> > attributes = getAttributesPos(xmlTags.tagNameEnd, xmlTags.tagOpenEnd - openTagTailLen);
+			std::vector< std::pair<int, int> > attributes = getAttributesPos(xmlTags.tagNameEnd, xmlTags.tagOpenEnd - openTagTailLen);
 			_pEditView->execute(SCI_SETINDICATORCURRENT,  SCE_UNIVERSAL_TAGATTR);
 			for (size_t i = 0 ; i < attributes.size() ; i++)
 			{

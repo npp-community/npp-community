@@ -23,8 +23,6 @@
 
 //static void extractArgs(TCHAR *cmd2Exec, TCHAR *args, const TCHAR *cmdEntier);
 
-using namespace std;
-
 #define CURRENTWORD_MAXLENGTH 2048
 
 const TCHAR fullCurrentPath[] = TEXT("FULL_CURRENT_PATH");
@@ -44,11 +42,11 @@ class Command {
 public :
 	Command(){};
 	Command(TCHAR *cmd) : _cmdLine(cmd){};
-	Command(generic_string cmd) : _cmdLine(cmd){};
+	Command(std::generic_string cmd) : _cmdLine(cmd){};
 	HINSTANCE run(HWND hWnd);
 
 protected :
-	generic_string _cmdLine;
+	std::generic_string _cmdLine;
 private :
 	void extractArgs(TCHAR *cmd2Exec, TCHAR *args, const TCHAR *cmdEntier);
 };

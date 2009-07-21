@@ -25,8 +25,6 @@
 const int nbExtMax = 256;
 const int extLenMax = 64;
 
-using namespace std;
-
 typedef std::vector<std::generic_string> stringVector;
 //const bool styleOpen = true;
 //const bool styleSave = false;

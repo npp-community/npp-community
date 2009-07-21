@@ -369,7 +369,7 @@ void Notepad_plus::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLine, CmdL
 
 #ifdef UNICODE
 	LocalizationSwitcher & localizationSwitcher = pNppParams->getLocalizationSwitcher();
-	wstring localizationDir = tmp;
+	std::wstring localizationDir = tmp;
 
 	localizationDir += TEXT("\\localization\\");
 	getMatchedFileNames(localizationDir.c_str(), patterns, fileNames, false, false);
@@ -630,16 +630,16 @@ void Notepad_plus::saveDockingParams()
 	nppGUI._dockingData._containerTabInfo.clear();
 
 	// create a vector to save the current information
-	vector<PlugingDlgDockingInfo>	vPluginDockInfo;
-	vector<FloatingWindowInfo>		vFloatingWindowInfo;
+	std::vector<PlugingDlgDockingInfo>	vPluginDockInfo;
+	std::vector<FloatingWindowInfo>		vFloatingWindowInfo;
 
 	// save every container
-	vector<DockingCont*> vCont = _dockingManager->getContainerInfo();
+	std::vector<DockingCont*> vCont = _dockingManager->getContainerInfo();
 
 	for (size_t i = 0 ; i < vCont.size() ; i++)
 	{
 		// save at first the visible Tb's
-		vector<tTbData *>	vDataVis	= vCont[i]->getDataOfVisTb();
+		std::vector<tTbData *>	vDataVis	= vCont[i]->getDataOfVisTb();
 
 		for (size_t j = 0 ; j < vDataVis.size() ; j++)
 		{
@@ -651,7 +651,7 @@ void Notepad_plus::saveDockingParams()
 		}
 
 		// save the hidden Tb's
-		vector<tTbData *>	vDataAll	= vCont[i]->getDataOfAllTb();
+		std::vector<tTbData *>	vDataAll	= vCont[i]->getDataOfAllTb();
 
 		for (size_t j = 0 ; j < vDataAll.size() ; j++)
 		{
@@ -732,7 +732,7 @@ bool Notepad_plus::loadSession(Session & session)
 	{
 		const TCHAR *pFn = session._mainViewFiles[i]._fileName.c_str();
 		if (isFileSession(pFn)) {
-			vector<sessionFileInfo>::iterator posIt = session._mainViewFiles.begin() + i;
+			std::vector<sessionFileInfo>::iterator posIt = session._mainViewFiles.begin() + i;
 			session._mainViewFiles.erase(posIt);
 			continue;	//skip session files, not supporting recursive sessions
 		}
@@ -769,7 +769,7 @@ bool Notepad_plus::loadSession(Session & session)
 		}
 		else
 		{
-			vector<sessionFileInfo>::iterator posIt = session._mainViewFiles.begin() + i;
+			std::vector<sessionFileInfo>::iterator posIt = session._mainViewFiles.begin() + i;
 			session._mainViewFiles.erase(posIt);
 			allSessionFilesLoaded = false;
 		}
@@ -782,7 +782,7 @@ bool Notepad_plus::loadSession(Session & session)
 	{
 		const TCHAR *pFn = session._subViewFiles[k]._fileName.c_str();
 		if (isFileSession(pFn)) {
-			vector<sessionFileInfo>::iterator posIt = session._subViewFiles.begin() + k;
+			std::vector<sessionFileInfo>::iterator posIt = session._subViewFiles.begin() + k;
 			session._subViewFiles.erase(posIt);
 			continue;	//skip session files, not supporting recursive sessions
 		}
@@ -831,7 +831,7 @@ bool Notepad_plus::loadSession(Session & session)
 		}
 		else
 		{
-			vector<sessionFileInfo>::iterator posIt = session._subViewFiles.begin() + k;
+			std::vector<sessionFileInfo>::iterator posIt = session._subViewFiles.begin() + k;
 			session._subViewFiles.erase(posIt);
 			allSessionFilesLoaded = false;
 		}
@@ -871,7 +871,7 @@ BufferID Notepad_plus::doOpen(const TCHAR *fileName, bool isReadOnly)
 	std::generic_string gs_fileName = fileName;
 	size_t res = gs_fileName.find_first_of(UNTITLED_STR);
 
-	if (res != string::npos && res == 0)
+	if (res != std::generic_string::npos && res == 0)
 	{
 		fileName2Find = fileName;
 	}
@@ -1141,7 +1141,7 @@ bool Notepad_plus::fileReload()
 	return doReload(buf, buf->isDirty());
 }
 
-generic_string exts2Filters(std::generic_string exts) {
+std::generic_string exts2Filters(std::generic_string exts) {
 	const TCHAR *extStr = exts.c_str();
 	TCHAR aExt[MAX_PATH];
 	std::generic_string filters(TEXT(""));
@@ -2271,7 +2271,7 @@ void Notepad_plus::checkLangsMenu(int id) const
 	::CheckMenuRadioItem(_mainMenuHandle, IDM_LANG_C, IDM_LANG_USER_LIMIT, id, MF_BYCOMMAND);
 }
 
-generic_string Notepad_plus::getLangDesc(LangType langType, bool shortDesc)
+std::generic_string Notepad_plus::getLangDesc(LangType langType, bool shortDesc)
 {
 
 	if ((langType >= L_EXTERNAL) && (langType < NppParameters::getInstance()->L_END))
@@ -2345,7 +2345,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 				bool isProcessed = false;
 
 				int fromLine = _pEditView->execute(SCI_LINEFROMPOSITION, notification->position);
-				pair<size_t, bool> undolevel = _pEditView->getLineUndoState(fromLine);
+				std::pair<size_t, bool> undolevel = _pEditView->getLineUndoState(fromLine);
 
 				if ((notification->modificationType & (SC_MOD_DELETETEXT | SC_MOD_INSERTTEXT)) &&
 					(notification->modificationType & SC_PERFORMED_USER))
@@ -2364,7 +2364,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 						{
 							++fromLine;
 							_pEditView->execute(SCI_MARKERADD, fromLine, MARK_LINEMODIFIEDUNSAVED);
-							pair<size_t, bool> modifInfo = _pEditView->getLineUndoState(fromLine);
+							std::pair<size_t, bool> modifInfo = _pEditView->getLineUndoState(fromLine);
 							_pEditView->execute(modifInfo.second?SCI_MARKERADD:SCI_MARKERDELETE, fromLine, MARK_LINEMODIFIEDSAVED);
 						}
 					}
@@ -2386,7 +2386,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 						{
 							++fromLine;
 							_pEditView->execute(SCI_MARKERADD, fromLine, MARK_LINEMODIFIEDUNSAVED);
-							pair<size_t, bool> modifInfo = _pEditView->getLineUndoState(fromLine);
+							std::pair<size_t, bool> modifInfo = _pEditView->getLineUndoState(fromLine);
 							_pEditView->execute(modifInfo.second?SCI_MARKERADD:SCI_MARKERDELETE, fromLine, MARK_LINEMODIFIEDSAVED);
 						}
 					}
@@ -2415,7 +2415,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 					{
 						for (int i = fromLine + 1 ; i < fromLine + notification->linesAdded ; i++)
 						{
-							pair<size_t, bool> level = _pEditView->getLineUndoState(i);
+							std::pair<size_t, bool> level = _pEditView->getLineUndoState(i);
 							if (level.first > 0)
 								_pEditView->execute(SCI_MARKERADD, i, MARK_LINEMODIFIEDUNSAVED);
 							_pEditView->execute(level.second?SCI_MARKERADD:SCI_MARKERDELETE, fromLine, MARK_LINEMODIFIEDSAVED);
@@ -2439,7 +2439,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 						{
 							++fromLine;
 							_pEditView->execute(SCI_MARKERADD, fromLine, MARK_LINEMODIFIEDUNSAVED);
-							pair<size_t, bool> modifInfo = _pEditView->getLineUndoState(fromLine);
+							std::pair<size_t, bool> modifInfo = _pEditView->getLineUndoState(fromLine);
 							_pEditView->execute(modifInfo.second?SCI_MARKERADD:SCI_MARKERDELETE, fromLine, MARK_LINEMODIFIEDSAVED);
 						}
 					}
@@ -2466,7 +2466,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 					{
 						for (int i = fromLine + 1 ; i < fromLine + notification->linesAdded ; i++)
 						{
-							pair<size_t, bool> level = _pEditView->getLineUndoState(i);
+							std::pair<size_t, bool> level = _pEditView->getLineUndoState(i);
 							if (level.first > 0)
 								_pEditView->execute(SCI_MARKERADD, i, MARK_LINEMODIFIEDUNSAVED);
 							_pEditView->execute(level.second?SCI_MARKERADD:SCI_MARKERDELETE, fromLine, MARK_LINEMODIFIEDSAVED);
@@ -2535,7 +2535,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 				{
 					TCHAR goToView[32] = TEXT("Move to other view");
 					TCHAR cloneToView[32] = TEXT("Clone to other View");
-					vector<MenuItemUnit> itemUnitArray;
+					std::vector<MenuItemUnit> itemUnitArray;
 					itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_GOTO_ANOTHER_VIEW, goToView));
 					itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_CLONE_TO_ANOTHER_VIEW, cloneToView));
 					_tabPopupDropMenu->create(_hSelf, itemUnitArray);
@@ -2721,7 +2721,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 
 		if (!_tabPopupMenu->isCreated())
 		{
-			vector<MenuItemUnit> itemUnitArray;
+			std::vector<MenuItemUnit> itemUnitArray;
 			itemUnitArray.push_back(MenuItemUnit(IDM_FILE_CLOSE, TEXT("Close me")));
 			itemUnitArray.push_back(MenuItemUnit(IDM_FILE_CLOSEALL_BUT_CURRENT, TEXT("Close all but me")));
 			itemUnitArray.push_back(MenuItemUnit(IDM_FILE_SAVE, TEXT("Save me")));
@@ -3138,7 +3138,7 @@ void Notepad_plus::addHotSpot(bool docIsModifing)
 	_pEditView->execute(SCI_SETTARGETSTART, startPos);
 	_pEditView->execute(SCI_SETTARGETEND, endPos);
 
-	vector<pair<int, int> > hotspotStylers;
+	std::vector<std::pair<int, int> > hotspotStylers;
 
 	int bitsNeeded = _pEditView->execute(SCI_GETSTYLEBITSNEEDED);
 	int styleMask = (1<<bitsNeeded)-1;
@@ -3185,7 +3185,7 @@ void Notepad_plus::addHotSpot(bool docIsModifing)
 			}
 			else
 			{
-				pair<int, int> MyPair(style_hotspot, idStyle);
+				std::pair<int, int> MyPair(style_hotspot, idStyle);
 				hotspotStylers.push_back(MyPair);
 
 				Style hotspotStyle;
@@ -4824,7 +4824,7 @@ void Notepad_plus::command(int id)
 			else if ((id >= ID_MACRO) && (id < ID_MACRO_LIMIT))
 			{
 				int i = id - ID_MACRO;
-				vector<MacroShortcut> & theMacros = pNppParam->getMacroList();
+				std::vector<MacroShortcut> & theMacros = pNppParam->getMacroList();
 				Macro macro = theMacros[i].getMacro();
 				_pEditView->execute(SCI_BEGINUNDOACTION);
 
@@ -4837,7 +4837,7 @@ void Notepad_plus::command(int id)
 			else if ((id >= ID_USER_CMD) && (id < ID_USER_CMD_LIMIT))
 			{
 				int i = id - ID_USER_CMD;
-				vector<UserCommand> & theUserCommands = pNppParam->getUserCommandList();
+				std::vector<UserCommand> & theUserCommands = pNppParam->getUserCommandList();
 				UserCommand ucmd = theUserCommands[i];
 
 				Command cmd(ucmd.getCmd());
@@ -5362,7 +5362,7 @@ bool Notepad_plus::reloadLang()
 		::ModifyMenu(_mainMenuHandle, IDM_WINDOW_WINDOWS, MF_BYCOMMAND, IDM_WINDOW_WINDOWS, windowTrans.c_str());
 	}
 	// Update scintilla context menu strings
-	vector<MenuItemUnit> & tmp = pNppParam->getContextMenuItems();
+	std::vector<MenuItemUnit> & tmp = pNppParam->getContextMenuItems();
 	size_t len = tmp.size();
 	TCHAR menuName[64];
 	for (size_t i = 0 ; i < len ; i++)
@@ -5374,7 +5374,7 @@ bool Notepad_plus::reloadLang()
 		}
 	}
 
-	vector<CommandShortcut> & shortcuts = pNppParam->getUserShortcuts();
+	std::vector<CommandShortcut> & shortcuts = pNppParam->getUserShortcuts();
 	len = shortcuts.size();
 
 	for(size_t i = 0; i < len; i++)
@@ -6623,7 +6623,7 @@ void Notepad_plus::changeFindReplaceDlgLang()
 #ifdef UNICODE
 					WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
 
-					basic_string<wchar_t> nameW = wmc->char2wchar(titre1, _nativeLangEncoding);
+					std::basic_string<wchar_t> nameW = wmc->char2wchar(titre1, _nativeLangEncoding);
 					pNppParam->getFindDlgTabTitiles()._find = nameW;
 
 					nameW = wmc->char2wchar(titre2, _nativeLangEncoding);
@@ -6761,8 +6761,8 @@ void Notepad_plus::changeShortcutLang()
 	if (!_nativeLangA) return;
 
 	NppParameters * pNppParam = NppParameters::getInstance();
-	vector<CommandShortcut> & mainshortcuts = pNppParam->getUserShortcuts();
-	vector<ScintillaKeyMap> & scinshortcuts = pNppParam->getScintillaKeyList();
+	std::vector<CommandShortcut> & mainshortcuts = pNppParam->getUserShortcuts();
+	std::vector<ScintillaKeyMap> & scinshortcuts = pNppParam->getScintillaKeyList();
 	int mainSize = (int)mainshortcuts.size();
 	int scinSize = (int)scinshortcuts.size();
 
@@ -7202,7 +7202,7 @@ HACCEL Notepad_plus::getAccTable() const
 
 bool Notepad_plus::addCurrentMacro()
 {
-	vector<MacroShortcut> & theMacros = (NppParameters::getInstance())->getMacroList();
+	std::vector<MacroShortcut> & theMacros = (NppParameters::getInstance())->getMacroList();
 
 	int nbMacro = theMacros.size();
 
@@ -7744,7 +7744,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			_windowsMenu->init(_hInst, _mainMenuHandle, windowTrans.c_str());
 
 			// Update context menu strings
-			vector<MenuItemUnit> & tmp = pNppParam->getContextMenuItems();
+			std::vector<MenuItemUnit> & tmp = pNppParam->getContextMenuItems();
 			size_t len = tmp.size();
 			TCHAR menuName[64];
 			for (size_t i = 0 ; i < len ; i++)
@@ -7758,7 +7758,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 			//Input all the menu item names into shortcut list
 			//This will automatically do all translations, since menu translation has been done already
-			vector<CommandShortcut> & shortcuts = pNppParam->getUserShortcuts();
+			std::vector<CommandShortcut> & shortcuts = pNppParam->getUserShortcuts();
 			len = shortcuts.size();
 
 			for(size_t i = 0; i < len; i++)
@@ -7781,7 +7781,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			pNppParam->setAccelerator(&_accelerator);
 
 			// Scintilla key accelerator
-			vector<HWND> scints;
+			std::vector<HWND> scints;
 			scints.push_back(_mainEditView->getHSelf());
 			scints.push_back(_subEditView->getHSelf());
 			_scintaccelerator.init(&scints, _mainMenuHandle, _hSelf);
@@ -8736,7 +8736,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 				if (indexMacro != -1)
 				{
-					vector<MacroShortcut> & ms = pNppParam->getMacroList();
+					std::vector<MacroShortcut> & ms = pNppParam->getMacroList();
 					m = ms[indexMacro].getMacro();
 				}
 
@@ -8943,7 +8943,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 				for (size_t i = 0 ; i < _hModelessDlgs.size() ; i++)
 					if (_hModelessDlgs[i] == (HWND)lParam)
 					{
-						vector<HWND>::iterator hDlg = _hModelessDlgs.begin() + i;
+						std::vector<HWND>::iterator hDlg = _hModelessDlgs.begin() + i;
 						_hModelessDlgs.erase(hDlg);
 						return NULL;
 					}
@@ -8970,8 +8970,8 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 					POINT p;
 					::GetCursorPos(&p);
 					ContextMenu scintillaContextmenu;
-					vector<MenuItemUnit> & tmp = pNppParam->getContextMenuItems();
-					vector<bool> isEnable;
+					std::vector<MenuItemUnit> & tmp = pNppParam->getContextMenuItems();
+					std::vector<bool> isEnable;
 					for (size_t i = 0 ; i < tmp.size() ; i++)
 					{
 						isEnable.push_back((::GetMenuState(_mainMenuHandle, tmp[i]._cmdID, MF_BYCOMMAND)&MF_DISABLED) == 0);
@@ -9273,10 +9273,10 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 			TCHAR *moduleName = (TCHAR *)lParam;
 			TCHAR *windowName = (TCHAR *)wParam;
-			vector<DockingCont *> dockContainer = _dockingManager->getContainerInfo();
+			std::vector<DockingCont *> dockContainer = _dockingManager->getContainerInfo();
 			for (size_t i = 0 ; i < dockContainer.size() ; i++)
 			{
-				vector<tTbData *> tbData = dockContainer[i]->getDataOfAllTb();
+				std::vector<tTbData *> tbData = dockContainer[i]->getDataOfAllTb();
 				for (size_t j = 0 ; j < tbData.size() ; j++)
 				{
 					if (generic_stricmp(moduleName, tbData[j]->pszModuleName) == 0)
@@ -10459,7 +10459,7 @@ void Notepad_plus::setFindReplaceFolderFilter(const TCHAR *dir, const TCHAR *fil
 		if (ext && ext[0])
 		{
 			fltr = TEXT("");
-			vector<std::generic_string> vStr;
+			std::vector<std::generic_string> vStr;
 			cutString(ext, vStr);
 			for (size_t i = 0; i < vStr.size(); i++)
 			{
@@ -10734,7 +10734,7 @@ void Notepad_plus::replaceMarkedline(int ln, const TCHAR *str)
 	_pEditView->replaceTarget(str, lineBegin, lineEnd);
 }
 
-generic_string Notepad_plus::getMarkedLine(int ln)
+std::generic_string Notepad_plus::getMarkedLine(int ln)
 {
 	int lineLen = _pEditView->execute(SCI_LINELENGTH, ln);
 	int lineBegin = _pEditView->execute(SCI_POSITIONFROMLINE, ln);
@@ -10883,7 +10883,7 @@ bool Notepad_plus::ScintillaCtrls::destroyScintilla(HWND handle2Destroy)
 			_scintVector[i]->destroy();
 			delete _scintVector[i];
 
-			vector<ScintillaEditView *>::iterator it2delete = _scintVector.begin()+ i;
+			std::vector<ScintillaEditView *>::iterator it2delete = _scintVector.begin()+ i;
 			_scintVector.erase(it2delete);
 			return true;
 		}
