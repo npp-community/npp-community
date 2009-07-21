@@ -16,6 +16,10 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
+#include "tinyxmlA.h"
+#include "tinyxml.h"
+
+
 #include "Parameters.h"
 #include "FileDialog.h"
 #include "ScintillaEditView.h"
@@ -345,10 +349,6 @@ static int strVal(const TCHAR *str, int base) {
 
 static int decStrVal(const TCHAR *str) {
 	return strVal(str, 10);
-};
-
-static int hexStrVal(const TCHAR *str) {
-	return strVal(str, 16);
 };
 
 static int getKwClassFromName(const TCHAR *str) {
@@ -2339,74 +2339,6 @@ void LexerStylerArray::eraseAll()
 	}
 
 	_nbLexerStyler = 0;
-}
-
-void StyleArray::addStyler(int styleID, TiXmlNode *styleNode)
-{
-	_styleArray[_nbStyler]._styleID = styleID;
-
-	if (styleNode)
-	{
-		TiXmlElement *element = styleNode->ToElement();
-
-		// For _fgColor, _bgColor :
-		// RGB() | (result & 0xFF000000) It's the case for -1 (0xFFFFFFFF)
-		// returned by hexStrVal(str)
-		const TCHAR *str = element->Attribute(TEXT("name"));
-		if (str)
-		{
-			_styleArray[_nbStyler]._styleDesc = str;
-		}
-
-		str = element->Attribute(TEXT("fgColor"));
-		if (str)
-		{
-			unsigned long result = hexStrVal(str);
-			_styleArray[_nbStyler]._fgColor = (RGB((result >> 16) & 0xFF, (result >> 8) & 0xFF, result & 0xFF)) | (result & 0xFF000000);
-
-		}
-
-		str = element->Attribute(TEXT("bgColor"));
-		if (str)
-		{
-			unsigned long result = hexStrVal(str);
-			_styleArray[_nbStyler]._bgColor = (RGB((result >> 16) & 0xFF, (result >> 8) & 0xFF, result & 0xFF)) | (result & 0xFF000000);
-		}
-
-		str = element->Attribute(TEXT("colorStyle"));
-		if (str)
-		{
-			_styleArray[_nbStyler]._colorStyle = decStrVal(str);
-		}
-
-		str = element->Attribute(TEXT("fontName"));
-		_styleArray[_nbStyler]._fontName = str;
-
-		str = element->Attribute(TEXT("fontStyle"));
-		if (str)
-		{
-			_styleArray[_nbStyler]._fontStyle = decStrVal(str);
-		}
-
-		str = element->Attribute(TEXT("fontSize"));
-		if (str)
-		{
-			_styleArray[_nbStyler]._fontSize = decStrVal(str);
-		}
-
-		str = element->Attribute(TEXT("keywordClass"));
-		if (str)
-		{
-			_styleArray[_nbStyler]._keywordClass = getKwClassFromName(str);
-		}
-
-		TiXmlNode *v = styleNode->FirstChild();
-		if (v)
-		{
-			_styleArray[_nbStyler]._keywords = new std::generic_string(v->Value());
-		}
-	}
-	_nbStyler++;
 }
 
 bool NppParameters::writeHistory(const TCHAR *fullpath)
@@ -4836,4 +4768,52 @@ void NppParameters::addScintillaModifiedIndex(int index)
 	{
 		_scintillaModifiedKeyIndices.push_back(index);
 	}
+}
+
+bool NppParameters::writeNbHistoryFile( int nb )
+{
+	if (!_pXmlUserDoc) return false;
+
+	TiXmlNode *nppRoot = _pXmlUserDoc->FirstChild(TEXT("NotepadPlus"));
+	if (!nppRoot) return false;
+
+	TiXmlNode *historyNode = nppRoot->FirstChildElement(TEXT("History"));
+	if (!historyNode) return false;
+
+	(historyNode->ToElement())->SetAttribute(TEXT("nbMaxFile"), nb);
+	return true;
+}
+
+const char * NppParameters::getNativeLangMenuStringA( int itemID )
+{
+	if (!_pXmlNativeLangDocA)
+		return NULL;
+
+	TiXmlNodeA * node =  _pXmlNativeLangDocA->FirstChild("NotepadPlus");
+	if (!node) return NULL;
+
+	node = node->FirstChild("Native-Langue");
+	if (!node) return NULL;
+
+	node = node->FirstChild("Menu");
+	if (!node) return NULL;
+
+	node = node->FirstChild("Main");
+	if (!node) return NULL;
+
+	node = node->FirstChild("Commands");
+	if (!node) return NULL;
+
+	for (TiXmlNodeA *childNode = node->FirstChildElement("Item");
+		childNode ;
+		childNode = childNode->NextSibling("Item") )
+	{
+		TiXmlElementA *element = childNode->ToElement();
+		int id;
+		if (element->Attribute("id", &id) && (id == itemID))
+		{
+			return element->Attribute("name");
+		}
+	}
+	return NULL;
 }

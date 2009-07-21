@@ -20,9 +20,14 @@
 
 #include "BufferID.h"
 #include "Parameters_def.h"
+#include "ScintillaRef.h"
+#include "Window.h"
+#include "Notepad_plus_msgs.h"
 
 // To be removed later.  Need to be included since Parameters.h was removed from ScintillaEditView.h
-#include "Parameters.h"  // For StyleArray, etc.
+#include "shortcut.h"
+
+#include "npp_styles.h"  // For StyleArray, etc.
 
 #define MENU 0x01
 #define TOOLBAR 0x02

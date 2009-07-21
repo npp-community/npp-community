@@ -18,9 +18,6 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
-#include "tinyxmlA.h"
-#include "tinyxml.h"
-
 #include "ScintillaRef.h"
 #include "ToolBar.h"
 #include "UserDefineLangReference.h"
@@ -30,6 +27,11 @@
 #include "Notepad_plus_msgs.h"
 
 #include "Parameters_def.h"
+
+// Forward declarations
+class TiXmlDocument;
+class TiXmlDocumentA;
+class TiXmlElement;
 
 void cutString(const TCHAR *str2cut, std::vector<std::generic_string> & patternVect);
 /*
@@ -163,241 +165,7 @@ struct DockingManagerData {
 	}
 };
 
-const int FONTSTYLE_BOLD = 1;
-const int FONTSTYLE_ITALIC = 2;
-const int FONTSTYLE_UNDERLINE = 4;
-
-const int COLORSTYLE_FOREGROUND = 0x01;
-const int COLORSTYLE_BACKGROUND = 0x02;
-const int COLORSTYLE_ALL = COLORSTYLE_FOREGROUND|COLORSTYLE_BACKGROUND;
-
-struct Style
-{
-	int _styleID;
-    const TCHAR *_styleDesc;
-
-	COLORREF _fgColor;
-	COLORREF _bgColor;
-	int _colorStyle;
-	const TCHAR *_fontName;
-	int _fontStyle;
-	int _fontSize;
-
-	int _keywordClass;
-	std::generic_string *_keywords;
-
-	Style():_styleID(-1), _fgColor(COLORREF(-1)), _bgColor(COLORREF(-1)), _colorStyle(COLORSTYLE_ALL), _fontName(NULL), _fontStyle(-1), _fontSize(-1), _keywordClass(-1), _keywords(NULL){};
-
-	~Style(){
-		if (_keywords)
-			delete _keywords;
-	};
-
-	Style(const Style & style)
-	{
-		_styleID = style._styleID;
-		_styleDesc = style._styleDesc;
-		_fgColor = style._fgColor;
-		_bgColor = style._bgColor;
-		_colorStyle = style._colorStyle;
-		_fontName = style._fontName;
-		_fontSize = style._fontSize;
-		_fontStyle = style._fontStyle;
-		_keywordClass = style._keywordClass;
-		if (style._keywords)
-			_keywords = new std::generic_string(*(style._keywords));
-		else
-			_keywords = NULL;
-	};
-
-	Style & operator=(const Style & style) {
-		if (this != &style)
-		{
-			this->_styleID = style._styleID;
-			this->_styleDesc = style._styleDesc;
-			this->_fgColor = style._fgColor;
-			this->_bgColor = style._bgColor;
-			this->_colorStyle = style._colorStyle;
-			this->_fontName = style._fontName;
-			this->_fontSize = style._fontSize;
-			this->_fontStyle = style._fontStyle;
-			this->_keywordClass = style._keywordClass;
-
-			if (!(this->_keywords) && style._keywords)
-				this->_keywords = new std::generic_string(*(style._keywords));
-			else if (this->_keywords && style._keywords)
-				this->_keywords->assign(*(style._keywords));
-			else if (this->_keywords && !(style._keywords))
-			{
-				delete (this->_keywords);
-				this->_keywords = NULL;
-			}
-		}
-		return *this;
-	};
-
-	void setKeywords(const TCHAR *str) {
-		if (!_keywords)
-			_keywords = new std::generic_string(str);
-		else
-			*_keywords = str;
-	};
-};
-
-struct GlobalOverride
-{
-	bool isEnable() const {return (enableFg || enableBg || enableFont || enableFontSize || enableBold || enableItalic || enableUnderLine);};
-	bool enableFg;
-	bool enableBg;
-	bool enableFont;
-	bool enableFontSize;
-	bool enableBold;
-	bool enableItalic;
-	bool enableUnderLine;
-	GlobalOverride():enableFg(false), enableBg(false), enableFont(false), enableFontSize(false), enableBold(false), enableItalic(false), enableUnderLine(false) {};
-};
-
-const int MAX_STYLE = 30;
-
-struct StyleArray
-{
-public:
-    StyleArray() : _nbStyler(0){};
-
-    StyleArray & operator=(const StyleArray & sa)
-    {
-        if (this != &sa)
-        {
-            this->_nbStyler = sa._nbStyler;
-            for (int i = 0 ; i < _nbStyler ; i++)
-            {
-                this->_styleArray[i] = sa._styleArray[i];
-            }
-        }
-        return *this;
-    }
-
-    int getNbStyler() const {return _nbStyler;};
-	void setNbStyler(int nb) {_nbStyler = nb;};
-
-    Style & getStyler(int index) {return _styleArray[index];};
-
-    bool hasEnoughSpace() {return (_nbStyler < MAX_STYLE);};
-    void addStyler(int styleID, TiXmlNode *styleNode);
-
-	void addStyler(int styleID, TCHAR *styleName) {
-		//ZeroMemory(&_styleArray[_nbStyler], sizeof(Style));;
-		_styleArray[_nbStyler]._styleID = styleID;
-		_styleArray[_nbStyler]._styleDesc = styleName;
-		_styleArray[_nbStyler]._fgColor = black;
-		_styleArray[_nbStyler]._bgColor = white;
-		_nbStyler++;
-	};
-
-    int getStylerIndexByID(int id) {
-        for (int i = 0 ; i < _nbStyler ; i++)
-            if (_styleArray[i]._styleID == id)
-                return i;
-        return -1;
-    };
-
-    int getStylerIndexByName(const TCHAR *name) const {
-		if (!name)
-			return -1;
-        for (int i = 0 ; i < _nbStyler ; i++)
-			if (!lstrcmp(_styleArray[i]._styleDesc, name))
-                return i;
-        return -1;
-    };
-
-protected:
-	Style _styleArray[MAX_STYLE];
-	int _nbStyler;
-};
-
-struct LexerStyler : public StyleArray
-{
-public :
-    LexerStyler():StyleArray(){};
-
-    LexerStyler & operator=(const LexerStyler & ls)
-    {
-        if (this != &ls)
-        {
-            *((StyleArray *)this) = ls;
-            lstrcpy(this->_lexerName, ls._lexerName);
-			lstrcpy(this->_lexerDesc, ls._lexerDesc);
-			lstrcpy(this->_lexerUserExt, ls._lexerUserExt);
-        }
-        return *this;
-    }
-
-    void setLexerName(const TCHAR *lexerName) {
-        lstrcpy(_lexerName, lexerName);
-    };
-
-	void setLexerDesc(const TCHAR *lexerDesc) {
-        lstrcpy(_lexerDesc, lexerDesc);
-    };
-
-	void setLexerUserExt(const TCHAR *lexerUserExt) {
-        lstrcpy(_lexerUserExt, lexerUserExt);
-    };
-
-    const TCHAR * getLexerName() const {return _lexerName;};
-	const TCHAR * getLexerDesc() const {return _lexerDesc;};
-    const TCHAR * getLexerUserExt() const {return _lexerUserExt;};
-
-private :
-	TCHAR _lexerName[16];
-	TCHAR _lexerDesc[32];
-	TCHAR _lexerUserExt[256];
-};
-
-const int MAX_LEXER_STYLE = 80;
-
-struct LexerStylerArray
-{
-public :
-	LexerStylerArray() : _nbLexerStyler(0){};
-
-    LexerStylerArray & operator=(const LexerStylerArray & lsa)
-    {
-        if (this != &lsa)
-        {
-            this->_nbLexerStyler = lsa._nbLexerStyler;
-            for (int i = 0 ; i < this->_nbLexerStyler ; i++)
-                this->_lexerStylerArray[i] = lsa._lexerStylerArray[i];
-        }
-        return *this;
-    }
-
-    int getNbLexer() const {return _nbLexerStyler;};
-
-    LexerStyler & getLexerFromIndex(int index)
-    {
-        return _lexerStylerArray[index];
-    };
-
-    const TCHAR * getLexerNameFromIndex(int index) const {return _lexerStylerArray[index].getLexerName();}
-	const TCHAR * getLexerDescFromIndex(int index) const {return _lexerStylerArray[index].getLexerDesc();}
-
-    LexerStyler * getLexerStylerByName(const TCHAR *lexerName) {
-		if (!lexerName) return NULL;
-        for (int i = 0 ; i < _nbLexerStyler ; i++)
-        {
-            if (!lstrcmp(_lexerStylerArray[i].getLexerName(), lexerName))
-                return &(_lexerStylerArray[i]);
-        }
-        return NULL;
-    };
-    bool hasEnoughSpace() {return (_nbLexerStyler < MAX_LEXER_STYLE);};
-    void addLexerStyler(const TCHAR *lexerName, const TCHAR *lexerDesc, const TCHAR *lexerUserExt, TiXmlNode *lexerNode);
-	void eraseAll();
-private :
-	LexerStyler _lexerStylerArray[MAX_LEXER_STYLE];
-	int _nbLexerStyler;
-};
+#include "npp_styles.h"
 
 struct NewDocDefaultSettings
 {
@@ -927,18 +695,7 @@ public:
         return _svp[whichOne];
     };
 
-	bool writeNbHistoryFile(int nb) {
-		if (!_pXmlUserDoc) return false;
-
-		TiXmlNode *nppRoot = _pXmlUserDoc->FirstChild(TEXT("NotepadPlus"));
-		if (!nppRoot) return false;
-
-		TiXmlNode *historyNode = nppRoot->FirstChildElement(TEXT("History"));
-		if (!historyNode) return false;
-
-		(historyNode->ToElement())->SetAttribute(TEXT("nbMaxFile"), nb);
-		return true;
-	};
+	bool writeNbHistoryFile(int nb);
 
 	bool writeHistory(const TCHAR *fullpath);
 
@@ -1123,38 +880,7 @@ public:
 
 	FindDlgTabTitiles & getFindDlgTabTitiles() { return _findDlgTabTitiles;};
 
-	const char * getNativeLangMenuStringA(int itemID) {
-		if (!_pXmlNativeLangDocA)
-			return NULL;
-
-		TiXmlNodeA * node =  _pXmlNativeLangDocA->FirstChild("NotepadPlus");
-		if (!node) return NULL;
-
-		node = node->FirstChild("Native-Langue");
-		if (!node) return NULL;
-
-		node = node->FirstChild("Menu");
-		if (!node) return NULL;
-
-		node = node->FirstChild("Main");
-		if (!node) return NULL;
-
-		node = node->FirstChild("Commands");
-		if (!node) return NULL;
-
-		for (TiXmlNodeA *childNode = node->FirstChildElement("Item");
-			childNode ;
-			childNode = childNode->NextSibling("Item") )
-		{
-			TiXmlElementA *element = childNode->ToElement();
-			int id;
-			if (element->Attribute("id", &id) && (id == itemID))
-			{
-				return element->Attribute("name");
-			}
-		}
-		return NULL;
-	};
+	const char * getNativeLangMenuStringA(int itemID);;
 
 	bool asNotepadStyle() const {return _asNotepadStyle;};
 

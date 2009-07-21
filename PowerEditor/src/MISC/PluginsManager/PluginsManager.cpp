@@ -16,6 +16,9 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
+
+#include "tinyxml.h"
+
 #include "PluginsManager.h"
 #include "Parameters.h"
 #include "resource.h"

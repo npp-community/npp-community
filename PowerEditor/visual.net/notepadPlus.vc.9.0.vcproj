@@ -402,6 +402,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\npp_styles.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Parameters.cpp"
 				>
 			</File>
@@ -752,6 +756,10 @@
 			</File>
 			<File
 				RelativePath="..\src\Notepad_plus.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\npp_styles.h"
 				>
 			</File>
 			<File

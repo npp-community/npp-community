@@ -1,4 +1,7 @@
 #include "precompiled_headers.h"
+
+#include "tinyxmlA.h"
+
 #include "WindowsDlg.h"
 #include "WindowsDlgRc.h"
 #include "DocTabView.h"

@@ -68,6 +68,10 @@
 #include "Buffer.h"
 
 #include "TinyXmlA.h"
+#include "TinyXml.h"
+#include "Parameters.h"
+
+
 
 const TCHAR Notepad_plus::_className[32] = TEXT("Notepad++");
 HWND Notepad_plus::gNppHWND = NULL;

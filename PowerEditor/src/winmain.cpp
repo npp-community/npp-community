@@ -26,6 +26,8 @@
 #include "resource.h"
 #include "Buffer.h"
 
+#include "Parameters.h"
+
 typedef std::vector<const TCHAR*> ParamVector;
 
 bool checkSingleFile(const TCHAR * commandLine) {

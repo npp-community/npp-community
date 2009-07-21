@@ -3,6 +3,7 @@
 
 #include "Notepad_plus.h"
 #include "ScintillaEditView.h"
+#include "Parameters.h"
 
 FileManager * FileManager::_pSelf = new FileManager();
 

@@ -16,6 +16,9 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
+
+#include "tinyxml.h"
+
 #include "preferenceDlg.h"
 
 #include "preference_rc.h"
@@ -26,6 +29,7 @@
 #include "ControlsTab.h"
 #include "menuCmdID.h"
 #include "resource.h"
+#include "Parameters.h"
 
 const int BLINKRATE_FASTEST = 50;
 const int BLINKRATE_SLOWEST = 2500;

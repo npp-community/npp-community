@@ -21,7 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define WORD_STYLE_H
 
 #include "StaticDialog.h"
-#include "Parameters.h"
+#include "npp_styles.h"
 #include "resource.h"
 
 #define WM_UPDATESCINTILLAS			(WORDSTYLE_USER + 1) //GlobalStyleDlg's msg 2 send 2 its parent
