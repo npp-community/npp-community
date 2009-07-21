@@ -423,7 +423,7 @@ generic_string ThemeSwitcher::getThemeFromXmlFileName(const TCHAR *xmlFullPath) 
 	TCHAR fn[MAX_PATH];
 	lstrcpy(fn, ::PathFindFileName(xmlFullPath));
 	PathRemoveExtension(fn);
-	generic_string themeName = fn;
+	std::generic_string themeName = fn;
 	return themeName;
 }
 
@@ -576,7 +576,7 @@ NppParameters::~NppParameters()
 
 	::RemoveFontResource(LINEDRAW_FONT);
 }
-void cutString(const TCHAR *str2cut, vector<generic_string> & patternVect)
+void cutString(const TCHAR *str2cut, std::vector<std::generic_string> & patternVect)
 {
 	TCHAR str2scan[MAX_PATH];
 	lstrcpy(str2scan, str2cut);
@@ -1241,7 +1241,7 @@ bool NppParameters::getContextMenuFromXmlTree(HMENU mainMenuHadle)
 						::GetMenuString(mainMenuHadle, i, menuEntryString, 64, MF_BYPOSITION);
 						if (generic_stricmp(menuEntryName, purgeMenuItemString(menuEntryString).c_str()) == 0)
 						{
-							vector< pair<HMENU, int> > parentMenuPos;
+							std::vector< pair<HMENU, int> > parentMenuPos;
 							HMENU topMenu = ::GetSubMenu(mainMenuHadle, i);
 							int maxTopMenuPos = ::GetMenuItemCount(topMenu);
 							HMENU currMenu = topMenu;
@@ -1501,7 +1501,7 @@ void NppParameters::feedFileListParameters(TiXmlNode *node)
 		const TCHAR *filePath = (childNode->ToElement())->Attribute(TEXT("filename"));
 		if (filePath)
 		{
-			_LRFileList[_nbFile] = new generic_string(filePath);
+			_LRFileList[_nbFile] = new std::generic_string(filePath);
 			_nbFile++;
 		}
 	}
@@ -1522,7 +1522,7 @@ void NppParameters::feedFindHistoryParameters(TiXmlNode *node)
 			const TCHAR *filePath = (childNode->ToElement())->Attribute(TEXT("name"));
 			if (filePath)
 			{
-				_findHistory._pFindHistoryPath[_findHistory._nbFindHistoryPath++] = new generic_string(filePath);
+				_findHistory._pFindHistoryPath[_findHistory._nbFindHistoryPath++] = new std::generic_string(filePath);
 			}
 		}
 	}
@@ -1537,7 +1537,7 @@ void NppParameters::feedFindHistoryParameters(TiXmlNode *node)
 			const TCHAR *fileFilter = (childNode->ToElement())->Attribute(TEXT("name"));
 			if (fileFilter)
 			{
-				_findHistory._pFindHistoryFilter[_findHistory._nbFindHistoryFilter++] = new generic_string(fileFilter);
+				_findHistory._pFindHistoryFilter[_findHistory._nbFindHistoryFilter++] = new std::generic_string(fileFilter);
 			}
 		}
 	}
@@ -1552,7 +1552,7 @@ void NppParameters::feedFindHistoryParameters(TiXmlNode *node)
 			const TCHAR *fileFind = (childNode->ToElement())->Attribute(TEXT("name"));
 			if (fileFind)
 			{
-				_findHistory._pFindHistoryFind[_findHistory._nbFindHistoryFind++] = new generic_string(fileFind);
+				_findHistory._pFindHistoryFind[_findHistory._nbFindHistoryFind++] = new std::generic_string(fileFind);
 			}
 		}
 	}
@@ -1567,7 +1567,7 @@ void NppParameters::feedFindHistoryParameters(TiXmlNode *node)
 			const TCHAR *fileReplace = (childNode->ToElement())->Attribute(TEXT("name"));
 			if (fileReplace)
 			{
-				_findHistory._pFindHistoryReplace[_findHistory._nbFindHistoryReplace++] = new generic_string(fileReplace);
+				_findHistory._pFindHistoryReplace[_findHistory._nbFindHistoryReplace++] = new std::generic_string(fileReplace);
 			}
 		}
 	}
@@ -2403,7 +2403,7 @@ void StyleArray::addStyler(int styleID, TiXmlNode *styleNode)
 		TiXmlNode *v = styleNode->FirstChild();
 		if (v)
 		{
-			_styleArray[_nbStyler]._keywords = new generic_string(v->Value());
+			_styleArray[_nbStyler]._keywords = new std::generic_string(v->Value());
 		}
 	}
 	_nbStyler++;

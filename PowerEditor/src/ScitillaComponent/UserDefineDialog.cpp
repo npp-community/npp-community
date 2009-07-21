@@ -1466,7 +1466,7 @@ BOOL CALLBACK UserDefineDialog::run_dlgProc(UINT message, WPARAM wParam, LPARAM 
 
 						if (tmpName)
 						{
-							generic_string newNameString(tmpName);
+							std::generic_string newNameString(tmpName);
 							const TCHAR *newName = newNameString.c_str();
 
 							if (pNppParam->isExistingUserLangName(newName))

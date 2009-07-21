@@ -264,7 +264,7 @@ BOOL CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPar
 			ThemeSwitcher & themeSwitcher = nppParamInst->getThemeSwitcher();
 			for(size_t i = 0 ; i < themeSwitcher.size() ; i++)
 			{
-				pair<generic_string, generic_string> & themeInfo = themeSwitcher.getElementFromIndex(i);
+				std::pair<std::generic_string, std::generic_string> & themeInfo = themeSwitcher.getElementFromIndex(i);
 				int j = ::SendMessage(_hSwitch2ThemeCombo, CB_ADDSTRING, 0, (LPARAM)themeInfo.first.c_str());
 				::SendMessage(_hSwitch2ThemeCombo, CB_SETITEMDATA, j, (LPARAM)themeInfo.second.c_str());
 				if (! themeInfo.second.compare( nppParamInst->getNppGUI()._themeName ) )
@@ -396,7 +396,7 @@ BOOL CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPar
 							NppParameters *nppParamInst = NppParameters::getInstance();
 							if (_restoreInvalid)
 							{
-								generic_string str( nppParamInst->getNppGUI()._themeName );
+								std::generic_string str( nppParamInst->getNppGUI()._themeName );
 								nppParamInst->reloadStylers( &str[0] );
 							}
 
@@ -644,7 +644,7 @@ void WordStyleDlg::loadLangListFromNppParam()
 	setStyleListFromLexer(index2Begin);
 }
 
-void WordStyleDlg::updateThemeName(generic_string themeName)
+void WordStyleDlg::updateThemeName(std::generic_string themeName)
 {
 	NppParameters *pNppParam = NppParameters::getInstance();
 	NppGUI & nppGUI = (NppGUI & )pNppParam->getNppGUI();
@@ -759,7 +759,7 @@ void WordStyleDlg::switchToTheme()
 {
 	int iSel = ::SendMessage(_hSwitch2ThemeCombo, CB_GETCURSEL, 0, 0);
 
-	generic_string prevThemeName(_themeName);
+	std::generic_string prevThemeName(_themeName);
 	_themeName.clear();
 	_themeName.assign( (TCHAR *)::SendMessage(_hSwitch2ThemeCombo, CB_GETITEMDATA, iSel, 0) );
 
@@ -939,7 +939,7 @@ void WordStyleDlg::setVisualFromStyleList()
 		LangType lType = pNppParams->getLangIDFromStr(lexerStyler.getLexerName());
 		if (lType == L_TXT)
 		{
-			generic_string str = lexerStyler.getLexerName();
+			std::generic_string str = lexerStyler.getLexerName();
 			str += TEXT(" is not defined in NppParameters::getLangIDFromStr()");
 				printStr(str.c_str());
 		}

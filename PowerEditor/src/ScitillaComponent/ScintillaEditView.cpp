@@ -277,7 +277,7 @@ LRESULT ScintillaEditView::scintillaNew_Proc(HWND hwnd, UINT Message, WPARAM wPa
 					execute(SCI_BEGINUNDOACTION);
 
 					ColumnModeInfo colInfos = getColumnModeSelectInfo();
-					generic_string str(1, (TCHAR)wParam);
+					std::generic_string str(1, (TCHAR)wParam);
 					columnReplace(colInfos, str.c_str());
 
 					int selStart = execute(SCI_GETSELECTIONSTART)+1;
@@ -547,11 +547,11 @@ void ScintillaEditView::setEmbeddedJSLexer()
 	const TCHAR *pKwArray[10] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 	makeStyle(L_JS, pKwArray);
 
-	basic_string<char> keywordList("");
+	std::basic_string<char> keywordList("");
 	if (pKwArray[LANG_INDEX_INSTR])
 	{
 #ifdef UNICODE
-		basic_string<wchar_t> kwlW = pKwArray[LANG_INDEX_INSTR];
+		std::basic_string<wchar_t> kwlW = pKwArray[LANG_INDEX_INSTR];
 		keywordList = wstring2string(kwlW, CP_ACP);
 #else
 		keywordList = pKwArray[LANG_INDEX_INSTR];
@@ -569,11 +569,11 @@ void ScintillaEditView::setPhpEmbeddedLexer()
 	const TCHAR *pKwArray[10] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 	makeStyle(L_PHP, pKwArray);
 
-	basic_string<char> keywordList("");
+	std::basic_string<char> keywordList("");
 	if (pKwArray[LANG_INDEX_INSTR])
 	{
 #ifdef UNICODE
-		basic_string<wchar_t> kwlW = pKwArray[LANG_INDEX_INSTR];
+		std::basic_string<wchar_t> kwlW = pKwArray[LANG_INDEX_INSTR];
 		keywordList = wstring2string(kwlW, CP_ACP);
 #else
 		keywordList = pKwArray[LANG_INDEX_INSTR];
@@ -591,11 +591,11 @@ void ScintillaEditView::setEmbeddedAspLexer()
 	const TCHAR *pKwArray[10] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 	makeStyle(L_ASP, pKwArray);
 
-	basic_string<char> keywordList("");
+	std::basic_string<char> keywordList("");
 	if (pKwArray[LANG_INDEX_INSTR])
 	{
 #ifdef UNICODE
-		basic_string<wchar_t> kwlW = pKwArray[LANG_INDEX_INSTR];
+		std::basic_string<wchar_t> kwlW = pKwArray[LANG_INDEX_INSTR];
 		keywordList = wstring2string(kwlW, CP_ACP);
 #else
 		keywordList = pKwArray[LANG_INDEX_INSTR];
@@ -666,7 +666,7 @@ void ScintillaEditView::setExternalLexer(LangType typeDoc)
 
 			if (style._keywordClass >= 0 && style._keywordClass <= KEYWORDSET_MAX)
 			{
-				basic_string<char> keywordList("");
+				std::basic_string<char> keywordList("");
 				if (style._keywords)
 				{
 #ifdef UNICODE
@@ -747,12 +747,12 @@ void ScintillaEditView::setCppLexer(LangType langType)
 	const TCHAR *pKwArray[10] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 	makeStyle(langType, pKwArray);
 
-	basic_string<char> keywordListInstruction("");
-	basic_string<char> keywordListType("");
+	std::basic_string<char> keywordListInstruction("");
+	std::basic_string<char> keywordListType("");
 	if (pKwArray[LANG_INDEX_INSTR])
 	{
 #ifdef UNICODE
-		basic_string<wchar_t> kwlW = pKwArray[LANG_INDEX_INSTR];
+		std::basic_string<wchar_t> kwlW = pKwArray[LANG_INDEX_INSTR];
 		keywordListInstruction = wstring2string(kwlW, CP_ACP);
 #else
 		keywordListInstruction = pKwArray[LANG_INDEX_INSTR];
@@ -763,7 +763,7 @@ void ScintillaEditView::setCppLexer(LangType langType)
 	if (pKwArray[LANG_INDEX_TYPE])
 	{
 #ifdef UNICODE
-		basic_string<wchar_t> kwlW = pKwArray[LANG_INDEX_TYPE];
+		std::basic_string<wchar_t> kwlW = pKwArray[LANG_INDEX_TYPE];
 		keywordListType = wstring2string(kwlW, CP_ACP);
 #else
 		keywordListType = pKwArray[LANG_INDEX_TYPE];
@@ -787,12 +787,12 @@ void ScintillaEditView::setTclLexer()
 	const TCHAR *pKwArray[10] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 	makeStyle(L_TCL, pKwArray);
 
-	basic_string<char> keywordListInstruction("");
-	basic_string<char> keywordListType("");
+	std::basic_string<char> keywordListInstruction("");
+	std::basic_string<char> keywordListType("");
 	if (pKwArray[LANG_INDEX_INSTR])
 	{
 #ifdef UNICODE
-		basic_string<wchar_t> kwlW = pKwArray[LANG_INDEX_INSTR];
+		std::basic_string<wchar_t> kwlW = pKwArray[LANG_INDEX_INSTR];
 		keywordListInstruction = wstring2string(kwlW, CP_ACP);
 #else
 		keywordListInstruction = pKwArray[LANG_INDEX_INSTR];
@@ -803,7 +803,7 @@ void ScintillaEditView::setTclLexer()
 	if (pKwArray[LANG_INDEX_TYPE])
 	{
 #ifdef UNICODE
-		basic_string<wchar_t> kwlW = pKwArray[LANG_INDEX_TYPE];
+		std::basic_string<wchar_t> kwlW = pKwArray[LANG_INDEX_TYPE];
 		keywordListType = wstring2string(kwlW, CP_ACP);
 #else
 		keywordListType = pKwArray[LANG_INDEX_TYPE];
@@ -824,7 +824,7 @@ void ScintillaEditView::setObjCLexer(LangType langType)
 
 	makeStyle(langType, pKwArray);
 
-	basic_string<char> objcInstr1Kwl("");
+	std::basic_string<char> objcInstr1Kwl("");
 	if (pKwArray[LANG_INDEX_INSTR])
 	{
 #ifdef UNICODE
@@ -835,7 +835,7 @@ void ScintillaEditView::setObjCLexer(LangType langType)
 	}
 	const char *objcInstrs = getCompleteKeywordList(objcInstr1Kwl, langType, LANG_INDEX_INSTR);
 
-	basic_string<char> objcInstr2Kwl("");
+	std::basic_string<char> objcInstr2Kwl("");
 	if (pKwArray[LANG_INDEX_INSTR2])
 	{
 #ifdef UNICODE
@@ -846,7 +846,7 @@ void ScintillaEditView::setObjCLexer(LangType langType)
 	}
 	const char *objCDirective = getCompleteKeywordList(objcInstr2Kwl, langType, LANG_INDEX_INSTR2);
 
-	basic_string<char> objcTypeKwl("");
+	std::basic_string<char> objcTypeKwl("");
 	if (pKwArray[LANG_INDEX_TYPE])
 	{
 #ifdef UNICODE
@@ -858,7 +858,7 @@ void ScintillaEditView::setObjCLexer(LangType langType)
 	const char *objcTypes = getCompleteKeywordList(objcTypeKwl, langType, LANG_INDEX_TYPE);
 
 
-	basic_string<char> objcType2Kwl("");
+	std::basic_string<char> objcType2Kwl("");
 	if (pKwArray[LANG_INDEX_TYPE2])
 	{
 #ifdef UNICODE
@@ -871,7 +871,7 @@ void ScintillaEditView::setObjCLexer(LangType langType)
 
 	const TCHAR *doxygenKeyWords_generic = _pParameter->getWordList(L_CPP, LANG_INDEX_TYPE2);
 	const char * doxygenKeyWords;
-	basic_string<char> doxygenKeyWordsString("");
+	std::basic_string<char> doxygenKeyWordsString("");
 #ifdef UNICODE
 		doxygenKeyWordsString = wstring2string(doxygenKeyWords_generic, CP_ACP);
 		doxygenKeyWords = doxygenKeyWordsString.c_str();
@@ -2249,7 +2249,7 @@ ColumnModeInfo ScintillaEditView::getColumnModeSelectInfo()
 			{
 				zeroCharSelMode = false;
 			}
-			columnModeInfo.push_back(pair<int, int>(absPosSelStartPerLine, absPosSelEndPerLine));
+			columnModeInfo.push_back(std::pair<int, int>(absPosSelStartPerLine, absPosSelEndPerLine));
 		}
 
 		if (!zeroCharSelMode)

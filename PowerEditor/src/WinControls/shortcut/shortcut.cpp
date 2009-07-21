@@ -158,9 +158,9 @@ UCHAR vkeyValue[] = {\
 0x76, 0x77, 0x78, 0x79, 0x7A, 0x7B};
 */
 
-generic_string Shortcut::toString() const
+std::generic_string Shortcut::toString() const
 {
-	generic_string sc = TEXT("");
+	std::generic_string sc = TEXT("");
 	if (!isEnabled())
 		return sc;
 
@@ -171,7 +171,7 @@ generic_string Shortcut::toString() const
 	if (_keyCombo._isShift)
 		sc += TEXT("Shift+");
 
-	generic_string keyString;
+	std::generic_string keyString;
 	getKeyStrFromVal(_keyCombo._key, keyString);
 	sc += keyString;
 	return sc;
@@ -197,12 +197,12 @@ void Shortcut::setName(const TCHAR * name) {
 	_name[i] = 0;
 }
 
-generic_string ScintillaKeyMap::toString() const {
+std::generic_string ScintillaKeyMap::toString() const {
 	return toString(0);
 }
 
-generic_string ScintillaKeyMap::toString(int index) const {
-	generic_string sc = TEXT("");
+std::generic_string ScintillaKeyMap::toString(int index) const {
+	std::generic_string sc = TEXT("");
 	if (!isEnabled())
 		return sc;
 
@@ -214,7 +214,7 @@ generic_string ScintillaKeyMap::toString(int index) const {
 	if (kc._isShift)
 		sc += TEXT("Shift+");
 
-	generic_string keyString;
+	std::generic_string keyString;
 	getKeyStrFromVal(kc._key, keyString);
 	sc += keyString;
 	return sc;
@@ -263,7 +263,7 @@ size_t ScintillaKeyMap::getSize() const {
 	return size;
 }
 
-void getKeyStrFromVal(UCHAR keyVal, generic_string & str)
+void getKeyStrFromVal(UCHAR keyVal, std::generic_string & str)
 {
 	str = TEXT("");
 	bool found = false;
@@ -280,23 +280,23 @@ void getKeyStrFromVal(UCHAR keyVal, generic_string & str)
 		str = TEXT("Unlisted");
 }
 
-void getNameStrFromCmd(INT cmd, generic_string & str)
+void getNameStrFromCmd(INT cmd, std::generic_string & str)
 {
 	if ((cmd >= ID_MACRO) && (cmd < ID_MACRO_LIMIT))
 	{
-		vector<MacroShortcut> & theMacros = (NppParameters::getInstance())->getMacroList();
+		std::vector<MacroShortcut> & theMacros = (NppParameters::getInstance())->getMacroList();
 		int i = cmd - ID_MACRO;
 		str = theMacros[i].getName();
 	}
 	else if ((cmd >= ID_USER_CMD) && (cmd < ID_USER_CMD_LIMIT))
 	{
-		vector<UserCommand> & userCommands = (NppParameters::getInstance())->getUserCommandList();
+		std::vector<UserCommand> & userCommands = (NppParameters::getInstance())->getUserCommandList();
 		int i = cmd - ID_USER_CMD;
 		str = userCommands[i].getName();
 	}
 	else if ((cmd >= ID_PLUGINS_CMD) && (cmd < ID_PLUGINS_CMD_LIMIT))
 	{
-		vector<PluginCmdShortcut> & pluginCmds = (NppParameters::getInstance())->getPluginCommandList();
+		std::vector<PluginCmdShortcut> & pluginCmds = (NppParameters::getInstance())->getPluginCommandList();
 		int i = 0;
 		for (size_t j = 0 ; j < pluginCmds.size() ; j++)
 		{
@@ -447,10 +447,10 @@ void Accelerator::updateShortcuts()
 {
 	NppParameters *pNppParam = NppParameters::getInstance();
 
-	vector<CommandShortcut> & shortcuts = pNppParam->getUserShortcuts();
-	vector<MacroShortcut> & macros  = pNppParam->getMacroList();
-	vector<UserCommand> & userCommands = pNppParam->getUserCommandList();
-	vector<PluginCmdShortcut> & pluginCommands = pNppParam->getPluginCommandList();
+	std::vector<CommandShortcut> & shortcuts = pNppParam->getUserShortcuts();
+	std::vector<MacroShortcut> & macros  = pNppParam->getMacroList();
+	std::vector<UserCommand> & userCommands = pNppParam->getUserCommandList();
+	std::vector<PluginCmdShortcut> & pluginCommands = pNppParam->getPluginCommandList();
 
 	size_t nbMenu = shortcuts.size();
 	size_t nbMacro = macros.size();
@@ -509,22 +509,22 @@ void Accelerator::updateShortcuts()
 
 void Accelerator::updateFullMenu() {
 	NppParameters * pNppParam = NppParameters::getInstance();
-	vector<CommandShortcut> commands = pNppParam->getUserShortcuts();
+	std::vector<CommandShortcut> commands = pNppParam->getUserShortcuts();
 	for(size_t i = 0; i < commands.size(); i++) {
 		updateMenuItemByCommand(commands[i]);
 	}
 
-	vector<MacroShortcut> mcommands = pNppParam->getMacroList();
+	std::vector<MacroShortcut> mcommands = pNppParam->getMacroList();
 	for(size_t i = 0; i < mcommands.size(); i++) {
 		updateMenuItemByCommand(mcommands[i]);
 	}
 
-	vector<UserCommand> ucommands = pNppParam->getUserCommandList();
+	std::vector<UserCommand> ucommands = pNppParam->getUserCommandList();
 	for(size_t i = 0; i < ucommands.size(); i++) {
 		updateMenuItemByCommand(ucommands[i]);
 	}
 
-	vector<PluginCmdShortcut> pcommands = pNppParam->getPluginCommandList();
+	std::vector<PluginCmdShortcut> pcommands = pNppParam->getPluginCommandList();
 	for(size_t i = 0; i < pcommands.size(); i++) {
 		updateMenuItemByCommand(pcommands[i]);
 	}
@@ -613,7 +613,7 @@ void ScintillaAccelerator::init(std::vector<HWND> * vScintillas, HMENU hMenu, HW
 void ScintillaAccelerator::updateKeys()
 {
 	NppParameters *pNppParam = NppParameters::getInstance();
-	vector<ScintillaKeyMap> & map = pNppParam->getScintillaKeyList();
+	std::vector<ScintillaKeyMap> & map = pNppParam->getScintillaKeyList();
 	int mapSize = (int)map.size();
 	int index;
 
@@ -654,7 +654,7 @@ void ScintillaAccelerator::updateMenuItemByID(ScintillaKeyMap skm, int id)
 		}
 		i++;
 	}
-	generic_string menuItem = cmdName;
+	std::generic_string menuItem = cmdName;
 	if (skm.isEnabled())
 	{
 		menuItem += TEXT("\t");
@@ -774,7 +774,7 @@ BOOL CALLBACK ScintillaKeyMap::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /
 					if (res > -1) {
 						if (res == oldsize) {
 							::SendDlgItemMessage(_hSelf, IDC_LIST_KEYS, LB_INSERTSTRING, (WPARAM)-1, (LPARAM)toString(res).c_str());
-						}else {	//update current generic_string, can happen if it was disabled
+						}else {	//update current std::generic_string, can happen if it was disabled
 							updateListItem(res);
 						}
 						::SendDlgItemMessage(_hSelf, IDC_LIST_KEYS, LB_SETCURSEL, res, 0);

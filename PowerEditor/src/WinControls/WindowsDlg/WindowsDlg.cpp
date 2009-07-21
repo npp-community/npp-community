@@ -314,7 +314,7 @@ BOOL CALLBACK WindowsDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam
 						}
 						int i;
 						int n = _idxMap.size();
-						vector<int> sortMap;
+						std::vector<int> sortMap;
 						sortMap.resize(n);
 						for (i=0; i<n; ++i) sortMap[_idxMap[i]] = ListView_GetItemState(_hList, i, LVIS_SELECTED);
 						stable_sort(_idxMap.begin(), _idxMap.end(), BufferEquivalent(_pTab, iColumn, reverse));
@@ -577,7 +577,7 @@ void WindowsDlg::resetSelection()
 {
 	int curSel = _pTab->getCurrentTabIndex();
 	int pos = 0;
-	for (vector<int>::iterator itr = _idxMap.begin(), end = _idxMap.end(); itr != end; ++itr, ++pos)
+	for (std::vector<int>::iterator itr = _idxMap.begin(), end = _idxMap.end(); itr != end; ++itr, ++pos)
 	{
 		if (*itr == curSel)
 		{
@@ -650,7 +650,7 @@ void WindowsDlg::doClose()
 	nmdlg.code = WDN_NOTIFY;
 	UINT n = nmdlg.nItems = ListView_GetSelectedCount(_hList);
 	nmdlg.Items = new UINT[nmdlg.nItems];
-	vector<int> key;
+	std::vector<int> key;
 	key.resize(n, 0x7fffffff);
 	for(INT i=-1, j=0;; ++j) {
 		i = ListView_GetNextItem(_hList, i, LVNI_SELECTED);
@@ -663,19 +663,19 @@ void WindowsDlg::doClose()
 	if (nmdlg.processed)
 	{
 		// Trying to retain sort order. fairly sure there is a much better algorithm for this
-		vector<int>::iterator kitr = key.begin();
+		std::vector<int>::iterator kitr = key.begin();
 		for (UINT i=0; i<n; ++i, ++kitr)
 		{
 			if (nmdlg.Items[i] == -1)
 			{
 				int oldVal = _idxMap[*kitr];
 				_idxMap[*kitr] = -1;
-				for (vector<int>::iterator itr = _idxMap.begin(), end = _idxMap.end(); itr != end; ++itr)
+				for (std::vector<int>::iterator itr = _idxMap.begin(), end = _idxMap.end(); itr != end; ++itr)
 					if (*itr > oldVal)
 						--(*itr);
 			}
 		}
-		_idxMap.erase(std::remove_if(_idxMap.begin(), _idxMap.end(), bind2nd(equal_to<int>(), -1)), _idxMap.end());
+		_idxMap.erase(std::remove_if(_idxMap.begin(), _idxMap.end(), bind2nd(std::equal_to<int>(), -1)), _idxMap.end());
 	}
 	delete[] nmdlg.Items;
 
@@ -709,7 +709,7 @@ void WindowsDlg::doSortToTabs()
 	nmdlg.code = WDN_NOTIFY;
 	UINT n = nmdlg.nItems = ListView_GetItemCount(_hList);
 	nmdlg.Items = new UINT[nmdlg.nItems];
-	vector<int> key;
+	std::vector<int> key;
 	key.resize(n, 0x7fffffff);
 	for(INT i=-1, j=0;; ++j) {
 		i = ListView_GetNextItem(_hList, i, LVNI_ALL);
@@ -744,7 +744,7 @@ void WindowsMenu::init(HINSTANCE hInst, HMENU hMainMenu, const TCHAR *translatio
 
 	if (translation && translation[0])
 	{
-		generic_string windowStr(translation);
+		std::generic_string windowStr(translation);
 		windowStr += TEXT("...");
 		::ModifyMenu(_hMenu, IDM_WINDOW_WINDOWS, MF_BYCOMMAND, IDM_WINDOW_WINDOWS, windowStr.c_str());
 	}

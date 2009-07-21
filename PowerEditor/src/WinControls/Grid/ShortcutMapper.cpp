@@ -95,35 +95,35 @@ void ShortcutMapper::fillOutBabyGrid()
 
 	switch(_currentState) {
 		case STATE_MENU: {
-			vector<CommandShortcut> & cshortcuts = nppParam->getUserShortcuts();
+			std::vector<CommandShortcut> & cshortcuts = nppParam->getUserShortcuts();
 			for(size_t i = 0; i < nrItems; i++) {
 				_babygrid.setText(i+1, 1, cshortcuts[i].getName());
 				_babygrid.setText(i+1, 2, cshortcuts[i].toString().c_str());
 			}
 			break; }
 		case STATE_MACRO: {
-			vector<MacroShortcut> & cshortcuts = nppParam->getMacroList();
+			std::vector<MacroShortcut> & cshortcuts = nppParam->getMacroList();
 			for(size_t i = 0; i < nrItems; i++) {
 				_babygrid.setText(i+1, 1, cshortcuts[i].getName());
 				_babygrid.setText(i+1, 2, cshortcuts[i].toString().c_str());
 			}
 			break; }
 		case STATE_USER: {
-			vector<UserCommand> & cshortcuts = nppParam->getUserCommandList();
+			std::vector<UserCommand> & cshortcuts = nppParam->getUserCommandList();
 			for(size_t i = 0; i < nrItems; i++) {
 				_babygrid.setText(i+1, 1, cshortcuts[i].getName());
 				_babygrid.setText(i+1, 2, cshortcuts[i].toString().c_str());
 			}
 			break; }
 		case STATE_PLUGIN: {
-			vector<PluginCmdShortcut> & cshortcuts = nppParam->getPluginCommandList();
+			std::vector<PluginCmdShortcut> & cshortcuts = nppParam->getPluginCommandList();
 			for(size_t i = 0; i < nrItems; i++) {
 				_babygrid.setText(i+1, 1, cshortcuts[i].getName());
 				_babygrid.setText(i+1, 2, cshortcuts[i].toString().c_str());
 			}
 			break; }
 		case STATE_SCINTILLA: {
-			vector<ScintillaKeyMap> & cshortcuts = nppParam->getScintillaKeyList();
+			std::vector<ScintillaKeyMap> & cshortcuts = nppParam->getScintillaKeyList();
 			for(size_t i = 0; i < nrItems; i++) {
 				_babygrid.setText(i+1, 1, cshortcuts[i].getName());
 				_babygrid.setText(i+1, 2, cshortcuts[i].toString().c_str());
@@ -197,7 +197,7 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 					switch(_currentState) {
 						case STATE_MENU: {
 							//Get CommandShortcut corresponding to row
-							vector<CommandShortcut> & shortcuts = nppParam->getUserShortcuts();
+							std::vector<CommandShortcut> & shortcuts = nppParam->getUserShortcuts();
 							CommandShortcut csc = shortcuts[row - 1], prevcsc = shortcuts[row - 1];
 							csc.init(_hInst, _hSelf);
 							if (csc.doDialog() != -1 && prevcsc != csc) {	//shortcut was altered
@@ -211,7 +211,7 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 							break; }
 						case STATE_MACRO: {
 							//Get MacroShortcut corresponding to row
-							vector<MacroShortcut> & shortcuts = nppParam->getMacroList();
+							std::vector<MacroShortcut> & shortcuts = nppParam->getMacroList();
 							MacroShortcut msc = shortcuts[row - 1], prevmsc = shortcuts[row - 1];
 							msc.init(_hInst, _hSelf);
 							if (msc.doDialog() != -1 && prevmsc != msc) {	//shortcut was altered
@@ -226,7 +226,7 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 							break; }
 						case STATE_USER: {
 							//Get UserCommand corresponding to row
-							vector<UserCommand> & shortcuts = nppParam->getUserCommandList();
+							std::vector<UserCommand> & shortcuts = nppParam->getUserCommandList();
 							UserCommand ucmd = shortcuts[row - 1], prevucmd = shortcuts[row - 1];
 							ucmd.init(_hInst, _hSelf);
 							prevucmd = ucmd;
@@ -242,7 +242,7 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 							break; }
 						case STATE_PLUGIN: {
 							//Get PluginCmdShortcut corresponding to row
-							vector<PluginCmdShortcut> & shortcuts = nppParam->getPluginCommandList();
+							std::vector<PluginCmdShortcut> & shortcuts = nppParam->getPluginCommandList();
 							PluginCmdShortcut pcsc = shortcuts[row - 1], prevpcsc = shortcuts[row - 1];
 							pcsc.init(_hInst, _hSelf);
 							prevpcsc = pcsc;
@@ -265,7 +265,7 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 							break; }
 						case STATE_SCINTILLA: {
 							//Get ScintillaKeyMap corresponding to row
-							vector<ScintillaKeyMap> & shortcuts = nppParam->getScintillaKeyList();
+							std::vector<ScintillaKeyMap> & shortcuts = nppParam->getScintillaKeyList();
 							ScintillaKeyMap skm = shortcuts[row - 1], prevskm = shortcuts[row-1];
 							skm.init(_hInst, _hSelf);
 							if (skm.doDialog() != -1 && prevskm != skm)
@@ -304,8 +304,8 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 								return FALSE;			//this is bad
 								break; }
 							case STATE_MACRO: {
-								vector<MacroShortcut> & theMacros = nppParam->getMacroList();
-								vector<MacroShortcut>::iterator it = theMacros.begin();
+								std::vector<MacroShortcut> & theMacros = nppParam->getMacroList();
+								std::vector<MacroShortcut>::iterator it = theMacros.begin();
 								cmdID = theMacros[shortcutIndex].getID();
 								theMacros.erase(it + shortcutIndex);
 								fillOutBabyGrid();
@@ -323,8 +323,8 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 								//::SendMessage(_hParent, NPPM_INTERNAL_MACROLIST_MODIFIED, 0, 0);
 								break; }
 							case STATE_USER: {
-								vector<UserCommand> & theUserCmds = nppParam->getUserCommandList();
-								vector<UserCommand>::iterator it = theUserCmds.begin();
+								std::vector<UserCommand> & theUserCmds = nppParam->getUserCommandList();
+								std::vector<UserCommand>::iterator it = theUserCmds.begin();
 								cmdID = theUserCmds[shortcutIndex].getID();
 								theUserCmds.erase(it + shortcutIndex);
 								fillOutBabyGrid();
@@ -374,7 +374,7 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 						::GetCursorPos(&p);
 						if (!_rightClickMenu.isCreated())
 						{
-							vector<MenuItemUnit> itemUnitArray;
+							std::vector<MenuItemUnit> itemUnitArray;
 							itemUnitArray.push_back(MenuItemUnit(IDM_BABYGRID_MODIFY, TEXT("Modify")));
 							itemUnitArray.push_back(MenuItemUnit(IDM_BABYGRID_DELETE, TEXT("Delete")));
 							_rightClickMenu.create(_hSelf, itemUnitArray);

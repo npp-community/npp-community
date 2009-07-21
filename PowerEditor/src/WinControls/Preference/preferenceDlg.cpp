@@ -76,8 +76,8 @@ private :
 struct LangID_Name
 {
 	LangType _id;
-	generic_string _name;
-	LangID_Name(LangType id, generic_string name) : _id(id), _name(name){};
+	std::generic_string _name;
+	LangID_Name(LangType id, std::generic_string name) : _id(id), _name(name){};
 };
 
 class DefaultNewDocDlg : public StaticDialog
@@ -100,7 +100,7 @@ public :
 	LangMenuDlg() {};
 private :
 	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
-	vector<LangMenuItem> _langList;
+	std::vector<LangMenuItem> _langList;
 };
 
 class PrintSettingsDlg : public StaticDialog
@@ -122,8 +122,8 @@ private :
 };
 
 struct strCouple {
-	generic_string _varDesc;
-	generic_string _var;
+	std::generic_string _varDesc;
+	std::generic_string _var;
 	strCouple(TCHAR *varDesc, TCHAR *var): _varDesc(varDesc), _var(var){};
 };
 
@@ -133,7 +133,7 @@ public :
 	PrintSettings2Dlg():_focusedEditCtrl(0), _selStart(0), _selEnd(0){};
 private :
 	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
-	vector<strCouple> varList;
+	std::vector<strCouple> varList;
 	int _focusedEditCtrl;
 	DWORD _selStart;
 	DWORD _selEnd;
@@ -409,7 +409,7 @@ BOOL CALLBACK BarsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*
 
 			for (size_t i = 0 ; i < localizationSwitcher.size() ; i++)
 			{
-				pair<wstring, wstring> localizationInfo = localizationSwitcher.getElementFromIndex(i);
+				std::pair<std::wstring, std::wstring> localizationInfo = localizationSwitcher.getElementFromIndex(i);
 				::SendDlgItemMessage(_hSelf, IDC_COMBO_LOCALIZATION, CB_ADDSTRING, 0, (LPARAM)localizationInfo.first.c_str());
 			}
 #endif
@@ -1145,7 +1145,7 @@ BOOL CALLBACK DefaultNewDocDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM 
 			int index = 0;
 			for (int i = L_TXT ; i < pNppParam->L_END ; i++)
 			{
-				generic_string str;
+				std::generic_string str;
 				if ((LangType)i != L_USER)
 				{
 					int cmdID = pNppParam->langTypeToCommandID((LangType)i);
@@ -1299,7 +1299,7 @@ BOOL CALLBACK LangMenuDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPara
 		{
 			for (int i = L_TXT ; i < pNppParam->L_END ; i++)
 			{
-				generic_string str;
+				std::generic_string str;
 				if ((LangType)i != L_USER)
 				{
 					int cmdID = pNppParam->langTypeToCommandID((LangType)i);
@@ -1385,7 +1385,7 @@ BOOL CALLBACK LangMenuDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPara
 				case IDC_BUTTON_REMOVE :
 				{
 					int list2Remove, list2Add, idButton2Enable, idButton2Disable;
-					vector<LangMenuItem> *pSrcLst, *pDestLst;
+					std::vector<LangMenuItem> *pSrcLst, *pDestLst;
 
 					if (LOWORD(wParam)==IDC_BUTTON_REMOVE)
 					{
@@ -1413,7 +1413,7 @@ BOOL CALLBACK LangMenuDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPara
 					::SendDlgItemMessage(_hSelf, list2Remove, LB_GETTEXT, iRemove, (LPARAM)s);
 
 					LangMenuItem lmi = pSrcLst->at(iRemove);
-					vector<LangMenuItem>::iterator lang2Remove = pSrcLst->begin() + iRemove;
+					std::vector<LangMenuItem>::iterator lang2Remove = pSrcLst->begin() + iRemove;
 					pSrcLst->erase(lang2Remove);
 
 					int iAdd = ::SendDlgItemMessage(_hSelf, list2Add, LB_ADDSTRING, 0, (LPARAM)s);
@@ -1437,7 +1437,7 @@ BOOL CALLBACK LangMenuDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPara
 							{
 								TiXmlElement *element = childNode->ToElement();
 
-								if (generic_string(element->Attribute(TEXT("name"))) == lmi._langName)
+								if (std::generic_string(element->Attribute(TEXT("name"))) == lmi._langName)
 								{
 									element->SetAttribute(TEXT("excluded"), (LOWORD(wParam)==IDC_BUTTON_REMOVE)?TEXT("yes"):TEXT("no"));
 									pNppParam->getExternalLexerDoc()->at(x)->SaveFile();
@@ -1574,15 +1574,15 @@ BOOL CALLBACK PrintSettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM 
 	return FALSE;
 }
 
-void trim(generic_string & str)
+void trim(std::generic_string & str)
 {
-	generic_string::size_type pos = str.find_last_not_of(' ');
+	std::generic_string::size_type pos = str.find_last_not_of(' ');
 
-	if (pos != generic_string::npos)
+	if (pos != std::generic_string::npos)
 	{
 		str.erase(pos + 1);
 		pos = str.find_first_not_of(' ');
-		if(pos != generic_string::npos) str.erase(0, pos);
+		if(pos != std::generic_string::npos) str.erase(0, pos);
 	}
 	else str.erase(str.begin(), str.end());
 };
@@ -1730,7 +1730,7 @@ BOOL CALLBACK PrintSettings2Dlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM
 				}
 
 				::GetDlgItemText(_hSelf, groupStatic, str, stringSize);
-				generic_string title = str;
+				std::generic_string title = str;
 				title += TEXT(" ");
 				::GetDlgItemText(_hSelf, focusedEditStatic, str, stringSize);
 				title += str;
@@ -1818,7 +1818,7 @@ BOOL CALLBACK PrintSettings2Dlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM
 					::SendDlgItemMessage(_hSelf, _focusedEditCtrl, WM_GETTEXT, stringSize, (LPARAM)str);
 					//::MessageBox(NULL, str, TEXT(""), MB_OK);
 
-					generic_string str2Set(str);
+					std::generic_string str2Set(str);
 					str2Set.replace(_selStart, _selEnd - _selStart, varStr);
 
 					::SetDlgItemText(_hSelf, _focusedEditCtrl, str2Set.c_str());
