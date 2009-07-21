@@ -24,7 +24,7 @@
 #include "resource.h"
 #include "printer.h"
 #include "FileNameStringSplitter.h"
-#include "ValueDlgs.h"
+#include "ValueDlg.h"
 #include "Utf8_16.h"
 #include "regExtDlg.h"
 #include "ShortcutMapper.h"
