@@ -72,6 +72,7 @@
 #include "Parameters.h"
 
 #include "npp_winver.h"
+#include "npp_session.h"
 
 const TCHAR Notepad_plus::_className[32] = TEXT("Notepad++");
 HWND Notepad_plus::gNppHWND = NULL;
@@ -723,8 +724,9 @@ void Notepad_plus::saveDockingParams()
 
 // return true if all the session files are loaded
 // return false if one or more sessions files fail to load (and session is modify to remove invalid files)
-bool Notepad_plus::loadSession(Session & session)
+bool Notepad_plus::loadSession(Session* session)
 {
+	assert(session);
 	assert(_mainDocTab);
 	assert(_subDocTab);
 	bool allSessionFilesLoaded = true;
@@ -732,12 +734,12 @@ bool Notepad_plus::loadSession(Session & session)
 	size_t i = 0;
 	showView(MAIN_VIEW);
 	switchEditViewTo(MAIN_VIEW);	//open files in main
-	for ( ; i < session.nbMainFiles() ; )
+	for ( ; i < session->nbMainFiles() ; )
 	{
-		const TCHAR *pFn = session._mainViewFiles[i]._fileName.c_str();
+		const TCHAR *pFn = session->_mainViewFiles[i]._fileName.c_str();
 		if (isFileSession(pFn)) {
-			std::vector<sessionFileInfo>::iterator posIt = session._mainViewFiles.begin() + i;
-			session._mainViewFiles.erase(posIt);
+			std::vector<sessionFileInfo>::iterator posIt = session->_mainViewFiles.begin() + i;
+			session->_mainViewFiles.erase(posIt);
 			continue;	//skip session files, not supporting recursive sessions
 		}
 		if (PathFileExists(pFn)) {
@@ -748,7 +750,7 @@ bool Notepad_plus::loadSession(Session & session)
 		if (lastOpened != BUFFER_INVALID)
 		{
 			showView(MAIN_VIEW);
-			const TCHAR *pLn = session._mainViewFiles[i]._langName.c_str();
+			const TCHAR *pLn = session->_mainViewFiles[i]._langName.c_str();
 			int id = getLangFromMenuName(pLn);
 			LangType typeToSet = L_TXT;
 			if (id != 0 && lstrcmp(pLn, TEXT("User Defined")) != 0)
@@ -757,24 +759,24 @@ bool Notepad_plus::loadSession(Session & session)
 				typeToSet = (LangType)(id - IDM_LANG_EXTERNAL + L_EXTERNAL);
 
 			Buffer * buf = MainFileManager->getBufferByID(lastOpened);
-			buf->setPosition(session._mainViewFiles[i], _mainEditView);
+			buf->setPosition(session->_mainViewFiles[i], _mainEditView);
 			buf->setLangType(typeToSet, pLn);
 
 			//Force in the document so we can add the markers
 			//Dont use default methods because of performance
 			Document prevDoc = _mainEditView->execute(SCI_GETDOCPOINTER);
 			_mainEditView->execute(SCI_SETDOCPOINTER, 0, buf->getDocument());
-			for (size_t j = 0 ; j < session._mainViewFiles[i].marks.size() ; j++)
+			for (size_t j = 0 ; j < session->_mainViewFiles[i].marks.size() ; j++)
 			{
-				_mainEditView->execute(SCI_MARKERADD, session._mainViewFiles[i].marks[j], MARK_BOOKMARK);
+				_mainEditView->execute(SCI_MARKERADD, session->_mainViewFiles[i].marks[j], MARK_BOOKMARK);
 			}
 			_mainEditView->execute(SCI_SETDOCPOINTER, 0, prevDoc);
 			i++;
 		}
 		else
 		{
-			std::vector<sessionFileInfo>::iterator posIt = session._mainViewFiles.begin() + i;
-			session._mainViewFiles.erase(posIt);
+			std::vector<sessionFileInfo>::iterator posIt = session->_mainViewFiles.begin() + i;
+			session->_mainViewFiles.erase(posIt);
 			allSessionFilesLoaded = false;
 		}
 	}
@@ -782,12 +784,12 @@ bool Notepad_plus::loadSession(Session & session)
 	size_t k = 0;
 	showView(SUB_VIEW);
 	switchEditViewTo(SUB_VIEW);	//open files in sub
-	for ( ; k < session.nbSubFiles() ; )
+	for ( ; k < session->nbSubFiles() ; )
 	{
-		const TCHAR *pFn = session._subViewFiles[k]._fileName.c_str();
+		const TCHAR *pFn = session->_subViewFiles[k]._fileName.c_str();
 		if (isFileSession(pFn)) {
-			std::vector<sessionFileInfo>::iterator posIt = session._subViewFiles.begin() + k;
-			session._subViewFiles.erase(posIt);
+			std::vector<sessionFileInfo>::iterator posIt = session->_subViewFiles.begin() + k;
+			session->_subViewFiles.erase(posIt);
 			continue;	//skip session files, not supporting recursive sessions
 		}
 		if (PathFileExists(pFn)) {
@@ -804,7 +806,7 @@ bool Notepad_plus::loadSession(Session & session)
 			showView(SUB_VIEW);
 			if (canHideView(MAIN_VIEW))
 				hideView(MAIN_VIEW);
-			const TCHAR *pLn = session._subViewFiles[k]._langName.c_str();
+			const TCHAR *pLn = session->_subViewFiles[k]._langName.c_str();
 			int id = getLangFromMenuName(pLn);
 			LangType typeToSet = L_TXT;
 			if (id != 0)
@@ -813,7 +815,7 @@ bool Notepad_plus::loadSession(Session & session)
 				typeToSet = (LangType)(id - IDM_LANG_EXTERNAL + L_EXTERNAL);
 
 			Buffer * buf = MainFileManager->getBufferByID(lastOpened);
-			buf->setPosition(session._subViewFiles[k], _subEditView);
+			buf->setPosition(session->_subViewFiles[k], _subEditView);
 			if (typeToSet == L_USER) {
 				if (!lstrcmp(pLn, TEXT("User Defined"))) {
 					pLn = TEXT("");	//default user defined
@@ -825,9 +827,9 @@ bool Notepad_plus::loadSession(Session & session)
 			//Dont use default methods because of performance
 			Document prevDoc = _subEditView->execute(SCI_GETDOCPOINTER);
 			_subEditView->execute(SCI_SETDOCPOINTER, 0, buf->getDocument());
-			for (size_t j = 0 ; j < session._subViewFiles[k].marks.size() ; j++)
+			for (size_t j = 0 ; j < session->_subViewFiles[k].marks.size() ; j++)
 			{
-				_subEditView->execute(SCI_MARKERADD, session._subViewFiles[k].marks[j], MARK_BOOKMARK);
+				_subEditView->execute(SCI_MARKERADD, session->_subViewFiles[k].marks[j], MARK_BOOKMARK);
 			}
 			_subEditView->execute(SCI_SETDOCPOINTER, 0, prevDoc);
 
@@ -835,8 +837,8 @@ bool Notepad_plus::loadSession(Session & session)
 		}
 		else
 		{
-			std::vector<sessionFileInfo>::iterator posIt = session._subViewFiles.begin() + k;
-			session._subViewFiles.erase(posIt);
+			std::vector<sessionFileInfo>::iterator posIt = session->_subViewFiles.begin() + k;
+			session->_subViewFiles.erase(posIt);
 			allSessionFilesLoaded = false;
 		}
 	}
@@ -844,14 +846,14 @@ bool Notepad_plus::loadSession(Session & session)
 	_mainEditView->restoreCurrentPos();
 	_subEditView->restoreCurrentPos();
 
-	if (session._activeMainIndex < (size_t)_mainDocTab->nbItem())//session.nbMainFiles())
-		activateBuffer(_mainDocTab->getBufferByIndex(session._activeMainIndex), MAIN_VIEW);
+	if (session->_activeMainIndex < (size_t)_mainDocTab->nbItem())//session->nbMainFiles())
+		activateBuffer(_mainDocTab->getBufferByIndex(session->_activeMainIndex), MAIN_VIEW);
 
-	if (session._activeSubIndex < (size_t)_subDocTab->nbItem())//session.nbSubFiles())
-		activateBuffer(_subDocTab->getBufferByIndex(session._activeSubIndex), SUB_VIEW);
+	if (session->_activeSubIndex < (size_t)_subDocTab->nbItem())//session->nbSubFiles())
+		activateBuffer(_subDocTab->getBufferByIndex(session->_activeSubIndex), SUB_VIEW);
 
-	if ((session.nbSubFiles() > 0) && (session._activeView == MAIN_VIEW || session._activeView == SUB_VIEW))
-		switchEditViewTo(session._activeView);
+	if ((session->nbSubFiles() > 0) && (session->_activeView == MAIN_VIEW || session->_activeView == SUB_VIEW))
+		switchEditViewTo(session->_activeView);
 	else
 		switchEditViewTo(MAIN_VIEW);
 
@@ -1776,7 +1778,7 @@ void Notepad_plus::saveShortcuts()
 
 void Notepad_plus::saveSession(const Session & session)
 {
-	(NppParameters::getInstance())->writeSession(session);
+	(NppParameters::getInstance())->writeSession(&session);
 }
 
 void Notepad_plus::doTrimTrailing()
@@ -1801,7 +1803,7 @@ void Notepad_plus::doTrimTrailing()
 
 void Notepad_plus::loadLastSession()
 {
-	Session lastSession = (NppParameters::getInstance())->getSession();
+	Session* lastSession = (NppParameters::getInstance())->getSession();
 	loadSession(lastSession);
 }
 
@@ -8529,7 +8531,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			const TCHAR *sessionFileName = (const TCHAR *)lParam;
 			if ((!sessionFileName) || (sessionFileName[0] == '\0')) return 0;
 			Session session2Load;
-			if (pNppParam->loadSession(session2Load, sessionFileName))
+			if (pNppParam->loadSession(&session2Load, sessionFileName))
 			{
 				return session2Load.nbMainFiles() + session2Load.nbSubFiles();
 			}
@@ -8544,7 +8546,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			if ((!sessionFileName) || (sessionFileName[0] == '\0')) return FALSE;
 
 			Session session2Load;
-			if (pNppParam->loadSession(session2Load, sessionFileName))
+			if (pNppParam->loadSession(&session2Load, sessionFileName))
 			{
 				size_t i = 0;
 				for ( ; i < session2Load.nbMainFiles() ; )
@@ -10022,13 +10024,13 @@ bool Notepad_plus::fileLoadSession(const TCHAR *fn)
 		bool isAllSuccessful = true;
 		Session session2Load;
 
-		if ((NppParameters::getInstance())->loadSession(session2Load, sessionFileName))
+		if ((NppParameters::getInstance())->loadSession(&session2Load, sessionFileName))
 		{
-			isAllSuccessful = loadSession(session2Load);
+			isAllSuccessful = loadSession(&session2Load);
 			result = true;
 		}
 		if (!isAllSuccessful)
-			(NppParameters::getInstance())->writeSession(session2Load, sessionFileName);
+			(NppParameters::getInstance())->writeSession(&session2Load, sessionFileName);
 	}
 	return result;
 }
@@ -10050,7 +10052,7 @@ const TCHAR * Notepad_plus::fileSaveSession(size_t nbFile, TCHAR ** fileNames, c
 		else
 			getCurrentOpenedFiles(currentSession);
 
-		(NppParameters::getInstance())->writeSession(currentSession, sessionFile2save);
+		(NppParameters::getInstance())->writeSession(&currentSession, sessionFile2save);
 		return sessionFile2save;
 	}
 	return NULL;

@@ -6,6 +6,8 @@
 #include "Parameters.h"
 #include "Utf8_16.h"
 
+#include "npp_session.h"
+
 FileManager * FileManager::_pSelf = new FileManager();
 
 const int blockSize = 128 * 1024 + 4;

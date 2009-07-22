@@ -27,7 +27,10 @@
 #include "MenuCmdID.h"
 
 #include "resource.h"
+#include "colors.h"
+
 #include "npp_winver.h"
+#include "npp_session.h"
 
 struct WinMenuKeyDefinition {	//more or less matches accelerator table definition, easy copy/paste
 	//const TCHAR * name;	//name retrieved from menu?
@@ -438,6 +441,8 @@ NppParameters::NppParameters() : _pXmlDoc(NULL),_pXmlUserDoc(NULL), _pXmlUserSty
 								_transparentFuncAddr(NULL), _enableThemeDialogTextureFuncAddr(NULL),\
 								_isTaskListRBUTTONUP_Active(false), _fileSaveDlgFilterIndex(-1), _asNotepadStyle(false), _isFindReplacing(false)
 {
+	_session = new Session();
+
 	_findHistory._nbFindHistoryPath = 0;
 	_findHistory._nbFindHistoryFilter = 0;
 	_findHistory._nbFindHistoryFind = 0;
@@ -480,6 +485,8 @@ NppParameters::~NppParameters()
 		FreeLibrary(_hUXTheme);
 
 	::RemoveFontResource(LINEDRAW_FONT);
+
+	delete _session;
 }
 void cutString(const TCHAR *str2cut, std::vector<std::generic_string> & patternVect)
 {
@@ -1250,12 +1257,12 @@ void NppParameters::setWorkingDir(const TCHAR * newPath)
 	}
 }
 
-bool NppParameters::loadSession(Session & session, const TCHAR *sessionFileName)
+bool NppParameters::loadSession(Session* session, const TCHAR *sessionFileName)
 {
 	TiXmlDocument *pXmlSessionDocument = new TiXmlDocument(sessionFileName);
 	bool loadOkay = pXmlSessionDocument->LoadFile();
 	if (loadOkay)
-		loadOkay = getSessionFromXmlTree(pXmlSessionDocument, &session);
+		loadOkay = getSessionFromXmlTree(pXmlSessionDocument, session);
 
 	delete pXmlSessionDocument;
 	return loadOkay;
@@ -1267,7 +1274,7 @@ bool NppParameters::getSessionFromXmlTree(TiXmlDocument *pSessionDoc, Session *p
 		return false;
 
 	TiXmlDocument **ppSessionDoc = &_pXmlSessionDoc;
-	Session *ptrSession = &_session;
+	Session *ptrSession = _session;
 
 	if (pSessionDoc)
 	{
@@ -1917,8 +1924,9 @@ void NppParameters::insertScintKey(TiXmlNode *scintKeyRoot, const ScintillaKeyMa
 	}
 }
 
-void NppParameters::writeSession(const Session & session, const TCHAR *fileName)
+void NppParameters::writeSession(const Session* session, const TCHAR *fileName)
 {
+	assert(session);
 	const TCHAR *pathName = fileName?fileName:_sessionPath;
 
 	_pXmlSessionDoc = new TiXmlDocument(pathName);
@@ -1927,49 +1935,49 @@ void NppParameters::writeSession(const Session & session, const TCHAR *fileName)
 	if (root)
 	{
 		TiXmlNode *sessionNode = root->InsertEndChild(TiXmlElement(TEXT("Session")));
-		(sessionNode->ToElement())->SetAttribute(TEXT("activeView"), (int)session._activeView);
+		(sessionNode->ToElement())->SetAttribute(TEXT("activeView"), (int)session->_activeView);
 
 		TiXmlNode *mainViewNode = sessionNode->InsertEndChild(TiXmlElement(TEXT("mainView")));
-		(mainViewNode->ToElement())->SetAttribute(TEXT("activeIndex"), (int)session._activeMainIndex);
-		for (size_t i = 0 ; i < session._mainViewFiles.size() ; i++)
+		(mainViewNode->ToElement())->SetAttribute(TEXT("activeIndex"), (int)session->_activeMainIndex);
+		for (size_t i = 0 ; i < session->_mainViewFiles.size() ; i++)
 		{
 			TiXmlNode *fileNameNode = mainViewNode->InsertEndChild(TiXmlElement(TEXT("File")));
 
-			(fileNameNode->ToElement())->SetAttribute(TEXT("firstVisibleLine"), session._mainViewFiles[i]._firstVisibleLine);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("xOffset"), session._mainViewFiles[i]._xOffset);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("scrollWidth"), session._mainViewFiles[i]._scrollWidth);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("startPos"), session._mainViewFiles[i]._startPos);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("endPos"), session._mainViewFiles[i]._endPos);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("selMode"), session._mainViewFiles[i]._selMode);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("lang"), session._mainViewFiles[i]._langName.c_str());
-			(fileNameNode->ToElement())->SetAttribute(TEXT("filename"), session._mainViewFiles[i]._fileName.c_str());
+			(fileNameNode->ToElement())->SetAttribute(TEXT("firstVisibleLine"), session->_mainViewFiles[i]._firstVisibleLine);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("xOffset"), session->_mainViewFiles[i]._xOffset);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("scrollWidth"), session->_mainViewFiles[i]._scrollWidth);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("startPos"), session->_mainViewFiles[i]._startPos);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("endPos"), session->_mainViewFiles[i]._endPos);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("selMode"), session->_mainViewFiles[i]._selMode);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("lang"), session->_mainViewFiles[i]._langName.c_str());
+			(fileNameNode->ToElement())->SetAttribute(TEXT("filename"), session->_mainViewFiles[i]._fileName.c_str());
 
-			for (size_t j = 0 ; j < session._mainViewFiles[i].marks.size() ; j++)
+			for (size_t j = 0 ; j < session->_mainViewFiles[i].marks.size() ; j++)
 			{
-				size_t markLine = session._mainViewFiles[i].marks[j];
+				size_t markLine = session->_mainViewFiles[i].marks[j];
 				TiXmlNode *markNode = fileNameNode->InsertEndChild(TiXmlElement(TEXT("Mark")));
 				markNode->ToElement()->SetAttribute(TEXT("line"), markLine);
 			}
 		}
 
 		TiXmlNode *subViewNode = sessionNode->InsertEndChild(TiXmlElement(TEXT("subView")));
-		(subViewNode->ToElement())->SetAttribute(TEXT("activeIndex"), (int)session._activeSubIndex);
-		for (size_t i = 0 ; i < session._subViewFiles.size() ; i++)
+		(subViewNode->ToElement())->SetAttribute(TEXT("activeIndex"), (int)session->_activeSubIndex);
+		for (size_t i = 0 ; i < session->_subViewFiles.size() ; i++)
 		{
 			TiXmlNode *fileNameNode = subViewNode->InsertEndChild(TiXmlElement(TEXT("File")));
 
-			(fileNameNode->ToElement())->SetAttribute(TEXT("firstVisibleLine"), session._subViewFiles[i]._firstVisibleLine);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("xOffset"), session._subViewFiles[i]._xOffset);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("scrollWidth"), session._subViewFiles[i]._scrollWidth);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("startPos"), session._subViewFiles[i]._startPos);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("endPos"), session._subViewFiles[i]._endPos);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("selMode"), session._subViewFiles[i]._selMode);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("lang"), session._subViewFiles[i]._langName.c_str());
-			(fileNameNode->ToElement())->SetAttribute(TEXT("filename"), session._subViewFiles[i]._fileName.c_str());
+			(fileNameNode->ToElement())->SetAttribute(TEXT("firstVisibleLine"), session->_subViewFiles[i]._firstVisibleLine);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("xOffset"), session->_subViewFiles[i]._xOffset);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("scrollWidth"), session->_subViewFiles[i]._scrollWidth);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("startPos"), session->_subViewFiles[i]._startPos);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("endPos"), session->_subViewFiles[i]._endPos);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("selMode"), session->_subViewFiles[i]._selMode);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("lang"), session->_subViewFiles[i]._langName.c_str());
+			(fileNameNode->ToElement())->SetAttribute(TEXT("filename"), session->_subViewFiles[i]._fileName.c_str());
 
-			for (size_t j = 0 ; j < session._subViewFiles[i].marks.size() ; j++)
+			for (size_t j = 0 ; j < session->_subViewFiles[i].marks.size() ; j++)
 			{
-				size_t markLine = session._subViewFiles[i].marks[j];
+				size_t markLine = session->_subViewFiles[i].marks[j];
 				TiXmlNode *markNode = fileNameNode->InsertEndChild(TiXmlElement(TEXT("Mark")));
 				markNode->ToElement()->SetAttribute(TEXT("line"), markLine);
 			}
@@ -4721,4 +4729,56 @@ const char * NppParameters::getNativeLangMenuStringA( int itemID )
 		}
 	}
 	return NULL;
+}
+
+UserLangContainer::UserLangContainer()
+{
+	_name = TEXT("new user define");
+	_ext = TEXT("");
+
+	// Keywords list of Delimiters (index 0)
+	lstrcpy(_keywordLists[0], TEXT("000000"));
+	for (int i = 1 ; i < nbKeywodList ; i++)
+	{
+		*_keywordLists[i] = '\0';
+	}
+}
+
+UserLangContainer::UserLangContainer( const TCHAR *name, const TCHAR *ext ) : _name(name), _ext(ext)
+{
+	// Keywords list of Delimiters (index 0)
+	lstrcpy(_keywordLists[0], TEXT("000000"));
+	for (int j = 1 ; j < nbKeywodList ; j++)
+	{
+		*_keywordLists[j] = '\0';
+	}
+}
+
+UserLangContainer & UserLangContainer::operator=( const UserLangContainer & ulc )
+{
+	if (this != &ulc)
+	{
+		_name = ulc._name;
+		_ext = ulc._ext;
+		_isCaseIgnored = ulc._isCaseIgnored;
+		_styleArray = ulc._styleArray;
+		int nbStyler = _styleArray.getNbStyler();
+		for (int i = 0 ; i < nbStyler ; i++)
+		{
+			Style & st = _styleArray.getStyler(i);
+			if (st._bgColor == COLORREF(-1))
+			{
+				st._bgColor = white;
+			}
+			if (st._fgColor == COLORREF(-1))
+			{
+				st._fgColor = black;
+			}
+		}
+		for (int i = 0 ; i < nbKeywodList ; i++)
+		{
+			lstrcpy(_keywordLists[i], ulc._keywordLists[i]);
+		}
+	}
+	return *this;
 }

@@ -27,6 +27,9 @@
 
 #include "Parameters.h"
 
+#include "colors.h"
+#include "npp_session.h"
+
 
 // initialize the static variable
 HINSTANCE ScintillaEditView::_hLib = ::LoadLibrary(TEXT("SciLexer.DLL"));

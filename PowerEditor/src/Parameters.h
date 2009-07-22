@@ -21,7 +21,6 @@
 #include "ScintillaRef.h"
 #include "ToolBar.h"
 #include "UserDefineLangReference.h"
-#include "colors.h"
 #include "shortcut.h"
 #include "ContextMenu.h"
 #include "Notepad_plus_msgs.h"
@@ -36,6 +35,8 @@ class TiXmlDocument;
 class TiXmlDocumentA;
 class TiXmlElement;
 
+struct Session;
+
 void cutString(const TCHAR *str2cut, std::vector<std::generic_string> & patternVect);
 /*
 struct HeaderLineState {
@@ -45,44 +46,6 @@ struct HeaderLineState {
 	bool _isCollapsed;
 };
 */
-struct Position
-{
-	int _firstVisibleLine;
-	int _startPos;
-	int _endPos;
-	int _xOffset;
-	int _selMode;
-	int _scrollWidth;
-	Position() : _firstVisibleLine(0), _startPos(0), _endPos(0), _xOffset(0), _scrollWidth(1), _selMode(0) {};
-};
-
-struct sessionFileInfo : public Position {
-	sessionFileInfo(const TCHAR *fn) {
-		if (fn) _fileName = fn;
-	};
-	sessionFileInfo(const TCHAR *fn, const TCHAR *ln, Position pos) : Position(pos) {
-		if (fn) _fileName = fn;
-		if (ln)	_langName = ln;
-	};
-
-	sessionFileInfo(std::generic_string fn) : _fileName(fn){};
-	sessionFileInfo(std::generic_string fn, Position pos) : Position(pos), _fileName(fn){};
-
-	std::generic_string _fileName;
-	std::generic_string	_langName;
-	std::vector<size_t> marks;
-};
-
-struct Session {
-	size_t nbMainFiles() const {return _mainViewFiles.size();};
-	size_t nbSubFiles() const {return _subViewFiles.size();};
-	size_t _activeView;
-	size_t _activeMainIndex;
-	size_t _activeSubIndex;
-	std::vector<sessionFileInfo> _mainViewFiles;
-	std::vector<sessionFileInfo> _subViewFiles;
-};
-
 struct CmdLineParams {
 	bool _isNoPlugin;
 	bool _isReadOnly;
@@ -244,6 +207,7 @@ struct NppGUI
 		_defaultDir[0] = 0;
 		_defaultDirExp[0] = 0;
 	};
+
 	toolBarStatusType _toolBarStatus;		// small, large ou standard
 	bool _toolbarShow;
 	bool _statusBarShow;		// show ou hide
@@ -341,16 +305,16 @@ struct ScintillaViewParams
 
 };
 
-const int NB_LIST = 20;
-const int NB_MAX_LRF_FILE = 30;
-const int NB_MAX_USER_LANG = 30;
-const int NB_MAX_EXTERNAL_LANG = 30;
-const int LANG_NAME_LEN = 32;
+#define NB_LIST 20
+#define NB_MAX_LRF_FILE 30
+#define NB_MAX_USER_LANG 30
+#define NB_MAX_EXTERNAL_LANG 30
+#define LANG_NAME_LEN 32
 
-const int NB_MAX_FINDHISTORY_FIND    = 30;
-const int NB_MAX_FINDHISTORY_REPLACE = 30;
-const int NB_MAX_FINDHISTORY_PATH    = 30;
-const int NB_MAX_FINDHISTORY_FILTER  = 20;
+#define NB_MAX_FINDHISTORY_FIND    30
+#define NB_MAX_FINDHISTORY_REPLACE 30
+#define NB_MAX_FINDHISTORY_PATH    30
+#define NB_MAX_FINDHISTORY_FILTER  20
 
 struct Lang
 {
@@ -416,47 +380,14 @@ friend class SymbolsStyleDialog;
 friend class UserDefineDialog;
 
 public :
-	UserLangContainer(){
-		_name = TEXT("new user define");
-		_ext = TEXT("");
+	UserLangContainer();;
+	UserLangContainer(const TCHAR *name, const TCHAR *ext);
 
-		// Keywords list of Delimiters (index 0)
-		lstrcpy(_keywordLists[0], TEXT("000000"));
-		for (int i = 1 ; i < nbKeywodList ; i++)
-			*_keywordLists[i] = '\0';
-	};
-	UserLangContainer(const TCHAR *name, const TCHAR *ext) : _name(name), _ext(ext) {
-		// Keywords list of Delimiters (index 0)
-		lstrcpy(_keywordLists[0], TEXT("000000"));
-		for (int j = 1 ; j < nbKeywodList ; j++)
-			*_keywordLists[j] = '\0';
-	};
+	UserLangContainer & operator=(const UserLangContainer & ulc);
 
-	UserLangContainer & operator=(const UserLangContainer & ulc) {
-		if (this != &ulc)
-        {
-			this->_name = ulc._name;
-			this->_ext = ulc._ext;
-			this->_isCaseIgnored = ulc._isCaseIgnored;
-			this->_styleArray = ulc._styleArray;
-			int nbStyler = this->_styleArray.getNbStyler();
-			for (int i = 0 ; i < nbStyler ; i++)
-			{
-				Style & st = this->_styleArray.getStyler(i);
-				if (st._bgColor == COLORREF(-1))
-					st._bgColor = white;
-				if (st._fgColor == COLORREF(-1))
-					st._fgColor = black;
-			}
-			for (int i = 0 ; i < nbKeywodList ; i++)
-				lstrcpy(this->_keywordLists[i], ulc._keywordLists[i]);
-		}
-		return *this;
-	};
-
-	int getNbKeywordList() {return nbKeywodList;};
-	const TCHAR * getName() {return _name.c_str();};
-	const TCHAR * getExtention() {return _ext.c_str();};
+	int getNbKeywordList() {return nbKeywodList;}
+	const TCHAR * getName() {return _name.c_str();}
+	const TCHAR * getExtention() {return _ext.c_str();}
 
 private:
 	std::generic_string _name;
@@ -617,10 +548,10 @@ private :
 	std::generic_string _stylesXmlPath;
 };
 
-const int NB_LANG = 80;
+#define NB_LANG 80
 
-const bool DUP = true;
-const bool FREE = false;
+#define DUP true
+#define FREE false
 
 class NppParameters
 {
@@ -759,7 +690,7 @@ public:
 
 	void writeUserDefinedLang();
 	void writeShortcuts();
-	void writeSession(const Session & session, const TCHAR *fileName = NULL);
+	void writeSession(const Session * session, const TCHAR *fileName = NULL);
 	bool writeFindHistory();
 
 
@@ -852,7 +783,7 @@ public:
 	void addScintillaModifiedIndex(int index);
 
 	std::vector<MenuItemUnit> & getContextMenuItems() {return _contextMenuItems;};
-	const Session & getSession() const {return _session;};
+	Session* getSession() const {return _session;};
 	bool hasCustomContextMenu() const {return !_contextMenuItems.empty();};
 
 	void setAccelerator(Accelerator *pAccel) {_pAccelerator = pAccel;};
@@ -865,7 +796,7 @@ public:
 	const TCHAR * getWorkingDir() const {return _currentDirectory;};
 	void setWorkingDir(const TCHAR * newPath);
 
-	bool loadSession(Session & session, const TCHAR *sessionFileName);
+	bool loadSession(Session* session, const TCHAR *sessionFileName);
 	int langTypeToCommandID(LangType lt) const;
 	WNDPROC getEnableThemeDlgTexture() const {return _enableThemeDialogTextureFuncAddr;};
 
@@ -967,7 +898,7 @@ private:
 
 	//std::vector<std::generic_string> _noMenuCmdNames;
 	std::vector<MenuItemUnit> _contextMenuItems;
-	Session _session;
+	Session* _session;
 
 	TCHAR _shortcutsPath[MAX_PATH];
 	TCHAR _contextMenuPath[MAX_PATH];

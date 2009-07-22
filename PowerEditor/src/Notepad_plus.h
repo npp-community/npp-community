@@ -217,7 +217,7 @@ public:
 
 	bool addCurrentMacro();
 	void loadLastSession();
-	bool loadSession(Session & session);
+	bool loadSession(Session* session);
 	winVer getWinVersion() const {return _winVersion;};
 
 	bool emergency(std::generic_string emergencySavedDir);

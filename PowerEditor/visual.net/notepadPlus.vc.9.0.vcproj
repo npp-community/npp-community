@@ -733,6 +733,10 @@
 				Name="Parameters"
 				>
 				<File
+					RelativePath="..\src\npp_session.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\npp_styles.cpp"
 					>
 				</File>
@@ -1149,6 +1153,10 @@
 			<Filter
 				Name="Parameters"
 				>
+				<File
+					RelativePath="..\src\npp_session.h"
+					>
+				</File>
 				<File
 					RelativePath="..\src\npp_styles.h"
 					>
