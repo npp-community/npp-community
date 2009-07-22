@@ -20,7 +20,7 @@
 #include "dockingResource.h"
 #include "Docking.h"
 #include "ToolTip.h"
-#include "Parameters.h"
+#include "npp_winver.h"
 
 #ifndef WH_MOUSE_LL
 #define WH_MOUSE_LL 14
@@ -283,7 +283,7 @@ LRESULT DockingCont::runProcCaption(HWND hwnd, UINT Message, WPARAM wParam, LPAR
 
 				// start hooking
 				hWndServer		= _hCaption;
-				winVer ver = (NppParameters::getInstance())->getWinVersion();
+				winVer ver = getWinVersion();
 				hookMouse	= ::SetWindowsHookEx(ver >= WV_W2K?WH_MOUSE_LL:WH_MOUSE, (HOOKPROC)hookProcMouse, _hInst, 0);
 
 				if (!hookMouse)

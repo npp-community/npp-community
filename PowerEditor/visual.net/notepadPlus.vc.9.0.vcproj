@@ -402,10 +402,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\npp_styles.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\src\Parameters.cpp"
 				>
 			</File>
@@ -733,6 +729,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Parameters"
+				>
+				<File
+					RelativePath="..\src\npp_styles.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\npp_winver.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -756,10 +764,6 @@
 			</File>
 			<File
 				RelativePath="..\src\Notepad_plus.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\npp_styles.h"
 				>
 			</File>
 			<File
@@ -1139,6 +1143,18 @@
 				</File>
 				<File
 					RelativePath="..\src\WinControls\ColourPicker\WordStyleDlgRes.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Parameters"
+				>
+				<File
+					RelativePath="..\src\npp_styles.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\npp_winver.h"
 					>
 				</File>
 			</Filter>

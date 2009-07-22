@@ -19,7 +19,6 @@
 #include "tinyxmlA.h"
 #include "tinyxml.h"
 
-
 #include "Parameters.h"
 #include "FileDialog.h"
 #include "ScintillaEditView.h"
@@ -28,6 +27,7 @@
 #include "MenuCmdID.h"
 
 #include "resource.h"
+#include "npp_winver.h"
 
 struct WinMenuKeyDefinition {	//more or less matches accelerator table definition, easy copy/paste
 	//const TCHAR * name;	//name retrieved from menu?
@@ -427,100 +427,8 @@ std::generic_string ThemeSwitcher::getThemeFromXmlFileName(const TCHAR *xmlFullP
 	return themeName;
 }
 
-typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO);
-
-winVer getWindowsVersion()
-{
-	OSVERSIONINFOEX osvi;
-	SYSTEM_INFO si;
-	PGNSI pGNSI;
-	BOOL bOsVersionInfoEx;
-
-	ZeroMemory(&si, sizeof(SYSTEM_INFO));
-	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
-
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-
-	bOsVersionInfoEx = GetVersionEx ((OSVERSIONINFO *) &osvi);
-	if( !bOsVersionInfoEx )
-	{
-		osvi.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-		if (! GetVersionEx ( (OSVERSIONINFO *) &osvi) )
-			return WV_UNKNOWN;
-	}
-
-	pGNSI = (PGNSI) GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetNativeSystemInfo");
-	if(pGNSI != NULL)
-		pGNSI(&si);
-	else
-		GetSystemInfo(&si);
-
-   switch (osvi.dwPlatformId)
-   {
-		case VER_PLATFORM_WIN32_NT:
-		{
-			if ( osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1 )
-			{
-				return WV_WIN7;
-			}
-
-			if ( osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0 )
-			{
-				return WV_VISTA;
-			}
-
-			if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2 )
-			{
-				if (osvi.wProductType == VER_NT_WORKSTATION &&
-					   si.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_AMD64)
-				{
-					return WV_XPX64;
-				}
-				return WV_S2003;
-			}
-
-			if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1 )
-				return WV_XP;
-
-			if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0 )
-				return WV_W2K;
-
-			if ( osvi.dwMajorVersion <= 4 )
-				return WV_NT;
-		}
-		break;
-
-		// Test for the Windows Me/98/95.
-		case VER_PLATFORM_WIN32_WINDOWS:
-		{
-			if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 0)
-			{
-				return WV_95;
-			}
-
-			if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 10)
-			{
-				return WV_98;
-			}
-
-			if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 90)
-			{
-				return WV_ME;
-			}
-		}
-		break;
-
-      case VER_PLATFORM_WIN32s:
-		return WV_WIN32S;
-
-	  default :
-		return WV_UNKNOWN;
-   }
-   return WV_UNKNOWN;
-}
-
 NppParameters * NppParameters::_pSelf = new NppParameters;
-int FileDialog::_dialogFileBoxId = (NppParameters::getInstance())->getWinVersion() < WV_W2K?edt1:cmb13;
+int FileDialog::_dialogFileBoxId = getWinVersion() < WV_W2K?edt1:cmb13;
 
 NppParameters::NppParameters() : _pXmlDoc(NULL),_pXmlUserDoc(NULL), _pXmlUserStylerDoc(NULL),\
 								_pXmlUserLangDoc(NULL), /*_pXmlNativeLangDoc(NULL), */_pXmlNativeLangDocA(NULL),\
@@ -534,9 +442,6 @@ NppParameters::NppParameters() : _pXmlDoc(NULL),_pXmlUserDoc(NULL), _pXmlUserSty
 	_findHistory._nbFindHistoryFilter = 0;
 	_findHistory._nbFindHistoryFind = 0;
 	_findHistory._nbFindHistoryReplace = 0;
-
-	//Get windows version
-	_winVersion = getWindowsVersion();
 
 	// Prepare for default path
 	TCHAR nppPath[MAX_PATH];

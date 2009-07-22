@@ -28,6 +28,9 @@
 
 #include "Parameters_def.h"
 
+// JOCE: this needs to be taken out at some point...
+#include "npp_styles.h"
+
 // Forward declarations
 class TiXmlDocument;
 class TiXmlDocumentA;
@@ -164,8 +167,6 @@ struct DockingManagerData {
 		return NULL;
 	}
 };
-
-#include "npp_styles.h"
 
 struct NewDocDefaultSettings
 {
@@ -890,7 +891,6 @@ public:
 
 	bool getContextMenuFromXmlTree(HMENU mainMenuHadle);
 	bool reloadContextMenuFromXmlTree(HMENU mainMenuHadle);
-	winVer getWinVersion() { return _winVersion;};
 	FindHistory & getFindHistory() {return _findHistory;};
 	bool _isFindReplacing; // an on the fly variable for find/replace functions
 
@@ -983,8 +983,6 @@ private:
 
 	FindDlgTabTitiles _findDlgTabTitiles;
 	bool _asNotepadStyle;
-
-	winVer _winVersion;
 
 	static int CALLBACK EnumFontFamExProc(ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX * /*lpntme*/, int /*FontType*/, LPARAM lParam) {
 		std::vector<std::generic_string> *pStrVect = (std::vector<std::generic_string> *)lParam;

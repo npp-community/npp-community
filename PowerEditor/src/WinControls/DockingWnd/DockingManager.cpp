@@ -19,8 +19,9 @@
 #include "precompiled_headers.h"
 #include "DockingManager.h"
 #include "DockingCont.h"
-#include "Gripper.h"
+#include "dockingResource.h"
 #include "DockingSplitter.h"
+#include "Gripper.h"
 
 
 BOOL DockingManager::_isRegistered = FALSE;

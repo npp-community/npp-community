@@ -71,7 +71,7 @@
 #include "TinyXml.h"
 #include "Parameters.h"
 
-
+#include "npp_winver.h"
 
 const TCHAR Notepad_plus::_className[32] = TEXT("Notepad++");
 HWND Notepad_plus::gNppHWND = NULL;
@@ -120,7 +120,7 @@ Notepad_plus::Notepad_plus(): Window(), _mainWindowStatus(0), _pDocTab(NULL), _p
 {
 
 	ZeroMemory(&_prevSelectedRange, sizeof(_prevSelectedRange));
-	_winVersion = (NppParameters::getInstance())->getWinVersion();
+	_winVersion = getWinVersion();
 
 	TiXmlDocumentA *nativeLangDocRootA = (NppParameters::getInstance())->getNativeLangA();
 
@@ -3007,7 +3007,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 		}
 		//Else forward notification to window of rebarband
 		REBARBANDINFO rbBand;
-		winVer winVersion = (NppParameters::getInstance())->getWinVersion();
+		winVer winVersion = getWinVersion();
 		if (winVersion <= WV_W2K)
 		{
 			ZeroMemory(&rbBand, sizeof(REBARBANDINFO));

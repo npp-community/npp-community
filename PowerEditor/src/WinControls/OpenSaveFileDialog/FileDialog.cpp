@@ -81,7 +81,7 @@ FileDialog::FileDialog(HWND hwnd, HINSTANCE hInst)
 
 	_fileName[0] = '\0';
 
-	_winVersion = (NppParameters::getInstance())->getWinVersion();
+	_winVersion = getWinVersion();
 
 	_ofn.lStructSize = sizeof(_ofn);
 	if (_winVersion < WV_W2K)

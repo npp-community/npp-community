@@ -2132,7 +2132,7 @@ FindReplaceDlg::FindReplaceDlg() :
 	_tab(NULL)
 {
 	_uniFileName = new char[(_fileNameLenMax + 3) * 2];
-	_winVer = (NppParameters::getInstance())->getWinVersion();
+	_winVer = getWinVersion();
 }
 
 void FindReplaceDlg::changeTabName( DIALOG_TYPE index, const TCHAR *name2change )
@@ -2481,7 +2481,7 @@ void FindIncrementDlg::addToRebar(ReBar * rebar)
 	RECT client;
 	getClientRect(client);
 
-	winVer winVersion = (NppParameters::getInstance())->getWinVersion();
+	winVer winVersion = getWinVersion();
 	if (winVersion <= WV_W2K)
 	{
 		ZeroMemory(&_rbBand, sizeof(REBARBANDINFO));

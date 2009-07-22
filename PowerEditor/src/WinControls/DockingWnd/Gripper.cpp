@@ -18,13 +18,12 @@
 
 #include "precompiled_headers.h"
 
-
 #include "Gripper.h"
 
 #include "dockingResource.h"
 #include "DockingManager.h"
 #include "DockingCont.h"
-#include "Parameters.h"
+#include "npp_winver.h"
 
 #ifndef WH_KEYBOARD_LL
 #define WH_KEYBOARD_LL 13
@@ -255,7 +254,7 @@ void Gripper::create()
 	// start hooking
 	::SetWindowPos(_pCont->getHSelf(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 	::SetCapture(_hSelf);
-	winVer ver = (NppParameters::getInstance())->getWinVersion();
+	winVer ver = getWinVersion();
 	hookMouse = ::SetWindowsHookEx(ver >= WV_W2K?WH_MOUSE_LL:WH_MOUSE, (HOOKPROC)hookProcMouse, _hInst, 0);
 
     if (!hookMouse)

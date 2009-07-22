@@ -18,8 +18,7 @@
 #include "precompiled_headers.h"
 #include "ToolBar.h"
 #include "Shortcut.h"
-#include "Parameters.h"
-#include "Notepad_plus_msgs.h"
+#include "npp_winver.h"
 #include "ImageListSet.h"
 
 
@@ -322,7 +321,7 @@ void ToolBar::addToRebar(ReBar * rebar) {
 		return;
 	_pRebar = rebar;
 
-	winVer winVersion = (NppParameters::getInstance())->getWinVersion();
+	winVer winVersion = getWinVersion();
 	if (winVersion <= WV_W2K)
 	{
 		ZeroMemory(&_rbBand, sizeof(REBARBANDINFO));
@@ -429,7 +428,7 @@ void ReBar::setIDVisible(int id, bool show)
 		return;	//error
 
 	REBARBANDINFO rbBand;
-	winVer winVersion = (NppParameters::getInstance())->getWinVersion();
+	winVer winVersion = getWinVersion();
 	if (winVersion <= WV_W2K)
 	{
 		ZeroMemory(&rbBand, sizeof(REBARBANDINFO));
@@ -456,7 +455,7 @@ bool ReBar::getIDVisible(int id)
 	if (index == -1 )
 		return false;	//error
 	REBARBANDINFO rbBand;
-	winVer winVersion = (NppParameters::getInstance())->getWinVersion();
+	winVer winVersion = getWinVersion();
 	if (winVersion <= WV_W2K)
 	{
 		ZeroMemory(&rbBand, sizeof(REBARBANDINFO));

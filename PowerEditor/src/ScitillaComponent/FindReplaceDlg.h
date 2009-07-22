@@ -21,7 +21,7 @@
 #include "StaticDialog.h"
 #include "FindReplaceDlg_rc.h"
 #include "BufferID.h"
-#include "Notepad_plus_msgs.h"
+#include "npp_winver.h"
 
 // Forward declarations
 class Finder;

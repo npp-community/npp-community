@@ -22,7 +22,8 @@
 #include "TaskListDlg_rc.h"
 #include "resource.h"
 #include "TaskList.h"
-#include "Parameters.h"
+#include "npp_winver.h"
+#include "colors.h"
 
 static HWND hWndServer = NULL;
 static HHOOK hook = NULL;
@@ -104,7 +105,7 @@ BOOL CALLBACK TaskListDlg::run_dlgProc( UINT Message, WPARAM wParam, LPARAM lPar
 #ifndef WH_MOUSE_LL
 #define WH_MOUSE_LL 14
 #endif
-			winVer ver = (NppParameters::getInstance())->getWinVersion();
+			winVer ver = getWinVersion();
 			_hHooker = ::SetWindowsHookEx(ver >= WV_W2K?WH_MOUSE_LL:WH_MOUSE, (HOOKPROC)hookProc, _hInst, 0);
 			hook = _hHooker;
 			return FALSE;

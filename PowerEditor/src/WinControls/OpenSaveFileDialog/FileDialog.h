@@ -20,7 +20,7 @@
 
 //#define _WIN32_WINNT  0x0600
 
-#include "Notepad_plus_msgs.h"
+#include "npp_winver.h"
 
 const int nbExtMax = 256;
 const int extLenMax = 64;
