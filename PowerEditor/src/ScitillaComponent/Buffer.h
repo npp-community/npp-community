@@ -18,15 +18,16 @@
 #ifndef BUFFER_H
 #define BUFFER_H
 
-#include "Utf8_16.h"
-
 #include "BufferID.h"
 #include "Notepad_plus_msgs.h"
+#include "Parameters_def.h"
 
 struct Position;
 struct Lang;
 class ScintillaEditView;
 class Notepad_plus;
+
+class Utf8_16_Read;
 
 typedef sptr_t Document;
 

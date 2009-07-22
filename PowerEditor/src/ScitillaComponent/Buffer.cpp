@@ -4,6 +4,7 @@
 #include "Notepad_plus.h"
 #include "ScintillaEditView.h"
 #include "Parameters.h"
+#include "Utf8_16.h"
 
 FileManager * FileManager::_pSelf = new FileManager();
 
