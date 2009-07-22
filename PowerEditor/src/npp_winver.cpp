@@ -20,10 +20,9 @@
 
 winVer getWindowsVersionInternal();
 
-static const winVer s_winVer(getWindowsVersionInternal());
-
 winVer getWinVersion()
 {
+	static const winVer s_winVer(getWindowsVersionInternal());
 	return s_winVer;
 }
 
