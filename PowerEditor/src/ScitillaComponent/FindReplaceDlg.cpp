@@ -18,6 +18,7 @@
 #include "precompiled_headers.h"
 
 #include "FindReplaceDlg.h"
+#include "FindReplaceDlg_rc.h"
 #include "ScintillaEditView.h"
 #include "UniConversion.h"
 #include "Buffer.h"
@@ -28,6 +29,7 @@
 #include "Toolbar.h"
 
 #include "Parameters.h"
+#include "npp_winver.h"
 
 
 struct FoundInfo {
@@ -221,7 +223,7 @@ void FindReplaceDlg::addText2Combo(const TCHAR * txt2add, HWND hCombo, bool isUT
 	int i = 0;
 
 	TCHAR text[FINDREPLACE_MAXLENGTH];
-	bool isWin9x = _winVer <= WV_ME;
+	bool isWin9x = getWinVersion() <= WV_ME;
 	wchar_t wchars2Add[FINDREPLACE_MAXLENGTH];
 	wchar_t textW[FINDREPLACE_MAXLENGTH];
 	int count = ::SendMessage(hCombo, CB_GETCOUNT, 0, 0);
@@ -288,7 +290,7 @@ std::generic_string FindReplaceDlg::getTextFromCombo(HWND hCombo, bool /*isUnico
 std::generic_string FindReplaceDlg::getTextFromCombo(HWND hCombo, bool isUnicode) const
 {
 	TCHAR str[FINDREPLACE_MAXLENGTH];
-	bool isWin9x = _winVer <= WV_ME;
+	bool isWin9x = getWinVersion() <= WV_ME;
 	if (isUnicode)
 	{
 		wchar_t wchars[FINDREPLACE_MAXLENGTH];
@@ -2132,7 +2134,6 @@ FindReplaceDlg::FindReplaceDlg() :
 	_tab(NULL)
 {
 	_uniFileName = new char[(_fileNameLenMax + 3) * 2];
-	_winVer = getWinVersion();
 }
 
 void FindReplaceDlg::changeTabName( DIALOG_TYPE index, const TCHAR *name2change )
@@ -2168,6 +2169,113 @@ void FindReplaceDlg::gotoCorrectTab()
 	{
 		_tab->activateAt(_currentStatus);
 	}
+}
+
+void FindReplaceDlg::initOptionsFromDlg()
+{
+	_options._isWholeWord = isCheckedOrNot(IDWHOLEWORD);
+	_options._isMatchCase = isCheckedOrNot(IDMATCHCASE);
+	_options._searchType = isCheckedOrNot(IDREGEXP)?FindRegex:isCheckedOrNot(IDEXTENDED)?FindExtended:FindNormal;
+	_options._isWrapAround = isCheckedOrNot(IDWRAP);
+	_isInSelection = isCheckedOrNot(IDC_IN_SELECTION_CHECK);
+
+	_doPurge = isCheckedOrNot(IDC_PURGE_CHECK);
+	_doMarkLine = isCheckedOrNot(IDC_MARKLINE_CHECK);
+	_doStyleFoundToken = isCheckedOrNot(IDC_STYLEFOUND_CHECK);
+
+	::EnableWindow(::GetDlgItem(_hSelf, IDCMARKALL), (_doMarkLine || _doStyleFoundToken));
+}
+
+void FindReplaceDlg::doDialog( DIALOG_TYPE whichType, bool isRTL /*= false*/ )
+{
+	if (!isCreated())
+	{
+		create(IDD_FIND_REPLACE_DLG, isRTL);
+		_isRTL = isRTL;
+	}
+
+	if (whichType == FINDINFILES_DLG)
+		enableFindInFilesFunc();
+	else
+		enableReplaceFunc(whichType == REPLACE_DLG);
+
+	::SetFocus(::GetDlgItem(_hSelf, IDFINDWHAT));
+	display();
+}
+
+void FindReplaceDlg::setSearchText( TCHAR * txt2find )
+{
+	HWND hCombo = ::GetDlgItem(_hSelf, IDFINDWHAT);
+	if (txt2find && txt2find[0])
+	{
+		// We got a valid search string
+		::SendMessage(hCombo, CB_SETCURSEL, (WPARAM)-1, 0); // remove selection - to allow using down arrow to get to last searched word
+		::SetDlgItemText(_hSelf, IDFINDWHAT, txt2find);
+	}
+	::SendMessage(hCombo, CB_SETEDITSEL, 0, MAKELPARAM(0, -1)); // select all text - fast edit
+}
+
+void FindReplaceDlg::setFindInFilesDirFilter( const TCHAR *dir, const TCHAR *filters )
+{
+	if (dir)
+	{
+		_directory = dir;
+		::SetDlgItemText(_hSelf, IDD_FINDINFILES_DIR_COMBO, dir);
+	}
+	if (filters)
+	{
+		_filters = filters;
+		::SetDlgItemText(_hSelf, IDD_FINDINFILES_FILTERS_COMBO, filters);
+	}
+}
+
+std::generic_string FindReplaceDlg::getText2search() const
+{
+	return getTextFromCombo(::GetDlgItem(_hSelf, IDFINDWHAT));
+}
+
+void FindReplaceDlg::setDefaultButton( int nID )
+{
+#if 0
+	// There is a problem when you:
+	// 1. open the find dialog
+	// 2. press the "close" buttom
+	// 3. open it again
+	// 4. search for a non existing text
+	// 5. when the "Can't find the text:" messagebox appears, hit "OK"
+	// 6. now, the "Close" button looks like the default button. (but it only looks like that)
+	//    if you hit "Enter" the "Find" button will be "pressed".
+	// I thought this code might fix this but it doesn't
+	// See: http://msdn.microsoft.com/en-us/library/ms645413(VS.85).aspx
+
+	HWND pButton;
+	DWORD dwDefInfo = SendMessage(_hSelf, DM_GETDEFID, 0, 0L);
+	if (HIWORD(dwDefInfo) == DC_HASDEFID && (int)LOWORD(dwDefInfo) != nID)
+	{
+		// Reset 'DefButton' style
+		pButton = GetDlgItem(_hSelf, (int)LOWORD(dwDefInfo));
+		if (pButton)
+			SendMessage(pButton, BM_SETSTYLE, LOWORD(BS_PUSHBUTTON | BS_RIGHT ), MAKELPARAM(TRUE, 0));
+	}
+
+	SendMessage(_hSelf, DM_SETDEFID, (WPARAM)nID, 0L);
+	pButton = GetDlgItem(_hSelf, nID);
+	if (pButton)
+	{
+		SendMessage(pButton, BM_SETSTYLE, LOWORD(BS_DEFPUSHBUTTON), MAKELPARAM(TRUE, 0));
+	}
+#endif
+	SendMessage(_hSelf, DM_SETDEFID, (WPARAM)nID, 0L);
+}
+
+void FindReplaceDlg::init( HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView )
+{
+	Window::init(hInst, hPere);
+	if (!ppEditView)
+	{
+		throw int(9900);
+	}
+	_ppEditView = ppEditView;
 }
 
 void Finder::setFinderStyle()
@@ -2292,7 +2400,7 @@ void FindIncrementDlg::setSearchText(const TCHAR * txt2find, bool isUTF8 ) {
 	const int wideBufferSize = 256;
 	WCHAR wchars[wideBufferSize];
 	::MultiByteToWideChar(CP_UTF8, 0, txt2find, -1, wchars, wideBufferSize);
-	winVer winVersion = NppParameters::getInstance()->getWinVersion();
+	winVer winVersion = getWinVersion();
 	if (winVersion <= WV_ME) {
 		//Cannot simply take txt2find since its UTF8
 		char ansiBuffer[wideBufferSize];	//Assuming no more than 2 bytes for each wchar (SBCS or DBCS, no UTF8 and sorts)
@@ -2505,4 +2613,25 @@ void FindIncrementDlg::addToRebar(ReBar * rebar)
 	_rbBand.cxIdeal		= _rbBand.cx			= client.right-client.left;
 
 	_pRebar->addBand(&_rbBand, true);
+}
+
+void FindIncrementDlg::init( HINSTANCE hInst, HWND hPere, FindReplaceDlg *pFRDlg, bool isRTL /*= false*/ )
+{
+	Window::init(hInst, hPere);
+	if (!pFRDlg)
+		throw int(9910);
+	_pFRDlg = pFRDlg;
+	create(IDD_INCREMENT_FIND, isRTL);
+	_isRTL = isRTL;
+}
+
+void FindIncrementDlg::setFindStatus( FindStatus iStatus )
+{
+	static TCHAR *findStatus[] = { TEXT(""), // FSFound
+		TEXT("Phrase not found"), //FSNotFound
+		TEXT("Reached top of page, continued from bottom"), // FSTopReached
+		TEXT("Reached end of page, continued from top")}; // FSEndReached
+	if (iStatus<0 || iStatus >= sizeof(findStatus)/sizeof(findStatus[0]))
+		return; // out of range
+	::SendDlgItemMessage(_hSelf, IDC_INCFINDSTATUS, WM_SETTEXT, 0, (LPARAM)findStatus[iStatus]);
 }

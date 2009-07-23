@@ -19,9 +19,7 @@
 #define FIND_REPLACE_DLG_H
 
 #include "StaticDialog.h"
-#include "FindReplaceDlg_rc.h"
 #include "BufferID.h"
-#include "npp_winver.h"
 
 // Forward declarations
 class Finder;
@@ -76,44 +74,13 @@ public :
 
 	virtual void destroy();
 
-	void init(HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView) {
-		Window::init(hInst, hPere);
-		if (!ppEditView)
-			throw int(9900);
-		_ppEditView = ppEditView;
-	};
+	void init(HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView);
 
 	virtual void create(int dialogID, bool isRTL = false);
 
-	void initOptionsFromDlg()	{
-		_options._isWholeWord = isCheckedOrNot(IDWHOLEWORD);
-		_options._isMatchCase = isCheckedOrNot(IDMATCHCASE);
-		_options._searchType = isCheckedOrNot(IDREGEXP)?FindRegex:isCheckedOrNot(IDEXTENDED)?FindExtended:FindNormal;
-		_options._isWrapAround = isCheckedOrNot(IDWRAP);
-		_isInSelection = isCheckedOrNot(IDC_IN_SELECTION_CHECK);
+	void initOptionsFromDlg();
 
-		_doPurge = isCheckedOrNot(IDC_PURGE_CHECK);
-		_doMarkLine = isCheckedOrNot(IDC_MARKLINE_CHECK);
-		_doStyleFoundToken = isCheckedOrNot(IDC_STYLEFOUND_CHECK);
-
-		::EnableWindow(::GetDlgItem(_hSelf, IDCMARKALL), (_doMarkLine || _doStyleFoundToken));
-	};
-
-	void doDialog(DIALOG_TYPE whichType, bool isRTL = false) {
-		if (!isCreated())
-		{
-			create(IDD_FIND_REPLACE_DLG, isRTL);
-			_isRTL = isRTL;
-		}
-
-		if (whichType == FINDINFILES_DLG)
-			enableFindInFilesFunc();
-		else
-			enableReplaceFunc(whichType == REPLACE_DLG);
-
-		::SetFocus(::GetDlgItem(_hSelf, IDFINDWHAT));
-		display();
-	};
+	void doDialog(DIALOG_TYPE whichType, bool isRTL = false);
 	bool processFindNext(const TCHAR *txt2find, FindOption *options = NULL, FindStatus *oFindStatus = NULL);
 	bool processReplace(const TCHAR *txt2find, const TCHAR *txt2replace, FindOption *options = NULL);
 
@@ -127,16 +94,7 @@ public :
 	void replaceAllInOpenedDocs();
 	void findAllIn(InWhat op);
 
-	void setSearchText(TCHAR * txt2find) {
-		HWND hCombo = ::GetDlgItem(_hSelf, IDFINDWHAT);
-		if (txt2find && txt2find[0])
-		{
-			// We got a valid search string
-			::SendMessage(hCombo, CB_SETCURSEL, (WPARAM)-1, 0); // remove selection - to allow using down arrow to get to last searched word
-			::SetDlgItemText(_hSelf, IDFINDWHAT, txt2find);
-		}
-		::SendMessage(hCombo, CB_SETEDITSEL, 0, MAKELPARAM(0, -1)); // select all text - fast edit
-	}
+	void setSearchText(TCHAR * txt2find);
 	void gotoNextFoundResult(int direction = 0);;
 
 	void putFindResult(int result) {
@@ -150,22 +108,9 @@ public :
 		doDialog(FINDINFILES_DLG);
 	};
 
-	void setFindInFilesDirFilter(const TCHAR *dir, const TCHAR *filters) {
-		if (dir)
-		{
-			_directory = dir;
-			::SetDlgItemText(_hSelf, IDD_FINDINFILES_DIR_COMBO, dir);
-		}
-		if (filters)
-		{
-			_filters = filters;
-			::SetDlgItemText(_hSelf, IDD_FINDINFILES_FILTERS_COMBO, filters);
-		}
-	};
+	void setFindInFilesDirFilter(const TCHAR *dir, const TCHAR *filters);
 
-	std::generic_string getText2search() const {
-		return getTextFromCombo(::GetDlgItem(_hSelf, IDFINDWHAT));
-	};
+	std::generic_string getText2search() const;
 
 	const std::generic_string & getFilters() const {return _filters;};
 	const std::generic_string & getDirectory() const {return _directory;};
@@ -222,48 +167,12 @@ private :
 	char *_uniFileName;
 
 	TabBar* _tab;
-	winVer _winVer;
 
 	void enableReplaceFunc(bool isEnable);
 	void enableFindInFilesControls(bool isEnable = true);
 	void enableFindInFilesFunc();;
 
-	//////////////////
-
-	void setDefaultButton(int nID)
-	{
-#if 0
-		// There is a problem when you:
-		// 1. open the find dialog
-		// 2. press the "close" buttom
-		// 3. open it again
-		// 4. search for a non existing text
-		// 5. when the "Can't find the text:" messagebox appears, hit "OK"
-		// 6. now, the "Close" button looks like the default button. (but it only looks like that)
-		//    if you hit "Enter" the "Find" button will be "pressed".
-		// I thought this code might fix this but it doesn't
-		// See: http://msdn.microsoft.com/en-us/library/ms645413(VS.85).aspx
-
-		HWND pButton;
-		DWORD dwDefInfo = SendMessage(_hSelf, DM_GETDEFID, 0, 0L);
-		if (HIWORD(dwDefInfo) == DC_HASDEFID && (int)LOWORD(dwDefInfo) != nID)
-		{
-			// Reset 'DefButton' style
-			pButton = GetDlgItem(_hSelf, (int)LOWORD(dwDefInfo));
-			if (pButton)
-				SendMessage(pButton, BM_SETSTYLE, LOWORD(BS_PUSHBUTTON | BS_RIGHT ), MAKELPARAM(TRUE, 0));
-		}
-
-		SendMessage(_hSelf, DM_SETDEFID, (WPARAM)nID, 0L);
-		pButton = GetDlgItem(_hSelf, nID);
-		if (pButton)
-		{
-			SendMessage(pButton, BM_SETSTYLE, LOWORD(BS_DEFPUSHBUTTON), MAKELPARAM(TRUE, 0));
-		}
-#endif
-		SendMessage(_hSelf, DM_SETDEFID, (WPARAM)nID, 0L);
-	}
-	////////////////////////
+	void setDefaultButton(int nID);
 
 	void gotoCorrectTab();;
 
@@ -283,28 +192,12 @@ class FindIncrementDlg : public StaticDialog
 {
 public :
 	FindIncrementDlg() : _pFRDlg(NULL), _pRebar(NULL) {};
-	void init(HINSTANCE hInst, HWND hPere, FindReplaceDlg *pFRDlg, bool isRTL = false) {
-		Window::init(hInst, hPere);
-		if (!pFRDlg)
-			throw int(9910);
-		_pFRDlg = pFRDlg;
-		create(IDD_INCREMENT_FIND, isRTL);
-		_isRTL = isRTL;
-	};
+	void init(HINSTANCE hInst, HWND hPere, FindReplaceDlg *pFRDlg, bool isRTL = false);
 	virtual void destroy();
 	virtual void display(bool toShow = true) const;
 
 	void setSearchText(const TCHAR * txt2find, bool isUTF8 = false);
-	void setFindStatus(FindStatus iStatus) {
-		static TCHAR *findStatus[] = { TEXT(""), // FSFound
-		                               TEXT("Phrase not found"), //FSNotFound
-		                               TEXT("Reached top of page, continued from bottom"), // FSTopReached
-		                               TEXT("Reached end of page, continued from top")}; // FSEndReached
-		if (iStatus<0 || iStatus >= sizeof(findStatus)/sizeof(findStatus[0]))
-			return; // out of range
-		::SendDlgItemMessage(_hSelf, IDC_INCFINDSTATUS, WM_SETTEXT, 0, (LPARAM)findStatus[iStatus]);
-	}
-
+	void setFindStatus(FindStatus iStatus);
 	void addToRebar(ReBar * rebar);
 private :
 	bool _isRTL;
