@@ -69,7 +69,7 @@ public:
 
 	void showToolbar(tTbData *pTbData, BOOL state);
 
-	BOOL updateInfo(HWND hClient);;
+	BOOL updateInfo(HWND hClient);
 
 	void setActiveTb(tTbData* pTbData);
 	void setActiveTb(INT iItem);
@@ -98,7 +98,7 @@ public:
 		return dragFromTabTemp;
 	};
 
-	void setCaptionTop(BOOL isTopCaption);;
+	void setCaptionTop(BOOL isTopCaption);
 
 	void focusClient();
 
@@ -112,7 +112,7 @@ public:
 		RedrawWindow(_hContTab, NULL, NULL, 0);
 	};
 
-    virtual void destroy();;
+    virtual void destroy();
 
 protected :
 

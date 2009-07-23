@@ -33,7 +33,7 @@ public:
 	~ShortcutMapper();
 	//void init(HINSTANCE hInst, HWND parent) {};
 	void destroy();
-	void doDialog(bool isRTL = false);;
+	void doDialog(bool isRTL = false);
 	void getClientRect(RECT & rc) const {
 		Window::getClientRect(rc);
 		rc.top += 40;

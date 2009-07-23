@@ -27,13 +27,13 @@ class GoToLineDlg : public StaticDialog
 public :
 	GoToLineDlg() : StaticDialog(), _mode(go2line) {};
 
-	void init(HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView);;
+	void init(HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView);
 
-	virtual void create(int dialogID, bool isRTL = false);;
+	virtual void create(int dialogID, bool isRTL = false);
 
-	void doDialog(bool isRTL = false);;
+	void doDialog(bool isRTL = false);
 
-    virtual void display(bool toShow = true) const;;
+    virtual void display(bool toShow = true) const;
 
 protected :
 	enum mode {go2line, go2offsset};
@@ -44,11 +44,11 @@ private :
 
     ScintillaEditView **_ppEditView;
 
-    void updateLinesNumbers() const;;
+    void updateLinesNumbers() const;
 
-    void cleanLineEdit() const;;
+    void cleanLineEdit() const;
 
-    int getLine() const;;
+    int getLine() const;
 
 };
 

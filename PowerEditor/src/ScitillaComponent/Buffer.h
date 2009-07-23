@@ -253,11 +253,11 @@ public :
 		return _userLangExt;
 	};
 
-	const TCHAR * getCommentLineSymbol() const;;
+	const TCHAR * getCommentLineSymbol() const;
 
-	const TCHAR * getCommentStart() const;;
+	const TCHAR * getCommentStart() const;
 
-    const TCHAR * getCommentEnd() const;;
+    const TCHAR * getCommentEnd() const;
 
 	bool getNeedsLexing() const {
 		return _needLexer;
@@ -337,7 +337,7 @@ private :
 		doNotify(BufferChangeStatus);
 	}
 
-	void doNotify(int mask);;
+	void doNotify(int mask);
 };
 
 #endif //BUFFER_H

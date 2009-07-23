@@ -36,13 +36,13 @@ struct KeyCombo {
 class Shortcut : public StaticDialog
 {
 public:
-	Shortcut();;
+	Shortcut();
 
-	Shortcut(const TCHAR *name, bool isCtrl, bool isAlt, bool isShift, UCHAR key);;
+	Shortcut(const TCHAR *name, bool isCtrl, bool isAlt, bool isShift, UCHAR key);
 
 	Shortcut(const Shortcut & sc);
 
-	BYTE getAcceleratorModifiers();;
+	BYTE getAcceleratorModifiers();
 
 	Shortcut & operator=(const Shortcut & sc);
 	friend const bool operator==(const Shortcut & a, const Shortcut & b);
@@ -53,13 +53,13 @@ public:
 
 	virtual int doDialog();
 
-	virtual bool isValid() const;;
+	virtual bool isValid() const;
 	virtual bool isEnabled() const {	//true if _keyCombo != 0, false if _keyCombo == 0, in which case no accelerator should be made
 		return (_keyCombo._key != 0);
 	}
 
 	virtual std::generic_string toString() const;					//the hotkey part
-	std::generic_string toMenuItemString() const;;
+	std::generic_string toMenuItemString() const;
 	const KeyCombo & getKeyCombo() const {
 		return _keyCombo;
 	}
@@ -95,7 +95,7 @@ private :
 
 class ScintillaKeyMap : public Shortcut {
 public:
-	ScintillaKeyMap(Shortcut sc, long scintillaKeyID, unsigned long id);;
+	ScintillaKeyMap(Shortcut sc, long scintillaKeyID, unsigned long id);
 	long getScintillaKeyID() const {return _scintillaKeyID;}
 	int getMenuCmdID() const {return _menuCmdID;};
 	int toKeyDef(int index) const;
@@ -114,7 +114,7 @@ public:
 	int doDialog();
 
 	//only compares the internal KeyCombos, nothing else
-	friend const bool operator==(const ScintillaKeyMap & a, const ScintillaKeyMap & b);;
+	friend const bool operator==(const ScintillaKeyMap & a, const ScintillaKeyMap & b);
 
 	friend inline const bool operator!=(const ScintillaKeyMap & a, const ScintillaKeyMap & b) {
 		return !(a == b);
@@ -203,8 +203,8 @@ class Accelerator { //Handles accelerator keys for Notepad++ menu, including cus
 friend class ShortcutMapper;
 public:
 	Accelerator():_hAccelMenu(NULL), _hMenuParent(NULL), _hAccTable(NULL), _pAccelArray(NULL), _nbAccelItems(0){};
-	~Accelerator();;
-	void init(HMENU hMenu, HWND menuParent);;
+	~Accelerator();
+	void init(HMENU hMenu, HWND menuParent);
 	HACCEL getAccTable() const {return _hAccTable;};
 
 	void updateShortcuts();
@@ -217,7 +217,7 @@ private:
 	ACCEL *_pAccelArray;
 	int _nbAccelItems;
 
-	void reNew();;
+	void reNew();
 	void updateMenuItemByCommand(CommandShortcut csc);
 };
 

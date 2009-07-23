@@ -26,7 +26,7 @@ struct MenuItemUnit {
 	std::generic_string _subMenuName;
 	MenuItemUnit();
 	MenuItemUnit(unsigned long cmdID, std::generic_string itemName, std::generic_string subMenuName=TEXT(""));
-	MenuItemUnit(unsigned long cmdID, const TCHAR *itemName, const TCHAR *subMenuName=NULL);;
+	MenuItemUnit(unsigned long cmdID, const TCHAR *itemName, const TCHAR *subMenuName=NULL);
 };
 
 class ContextMenu {

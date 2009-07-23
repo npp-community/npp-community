@@ -380,7 +380,7 @@ friend class SymbolsStyleDialog;
 friend class UserDefineDialog;
 
 public :
-	UserLangContainer();;
+	UserLangContainer();
 	UserLangContainer(const TCHAR *name, const TCHAR *ext);
 
 	UserLangContainer & operator=(const UserLangContainer & ulc);
@@ -812,7 +812,7 @@ public:
 
 	FindDlgTabTitiles & getFindDlgTabTitiles() { return _findDlgTabTitiles;};
 
-	const char * getNativeLangMenuStringA(int itemID);;
+	const char * getNativeLangMenuStringA(int itemID);
 
 	bool asNotepadStyle() const {return _asNotepadStyle;};
 

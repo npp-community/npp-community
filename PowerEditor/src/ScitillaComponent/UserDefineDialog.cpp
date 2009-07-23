@@ -724,10 +724,10 @@ BOOL CALLBACK CommentStyleDialog::run_dlgProc(UINT Message, WPARAM wParam, LPARA
 			switch (wParam)
 			{
 				case IDC_COMMENTLINESYMBOL_CHECK :
-					return setPropertyByCheck(_hSelf, wParam, _pUserLang->_isCommentLineSymbol);;
+					return setPropertyByCheck(_hSelf, wParam, _pUserLang->_isCommentLineSymbol);
 
 				case IDC_COMMENTSYMBOL_CHECK :
-					return setPropertyByCheck(_hSelf, wParam, _pUserLang->_isCommentSymbol);;
+					return setPropertyByCheck(_hSelf, wParam, _pUserLang->_isCommentSymbol);
 
 			}
 		}

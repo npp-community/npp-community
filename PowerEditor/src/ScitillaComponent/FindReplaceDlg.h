@@ -95,7 +95,7 @@ public :
 	void findAllIn(InWhat op);
 
 	void setSearchText(TCHAR * txt2find);
-	void gotoNextFoundResult(int direction = 0);;
+	void gotoNextFoundResult(int direction = 0);
 
 	void putFindResult(int result) {
 		_findAllResult = result;
@@ -123,11 +123,11 @@ public :
 
 	void finishFilesSearch(int count);
 
-	void focusOnFinder();;
+	void focusOnFinder();
 
 	HWND getHFindResults();
 
-	void updateFinderScintilla();;
+	void updateFinderScintilla();
 
 protected :
 	virtual BOOL CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
@@ -170,18 +170,18 @@ private :
 
 	void enableReplaceFunc(bool isEnable);
 	void enableFindInFilesControls(bool isEnable = true);
-	void enableFindInFilesFunc();;
+	void enableFindInFilesFunc();
 
 	void setDefaultButton(int nID);
 
-	void gotoCorrectTab();;
+	void gotoCorrectTab();
 
 	bool isCheckedOrNot(int checkControlID) const {
 		return (BST_CHECKED == ::SendMessage(::GetDlgItem(_hSelf, checkControlID), BM_GETCHECK, 0, 0));
 	};
 
 	void updateCombos();
-	void updateCombo(int comboID);;
+	void updateCombo(int comboID);
 	void fillFindHistory();
 	void fillComboHistory(int id, int count, std::generic_string **pStrings);
 	void saveComboHistory(int id, int maxcount, int& oldcount, std::generic_string **pStrings);

@@ -33,18 +33,18 @@ public:
 
 	virtual void init(HINSTANCE hInst, HWND parent);
 
-    void create(tTbData * data, bool isRTL = false);;
+    void create(tTbData * data, bool isRTL = false);
 
 	virtual void updateDockingDlg();
 
-	virtual void display(bool toShow = true) const;;
+	virtual void display(bool toShow = true) const;
 
 	const TCHAR * getPluginFileName() const {
 		return _moduleName;
 	};
 
 protected :
-	virtual BOOL CALLBACK run_dlgProc(UINT message, WPARAM /*wParam*/, LPARAM lParam);;
+	virtual BOOL CALLBACK run_dlgProc(UINT message, WPARAM /*wParam*/, LPARAM lParam);
 
 	// Handles
     HWND			_HSource;

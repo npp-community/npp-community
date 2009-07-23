@@ -30,8 +30,8 @@ struct Position
 };
 
 struct sessionFileInfo : public Position {
-	sessionFileInfo(const TCHAR *fn);;
-	sessionFileInfo(const TCHAR *fn, const TCHAR *ln, Position pos);;
+	sessionFileInfo(const TCHAR *fn);
+	sessionFileInfo(const TCHAR *fn, const TCHAR *ln, Position pos);
 
 	sessionFileInfo(std::generic_string fn) : _fileName(fn){};
 	sessionFileInfo(std::generic_string fn, Position pos) : Position(pos), _fileName(fn){};

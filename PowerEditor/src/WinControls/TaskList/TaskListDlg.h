@@ -53,7 +53,7 @@ public :
     int doDialog(bool isRTL = false);
 
 protected :
-	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);;
+	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 
 private :
 	TaskList* _taskList;
@@ -62,7 +62,7 @@ private :
 	bool _initDir;
 	HHOOK _hHooker;
 
-	void drawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);;
+	void drawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);
 };
 
 

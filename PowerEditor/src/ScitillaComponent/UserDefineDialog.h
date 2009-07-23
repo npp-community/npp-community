@@ -77,7 +77,7 @@ public:
 protected :
 	void setKeywords2List(int ctrlID);
 
-	int getGroupIndexFromCombo(int ctrlID, bool & isFontSize) const;;
+	int getGroupIndexFromCombo(int ctrlID, bool & isFontSize) const;
 	int getStylerIndexFromCP(HWND hWnd, bool & isFG, ColourPicker **ppCP) const;
 	int getGroupeIndexFromCheck(int ctrlID, int & fontStyleMask) const;
 };
@@ -93,7 +93,7 @@ protected :
 	void setKeywords2List(int id);
 
     // SEE @REF #01
-    int getGroupIndexFromCombo(int ctrlID, bool & isFontSize)  const;;
+    int getGroupIndexFromCombo(int ctrlID, bool & isFontSize)  const;
     int getStylerIndexFromCP(HWND hWnd, bool & isFG, ColourPicker **ppCP) const;
     int getGroupeIndexFromCheck(int ctrlID, int & fontStyleMask) const;
 };
@@ -108,7 +108,7 @@ protected :
 	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 
     void setKeywords2List(int id);
-    int getGroupIndexFromCombo(int ctrlID, bool & isFontSize) const;;
+    int getGroupIndexFromCombo(int ctrlID, bool & isFontSize) const;
 
     int getStylerIndexFromCP(HWND hWnd, bool & isFG, ColourPicker **ppCP) const;
     int getGroupeIndexFromCheck(int ctrlID, int & fontStyleMask) const;
@@ -128,7 +128,7 @@ public :
 protected :
 	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
     void setKeywords2List(int /*ctrlID*/) {}
-    int getGroupIndexFromCombo(int ctrlID, bool & isFontSize) const;;
+    int getGroupIndexFromCombo(int ctrlID, bool & isFontSize) const;
     int getStylerIndexFromCP(HWND hWnd, bool & isFG, ColourPicker **ppCP) const;
     int getGroupeIndexFromCheck(int ctrlID, int & fontStyleMask) const;
 
@@ -180,7 +180,7 @@ public :
 	int getHeight() const {
 		return _dlgPos.bottom;
 	};
-	void doDialog(bool willBeShown = true, bool isRTL = false);;
+	void doDialog(bool willBeShown = true, bool isRTL = false);
 
 	virtual void reSizeTo(RECT & rc) // should NEVER be const !!!
 	{
@@ -193,7 +193,7 @@ public :
     bool isDocked() const {return _status == DOCK;};
 	void setDockStatus(bool isDocked) {_status = isDocked;};
 
-	int getNbKeywordList();;
+	int getNbKeywordList();
 	bool isDirty() const {return _isDirty;};
 	HWND getFolderHandle() const {
 		return _folderStyleDlg.getHSelf();

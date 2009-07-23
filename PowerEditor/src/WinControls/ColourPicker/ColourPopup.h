@@ -39,7 +39,7 @@ public :
 
 	void create(int dialogID);
 
-    void doDialog(POINT p);;
+    void doDialog(POINT p);
 
     virtual void destroy() {
 	    ::DestroyWindow(_hSelf);

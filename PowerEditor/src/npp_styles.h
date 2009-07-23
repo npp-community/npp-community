@@ -52,13 +52,13 @@ struct Style
 	std::generic_string *_keywords;
 
 	Style();
-	Style(const Style & style);;
+	Style(const Style & style);
 
 	~Style();
 
-	Style & operator=(const Style & style);;
+	Style & operator=(const Style & style);
 
-	void setKeywords(const TCHAR *str);;
+	void setKeywords(const TCHAR *str);
 };
 
 struct GlobalOverride
@@ -148,7 +148,7 @@ public :
 	const TCHAR * getLexerNameFromIndex(int index) const {return _lexerStylerArray[index].getLexerName();}
 	const TCHAR * getLexerDescFromIndex(int index) const {return _lexerStylerArray[index].getLexerDesc();}
 
-	LexerStyler * getLexerStylerByName(const TCHAR *lexerName);;
+	LexerStyler * getLexerStylerByName(const TCHAR *lexerName);
 	bool hasEnoughSpace() {return (_nbLexerStyler < MAX_LEXER_STYLE);};
 	void addLexerStyler(const TCHAR *lexerName, const TCHAR *lexerDesc, const TCHAR *lexerUserExt, TiXmlNode *lexerNode);
 	void eraseAll();

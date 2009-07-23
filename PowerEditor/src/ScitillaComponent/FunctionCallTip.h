@@ -36,7 +36,7 @@ public:
 	bool updateCalltip(int ch, bool needShown = false);	//Ch is character typed, or 0 if another event occured. NeedShown is true if calltip should be attempted to displayed. Return true if calltip was made visible
 	void showNextOverload();							//show next overlaoded parameters
 	void showPrevOverload();							//show prev overlaoded parameters
-	bool isVisible();;	//true if calltip visible
+	bool isVisible();	//true if calltip visible
 	void close();					//Close calltip if visible
 
 private:
