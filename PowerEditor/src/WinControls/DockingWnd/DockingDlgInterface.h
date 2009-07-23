@@ -21,9 +21,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define DOCKINGDLGINTERFACE_H
 
 #include "StaticDialog.h"
-#include "dockingResource.h"
-#include "Docking.h"
 
+struct tTbData;
 
 class DockingDlgInterface : public StaticDialog
 {
@@ -32,91 +31,20 @@ public:
 	DockingDlgInterface(int dlgID): StaticDialog(),
 		_dlgID(dlgID), _isFloating(TRUE), _iDockedPos(0) {};
 
-	virtual void init(HINSTANCE hInst, HWND parent)
-	{
-		StaticDialog::init(hInst, parent);
-		::GetModuleFileName((HMODULE)hInst, _moduleName, MAX_PATH);
-		lstrcpy(_moduleName, PathFindFileName(_moduleName));
-	}
+	virtual void init(HINSTANCE hInst, HWND parent);
 
-    void create(tTbData * data, bool isRTL = false){
-		StaticDialog::create(_dlgID, isRTL);
-		::GetWindowText(_hSelf, _pluginName, MAX_PATH);
+    void create(tTbData * data, bool isRTL = false);;
 
-        // user information
-		data->hClient		= _hSelf;
-		data->pszName		= _pluginName;
+	virtual void updateDockingDlg();
 
-		// supported features by plugin
-		data->uMask			= 0;
-
-		// additional info
-		data->pszAddInfo	= NULL;
-
-		_data = data;
-
-	};
-
-	virtual void updateDockingDlg() {
-		::SendMessage(_hParent, NPPM_DMMUPDATEDISPINFO, 0, (LPARAM)_hSelf);
-	}
-
-    virtual void destroy() {
-    };
-
-	virtual void display(bool toShow = true) const {
-		::SendMessage(_hParent, toShow?NPPM_DMMSHOW:NPPM_DMMHIDE, 0, (LPARAM)_hSelf);
-	};
+	virtual void display(bool toShow = true) const;;
 
 	const TCHAR * getPluginFileName() const {
 		return _moduleName;
 	};
 
 protected :
-	virtual BOOL CALLBACK run_dlgProc(UINT message, WPARAM /*wParam*/, LPARAM lParam)
-	{
-		switch (message)
-		{
-
-			case WM_NOTIFY:
-			{
-				LPNMHDR	pnmh	= (LPNMHDR)lParam;
-
-				if (pnmh->hwndFrom == _hParent)
-				{
-					switch (LOWORD(pnmh->code))
-					{
-						case DMN_CLOSE:
-						{
-							//::MessageBox(_hSelf, TEXT("Close Dialog"), TEXT("Plugin Message"), MB_OK);
-							break;
-						}
-						case DMN_FLOAT:
-						{
-							//::MessageBox(_hSelf, TEXT("Float Dialog"), TEXT("Plugin Message"), MB_OK);
-							_isFloating = true;
-							break;
-						}
-						case DMN_DOCK:
-						{
-							//TCHAR test[256];
-							//wsprintf(test, TEXT("Dock Dialog to %d"), HIWORD(pnmh->code));
-							//::MessageBox(_hSelf, test, TEXT("Plugin Message"), MB_OK);
-							_iDockedPos = HIWORD(pnmh->code);
-							_isFloating = false;
-							break;
-						}
-						default:
-							break;
-					}
-				}
-				break;
-			}
-			default:
-				break;
-		}
-		return FALSE;
-	};
+	virtual BOOL CALLBACK run_dlgProc(UINT message, WPARAM /*wParam*/, LPARAM lParam);;
 
 	// Handles
     HWND			_HSource;

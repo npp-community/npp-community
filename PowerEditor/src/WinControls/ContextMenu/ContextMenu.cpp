@@ -51,7 +51,9 @@ ContextMenu::ContextMenu() : _hParent(NULL), _hMenu(NULL)
 ContextMenu::~ContextMenu()
 {
 	if (isCreated())
+	{
 		::DestroyMenu(_hMenu);
+	}
 }
 
 void ContextMenu::create( HWND hParent, const std::vector<MenuItemUnit> & menuItemArray )

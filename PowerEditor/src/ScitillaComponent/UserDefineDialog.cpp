@@ -17,6 +17,7 @@
 
 #include "precompiled_headers.h"
 #include "UserDefineDialog.h"
+#include "UserDefineResource.h"
 #include "ScintillaEditView.h"
 #include "Parameters.h"
 #include "resource.h"
@@ -24,9 +25,110 @@
 #include "menuCmdID.h"
 #include "Buffer.h"
 #include "colors.h"
+#include "UserDefineLangReference.h"
+#include "ColourPicker.h"
+
 
 UserLangContainer * SharedParametersDialog::_pUserLang = NULL;
 ScintillaEditView * SharedParametersDialog::_pScintilla = NULL;
+
+enum UDD_KeywordList
+{
+	KWL_FOLDER_OPEN_INDEX = 1,
+	KWL_FOLDER_CLOSE_INDEX = 2,
+	KWL_OPERATOR_INDEX = 3,
+	KWL_COMMENT_INDEX = 4,
+	KWL_KW1_INDEX = 5,
+	KWL_KW2_INDEX = 6,
+	KWL_KW3_INDEX = 7,
+	KWL_KW4_INDEX = 8,
+	KWL_DELIM_INDEX = 0
+};
+
+enum UDD_Style
+{
+	STYLE_DEFAULT_INDEX = 0,
+	STYLE_BLOCK_OPEN_INDEX = 1,
+	STYLE_BLOCK_CLOSE_INDEX = 2,
+	STYLE_WORD1_INDEX = 3,
+	STYLE_WORD2_INDEX = 4,
+	STYLE_WORD3_INDEX = 5,
+	STYLE_WORD4_INDEX = 6,
+	STYLE_COMMENT_INDEX = 7,
+	STYLE_COMMENTLINE_INDEX = 8,
+	STYLE_NUMBER_INDEX = 9,
+	STYLE_OPERATOR_INDEX = 10,
+	STYLE_DELIM2_INDEX = 11,
+	STYLE_DELIM3_INDEX = 12
+};
+
+class StringDlg : public StaticDialog
+{
+public :
+	StringDlg() : StaticDialog() {};
+	void init(HINSTANCE hInst, HWND parent, TCHAR *title, TCHAR *staticName, TCHAR *text2Set, int txtLen = 0) {
+		Window::init(hInst, parent);
+		lstrcpy(_title, title);
+		lstrcpy(_static, staticName);
+		lstrcpy(_textValue, text2Set);
+		_txtLen = txtLen;
+	};
+
+	long doDialog();
+
+protected :
+	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/);
+
+private :
+	TCHAR _title[64];
+	TCHAR _textValue[256];
+	TCHAR _static[32];
+	int _txtLen;
+};
+
+long StringDlg::doDialog()
+{
+	return long(::DialogBoxParam(_hInst, MAKEINTRESOURCE(IDD_STRING_DLG), _hParent,  (DLGPROC)dlgProc, (LPARAM)this));
+}
+
+BOOL CALLBACK StringDlg::run_dlgProc( UINT Message, WPARAM wParam, LPARAM /*lParam*/ )
+{
+	switch (Message)
+	{
+	case WM_INITDIALOG :
+		{
+			::SetWindowText(_hSelf, _title);
+			::SetDlgItemText(_hSelf, IDC_STRING_STATIC, _static);
+			::SetDlgItemText(_hSelf, IDC_STRING_EDIT, _textValue);
+			if (_txtLen)
+				::SendDlgItemMessage(_hSelf, IDC_STRING_EDIT, EM_SETLIMITTEXT, _txtLen, 0);
+
+			return TRUE;
+		}
+
+	case WM_COMMAND :
+		{
+			switch (wParam)
+			{
+			case IDOK :
+				{
+					::GetDlgItemText(_hSelf, IDC_STRING_EDIT, _textValue, 256);
+					::EndDialog(_hSelf, int(_textValue));
+					return TRUE;
+				}
+
+			case IDCANCEL :
+				::EndDialog(_hSelf, 0);
+				return TRUE;
+
+			default:
+				return FALSE;
+			}
+		}
+	default :
+		return FALSE;
+	}
+}
 
 void SharedParametersDialog::initControls()
 {
@@ -366,6 +468,38 @@ int FolderStyleDialog::getGroupeIndexFromCheck(int ctrlID, int & fontStyleMask) 
     }
 }
 
+int FolderStyleDialog::getGroupIndexFromCombo( int ctrlID, bool & isFontSize ) const
+{
+	switch (ctrlID)
+	{
+		case IDC_DEFAULT_FONT_COMBO :
+			isFontSize = false;
+			return STYLE_DEFAULT_INDEX;
+
+		case IDC_DEFAULT_FONTSIZE_COMBO :
+			isFontSize = true;
+			return STYLE_DEFAULT_INDEX;
+
+		case IDC_FOLDEROPEN_FONT_COMBO :
+			isFontSize = false;
+			return STYLE_BLOCK_OPEN_INDEX;
+
+		case IDC_FOLDEROPEN_FONTSIZE_COMBO :
+			isFontSize = true;
+			return STYLE_BLOCK_OPEN_INDEX;
+
+		case IDC_FOLDERCLOSE_FONT_COMBO :
+			isFontSize = false;
+			return STYLE_BLOCK_CLOSE_INDEX;
+
+		case IDC_FOLDERCLOSE_FONTSIZE_COMBO :
+			isFontSize = true;
+			return STYLE_BLOCK_CLOSE_INDEX;
+
+		default :
+			return -1;
+	}
+}
 int fgStatic2[] = {IDC_KEYWORD1_FG_STATIC, IDC_KEYWORD2_FG_STATIC, IDC_KEYWORD3_FG_STATIC, IDC_KEYWORD4_FG_STATIC};
 int bgStatic2[] = {IDC_KEYWORD1_BG_STATIC, IDC_KEYWORD2_BG_STATIC, IDC_KEYWORD3_BG_STATIC, IDC_KEYWORD4_BG_STATIC};
 int fontSizeCombo2[] = {IDC_KEYWORD1_FONTSIZE_COMBO, IDC_KEYWORD2_FONTSIZE_COMBO, IDC_KEYWORD3_FONTSIZE_COMBO, IDC_KEYWORD4_FONTSIZE_COMBO};
@@ -528,6 +662,46 @@ void KeyWordsStyleDialog::updateDlg()
 	::SendDlgItemMessage(_hSelf, IDC_KEYWORD4_PREFIX_CHECK, BM_SETCHECK, _pUserLang->_isPrefix[3], 0);
 }
 
+int KeyWordsStyleDialog::getGroupIndexFromCombo( int ctrlID, bool & isFontSize ) const
+{
+	switch (ctrlID)
+	{
+		case IDC_KEYWORD1_FONT_COMBO :
+			isFontSize = false;
+			return STYLE_WORD1_INDEX;
+
+		case IDC_KEYWORD1_FONTSIZE_COMBO :
+			isFontSize = true;
+			return STYLE_WORD1_INDEX;
+
+		case IDC_KEYWORD2_FONT_COMBO :
+			isFontSize = false;
+			return STYLE_WORD2_INDEX;
+
+		case IDC_KEYWORD2_FONTSIZE_COMBO :
+			isFontSize = true;
+			return STYLE_WORD2_INDEX;
+
+		case IDC_KEYWORD3_FONT_COMBO :
+			isFontSize = false;
+			return STYLE_WORD3_INDEX;
+
+		case IDC_KEYWORD3_FONTSIZE_COMBO :
+			isFontSize = true;
+			return STYLE_WORD3_INDEX;
+
+		case IDC_KEYWORD4_FONT_COMBO :
+			isFontSize = false;
+			return STYLE_WORD4_INDEX;
+
+		case IDC_KEYWORD4_FONTSIZE_COMBO :
+			isFontSize = true;
+			return STYLE_WORD4_INDEX;
+
+		default :
+			return -1;
+	}
+}
 int fgStatic3[] = {IDC_COMMENT_FG_STATIC, IDC_COMMENTLINE_FG_STATIC, IDC_NUMBER_FG_STATIC};
 int bgStatic3[] = {IDC_COMMENT_BG_STATIC, IDC_COMMENTLINE_BG_STATIC, IDC_NUMBER_BG_STATIC};
 int fontSizeCombo3[] = {IDC_COMMENT_FONTSIZE_COMBO, IDC_COMMENTLINE_FONTSIZE_COMBO, IDC_NUMBER_FONTSIZE_COMBO};
@@ -731,6 +905,39 @@ void CommentStyleDialog::updateDlg()
 	::SendDlgItemMessage(_hSelf, IDC_COMMENTSYMBOL_CHECK, BM_SETCHECK, _pUserLang->_isCommentSymbol, 0);
 }
 
+int CommentStyleDialog::getGroupIndexFromCombo( int ctrlID, bool & isFontSize ) const
+{
+	switch (ctrlID)
+	{
+		case IDC_COMMENT_FONT_COMBO :
+			isFontSize = false;
+			return STYLE_COMMENT_INDEX;
+
+		case IDC_COMMENT_FONTSIZE_COMBO :
+			isFontSize = true;
+			return STYLE_COMMENT_INDEX;
+
+		case IDC_COMMENTLINE_FONT_COMBO :
+			isFontSize = false;
+			return STYLE_COMMENTLINE_INDEX;
+
+		case IDC_COMMENTLINE_FONTSIZE_COMBO :
+			isFontSize = true;
+			return STYLE_COMMENTLINE_INDEX;
+
+		case IDC_NUMBER_FONT_COMBO :
+			isFontSize = false;
+			return STYLE_NUMBER_INDEX;
+
+		case IDC_NUMBER_FONTSIZE_COMBO :
+			isFontSize = true;
+			return STYLE_NUMBER_INDEX;
+
+
+		default :
+			return -1;
+	}
+}
 TCHAR symbolesArray[] = TEXT("+-*/.?!:;,%^$&\"'(_)=}]@\\`|[{#~<>");
 const bool SymbolsStyleDialog::ADD = true;
 const bool SymbolsStyleDialog::REMOVE = false;
@@ -1122,6 +1329,38 @@ int SymbolsStyleDialog::getGroupeIndexFromCheck(int ctrlID, int & fontStyleMask)
 	}
 }
 
+int SymbolsStyleDialog::getGroupIndexFromCombo( int ctrlID, bool & isFontSize ) const
+{
+	switch (ctrlID)
+	{
+		case IDC_SYMBOL_FONT_COMBO :
+			isFontSize = false;
+			return STYLE_OPERATOR_INDEX;
+
+		case IDC_SYMBOL_FONTSIZE_COMBO :
+			isFontSize = true;
+			return STYLE_OPERATOR_INDEX;
+
+		case IDC_SYMBOL_FONT2_COMBO :
+			isFontSize = false;
+			return STYLE_DELIM2_INDEX;
+
+		case IDC_SYMBOL_FONTSIZE2_COMBO :
+			isFontSize = true;
+			return STYLE_DELIM2_INDEX;
+
+		case IDC_SYMBOL_FONT3_COMBO :
+			isFontSize = false;
+			return STYLE_DELIM3_INDEX;
+
+		case IDC_SYMBOL_FONTSIZE3_COMBO :
+			isFontSize = true;
+			return STYLE_DELIM3_INDEX;
+
+		default :
+			return -1;
+	}
+}
 TCHAR styleName[][32] = {TEXT("DEFAULT"), TEXT("FOLDEROPEN"), TEXT("FOLDERCLOSE"), TEXT("KEYWORD1"), TEXT("KEYWORD2"), TEXT("KEYWORD3"), TEXT("KEYWORD4"), TEXT("COMMENT"), TEXT("COMMENT LINE"), TEXT("NUMBER"), TEXT("OPERATOR"), TEXT("DELIMINER1"), TEXT("DELIMINER2"), TEXT("DELIMINER3")};
 
 
@@ -1611,4 +1850,18 @@ BOOL CALLBACK UserDefineDialog::run_dlgProc(UINT message, WPARAM wParam, LPARAM 
     }
 
 	return FALSE;
+}
+
+void UserDefineDialog::doDialog( bool willBeShown /*= true*/, bool isRTL /*= false*/ )
+{
+	if (!isCreated())
+	{
+		create(IDD_GLOBAL_USERDEFINE_DLG, isRTL);
+	}
+	display(willBeShown);
+}
+
+int UserDefineDialog::getNbKeywordList()
+{
+	return nbKeywodList;
 }

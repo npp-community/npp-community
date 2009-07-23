@@ -625,6 +625,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\WinControls\DockingWnd\DockingDlgInterface.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\WinControls\DockingWnd\DockingManager.cpp"
 					>
 				</File>

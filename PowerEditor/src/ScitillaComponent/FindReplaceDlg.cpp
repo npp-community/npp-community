@@ -23,6 +23,7 @@
 #include "UniConversion.h"
 #include "Buffer.h"
 #include "DockingDlgInterface.h"
+#include "Docking.h"
 #include "resource.h"
 
 #include "TabBar.h"

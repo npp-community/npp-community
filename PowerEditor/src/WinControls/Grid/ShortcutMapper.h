@@ -22,16 +22,17 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "StaticDialog.h"
 
-#include "BabyGridWrapper.h"
-#include "ContextMenu.h"
-
 enum GridState {STATE_MENU, STATE_MACRO, STATE_USER, STATE_PLUGIN, STATE_SCINTILLA};
+
+class BabyGridWrapper;
+class ContextMenu;
 
 class ShortcutMapper : public StaticDialog {
 public:
 	ShortcutMapper();
+	~ShortcutMapper();
 	//void init(HINSTANCE hInst, HWND parent) {};
-	void destroy() {};
+	void destroy();
 	void doDialog(bool isRTL = false);;
 	void getClientRect(RECT & rc) const {
 		Window::getClientRect(rc);
@@ -47,8 +48,8 @@ protected :
 
 private:
 	static const int maxTabName = 64;
-	BabyGridWrapper _babygrid;
-	ContextMenu _rightClickMenu;
+	BabyGridWrapper* _babygrid;
+	ContextMenu* _rightClickMenu;
 
 	GridState _currentState;
 	HWND _hTabCtrl;
