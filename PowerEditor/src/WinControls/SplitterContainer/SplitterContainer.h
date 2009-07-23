@@ -23,13 +23,9 @@
 
 #define SPC_CLASS_NAME TEXT("splitterContainer")
 
-#define ROTATION_A_GAUCHE 2000
-#define ROTATION_A_DROITE 2001
-
 typedef bool DIRECTION;
 const bool LEFT = true;
 const bool RIGHT = false;
-
 
 class SplitterContainer : public Window
 {
