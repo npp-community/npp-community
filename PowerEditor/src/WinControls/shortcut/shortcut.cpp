@@ -161,7 +161,7 @@ static int keyTranslate(int keyIn) {
 	}
 }
 
-#define nrKeys sizeof(namedKeyArray)/sizeof(KeyIDNAME)
+#define nrKeys (sizeof(namedKeyArray)/sizeof(KeyIDNAME))
 
 
 
@@ -498,7 +498,8 @@ Shortcut::Shortcut( const TCHAR *name, bool isCtrl, bool isAlt, bool isShift, UC
 	_keyCombo._key = key;
 }
 
-Shortcut::Shortcut( const Shortcut & sc )
+Shortcut::Shortcut( const Shortcut & sc ) :
+	StaticDialog()
 {
 	setName(sc.getMenuName());
 	_keyCombo = sc._keyCombo;
