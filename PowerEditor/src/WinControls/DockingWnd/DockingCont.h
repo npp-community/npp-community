@@ -107,11 +107,6 @@ public:
 		updateCaption();
 	};
 
-	void setTabStyle(const BOOL & bDrawOgLine) {
-		_bDrawOgLine = bDrawOgLine;
-		RedrawWindow(_hContTab, NULL, NULL, 0);
-	};
-
     virtual void destroy();
 
 protected :
@@ -172,9 +167,6 @@ private:
 	BOOL					_isMouseOver;
 	RECT					_rcCaption;
 
-	// tab style
-	BOOL					_bDrawOgLine;
-
 	// Important value for DlgMoving class
 	BOOL					_dragFromTab;
 
@@ -187,7 +179,6 @@ private:
 	// for moving and reordering
 	INT						_prevItem;
 	BOOL					_beginDrag;
-	HIMAGELIST				_hImageList;
 
 	// Is tooltip
 	BOOL					_bTabTTHover;
