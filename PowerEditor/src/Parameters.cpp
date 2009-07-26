@@ -419,7 +419,7 @@ bool LocalizationSwitcher::switchToLang(wchar_t *lang2switch) const
 
 std::generic_string ThemeSwitcher::getThemeFromXmlFileName(const TCHAR *xmlFullPath) const
 {
-	if ( 0 == _tcscmp(xmlFullPath, TEXT("")))
+	if (!xmlFullPath[0])
 	{
 		return xmlFullPath;
 	}
@@ -3158,7 +3158,7 @@ void NppParameters::feedGUIParameters(TiXmlNode *node)
 		else if (!lstrcmp(nm, TEXT("stylerTheme")))
 		{
 			const TCHAR *themePath = element->Attribute(TEXT("path"));
-			if (themePath != NULL && (_tcscmp(themePath, TEXT("")) != 0))
+			if (themePath != NULL && themePath[0])
 				_nppGUI._themeName.assign(themePath);
 		}
 	}

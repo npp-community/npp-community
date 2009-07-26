@@ -1705,8 +1705,8 @@ BOOL CALLBACK PrintSettings2Dlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM
 				//_colourHooker.setColour(RGB(0, 0, 0xFF));
 				::SendDlgItemMessage(_hSelf, IDC_VIEWPANEL_STATIC, WM_SETTEXT, 0, (LPARAM)str);
 
-				int focusedEditStatic = -1;
-				int groupStatic = -1;
+				int focusedEditStatic = 0;
+				int groupStatic = 0;
 				switch (_focusedEditCtrl)
 				{
 					case IDC_EDIT_HLEFT : focusedEditStatic = IDC_HL_STATIC; groupStatic = IDC_HGB_STATIC; break;
