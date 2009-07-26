@@ -22,8 +22,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "StaticDialog.h"
 
-const int extNameLen = 32;
-
 class RegExtDlg : public StaticDialog
 {
 public :

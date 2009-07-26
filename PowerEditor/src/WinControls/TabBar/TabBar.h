@@ -27,14 +27,12 @@
 
 #define WM_TABSETSTYLE	(WM_APP + 0x024)
 
-const int marge = 8;
-const int nbCtrlMax = 10;
+#define nbCtrlMax 10
 
-
-const TCHAR TABBAR_ACTIVEFOCUSEDINDCATOR[64] = TEXT("Active tab focused indicator");
-const TCHAR TABBAR_ACTIVEUNFOCUSEDINDCATOR[64] = TEXT("Active tab unfocused indicator");
-const TCHAR TABBAR_ACTIVETEXT[64] = TEXT("Active tab text");
-const TCHAR TABBAR_INACTIVETEXT[64] = TEXT("Inactive tabs");
+extern const TCHAR TABBAR_ACTIVEFOCUSEDINDCATOR[64];
+extern const TCHAR TABBAR_ACTIVEUNFOCUSEDINDCATOR[64];
+extern const TCHAR TABBAR_ACTIVETEXT[64];
+extern const TCHAR TABBAR_INACTIVETEXT[64];
 
 struct TBHDR {
 	NMHDR hdr;

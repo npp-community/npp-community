@@ -18,7 +18,7 @@
 #ifndef IMAGE_LIST_H
 #define IMAGE_LIST_H
 
-const int nbMax = 45;
+#define NB_MAX_COMMANDS 45
 #define	IDI_SEPARATOR_ICON -1
 
 class IconList
@@ -26,53 +26,19 @@ class IconList
 public :
 	IconList() : _hImglst(NULL) {};
 
-	void create(HINSTANCE hInst, int iconSize) {
-		InitCommonControls();
-		_hInst = hInst;
-		_iconSize = iconSize;
-		_hImglst = ImageList_Create(iconSize, iconSize, ILC_COLOR32 | ILC_MASK, 0, nbMax);
-		if (!_hImglst)
-			throw int(25);
-	};
-
-	void create(int iconSize, HINSTANCE hInst, int *iconIDArray, int iconIDArraySize) {
-		create(hInst, iconSize);
-		_pIconIDArray = iconIDArray;
-		_iconIDArraySize = iconIDArraySize;
-
-		for (int i = 0 ; i < iconIDArraySize ; i++)
-			addIcon(iconIDArray[i]);
-	};
+	void create(HINSTANCE hInst, int iconSize);
+	void create(int iconSize, HINSTANCE hInst, int *iconIDArray, int iconIDArraySize);
 
 	void destroy() {
 		ImageList_Destroy(_hImglst);
-	};
+	}
 
-	HIMAGELIST getHandle() const {return _hImglst;};
+	HIMAGELIST getHandle() const {return _hImglst;}
 
-	void addIcon(int iconID) const {
-		HICON hIcon = ::LoadIcon(_hInst, MAKEINTRESOURCE(iconID));
-		if (!hIcon)
-			throw int(26);
-		ImageList_AddIcon(_hImglst, hIcon);
-		::DestroyIcon(hIcon);
-	};
+	void addIcon(int iconID) const;
+	bool changeIcon(int index, const TCHAR *iconLocation) const;
+	void setIconSize(int size) const;
 
-	bool changeIcon(int index, const TCHAR *iconLocation) const{
-		HBITMAP hBmp = (HBITMAP)::LoadImage(_hInst, iconLocation, IMAGE_ICON, _iconSize, _iconSize, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS | LR_LOADTRANSPARENT);
-		if (!hBmp)
-			return false;
-		int i = ImageList_ReplaceIcon(_hImglst, index, (HICON)hBmp);
-		ImageList_AddMasked(_hImglst, (HBITMAP)hBmp, RGB(255,0,255));
-		::DeleteObject(hBmp);
-		return (i == index);
-	};
-
-	void setIconSize(int size) const {
-		ImageList_SetIconSize(_hImglst, size, size);
-		for (int i = 0 ; i < _iconIDArraySize ; i++)
-			addIcon(_pIconIDArray[i]);
-	};
 private :
 	HIMAGELIST _hImglst;
 	HINSTANCE _hInst;
@@ -108,9 +74,9 @@ protected :
 	IconListVector _iconListVector;
 };
 
-const int HLIST_DEFAULT = 0;
-const int HLIST_HOT = 1;
-const int HLIST_DISABLE = 2;
+#define HLIST_DEFAULT 0
+#define HLIST_HOT 1
+#define HLIST_DISABLE 2
 
 class ToolBarIcons : public IconLists
 {
@@ -139,22 +105,7 @@ public :
 		reInit(size);
 	};
 
-	void reInit(int size) {
-		ImageList_SetIconSize(getDefaultLst(), size, size);
-		ImageList_SetIconSize(getHotLst(), size, size);
-		ImageList_SetIconSize(getDisableLst(), size, size);
-
-		for (int i = 0 ; i < int(_tbiis.size()) ; i++)
-		{
-			if (_tbiis[i]._defaultIcon != -1)
-			{
-				_iconListVector[HLIST_DEFAULT].addIcon(_tbiis[i]._defaultIcon);
-				_iconListVector[HLIST_HOT].addIcon(_tbiis[i]._hotIcon);
-				_iconListVector[HLIST_DISABLE].addIcon(_tbiis[i]._grayIcon);
-			}
-		}
-
-	};
+	void reInit(int size);
 
 	int getNbIcon() const {
 		return int(_tbiis.size());
@@ -164,16 +115,11 @@ public :
 		return _tbiis[i]._stdIcon;
 	};
 
-	bool replaceIcon(int witchList, int iconIndex, const TCHAR *iconLocation) const {
-		if ((witchList != HLIST_DEFAULT) && (witchList != HLIST_HOT) && (witchList != HLIST_DISABLE))
-			return false;
-		return _iconListVector[witchList].changeIcon(iconIndex, iconLocation);
-
-	};
+	bool replaceIcon(int witchList, int iconIndex, const TCHAR *iconLocation) const;
 
 private :
 	ToolBarIconIDs _tbiis;
-	int _cmdArray[nbMax];
+	int _cmdArray[NB_MAX_COMMANDS];
 	unsigned int _nbCmd;
 };
 

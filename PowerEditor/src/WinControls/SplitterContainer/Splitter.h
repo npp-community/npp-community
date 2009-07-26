@@ -34,17 +34,17 @@
 #define WM_DOPOPUPMENU			(SPLITTER_USER + 3)
 #define WM_RESIZE_CONTAINER		(SPLITTER_USER + 4)
 
-const int HIEGHT_MINIMAL = 15;
+#define HIEGHT_MINIMAL 15
 
 enum Arrow {ARROW_LEFT, ARROW_UP, ARROW_RIGHT, ARROW_DOWN};
 
 typedef bool WH;
-const bool WIDTH = true;
-const bool HEIGHT = false;
+#define WIDTH true
+#define HEIGHT false
 
 typedef bool ZONE_TYPE;
-const bool TOP_LEFT = true;
-const bool BOTTOM_RIGHT = false;
+#define TOP_LEFT true
+#define BOTTOM_RIGHT false
 
 enum SplitterMode {
     DYNAMIC, LEFT_FIX, RIGHT_FIX

@@ -28,8 +28,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 enum fontStyleType {BOLD_STATUS, ITALIC_STATUS, UNDERLINE_STATUS};
 
-const bool C_FOREGROUND = false;
-const bool C_BACKGROUND = true;
+#define C_FOREGROUND false
+#define C_BACKGROUND true
 
 // Forward declarations
 class ColourStaticTextHooker;

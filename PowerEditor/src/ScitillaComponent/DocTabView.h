@@ -21,9 +21,9 @@
 #include "TabBar.h"
 #include "BufferID.h"
 
-const int SAVED_IMG_INDEX = 0;
-const int UNSAVED_IMG_INDEX = 1;
-const int REDONLY_IMG_INDEX = 2;
+#define SAVED_IMG_INDEX 0
+#define UNSAVED_IMG_INDEX 1
+#define REDONLY_IMG_INDEX 2
 
 class ScintillaEditView;
 class IconList;

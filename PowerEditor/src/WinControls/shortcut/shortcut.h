@@ -19,7 +19,7 @@
 
 #include "StaticDialog.h"
 
-const size_t nameLenMax = 64;
+#define nameLenMax 64
 
 class NppParameters;
 

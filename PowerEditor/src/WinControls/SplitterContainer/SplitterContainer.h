@@ -24,8 +24,8 @@
 #define SPC_CLASS_NAME TEXT("splitterContainer")
 
 typedef bool DIRECTION;
-const bool LEFT = true;
-const bool RIGHT = false;
+#define LEFT true
+#define RIGHT false
 
 class SplitterContainer : public Window
 {

@@ -26,6 +26,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "resource.h"
 
+#define activeText true
+#define activeNumeric false
+
 void ColumnEditorDlg::init(HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView)
 {
 	Window::init(hInst, hPere);

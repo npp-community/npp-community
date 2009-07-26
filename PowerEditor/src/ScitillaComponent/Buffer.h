@@ -59,8 +59,8 @@ struct HeaderLineState {
 	bool _isExpanded;
 };
 
-const int userLangNameMax = 16;
-const TCHAR UNTITLED_STR[] = TEXT("new ");
+#define userLangNameMax 16
+extern const TCHAR UNTITLED_STR[];
 
 //File manager class maintains all buffers
 class Buffer;

@@ -8,6 +8,8 @@
 
 #include "npp_session.h"
 
+const TCHAR UNTITLED_STR[] = TEXT("new ");
+
 FileManager * FileManager::_pSelf = new FileManager();
 
 const int blockSize = 128 * 1024 + 4;

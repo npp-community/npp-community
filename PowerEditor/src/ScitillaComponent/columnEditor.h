@@ -22,9 +22,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "StaticDialog.h"
 
-const bool activeText = true;
-const bool activeNumeric = false;
-
 // Forward declarations
 class ScintillaEditView;
 
