@@ -18,10 +18,21 @@
 #ifndef SCINTILLA_EDIT_VIEW_H
 #define SCINTILLA_EDIT_VIEW_H
 
+#ifndef WINDOW_CONTROL_H
 #include "Window.h"
+#endif
+
+#ifndef BUFFERID_H
 #include "BufferID.h"
+#endif
+
+#ifndef NOTEPAD_PLUS_MSGS_H
 #include "Notepad_plus_msgs.h"
+#endif
+
+#ifndef SCINTILLA_REF_H
 #include "ScintillaRef.h"
+#endif
 
 // Forward declarations
 class NppParameters;

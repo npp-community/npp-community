@@ -406,10 +406,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\Parameters_def.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\src\precompiled_headers.cpp"
 				>
 				<FileConfiguration
@@ -748,6 +744,10 @@
 					RelativePath="..\src\npp_winver.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\src\Parameters_def.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -776,10 +776,6 @@
 			</File>
 			<File
 				RelativePath="..\src\Parameters.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\Parameters_def.h"
 				>
 			</File>
 			<File
@@ -1167,6 +1163,10 @@
 				</File>
 				<File
 					RelativePath="..\src\npp_winver.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Parameters_def.h"
 					>
 				</File>
 			</Filter>

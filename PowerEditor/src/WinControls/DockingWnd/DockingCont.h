@@ -19,7 +19,9 @@
 #ifndef DOCKINGCONT
 #define DOCKINGCONT
 
+#ifndef STATIC_DIALOG_H
 #include "StaticDialog.h"
+#endif
 
 // window styles
 #define POPUP_STYLES		(WS_POPUP|WS_CLIPSIBLINGS|WS_CAPTION|WS_SYSMENU|WS_THICKFRAME|WS_MAXIMIZEBOX)

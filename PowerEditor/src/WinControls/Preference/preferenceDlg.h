@@ -20,7 +20,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef PREFERENCE_DLG_H
 #define PREFERENCE_DLG_H
 
+#ifndef STATIC_DIALOG_H
 #include "StaticDialog.h"
+#endif
 
 class ControlsTab;
 struct PreferenceDlgWindows;

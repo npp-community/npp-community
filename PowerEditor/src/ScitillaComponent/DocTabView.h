@@ -18,8 +18,13 @@
 #ifndef DOCTABVIEW_H
 #define DOCTABVIEW_H
 
+#ifndef TAB_BAR_H
 #include "TabBar.h"
+#endif
+
+#ifndef BUFFERID_H
 #include "BufferID.h"
+#endif
 
 #define SAVED_IMG_INDEX 0
 #define UNSAVED_IMG_INDEX 1

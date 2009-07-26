@@ -18,8 +18,9 @@
 #ifndef STATIC_DIALOG_H
 #define STATIC_DIALOG_H
 
+#ifndef WINDOW_CONTROL_H
 #include "Window.h"
-
+#endif
 
 typedef HRESULT (WINAPI * ETDTProc) (HWND, DWORD);
 

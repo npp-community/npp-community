@@ -18,7 +18,9 @@
 #ifndef ABOUT_DLG_H
 #define ABOUT_DLG_H
 
+#ifndef STATIC_DIALOG_H
 #include "StaticDialog.h"
+#endif
 
 class URLCtrl;
 

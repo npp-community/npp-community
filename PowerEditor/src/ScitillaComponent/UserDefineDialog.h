@@ -20,8 +20,13 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef USER_DEFINE_H
 #define USER_DEFINE_H
 
+#ifndef STATIC_DIALOG_H
 #include "StaticDialog.h"
+#endif
+
+#ifndef CONTROLS_TAB_H
 #include "ControlsTab.h"
+#endif
 
 class ScintillaEditView;
 class UserLangContainer;

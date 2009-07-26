@@ -18,17 +18,38 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
+#ifndef SCINTILLA_REF_H
 #include "ScintillaRef.h"
-#include "ToolBar.h"
-#include "UserDefineLangReference.h"
-#include "shortcut.h"
-#include "ContextMenu.h"
-#include "Notepad_plus_msgs.h"
+#endif
 
+#ifndef TOOL_BAR_H
+#include "ToolBar.h"
+#endif
+
+#ifndef USER_DEFINE_LANG_REFERENCE_H
+#include "UserDefineLangReference.h"
+#endif
+
+#ifndef SHORTCUTS_H
+#include "shortcut.h"
+#endif
+
+#ifndef CONTEXTMENU_H
+#include "ContextMenu.h"
+#endif
+
+#ifndef NOTEPAD_PLUS_MSGS_H
+#include "Notepad_plus_msgs.h"
+#endif
+
+#ifndef PARAMETERS_DEF_H
 #include "Parameters_def.h"
+#endif
 
 // JOCE: this needs to be taken out at some point...
+#ifndef NPP_STYLES
 #include "npp_styles.h"
+#endif
 
 // Forward declarations
 class TiXmlDocument;

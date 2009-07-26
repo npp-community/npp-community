@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#ifndef TARGETVER_H
+#define TARGETVER_H
 
 #pragma once
 
@@ -39,3 +41,5 @@
 #ifndef _WIN32_IE                       // Specifies that the minimum required platform is Internet Explorer 7.0.
 #define _WIN32_IE 0x0600        // Change this to the appropriate value to target other versions of IE.
 #endif
+
+#endif // TARGETVER_H

@@ -19,7 +19,9 @@
 #ifndef DOCKINGSPLITTER_H
 #define DOCKINGSPLITTER_H
 
+#ifndef WINDOW_CONTROL_H
 #include "window.h"
+#endif
 
 #define	DMS_VERTICAL		0x00000001
 #define	DMS_HORIZONTAL		0x00000002

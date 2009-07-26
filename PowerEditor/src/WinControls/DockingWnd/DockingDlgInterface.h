@@ -20,7 +20,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef DOCKINGDLGINTERFACE_H
 #define DOCKINGDLGINTERFACE_H
 
+#ifndef STATIC_DIALOG_H
 #include "StaticDialog.h"
+#endif
 
 struct tTbData;
 

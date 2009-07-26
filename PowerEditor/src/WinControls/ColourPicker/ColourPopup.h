@@ -20,8 +20,13 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef COLOUR_POPUP_H
 #define COLOUR_POPUP_H
 
+#ifndef WINDOW_CONTROL_H
 #include "Window.h"
+#endif
+
+#ifndef RESOURCE_H
 #include "resource.h"
+#endif
 
 #define WM_PICKUP_COLOR (COLOURPOPUP_USER + 1)
 #define WM_PICKUP_CANCEL (COLOURPOPUP_USER + 2)

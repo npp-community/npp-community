@@ -18,7 +18,9 @@
 #ifndef TAB_BAR_H
 #define TAB_BAR_H
 
+#ifndef WINDOW_CONTROL_H
 #include "Window.h"
+#endif
 
 //Notification message
 #define TCN_TABDROPPED (TCN_FIRST - 10)

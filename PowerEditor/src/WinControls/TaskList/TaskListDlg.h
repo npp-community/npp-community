@@ -18,7 +18,9 @@
 #ifndef TASKLISTDLG_H
 #define TASKLISTDLG_H
 
+#ifndef STATIC_DIALOG_H
 #include "StaticDialog.h"
+#endif
 
 #define dirUp true
 #define dirDown false

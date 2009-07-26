@@ -18,7 +18,6 @@
 #ifndef NPP_STYLES
 #define NPP_STYLES
 
-
 enum FontStyle
 {
 	FONTSTYLE_BOLD = 1,

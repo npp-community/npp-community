@@ -18,7 +18,9 @@
 #ifndef DOCKINGMANAGER_H
 #define DOCKINGMANAGER_H
 
+#ifndef WINDOW_CONTROL_H
 #include "Window.h"
+#endif
 
 #define DSPC_CLASS_NAME TEXT("dockingManager")
 

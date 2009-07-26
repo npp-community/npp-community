@@ -22,12 +22,14 @@ must not be misrepresented as being the original software.
 distribution.
 */
 
+#ifndef TINYXMLA_INCLUDED
 #include "tinyxmlA.h"
+#endif
 
 
 #ifndef TIXMLA_USE_STL
 
-#ifndef _INCLUDED
+#ifndef TIXMLA_STRING_INCLUDED
 #define TIXMLA_STRING_INCLUDED
 
 

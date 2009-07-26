@@ -18,7 +18,9 @@
 #ifndef WINDOW_INTERFACE_H
 #define WINDOW_INTERFACE_H
 
+#ifndef WINDOW_CONTROL_H
 #include "Window.h"
+#endif
 
 class WindowInterface : public Window
 {

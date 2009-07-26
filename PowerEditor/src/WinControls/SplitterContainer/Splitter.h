@@ -18,8 +18,13 @@
 #ifndef SPLITTER_H
 #define SPLITTER_H
 
+#ifndef WINDOW_CONTROL_H
 #include "Window.h"
+#endif
+
+#ifndef RESOURCE_H
 #include "resource.h"
+#endif
 
 #define SV_HORIZONTAL		0x00000001
 #define SV_VERTICAL			0x00000002

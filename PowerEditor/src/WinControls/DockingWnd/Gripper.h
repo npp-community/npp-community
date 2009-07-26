@@ -18,7 +18,9 @@
 #ifndef GRIPPER_H
 #define GRIPPER_H
 
+#ifndef DOCKING_H
 #include "Docking.h"
+#endif
 
 // Used by getRectAndStyle() to draw the drag rectangle
 static const WORD DotPattern[] =

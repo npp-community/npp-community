@@ -18,7 +18,9 @@
 #ifndef FILE_DIALOG_H
 #define FILE_DIALOG_H
 
+#ifndef NPP_WINVER_H
 #include "npp_winver.h"
+#endif
 
 typedef std::vector<std::generic_string> stringVector;
 

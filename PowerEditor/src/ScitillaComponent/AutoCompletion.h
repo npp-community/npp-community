@@ -18,7 +18,9 @@
 #ifndef AUTOCOMPLETION_H
 #define AUTOCOMPLETION_H
 
+#ifndef NOTEPAD_PLUS_MSGS_H
 #include "Notepad_plus_msgs.h"
+#endif
 
 class ScintillaEditView;
 class FunctionCallTip;

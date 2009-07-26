@@ -18,7 +18,9 @@
 #ifndef TOOL_BAR_H
 #define TOOL_BAR_H
 
+#ifndef WINDOW_CONTROL_H
 #include "Window.h"
+#endif
 
 #define REBAR_BAR_TOOLBAR		0
 #define REBAR_BAR_SEARCH		1

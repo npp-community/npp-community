@@ -18,16 +18,34 @@
 #ifndef NOTEPAD_PLUS_H
 #define NOTEPAD_PLUS_H
 
+#ifndef BUFFERID_H
 #include "BufferID.h"
+#endif
+
+#ifndef PARAMETERS_DEF_H
 #include "Parameters_def.h"
+#endif
+
+#ifndef SCINTILLA_REF_H
 #include "ScintillaRef.h"
+#endif
+
+#ifndef WINDOW_CONTROL_H
 #include "Window.h"
+#endif
+
+#ifndef NOTEPAD_PLUS_MSGS_H
 #include "Notepad_plus_msgs.h"
+#endif
 
 // To be removed later.  Need to be included since Parameters.h was removed from ScintillaEditView.h
+#ifndef SHORTCUTS_H
 #include "shortcut.h"
+#endif
 
+#ifndef NPP_STYLES
 #include "npp_styles.h"  // For StyleArray, etc.
+#endif
 
 #define MENU 0x01
 #define TOOLBAR 0x02

@@ -18,7 +18,9 @@
 #ifndef GOTILINE_DLG_H
 #define GOTILINE_DLG_H
 
+#ifndef STATIC_DIALOG_H
 #include "StaticDialog.h"
+#endif
 
 class ScintillaEditView;
 
