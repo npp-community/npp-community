@@ -24,7 +24,6 @@
 #include "shortcutRc.h"
 
 #include "keys.h"
-const int KEY_STR_LEN = 16;
 
 struct KeyIDNAME {
 	const TCHAR * name;
@@ -568,9 +567,8 @@ void Accelerator::updateShortcuts()
 	_pAccelArray = new ACCEL[nbMenu+nbMacro+nbUserCmd+nbPluginCmd];
 
 	int offset = 0;
-	size_t i = 0;
 	//no validation performed, it might be that invalid shortcuts are being used by default. Allows user to 'hack', might be a good thing
-	for(i = 0; i < nbMenu; i++) {
+	for(size_t i = 0; i < nbMenu; i++) {
 		if (shortcuts[i].isEnabled()) {// && shortcuts[i].isValid()) {
 			_pAccelArray[offset].cmd = (WORD)(shortcuts[i].getID());
 			_pAccelArray[offset].fVirt = shortcuts[i].getAcceleratorModifiers();
@@ -579,7 +577,7 @@ void Accelerator::updateShortcuts()
 		}
 	}
 
-	for(i = 0; i < nbMacro; i++) {
+	for(size_t i = 0; i < nbMacro; i++) {
 		if (macros[i].isEnabled()) {// && macros[i].isValid()) {
 			_pAccelArray[offset].cmd = (WORD)(macros[i].getID());
 			_pAccelArray[offset].fVirt = macros[i].getAcceleratorModifiers();
@@ -588,7 +586,7 @@ void Accelerator::updateShortcuts()
 		}
 	}
 
-	for(i = 0; i < nbUserCmd; i++) {
+	for(size_t i = 0; i < nbUserCmd; i++) {
 		if (userCommands[i].isEnabled()) {// && userCommands[i].isValid()) {
 			_pAccelArray[offset].cmd = (WORD)(userCommands[i].getID());
 			_pAccelArray[offset].fVirt = userCommands[i].getAcceleratorModifiers();
@@ -597,7 +595,7 @@ void Accelerator::updateShortcuts()
 		}
 	}
 
-	for(i = 0; i < nbPluginCmd; i++) {
+	for(size_t i = 0; i < nbPluginCmd; i++) {
 		if (pluginCommands[i].isEnabled()) {// && pluginCommands[i].isValid()) {
 			_pAccelArray[offset].cmd = (WORD)(pluginCommands[i].getID());
 			_pAccelArray[offset].fVirt = pluginCommands[i].getAcceleratorModifiers();

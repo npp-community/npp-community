@@ -114,6 +114,8 @@ FileDialog::~FileDialog()
 		_fileExt = NULL;
 	}
 }
+// Lint gets confused with the variable args variable...
+//lint -e438 Last value assigned to variable 'Symbol' not used
 
 // This function set and concatenate the filter into the list box of FileDialog.
 // The 1st parameter is the description of the file type, the 2nd .. Nth parameter(s) is (are)
@@ -147,6 +149,7 @@ void FileDialog::setExtFilter(const TCHAR *extText, const TCHAR *ext, ...)
 
 	setExtsFilter(extText, exts.c_str());
 }
+//lint +e438 (Warning -- Last value assigned to variable 'pArg' not used)
 
 int FileDialog::setExtsFilter(const TCHAR *extText, const TCHAR *exts)
 {
@@ -177,7 +180,6 @@ int FileDialog::setExtsFilter(const TCHAR *extText, const TCHAR *exts)
 	{
 		memcpy(_fileExt, oldFilter, _nbCharFileExt * sizeof(TCHAR));
 		delete[] oldFilter;
-		oldFilter = NULL;
 	}
 
 	// Append new filter

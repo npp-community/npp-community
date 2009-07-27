@@ -21,9 +21,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ToolTip.h"
 
 
-LRESULT CALLBACK dlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-
-
 void ToolTip::init(HINSTANCE hInst, HWND hParent)
 {
 	if (_hSelf == NULL)

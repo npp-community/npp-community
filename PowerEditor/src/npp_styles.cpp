@@ -67,7 +67,7 @@ Style::~Style()
 	}
 }
 
-Style & Style::operator=( const Style & style )
+const Style & Style::operator=( const Style & style )
 {
 	if (this != &style)
 	{
@@ -151,7 +151,7 @@ static int getKwClassFromName(const TCHAR *str) {
 
 
 
-StyleArray & StyleArray::operator=( const StyleArray & sa )
+const StyleArray & StyleArray::operator=( const StyleArray & sa )
 {
 	if (this != &sa)
 	{
@@ -277,7 +277,7 @@ int StyleArray::getStylerIndexByName( const TCHAR *name ) const
 // ***********************************
 
 
-LexerStyler & LexerStyler::operator=( const LexerStyler & ls )
+const LexerStyler & LexerStyler::operator=( const LexerStyler & ls )
 {
 	if (this != &ls)
 	{
@@ -315,7 +315,7 @@ void LexerStyler::setLexerUserExt( const TCHAR *lexerUserExt )
 //
 // ***********************************
 
-LexerStylerArray & LexerStylerArray::operator=( const LexerStylerArray & lsa )
+const LexerStylerArray & LexerStylerArray::operator=( const LexerStylerArray & lsa )
 {
 	if (this != &lsa)
 	{

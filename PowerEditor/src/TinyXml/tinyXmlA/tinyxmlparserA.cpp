@@ -414,7 +414,6 @@ void TiXmlDocumentA::StreamIn( TIXMLA_ISTREAM * in, TIXMLA_STRING * tag )
 				node->StreamIn( in, tag );
 				bool isElement = node->ToElement() != 0;
 				delete node;
-				node = 0;
 
 				// If this is the root element, we're done. Parsing will be
 				// done by the >> operator.
@@ -512,7 +511,6 @@ void TiXmlDocumentA::SetError( int err, const char* pError, TiXmlParsingDataA* d
 	}
 }
 
-
 TiXmlNodeA* TiXmlNodeA::Identify( const char* p )
 {
 	TiXmlNodeA* returnNode = 0;
@@ -523,7 +521,6 @@ TiXmlNodeA* TiXmlNodeA::Identify( const char* p )
 		return 0;
 	}
 
-	TiXmlDocumentA* doc = GetDocument();
 	p = SkipWhiteSpace( p );
 
 	if ( !p || !*p )
@@ -578,6 +575,7 @@ TiXmlNodeA* TiXmlNodeA::Identify( const char* p )
 	}
 	else
 	{
+		TiXmlDocumentA* doc = GetDocument();
 		if ( doc )
 			doc->SetError( TIXMLA_ERROR_OUT_OF_MEMORY, 0, 0 );
 	}
@@ -682,7 +680,6 @@ void TiXmlElementA::StreamIn (TIXMLA_ISTREAM * in, TIXMLA_STRING * tag)
 					return;
 				node->StreamIn( in, tag );
 				delete node;
-				node = 0;
 
 				// No return: go around from the beginning: text, closing tag, or node.
 			}
@@ -827,8 +824,11 @@ const char* TiXmlElementA::ReadValue( const char* p, TiXmlParsingDataA* data )
 
 			if ( !textNode )
 			{
-				if ( document ) document->SetError( TIXMLA_ERROR_OUT_OF_MEMORY, 0, 0 );
-				    return 0;
+				if ( document )
+				{
+					document->SetError( TIXMLA_ERROR_OUT_OF_MEMORY, 0, 0 );
+				}
+				return 0;
 			}
 
 			p = textNode->Parse( p, data );
@@ -976,10 +976,6 @@ const char* TiXmlAttributeA::Parse( const char* p, TiXmlParsingDataA* data )
 {
 	p = SkipWhiteSpace( p );
 	if ( !p || !*p ) return 0;
-
-	int tabsize = 4;
-	if ( document )
-		tabsize = document->TabSize();
 
 //	TiXmlParsingDataA data( p, prevData );
 	if ( data )

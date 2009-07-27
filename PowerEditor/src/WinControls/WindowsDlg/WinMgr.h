@@ -187,7 +187,7 @@ protected:
 	WINRECT* pCur;	  // current entry
 public:
 	CWinGroupIterator() { pCur = NULL; }
-	CWinGroupIterator& operator=(WINRECT* pg) {
+	const CWinGroupIterator& operator=(WINRECT* pg) {
 		assert(pg->IsGroup()); // can only iterate a group!
 		pCur = pg->Children();
 		return *this;

@@ -640,16 +640,14 @@ TiXmlNode* TiXmlElement::Clone() const
 	CopyToClone( clone );
 
 	// Clone the attributes, then clone the children.
-	TiXmlAttribute* attribute = 0;
-	for(	attribute = attributeSet.First();
-	attribute;
-	attribute = attribute->Next() )
+	for(TiXmlAttribute* attribute = attributeSet.First();
+		attribute;
+		attribute = attribute->Next() )
 	{
 		clone->SetAttribute( attribute->Name(), attribute->Value() );
 	}
 
-	TiXmlNode* node = 0;
-	for ( node = firstChild; node; node = node->NextSibling() )
+	for ( TiXmlNode* node = firstChild; node; node = node->NextSibling() )
 	{
 		clone->LinkEndChild( node->Clone() );
 	}
@@ -715,9 +713,8 @@ bool TiXmlDocument::LoadFile( const TCHAR* filename )
 	if ( file )
 	{
 		// Get the file size, so we can pre-allocate the generic_string. HUGE speed impact.
-		long length = 0;
 		fseek( file, 0, SEEK_END );
-		length = ftell( file );
+		long length = ftell( file );
 		fseek( file, 0, SEEK_SET );
 
 		// Strange case, but good to handle up front.
@@ -777,8 +774,7 @@ TiXmlNode* TiXmlDocument::Clone() const
 	clone->error = error;
 	clone->errorDesc = errorDesc.c_str ();
 
-	TiXmlNode* node = 0;
-	for ( node = firstChild; node; node = node->NextSibling() )
+	for ( TiXmlNode* node = firstChild; node; node = node->NextSibling() )
 	{
 		clone->LinkEndChild( node->Clone() );
 	}
@@ -946,8 +942,7 @@ void TiXmlText::StreamOut( TIXML_OSTREAM * stream ) const
 
 TiXmlNode* TiXmlText::Clone() const
 {
-	TiXmlText* clone = 0;
-	clone = new TiXmlText( TEXT("") );
+	TiXmlText* clone = new TiXmlText( TEXT("") );
 
 	if ( !clone )
 		return 0;

@@ -27,7 +27,7 @@ WINRECT::WINRECT(WORD f, INT id, LONG p)
 //
 WINRECT* WINRECT::Parent()
 {
-	WINRECT* pEntry = NULL;
+	WINRECT* pEntry;
 	for (pEntry=this; pEntry->Prev(); pEntry=pEntry->Prev()) {
 		; // go backwards to the end
 	}

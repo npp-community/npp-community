@@ -194,7 +194,6 @@ void Process::listenerStdOut()
 
 		if (!::PeekNamedPipe(_hPipeOutR, bufferOut, taille, &outbytesRead, &bytesAvail, NULL))
 		{
-			bytesAvail = 0;
 			break;
 		}
 
@@ -202,7 +201,9 @@ void Process::listenerStdOut()
 		{
 			result = :: ReadFile(_hPipeOutR, bufferOut, taille, &outbytesRead, NULL);
 			if ((!result) && (outbytesRead == 0))
+			{
 				break;
+			}
 		}
 		//outbytesRead = lstrlen(bufferOut);
 		bufferOut[outbytesRead] = '\0';
@@ -253,7 +254,6 @@ void Process::listenerStdErr()
 
 		if (!::PeekNamedPipe(_hPipeErrR, bufferErr, taille, &errbytesRead, &bytesAvail, NULL))
 		{
-			bytesAvail = 0;
 			break;
 		}
 
@@ -261,7 +261,9 @@ void Process::listenerStdErr()
 		{
 			result = :: ReadFile(_hPipeErrR, bufferErr, taille, &errbytesRead, NULL);
 			if ((!result) && (errbytesRead == 0))
+			{
 				break;
+			}
 		}
 		//outbytesRead = lstrlen(bufferOut);
 		bufferErr[errbytesRead] = '\0';
@@ -272,7 +274,9 @@ void Process::listenerStdErr()
 		if (::GetExitCodeProcess(_hProcess, (unsigned long*)&nExitCode))
 		{
 			if (nExitCode != STILL_ACTIVE)
+			{
 				break; // EOF condition
+			}
 		}
 	}
 

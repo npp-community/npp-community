@@ -25,8 +25,6 @@ bool Splitter::_isHorizontalFixedRegistered = false;
 bool Splitter::_isVerticalFixedRegistered = false;
 
 
-#define SPLITTER_SIZE 8
-
 Splitter::Splitter() : Window()
 {
 	//hInstance = GetModuleHandle(NULL);

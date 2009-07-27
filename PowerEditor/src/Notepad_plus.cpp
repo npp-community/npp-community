@@ -73,7 +73,6 @@
 #include "TinyXml.h"
 #include "Parameters.h"
 
-#include "npp_winver.h"
 #include "npp_session.h"
 
 const TCHAR Notepad_plus::_className[32] = TEXT("Notepad++");
@@ -82,9 +81,6 @@ const char *urlHttpRegExpr = "http://[a-z0-9_\\-\\+~.:?&@=/%#]*";
 
 int docTabIconIDs[] = {IDI_SAVED_ICON, IDI_UNSAVED_ICON, IDI_READONLY_ICON};
 enum tb_stat {tb_saved, tb_unsaved, tb_ro};
-
-#define DIR_LEFT true
-#define DIR_RIGHT false
 
 struct SortTaskListPred
 {
@@ -2622,12 +2618,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 			fileClose(bufferToClose, iView);
 			break;
 		}
-		int open = 1;
-		if (isFromPrimary || isFromSecondary)
-			open = notifyDocTab->nbItem();
 		doClose(bufferToClose, iView);
-		//if (open == 1 && canHideView(iView))
-		//	hideView(iView);
 		break;
 
 	}
@@ -3531,8 +3522,10 @@ void Notepad_plus::command(int id)
 		case IDM_MACRO_SAVECURRENTMACRO :
 		{
 			if (addCurrentMacro())
+			{
 				assert(_runMacroDlg);
 				_runMacroDlg->initMacroList();
+			}
 			break;
 		}
 		case IDM_EDIT_FULLPATHTOCLIP :
@@ -7246,18 +7239,23 @@ void Notepad_plus::changeToolBarIcons()
 
 bool Notepad_plus::switchToFile(BufferID id)
 {
-	int i = 0;
-	int iView = currentView();
 	if (id == BUFFER_INVALID)
 		return false;
 
-	if ((i = _pDocTab->getIndexByBuffer(id)) != -1)
+	int i = _pDocTab->getIndexByBuffer(id);
+	int iView = currentView();
+
+	if (i != -1)
 	{
 		iView = currentView();
 	}
-	else if ((i = _pNonDocTab->getIndexByBuffer(id)) != -1)
+	else
 	{
-		iView = otherView();
+		i = _pNonDocTab->getIndexByBuffer(id);
+		if ( i != -1)
+		{
+			iView = otherView();
+		}
 	}
 
 	if (i != -1)
@@ -8571,8 +8569,6 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		{
 			// convert to ASCII
 			Utf8_16_Write     UnicodeConvertor;
-			UINT            length  = 0;
-			char*            buffer  = NULL;
 			ScintillaEditView *pSci;
 
 			if (wParam == MAIN_VIEW)
@@ -8584,8 +8580,8 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 
 			// get text of current scintilla
-			length = pSci->execute(SCI_GETTEXTLENGTH, 0, 0) + 1;
-			buffer = new char[length];
+			UINT length = pSci->execute(SCI_GETTEXTLENGTH, 0, 0) + 1;
+			char* buffer = new char[length];
 			pSci->execute(SCI_GETTEXT, length, (LPARAM)buffer);
 
 			// convert here
@@ -8613,8 +8609,6 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		{
 			// convert
 			Utf8_16_Read    UnicodeConvertor;
-			UINT            length  = 0;
-			char*            buffer  = NULL;
 			ScintillaEditView *pSci;
 
 			if (wParam == MAIN_VIEW)
@@ -8625,8 +8619,8 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 				return -1;
 
 			// get text of current scintilla
-			length = pSci->execute(SCI_GETTEXTLENGTH, 0, 0) + 1;
-			buffer = new char[length];
+			UINT length = pSci->execute(SCI_GETTEXTLENGTH, 0, 0) + 1;
+			char* buffer = new char[length];
 			pSci->execute(SCI_GETTEXT, length, (LPARAM)buffer);
 
 			length = UnicodeConvertor.convert(buffer, length-1);
@@ -10062,8 +10056,6 @@ const TCHAR * Notepad_plus::fileSaveSession(size_t nbFile, TCHAR ** fileNames, c
 
 const TCHAR * Notepad_plus::fileSaveSession(size_t nbFile, TCHAR ** fileNames)
 {
-	const TCHAR *sessionFileName = NULL;
-
 	FileDialog fDlg(_hSelf, _hInst);
 	const TCHAR *ext = NppParameters::getInstance()->getNppGUI()._definedSessionExt.c_str();
 
@@ -10076,7 +10068,7 @@ const TCHAR * Notepad_plus::fileSaveSession(size_t nbFile, TCHAR ** fileNames)
 		sessionExt += ext;
 		fDlg.setExtFilter(TEXT("Session file"), sessionExt.c_str(), NULL);
 	}
-	sessionFileName = fDlg.doSaveDlg();
+	const TCHAR *sessionFileName = fDlg.doSaveDlg();
 
 	return fileSaveSession(nbFile, fileNames, sessionFileName);
 }
@@ -10218,11 +10210,6 @@ void Notepad_plus::notifyBufferChanged(Buffer * buffer, int mask)
 			}
 			case DOC_DELETED: 	//ask for keep
 			{
-				int index = _pDocTab->getIndexByBuffer(buffer->getID());
-				int iView = currentView();
-				if (index == -1)
-					iView = otherView();
-				//activateBuffer(buffer->getID(), iView);	//activate the buffer in the first view possible
 				didDialog = true;
 				if (doCloseOrNot(buffer->getFullPathName()) == IDNO)
 				{
@@ -10772,25 +10759,33 @@ int Notepad_plus::getLangFromMenuName(const TCHAR * langName)
 	TCHAR menuLangName[menuSize];
 
 	for ( int i = IDM_LANG_C; i <= IDM_LANG_USER; i++ )
+	{
 		if ( ::GetMenuString( _mainMenuHandle, i, menuLangName, menuSize, MF_BYCOMMAND ) )
+		{
 			if ( !lstrcmp( langName, menuLangName ) )
 			{
 				id	= i;
 				break;
 			}
+		}
+	}
 
-			if ( id == 0 )
+	if ( id == 0 )
+	{
+		for ( int i = IDM_LANG_USER + 1; i <= IDM_LANG_USER_LIMIT; i++ )
+		{
+			if ( ::GetMenuString( _mainMenuHandle, i, menuLangName, menuSize, MF_BYCOMMAND ) )
 			{
-				for ( int i = IDM_LANG_USER + 1; i <= IDM_LANG_USER_LIMIT; i++ )
-					if ( ::GetMenuString( _mainMenuHandle, i, menuLangName, menuSize, MF_BYCOMMAND ) )
-						if ( !lstrcmp( langName, menuLangName ) )
-						{
-							id	= i;
-							break;
-						}
+				if ( !lstrcmp( langName, menuLangName ) )
+				{
+					id	= i;
+					break;
+				}
 			}
+		}
+	}
 
-			return id;
+	return id;
 }
 
 std::generic_string Notepad_plus::getLangFromMenu(const Buffer * buf)

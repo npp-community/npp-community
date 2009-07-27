@@ -2203,8 +2203,8 @@ bool NppParameters::feedStylerArray(TiXmlNode *node)
 	    TiXmlElement *element = childNode->ToElement();
 	    const TCHAR *styleIDStr = element->Attribute(TEXT("styleID"));
 
-        int styleID = -1;
-		if ((styleID = decStrVal(styleIDStr)) != -1)
+        int styleID = decStrVal(styleIDStr);
+		if (styleID != -1)
 		{
 		    _widgetStyleArray.addStyler(styleID, childNode);
         }
@@ -2234,8 +2234,8 @@ void LexerStylerArray::addLexerStyler(const TCHAR *lexerName, const TCHAR *lexer
 
 		if (styleIDStr)
 		{
-			int styleID = -1;
-			if ((styleID = decStrVal(styleIDStr)) != -1)
+			int styleID = decStrVal(styleIDStr);
+			if (styleID != -1)
 			{
 				ls.addStyler(styleID, childNode);
 			}
@@ -2350,10 +2350,6 @@ void NppParameters::feedKeyWordsParameters(TiXmlNode *node)
 			}
 		}
 	}
-}
-
-extern "C" {
-typedef DWORD (WINAPI * EESFUNC) (LPCTSTR, LPTSTR, DWORD);
 }
 
 void NppParameters::feedGUIParameters(TiXmlNode *node)
@@ -3953,7 +3949,6 @@ bool NppParameters::writeGUIParams()
 		GUIConfigElement->SetAttribute(TEXT("triggerFromNbChar"), _nppGUI._autocFromLen);
 		const TCHAR * pStr = _nppGUI._funcParams?TEXT("yes"):TEXT("no");
 		GUIConfigElement->SetAttribute(TEXT("funcParams"), pStr);
-		autocExist = true;
 	}
 
 	if (dockingParamNode)
@@ -4754,7 +4749,7 @@ UserLangContainer::UserLangContainer( const TCHAR *name, const TCHAR *ext ) : _n
 	}
 }
 
-UserLangContainer & UserLangContainer::operator=( const UserLangContainer & ulc )
+const UserLangContainer & UserLangContainer::operator=( const UserLangContainer & ulc )
 {
 	if (this != &ulc)
 	{

@@ -404,7 +404,7 @@ public :
 	UserLangContainer();
 	UserLangContainer(const TCHAR *name, const TCHAR *ext);
 
-	UserLangContainer & operator=(const UserLangContainer & ulc);
+	const UserLangContainer & operator=(const UserLangContainer & ulc);
 
 	int getNbKeywordList() {return nbKeywodList;}
 	const TCHAR * getName() {return _name.c_str();}

@@ -281,9 +281,9 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 						case STATE_USER: {
 							//Get UserCommand corresponding to row
 							std::vector<UserCommand> & shortcuts = nppParam->getUserCommandList();
-							UserCommand ucmd = shortcuts[row - 1], prevucmd = shortcuts[row - 1];
+							UserCommand ucmd = shortcuts[row - 1];
 							ucmd.init(_hInst, _hSelf);
-							prevucmd = ucmd;
+							UserCommand prevucmd = ucmd;
 							if (ucmd.doDialog() != -1 && prevucmd != ucmd) {	//shortcut was altered
 								shortcuts[row - 1] = ucmd;
 								_babygrid->setText(row, 1, ucmd.getName());
@@ -297,9 +297,9 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 						case STATE_PLUGIN: {
 							//Get PluginCmdShortcut corresponding to row
 							std::vector<PluginCmdShortcut> & shortcuts = nppParam->getPluginCommandList();
-							PluginCmdShortcut pcsc = shortcuts[row - 1], prevpcsc = shortcuts[row - 1];
+							PluginCmdShortcut pcsc = shortcuts[row - 1];
 							pcsc.init(_hInst, _hSelf);
-							prevpcsc = pcsc;
+							PluginCmdShortcut prevpcsc = pcsc;
 							if (pcsc.doDialog() != -1 && prevpcsc != pcsc) {	//shortcut was altered
 								nppParam->addPluginModifiedIndex(row-1);
 								shortcuts[row - 1] = pcsc;

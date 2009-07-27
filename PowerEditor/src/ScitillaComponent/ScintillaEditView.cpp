@@ -2158,9 +2158,9 @@ bool ScintillaEditView::expandWordSelection()
 	return false;
 }
 
-TCHAR * int2str(TCHAR *str, int strLen, int number, int base, int nbChiffre, bool isZeroLeading)
+TCHAR * int2str(TCHAR *str, int strLen, int number, int base, int nbDigits, bool isZeroLeading)
 {
-	if (nbChiffre >= strLen) return NULL;
+	if (nbDigits >= strLen) return NULL;
 	TCHAR f[64];
 	TCHAR fStr[2] = TEXT("d");
 	if (base == 16)
@@ -2171,7 +2171,7 @@ TCHAR * int2str(TCHAR *str, int strLen, int number, int base, int nbChiffre, boo
 	{
 		const unsigned int MASK_ULONG_BITFORT = 0x80000000;
 		int nbBits = sizeof(unsigned int) * 8;
-		int nbBit2Shift = (nbChiffre >= nbBits)?nbBits:(nbBits - nbChiffre);
+		int nbBit2Shift = (nbDigits >= nbBits)?nbBits:(nbBits - nbDigits);
 		unsigned long mask = MASK_ULONG_BITFORT >> nbBit2Shift;
 		int i = 0;
 		for (; mask > 0 ; i++)
@@ -2198,7 +2198,7 @@ TCHAR * int2str(TCHAR *str, int strLen, int number, int base, int nbChiffre, boo
 			wsprintf(str, f, number);
 		}
 		int i = lstrlen(str);
-		for ( ; i < nbChiffre ; i++)
+		for ( ; i < nbDigits ; i++)
 			str[i] = ' ';
 		str[i] = '\0';
 	}
@@ -2206,7 +2206,7 @@ TCHAR * int2str(TCHAR *str, int strLen, int number, int base, int nbChiffre, boo
 	{
 		if (base != 2)
 		{
-			wsprintf(f, TEXT("%%.%d%s"), nbChiffre, fStr);
+			wsprintf(f, TEXT("%%.%d%s"), nbDigits, fStr);
 			wsprintf(str, f, number);
 		}
 		// else already done.
@@ -2234,8 +2234,8 @@ ColumnModeInfo ScintillaEditView::getColumnModeSelectInfo()
 			startCol = endCol;
 			endCol = tmp;
 
-			selStartAbsPos = execute(SCI_FINDCOLUMN, startLine, startCol);
-			selEndAbsPos = execute(SCI_FINDCOLUMN, endLine, endCol);
+			execute(SCI_FINDCOLUMN, startLine, startCol);
+			execute(SCI_FINDCOLUMN, endLine, endCol);
 		}
 
 		bool zeroCharSelMode = true;

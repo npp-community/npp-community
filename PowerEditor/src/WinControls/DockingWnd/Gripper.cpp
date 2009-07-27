@@ -25,10 +25,6 @@
 #include "DockingCont.h"
 #include "npp_winver.h"
 
-#ifndef WH_KEYBOARD_LL
-#define WH_KEYBOARD_LL 13
-#endif
-
 #ifndef WH_MOUSE_LL
 #define WH_MOUSE_LL 14
 #endif
@@ -536,7 +532,6 @@ void Gripper::doTabReordering(POINT pt)
 
 void Gripper::drawRectangle(POINT pt)
 {
-	HANDLE		hbrushOrig	= NULL;
 	RECT		rc			= {0};
 
 	if (!_hdc)
@@ -548,12 +543,11 @@ void Gripper::drawRectangle(POINT pt)
 	if (!_hbrush)
 		_hbrush = ::CreatePatternBrush(_hbm);
 
-
 	// Determine whether to draw a solid drag rectangle or checkered
 	getMovingRect(pt, &rc);
 
 	::SetBrushOrgEx(_hdc, rc.left, rc.top, 0);
-	hbrushOrig = ::SelectObject(_hdc, _hbrush);
+	HANDLE hbrushOrig = ::SelectObject(_hdc, _hbrush);
 
 	// line: left
 	::PatBlt(_hdc, rc.left, rc.top, 3, rc.bottom - 3, PATINVERT);
@@ -580,10 +574,9 @@ void Gripper::getMousePoints(POINT* pt, POINT* ptPrev)
 void Gripper::getMovingRect(POINT pt, RECT *rc)
 {
 	RECT			rcCorr			= {0};
-	DockingCont*	pContHit		= NULL;
 
 	/* test if mouse hits a container */
-	pContHit = contHitTest(pt);
+	DockingCont* pContHit = contHitTest(pt);
 
 	if (pContHit != NULL)
 	{

@@ -62,7 +62,6 @@ private:
 int Searching::convertExtendedToString(const TCHAR * query, TCHAR * result, int length) {	//query may equal to result, since it always gets smaller
 	int i = 0, j = 0;
 	int charLeft = length;
-	bool isGood = true;
 	TCHAR current;
 	while(i < length) {	//because the backslash escape quences always reduce the size of the std::generic_string, no overflow checks have to be made for target, assuming parameters are correct
 		current = query[i];
@@ -115,7 +114,6 @@ int Searching::convertExtendedToString(const TCHAR * query, TCHAR * result, int 
 					result[j] = '\\';
 					j++;
 					result[j] = current;
-					isGood = false;
 					break;
 				}
 			}
@@ -1349,7 +1347,7 @@ bool FindReplaceDlg::processFindNext(const TCHAR *txt2find, FindOption *options,
 	lstrcpy(pText, txt2find);
 
 	if (pOptions->_searchType == FindExtended) {
-		stringSizeFind = Searching::convertExtendedToString(txt2find, pText, stringSizeFind);
+		Searching::convertExtendedToString(txt2find, pText, stringSizeFind);
 	}
 
 	int docLength = int((*_ppEditView)->execute(SCI_GETLENGTH));
@@ -1472,8 +1470,8 @@ bool FindReplaceDlg::processReplace(const TCHAR *txt2find, const TCHAR *txt2repl
 	lstrcpy(pTextReplace, txt2replace);
 
 	if (pOptions->_searchType == FindExtended) {
-		stringSizeFind = Searching::convertExtendedToString(txt2find, pTextFind, stringSizeFind);
-		stringSizeReplace = Searching::convertExtendedToString(txt2replace, pTextReplace, stringSizeReplace);
+		Searching::convertExtendedToString(txt2find, pTextFind, stringSizeFind);
+		Searching::convertExtendedToString(txt2replace, pTextReplace, stringSizeReplace);
 	}
 
 	bool isRegExp = pOptions->_searchType == FindRegex;
@@ -1655,9 +1653,9 @@ int FindReplaceDlg::processRange(ProcessOperation op, const TCHAR *txt2find, con
 	}
 
 	if (pOptions->_searchType == FindExtended) {
-		stringSizeFind = Searching::convertExtendedToString(pTextFind, pTextFind, stringSizeFind);
+		Searching::convertExtendedToString(pTextFind, pTextFind, stringSizeFind);
 		if (op == ProcessReplaceAll)
-			stringSizeReplace = Searching::convertExtendedToString(pTextReplace, pTextReplace, stringSizeReplace);
+			Searching::convertExtendedToString(pTextReplace, pTextReplace, stringSizeReplace);
 	}
 
 	bool isRegExp = pOptions->_searchType == FindRegex;
@@ -1676,12 +1674,9 @@ int FindReplaceDlg::processRange(ProcessOperation op, const TCHAR *txt2find, con
 		}
 	}
 
-	int targetStart = 0;
-	int targetEnd = 0;
-
 	//Initial range for searching
 	(*_ppEditView)->execute(SCI_SETSEARCHFLAGS, flags);
-	targetStart = (*_ppEditView)->searchInTarget(pTextFind, startRange, endRange);
+	int targetStart = (*_ppEditView)->searchInTarget(pTextFind, startRange, endRange);
 
 	if ((targetStart != -1) && (op == ProcessFindAll))	//add new filetitle if this file results in hits
 	{
@@ -1691,7 +1686,7 @@ int FindReplaceDlg::processRange(ProcessOperation op, const TCHAR *txt2find, con
 	{
 		//int posFindBefore = posFind;
 		targetStart = int((*_ppEditView)->execute(SCI_GETTARGETSTART));
-		targetEnd = int((*_ppEditView)->execute(SCI_GETTARGETEND));
+		int targetEnd = int((*_ppEditView)->execute(SCI_GETTARGETEND));
 		if (targetEnd > endRange) {	//we found a result but outside our range, therefore do not process it
 			break;
 		}

@@ -55,7 +55,6 @@ bool AutoCompletion::showAutoComplete() {
 	int curPos = int(_pEditView->execute(SCI_GETCURRENTPOS));
 	int line = _pEditView->getCurrentLineNumber();
 	int startLinePos = int(_pEditView->execute(SCI_POSITIONFROMLINE, line ));
-	int startWordPos = startLinePos;
 
 	int len = curPos-startLinePos;
 	char * lineBuffer = new char[len+1];
@@ -75,7 +74,7 @@ bool AutoCompletion::showAutoComplete() {
 		offset--;
 
 	}
-	startWordPos = curPos-nrChars;
+	int startWordPos = curPos-nrChars;
 
 	_pEditView->execute(SCI_AUTOCSETSEPARATOR, WPARAM('\n'));
 	_pEditView->execute(SCI_AUTOCSETIGNORECASE, _ignoreCase);
@@ -263,8 +262,8 @@ bool AutoCompletion::setLanguage(LangType language) {
 
 		TiXmlElement * pElem = pAutoNode->FirstChildElement(TEXT("Environment"));
 		if (pElem) {
-			const TCHAR * val = 0;
-			val = pElem->Attribute(TEXT("ignoreCase"));
+
+			const TCHAR * val = pElem->Attribute(TEXT("ignoreCase"));
 			if (val && !lstrcmp(val, TEXT("no"))) {
 				_ignoreCase = false;
 				_funcCalltip->_ignoreCase = false;

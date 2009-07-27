@@ -22,7 +22,6 @@
 #include "RunMacroDlg.h"
 #include "Parameters.h"
 #include "resource.h"
-#include "Notepad_plus_msgs.h"
 #include "RunMacroDlg_rc.h"
 
 

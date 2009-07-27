@@ -55,7 +55,7 @@ struct Style
 
 	~Style();
 
-	Style & operator=(const Style & style);
+	const Style & operator=(const Style & style);
 
 	void setKeywords(const TCHAR *str);
 };
@@ -81,7 +81,7 @@ struct StyleArray
 public:
 	StyleArray() : _nbStyler(0){};
 
-	StyleArray & operator=(const StyleArray & sa);
+	const StyleArray & operator=(const StyleArray & sa);
 
 	int getNbStyler() const {return _nbStyler;}
 	void setNbStyler(int nb) {_nbStyler = nb;}
@@ -110,7 +110,7 @@ struct LexerStyler : public StyleArray
 public :
 	LexerStyler():StyleArray(){};
 
-	LexerStyler & operator=(const LexerStyler & ls);
+	const LexerStyler & operator=(const LexerStyler & ls);
 
 	void setLexerName(const TCHAR *lexerName);
 	void setLexerDesc(const TCHAR *lexerDesc);
@@ -135,7 +135,7 @@ struct LexerStylerArray
 public :
 	LexerStylerArray() : _nbLexerStyler(0){};
 
-	LexerStylerArray & operator=(const LexerStylerArray & lsa);
+	const LexerStylerArray & operator=(const LexerStylerArray & lsa);
 
 	int getNbLexer() const {return _nbLexerStyler;};
 

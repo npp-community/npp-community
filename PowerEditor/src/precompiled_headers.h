@@ -15,7 +15,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#pragma once
+#ifndef PRECOMPILED_HEADERS_H
+#define PRECOMPILED_HEADERS_H
+
 #include "targetver.h"
 
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
@@ -77,3 +79,5 @@
 
 // Power Editor
 #include "Common.h"
+
+#endif // PRECOMPILED_HEADERS_H

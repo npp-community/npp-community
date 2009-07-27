@@ -161,7 +161,7 @@ public:
 	void killAllChildren();
 	virtual void destroy();
 
-    static const TCHAR * Notepad_plus::getClassName() {
+    static const TCHAR * getClassName() {
 		return _className;
 	};
 

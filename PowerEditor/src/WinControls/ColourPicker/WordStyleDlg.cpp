@@ -835,7 +835,7 @@ void WordStyleDlg::setVisualFromStyleList()
     //--Warning text
     //bool showWarning = ((_currentLexerIndex == 0) && (style._styleID == STYLE_DEFAULT));//?SW_SHOW:SW_HIDE;
 
-	COLORREF c = c = RGB(0x00, 0x00, 0xFF);
+	COLORREF color = RGB(0x00, 0x00, 0xFF);
 	TCHAR str[256];
 
 	str[0] = '\0';
@@ -855,7 +855,7 @@ void WordStyleDlg::setVisualFromStyleList()
 
 	// PAD for fix a display glitch
 	lstrcat(str, TEXT("          "));
-	colourHooker->setColour(c);
+	colourHooker->setColour(color);
 	::SetWindowText(_hStyleInfoStaticText, str);
 
 	//-- 2 couleurs : fg et bg
