@@ -161,6 +161,8 @@ private :
 	bool _isRTL;
 
 	int _findAllResult;
+
+	// JOCE either remove the magic number, or use a std::string if possible.
 	TCHAR _findAllResultStr[1024];
 
 	std::generic_string _filters;

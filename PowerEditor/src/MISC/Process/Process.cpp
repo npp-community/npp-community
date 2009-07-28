@@ -18,6 +18,30 @@
 #include "precompiled_headers.h"
 #include "process.h"
 
+Process::Process(progType pt) :
+	_type(pt),
+	_exitCode(STILL_ACTIVE),
+	_hPipeOutR(NULL),
+	_hPipeErrR(NULL),
+	_hProcess(NULL),
+	_hProcessThread(NULL),
+	_bProcessEnd(TRUE)
+{}
+
+Process::Process(const TCHAR *cmd, const TCHAR *args, const TCHAR *cDir, progType pt) :
+	_type(pt),
+	_command(cmd),
+	_args(args),
+	_curDir(cDir),
+	_exitCode(STILL_ACTIVE),
+	_hPipeOutR(NULL),
+	_hPipeErrR(NULL),
+	_hProcess(NULL),
+	_hProcessThread(NULL),
+	_bProcessEnd(TRUE)
+{
+}
+
 BOOL Process::run()
 {
 	BOOL result = TRUE;
@@ -72,7 +96,7 @@ BOOL Process::run()
 						TRUE,        // inherit handles flag
 						(_type == WIN32_PROG)?NULL:CREATE_SUSPENDED,           // flags
 						NULL,        // inherit environment
-						_curDir,        // inherit directory
+						_curDir.c_str(),        // inherit directory
 						&startup,    // STARTUPINFO
 						&procinfo);  // PROCESS_INFORMATION
 

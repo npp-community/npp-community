@@ -20,6 +20,39 @@
 #include "TaskListDlg_rc.h"
 #include "colors.h"
 
+TaskList::TaskList() :
+	_defaultProc(NULL), _hFont(NULL), _hFontSelected(NULL),
+	_nbItem(0), _currentIndex(0)
+{
+	_rc.left = 0;
+	_rc.top = 0;
+	_rc.right = 150;
+	_rc.bottom = 0;
+}
+
+TaskList::~TaskList()
+{
+	if (_hSelf)
+	{
+		TaskList::destroy();
+	}
+}
+
+void TaskList::destroy()
+{
+	if (_hFont)
+	{
+		DeleteObject(_hFont);
+	}
+
+	if (_hFontSelected)
+	{
+		DeleteObject(_hFontSelected);
+	}
+	::DestroyWindow(_hSelf);
+	_hSelf = NULL;
+}
+
 void TaskList::init(HINSTANCE hInst, HWND parent, HIMAGELIST hImaLst, int nbItem, int index2set)
 {
 	Window::init(hInst, parent);
@@ -242,3 +275,32 @@ LRESULT TaskList::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 	}
 }
 
+void TaskList::setFont( TCHAR *fontName, size_t fontSize )
+{
+	if (_hFont)
+	{
+		::DeleteObject(_hFont);
+	}
+
+	if (_hFontSelected)
+	{
+		::DeleteObject(_hFontSelected);
+	}
+
+	_hFont = ::CreateFont(fontSize, 0, 0, 0,
+		FW_NORMAL,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		fontName);
+
+	_hFontSelected = ::CreateFont(fontSize, 0, 0, 0,
+		FW_BOLD,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		fontName);
+
+	if (_hFont)
+	{
+		::SendMessage(_hSelf, WM_SETFONT, reinterpret_cast<WPARAM>(_hFont), 0);
+	}
+}

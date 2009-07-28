@@ -108,22 +108,18 @@ protected:
 struct LexerStyler : public StyleArray
 {
 public :
-	LexerStyler():StyleArray(){};
-
-	const LexerStyler & operator=(const LexerStyler & ls);
-
 	void setLexerName(const TCHAR *lexerName);
 	void setLexerDesc(const TCHAR *lexerDesc);
 	void setLexerUserExt(const TCHAR *lexerUserExt);
 
-	const TCHAR * getLexerName() const {return _lexerName;}
-	const TCHAR * getLexerDesc() const {return _lexerDesc;}
-	const TCHAR * getLexerUserExt() const {return _lexerUserExt;}
+	const TCHAR * getLexerName() const {return _lexerName.c_str();}
+	const TCHAR * getLexerDesc() const {return _lexerDesc.c_str();}
+	const TCHAR * getLexerUserExt() const {return _lexerUserExt.c_str();}
 
 private :
-	TCHAR _lexerName[16];
-	TCHAR _lexerDesc[32];
-	TCHAR _lexerUserExt[256];
+	std::generic_string _lexerName;
+	std::generic_string _lexerDesc;
+	std::generic_string _lexerUserExt;
 };
 
 #define  MAX_LEXER_STYLE 80

@@ -27,6 +27,7 @@
 #include "Buffer.h"
 
 #include "Parameters.h"
+#include "npp_winver.h"
 
 typedef std::vector<const TCHAR*> ParamVector;
 
@@ -289,7 +290,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 	std::generic_string version = TEXT("-v");
 	version += VERSION_VALUE;
 
-	winVer curWinVer = notepad_plus_plus.getWinVersion();
+	winVer curWinVer = getWinVersion();
 
 	bool isUpExist = nppGui._doesExistUpdater = (::PathFileExists(updaterFullPath.c_str()) == TRUE);
 	bool doUpdate = !nppGui._neverUpdate;
@@ -312,7 +313,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 	Win32Exception::installHandler();
 	try {
 		notepad_plus_plus.init(hInstance, NULL, quotFileName.c_str(), &cmdLineParams);
-		bool unicodeSupported = notepad_plus_plus.getWinVersion() >= WV_NT;
+		bool unicodeSupported = getWinVersion() >= WV_NT;
 		bool going = true;
 		while (going)
 		{

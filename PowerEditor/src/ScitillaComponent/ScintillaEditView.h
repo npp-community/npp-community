@@ -295,29 +295,7 @@ public:
 
 	bool isSelecting() const;
 	void setHiLiteResultWords(const TCHAR *keywords);
-/*
-	pair<size_t, bool> getLineUndoState(size_t currentLine) {
-		Buffer * buf = getCurrentBuffer();
-		return buf->getLineUndoState(currentLine);
-	};
-	void setLineUndoState(size_t currentLine, size_t undoLevel, bool isSaved = false) {
-		Buffer * buf = getCurrentBuffer();
-		buf->setLineUndoState(currentLine, undoLevel, isSaved);
-	};
 
-	void markSavedLines() {
-		for (int i = 0 ; i <= lastZeroBasedLineNumber() ; i++)
-		{
-			if ((execute(SCI_MARKERGET, i) & (1 << MARK_LINEMODIFIEDUNSAVED)) != 0)
-			{
-				execute(SCI_MARKERDELETE, i, MARK_LINEMODIFIEDUNSAVED);
-				execute(SCI_MARKERADD, i, MARK_LINEMODIFIEDSAVED);
-				//pair<size_t, bool> st = getLineUndoState(i);
-				setLineUndoState(i, 0, true);
-			}
-		}
-	};
-*/
 protected:
 	static HINSTANCE _hLib;
 	static int _refCount;

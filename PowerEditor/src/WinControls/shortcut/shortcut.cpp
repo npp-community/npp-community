@@ -339,6 +339,7 @@ void getNameStrFromCmd(INT cmd, std::generic_string & str)
 	}
 	else
 	{
+		// JOCE: Used only to get the class name.  We should move the class name elsewhere, where it brings less baggage with it.
 		HWND hNotepad_plus = ::FindWindow(Notepad_plus::getClassName(), NULL);
 		const int commandSize = 64;
 		TCHAR cmdName[commandSize];
@@ -959,7 +960,8 @@ int ScintillaKeyMap::doDialog()
 	return ::DialogBoxParam(_hInst, MAKEINTRESOURCE(IDD_SHORTCUTSCINT_DLG), _hParent,  (DLGPROC)dlgProc, (LPARAM)this);
 }
 
-ScintillaKeyMap::ScintillaKeyMap( Shortcut sc, long scintillaKeyID, unsigned long id ) : Shortcut(sc), _menuCmdID(id), _scintillaKeyID(scintillaKeyID)
+ScintillaKeyMap::ScintillaKeyMap( Shortcut sc, long scintillaKeyID, unsigned long id ) :
+	Shortcut(sc), _scintillaKeyID(scintillaKeyID), _menuCmdID(id)
 {
 	_keyCombos.clear();
 	_keyCombos.push_back(_keyCombo);

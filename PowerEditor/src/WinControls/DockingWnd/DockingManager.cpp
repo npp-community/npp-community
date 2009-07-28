@@ -57,6 +57,11 @@ LRESULT CALLBACK FocusWndProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 DockingManager::DockingManager()
 {
+	_ppWindow = NULL;
+	memset(&_rcWork, 0, sizeof(RECT));
+	memset(&_rect, 0, sizeof(RECT));
+	_ppMainWindow = NULL;
+
 	_isInitialized			= FALSE;
 	_hImageList				= NULL;
 	memset(_iContMap, -1, CONT_MAP_MAX);

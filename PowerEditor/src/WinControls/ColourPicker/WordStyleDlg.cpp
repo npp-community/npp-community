@@ -28,22 +28,29 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 class ColourStaticTextHooker {
 public :
-	ColourStaticTextHooker() : _colour(RGB(0x00, 0x00, 0x00))/*, _hFont(NULL)*/ {};
+	ColourStaticTextHooker() :
+		_colour(RGB(0x00, 0x00, 0x00)),
+		_oldProc(NULL)
+	{}
 
-	COLORREF setColour(COLORREF colour2Set) {
+	COLORREF setColour(COLORREF colour2Set)
+	{
 		COLORREF oldColour = _colour;
 		_colour = colour2Set;
 		return oldColour;
-	};
-	void hookOn(HWND staticHandle) {
+	}
+
+	void hookOn(HWND staticHandle)
+	{
 		::SetWindowLongPtr(staticHandle, GWL_USERDATA, (LONG)this);
 		_oldProc = (WNDPROC)::SetWindowLongPtr(staticHandle, GWL_WNDPROC, (LONG)staticProc);
-	};
+	}
 private :
 	COLORREF _colour;
 	WNDPROC _oldProc;
 
-	static BOOL CALLBACK staticProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam){
+	static BOOL CALLBACK staticProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+	{
 		ColourStaticTextHooker *pColourStaticTextHooker = reinterpret_cast<ColourStaticTextHooker *>(::GetWindowLongPtr(hwnd, GWL_USERDATA));
 		return pColourStaticTextHooker->colourStaticProc(hwnd, message, wParam, lParam);
 	};
@@ -51,17 +58,23 @@ private :
 };
 
 WordStyleDlg::WordStyleDlg():
+	_pFgColour(NULL), _pBgColour(NULL),
+	_currentLexerIndex(0), _currentThemeIndex(0),
+	_hCheckBold(NULL), _hCheckItalic(NULL), _hCheckUnderline(NULL),
+	_hFontNameCombo(NULL), _hFontSizeCombo(NULL), _hSwitch2ThemeCombo(NULL),
+	_hFgColourStaticText(NULL),_hBgColourStaticText(NULL),
+	_hFontNameStaticText(NULL), _hFontSizeStaticText(NULL),
+	_hStyleInfoStaticText(NULL),
+	_restoreInvalid(false),
+	_colourHooker(new ColourStaticTextHooker),
 	_isDirty(false),
 	_isThemeDirty(false),
-	_restoreInvalid(false),
-	_isShownGOCtrls(false),
-	_currentLexerIndex(0),
-	colourHooker(new ColourStaticTextHooker)
+	_isShownGOCtrls(false)
 {}
 
 WordStyleDlg::~WordStyleDlg()
 {
-	delete colourHooker;
+	delete _colourHooker;
 }
 
 void WordStyleDlg::doDialog(bool isRTL)
@@ -88,6 +101,8 @@ void WordStyleDlg::prepare2Cancel()
 
 void WordStyleDlg::redraw() const
 {
+	assert(_pFgColour);
+	assert(_pBgColour);
 	_pFgColour->redraw();
 	_pBgColour->redraw();
 	::InvalidateRect(_hStyleInfoStaticText, NULL, TRUE);
@@ -137,12 +152,14 @@ int WordStyleDlg::whichTabColourIndex()
 
 void WordStyleDlg::enableFg(bool isEnable)
 {
+	assert(_pFgColour);
 	::EnableWindow(_pFgColour->getHSelf(), isEnable);
 	::EnableWindow(_hFgColourStaticText, isEnable);
 }
 
 void WordStyleDlg::enableBg(bool isEnable)
 {
+	assert(_pBgColour);
 	::EnableWindow(_pBgColour->getHSelf(), isEnable);
 	::EnableWindow(_hBgColourStaticText, isEnable);
 }
@@ -257,8 +274,8 @@ BOOL CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPar
 			_hFontSizeStaticText = ::GetDlgItem(_hSelf, IDC_FONTSIZE_STATIC);
 			_hStyleInfoStaticText = ::GetDlgItem(_hSelf, IDC_STYLEDESCRIPTION_STATIC);
 
-			colourHooker->setColour(RGB(0xFF, 0x00, 0x00));
-			colourHooker->hookOn(_hStyleInfoStaticText);
+			_colourHooker->setColour(RGB(0xFF, 0x00, 0x00));
+			_colourHooker->hookOn(_hStyleInfoStaticText);
 
 			_currentThemeIndex = -1;
 			int defaultThemeIndex = 0;
@@ -333,10 +350,20 @@ BOOL CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPar
 
 		case WM_DESTROY:
 		{
-			_pFgColour->destroy();
-			_pBgColour->destroy();
-			delete _pFgColour;
-			delete _pBgColour;
+			if (_pFgColour)
+			{
+				_pFgColour->destroy();
+				delete _pFgColour;
+				_pFgColour = NULL;
+			}
+
+			if (_pBgColour)
+			{
+				_pBgColour->destroy();
+				delete _pBgColour;
+				_pBgColour = NULL;
+			}
+
 			return TRUE;
 		}
 
@@ -577,6 +604,8 @@ BOOL CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPar
 
 							case CPN_COLOURPICKED:
 							{
+								assert(_pFgColour);
+								assert(_pBgColour);
 								if ((HWND)lParam == _pFgColour->getHSelf())
 								{
 									updateColour(C_FOREGROUND);
@@ -657,6 +686,7 @@ void WordStyleDlg::updateColour(bool which)
 	Style & style = getCurrentStyler();
 	if (which == C_FOREGROUND)
 	{
+		assert(_pFgColour);
 		style._fgColor = _pFgColour->getColour();
 		if (_pFgColour->isEnabled())
 			style._colorStyle |= COLORSTYLE_FOREGROUND;
@@ -665,6 +695,7 @@ void WordStyleDlg::updateColour(bool which)
 	}
 	else //(which == C_BACKGROUND)
 	{
+		assert(_pBgColour);
 		style._bgColor = _pBgColour->getColour();
 		if (_pBgColour->isEnabled())
 			style._colorStyle |= COLORSTYLE_BACKGROUND;
@@ -855,13 +886,14 @@ void WordStyleDlg::setVisualFromStyleList()
 
 	// PAD for fix a display glitch
 	lstrcat(str, TEXT("          "));
-	colourHooker->setColour(color);
+	_colourHooker->setColour(color);
 	::SetWindowText(_hStyleInfoStaticText, str);
 
 	//-- 2 couleurs : fg et bg
 	bool isEnable = false;
 	if (HIBYTE(HIWORD(style._fgColor)) != 0xFF)
 	{
+		assert(_pFgColour);
 		_pFgColour->setColour(style._fgColor);
 		_pFgColour->setEnabled((style._colorStyle & COLORSTYLE_FOREGROUND) != 0);
 		isEnable = true;
@@ -871,6 +903,7 @@ void WordStyleDlg::setVisualFromStyleList()
 	isEnable = false;
 	if (HIBYTE(HIWORD(style._bgColor)) != 0xFF)
 	{
+		assert(_pBgColour);
 		_pBgColour->setColour(style._bgColor);
 		_pBgColour->setEnabled((style._colorStyle & COLORSTYLE_BACKGROUND) != 0);
 		isEnable = true;

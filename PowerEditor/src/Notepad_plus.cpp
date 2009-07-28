@@ -101,40 +101,46 @@ struct SortTaskListPred
 	}
 };
 
-Notepad_plus::Notepad_plus(): Window(), _mainWindowStatus(0), _pDocTab(NULL), _pEditView(NULL),
-	_pMainSplitter(NULL), _subSplitter(NULL), _dockingManager(NULL),
-	_recordingMacro(false), _pTrayIco(NULL), _pluginsManager(new PluginsManager()), _isUDDocked(false), _isRTL(false),
-	_linkTriggered(true), _isDocModifing(false), _isHotspotDblClicked(false), _sysMenuEntering(false),
-	// TODO Joce 7/13/09
-	// Since _autoCompleteMain and _autoCompleteSub rely on the views to be initialized, maybe we can push all these guys to the
-	// WM_CREATE.
-	_subEditView(new ScintillaEditView()), _mainEditView(new ScintillaEditView()), _invisibleEditView(new ScintillaEditView()), _fileEditView(new ScintillaEditView()),
-	_autoCompleteMain(new AutoCompletion(_mainEditView)), _autoCompleteSub(new AutoCompletion(_subEditView)), _tabPopupMenu(NULL), _tabPopupDropMenu(NULL),
-	_smartHighlighter(NULL),_mainDocTab(NULL), _subDocTab(NULL),
-	_nativeLangEncoding(CP_ACP), _isFileOpening(false), _docTabIconList(NULL),
-	_toolBar(NULL), _statusBar(NULL), _rebarTop(NULL), _rebarBottom(NULL),
-	_findReplaceDlg(NULL), _incrementFindDlg(NULL), _aboutDlg(NULL), _runDlg(NULL), _goToLineDlg(NULL),
-	_colEditorDlg(NULL), _configStyleDlg(NULL), _preferenceDlg(NULL), _lastRecentFileList(new LastRecentFileList()), _windowsMenu(NULL),
-	_runMacroDlg(NULL)
+Notepad_plus::Notepad_plus():
+	_pMainWindow(NULL), _dockingManager(NULL), _smartHighlighter(NULL),
+	_nativeLangEncoding(CP_ACP),
+	_mainDocTab(NULL), _subDocTab(NULL), _pDocTab(NULL), _pNonDocTab(NULL),
+	_subEditView(new ScintillaEditView()),
+	_mainEditView(new ScintillaEditView()),
+	_invisibleEditView(new ScintillaEditView()),
+	_fileEditView(new ScintillaEditView()),
+	_pEditView(NULL),_pNonEditView(NULL),
+	_pMainSplitter(NULL), _subSplitter(NULL),
+	_autoCompleteMain(new AutoCompletion(_mainEditView)),
+	_autoCompleteSub(new AutoCompletion(_subEditView)),
+	_tabPopupMenu(NULL),_tabPopupDropMenu(NULL),
+	_toolBar(NULL), _docTabIconList(NULL),
+	_statusBar(NULL), _toReduceTabBar(false),
+	_rebarTop(NULL), _rebarBottom(NULL),
+	_findReplaceDlg(NULL), _incrementFindDlg(NULL), _aboutDlg(NULL),
+	_runDlg(NULL), _goToLineDlg(NULL),
+	_colEditorDlg(NULL), _configStyleDlg(NULL), _preferenceDlg(NULL),
+	_lastRecentFileList(new LastRecentFileList()),
+	_windowsMenu(NULL), _mainMenuHandle(NULL),
+	_sysMenuEntering(false),
+	_recordingMacro(false), _runMacroDlg(NULL),
+	_linkTriggered(true), _isDocModifing(false), _isHotspotDblClicked(false),
+	_isUDDocked(false),
+	_pTrayIco(NULL),
+	_zoomOriginalValue(0),
+	_pluginsManager(new PluginsManager()),
+	_isRTL(false),
+	_isFileOpening(false),
+	_mainWindowStatus(0),
+	_activeView(MAIN_VIEW)
 {
-
+	memset(&_nppPath, 0, MAX_PATH * sizeof(TCHAR));
 	ZeroMemory(&_prevSelectedRange, sizeof(_prevSelectedRange));
-	_winVersion = getWinVersion();
 
 	TiXmlDocumentA *nativeLangDocRootA = (NppParameters::getInstance())->getNativeLangA();
 
-	//_subEditView = new ScintillaEditView();
-	//_mainEditView = new ScintillaEditView();
-	//_invisibleEditView = new ScintillaEditView();
-	//_fileEditView = new ScintillaEditView();
-	//_autoCompleteMain = new AutoCompletion(_mainEditView);
-	//_autoCompleteSub = new AutoCompletion(_subEditView);
-	//_smartHighlighter = NULL;
-
-
 	if (nativeLangDocRootA)
 	{
-
 		_nativeLangA =  nativeLangDocRootA->FirstChild("NotepadPlus");
 		if (_nativeLangA)
 		{
@@ -234,9 +240,9 @@ Notepad_plus::Notepad_plus(): Window(), _mainWindowStatus(0), _pDocTab(NULL), _p
 }
 
 // ATTENTION : the order of the destruction is very important
-// because if the parent's window hadle is destroyed before
-// the destruction of its childrens' windows handle,
-// its childrens' windows handle will be destroyed automatically!
+// because if the parent's window handle is destroyed before
+// the destruction of its children's windows handle,
+// its children's windows handle will be destroyed automatically!
 Notepad_plus::~Notepad_plus()
 {
 	(NppParameters::getInstance())->destroyInstance();
@@ -316,8 +322,10 @@ void Notepad_plus::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLine, CmdL
 	newUpperLeft.x = nppGUI._appPos.left + workAreaRect.left;
 	newUpperLeft.y = nppGUI._appPos.top + workAreaRect.top;
 
+	winVer winVersion = getWinVersion();
+
 	// GetSystemMetrics does not support the multi-monitor values on Windows NT and Windows 95.
-	if ((_winVersion != WV_95) && (_winVersion != WV_NT))
+	if ((winVersion != WV_95) && (winVersion != WV_NT))
 	{
 		int margin = ::GetSystemMetrics(SM_CYSMCAPTION);
 		if (newUpperLeft.x > ::GetSystemMetrics(SM_CXVIRTUALSCREEN)-margin)
@@ -3002,8 +3010,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 		}
 		//Else forward notification to window of rebarband
 		REBARBANDINFO rbBand;
-		winVer winVersion = getWinVersion();
-		if (winVersion <= WV_W2K)
+		if (getWinVersion() <= WV_W2K)
 		{
 			ZeroMemory(&rbBand, sizeof(REBARBANDINFO));
 			rbBand.cbSize  = sizeof(REBARBANDINFO);
@@ -9310,7 +9317,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 		case NPPM_GETWINDOWSVERSION:
 		{
-			return _winVersion;
+			return getWinVersion();
 		}
 
 		case NPPM_MAKECURRENTBUFFERDIRTY :

@@ -26,15 +26,19 @@
 static bool isInList(std::generic_string word, const std::vector<std::generic_string> & wordArray)
 {
 	for (size_t i = 0 ; i < wordArray.size() ; i++)
+	{
 		if (wordArray[i] == word)
+		{
 			return true;
+		}
+	}
 	return false;
 };
 
 AutoCompletion::AutoCompletion(ScintillaEditView * pEditView) :
-	_funcCompletionActive(false), _pEditView(pEditView), _funcCalltip(new FunctionCallTip(pEditView)),
-	_curLang(L_TXT), _XmlFile(NULL), _activeCompletion(CompletionNone),
-	_pXmlKeyword(NULL), _ignoreCase(true), _keyWords(TEXT(""))
+	_funcCompletionActive(false), _pEditView(pEditView), _curLang(L_TXT),
+	_XmlFile(NULL), _pXmlKeyword(NULL), _activeCompletion(CompletionNone),
+	_ignoreCase(true), _keyWords(TEXT("")), _funcCalltip(new FunctionCallTip(pEditView))
 {
 	//Do not load any language yet
 }

@@ -29,10 +29,14 @@
 class DockingSplitter : public Window
 {
 public :
-	DockingSplitter() : _isLeftButtonDown(FALSE), _hMessage(NULL) {};
-	~DockingSplitter(){};
+	DockingSplitter() : _hMessage(NULL), _isLeftButtonDown(FALSE), _flags(0)
+	{
+		_ptOldPos.x = 0;
+		_ptOldPos.y = 0;
+	}
+	~DockingSplitter(){}
 
-	virtual void destroy() {};
+	virtual void destroy() {}
 
 public:
 	void init(HINSTANCE hInst, HWND hWnd, HWND hMessage, UINT flags);

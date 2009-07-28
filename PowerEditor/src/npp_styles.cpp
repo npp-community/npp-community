@@ -30,6 +30,7 @@
 
 Style::Style() :
 	_styleID(-1),
+	_styleDesc(NULL),
 	_fgColor(COLORREF(-1)),
 	_bgColor(COLORREF(-1)),
 	_colorStyle(COLORSTYLE_ALL),
@@ -277,35 +278,19 @@ int StyleArray::getStylerIndexByName( const TCHAR *name ) const
 // ***********************************
 
 
-const LexerStyler & LexerStyler::operator=( const LexerStyler & ls )
-{
-	if (this != &ls)
-	{
-		*((StyleArray *)this) = ls;
-		// JOCE unchecked string copies....  Bad.  To change for strings.
-		lstrcpy(this->_lexerName, ls._lexerName);
-		lstrcpy(this->_lexerDesc, ls._lexerDesc);
-		lstrcpy(this->_lexerUserExt, ls._lexerUserExt);
-	}
-	return *this;
-}
-
 void LexerStyler::setLexerName( const TCHAR *lexerName )
 {
-	// JOCE unchecked string copies....  Bad.  To change for strings.
-	lstrcpy(_lexerName, lexerName);
+	_lexerName = lexerName;
 }
 
 void LexerStyler::setLexerDesc( const TCHAR *lexerDesc )
 {
-	// JOCE unchecked string copies....  Bad.  To change for strings.
-	lstrcpy(_lexerDesc, lexerDesc);
+	_lexerDesc = lexerDesc;
 }
 
 void LexerStyler::setLexerUserExt( const TCHAR *lexerUserExt )
 {
-	// JOCE unchecked string copies....  Bad.  To change for strings.
-	lstrcpy(_lexerUserExt, lexerUserExt);
+	_lexerUserExt = lexerUserExt;
 }
 
 

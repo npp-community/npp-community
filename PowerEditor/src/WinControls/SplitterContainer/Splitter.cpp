@@ -25,16 +25,17 @@ bool Splitter::_isHorizontalFixedRegistered = false;
 bool Splitter::_isVerticalFixedRegistered = false;
 
 
-Splitter::Splitter() : Window()
+Splitter::Splitter() :
+	_splitPercent(0),
+	_spiltterSize(0),
+	_isDraged(false),
+	_dwFlags(0),
+	_isFixed(false)
 {
-	//hInstance = GetModuleHandle(NULL);
-	_rect.left   = 0; // x axis
-	_rect.top    = 0; // y axis
-	_rect.right  = 0; // Width of the spliter.
-	_rect.bottom = 0; // Height of the spliter
-	_isFixed = false;
+	memset(&_rect, 0, sizeof(RECT));
+	memset(&_clickZone2TL, 0, sizeof(RECT));
+	memset(&_clickZone2BR, 0, sizeof(RECT));
 }
-
 
 void Splitter::init( HINSTANCE hInst, HWND hPere, int splitterSize,
 				int iSplitRatio, DWORD dwFlags)

@@ -433,15 +433,34 @@ std::generic_string ThemeSwitcher::getThemeFromXmlFileName(const TCHAR *xmlFullP
 NppParameters * NppParameters::_pSelf = new NppParameters;
 int FileDialog::_dialogFileBoxId = getWinVersion() < WV_W2K?edt1:cmb13;
 
-NppParameters::NppParameters() : _pXmlDoc(NULL),_pXmlUserDoc(NULL), _pXmlUserStylerDoc(NULL),\
-								_pXmlUserLangDoc(NULL), /*_pXmlNativeLangDoc(NULL), */_pXmlNativeLangDocA(NULL),\
-								_nbLang(0), _nbFile(0), _nbMaxFile(10), _pXmlToolIconsDoc(NULL),\
-								_pXmlShortcutDoc(NULL), _pXmlContextMenuDoc(NULL), _pXmlSessionDoc(NULL),\
-								_nbUserLang(0), _nbExternalLang(0), _hUser32(NULL), _hUXTheme(NULL),\
-								_transparentFuncAddr(NULL), _enableThemeDialogTextureFuncAddr(NULL),\
-								_isTaskListRBUTTONUP_Active(false), _fileSaveDlgFilterIndex(-1), _asNotepadStyle(false), _isFindReplacing(false)
+NppParameters::NppParameters() :
+	_isTaskListRBUTTONUP_Active(false),
+	_isFindReplacing(false),
+	_pXmlDoc(NULL), _pXmlUserDoc(NULL), _pXmlUserStylerDoc(NULL),
+	_pXmlUserLangDoc(NULL), _pXmlToolIconsDoc(NULL), _pXmlShortcutDoc(NULL),
+	_pXmlContextMenuDoc(NULL), _pXmlSessionDoc(NULL), _pXmlNativeLangDocA(NULL),
+	_nbLang(0), _nbFile(0), _nbMaxFile(10), _nbUserLang(0), _nbExternalLang(0),
+	_fileSaveDlgFilterIndex(-1),
+	_hUser32(NULL), _hUXTheme(NULL),
+	_transparentFuncAddr(NULL), _enableThemeDialogTextureFuncAddr(NULL),
+	_session(new Session()),
+	_pAccelerator(NULL), _pScintAccelerator(NULL),
+	_asNotepadStyle(false)
 {
-	_session = new Session();
+	memset(&_langList, 0, NB_LANG * sizeof(Lang *));
+	memset(&_LRFileList, 0, NB_MAX_LRF_FILE * sizeof(std::generic_string *));
+	memset(&_userLangArray, 0, NB_MAX_USER_LANG * sizeof(UserLangContainer *));
+	memset(&_userDefineLangPath, 0, MAX_PATH * sizeof(TCHAR));
+	memset(&_externalLangArray, 0, NB_MAX_EXTERNAL_LANG * sizeof(ExternalLangContainer *));
+
+	memset(&_shortcutsPath, 0 , MAX_PATH * sizeof(TCHAR));
+	memset(&_contextMenuPath, 0 , MAX_PATH * sizeof(TCHAR));
+	memset(&_sessionPath, 0 , MAX_PATH * sizeof(TCHAR));
+	memset(&_nppPath, 0 , MAX_PATH * sizeof(TCHAR));
+	memset(&_userPath, 0 , MAX_PATH * sizeof(TCHAR));
+	memset(&_stylerPath, 0 , MAX_PATH * sizeof(TCHAR));
+	memset(&_appdataNppDir, 0 , MAX_PATH * sizeof(TCHAR));
+	memset(&_currentDirectory, 0 , MAX_PATH * sizeof(TCHAR));
 
 	_findHistory._nbFindHistoryPath = 0;
 	_findHistory._nbFindHistoryFilter = 0;
@@ -458,7 +477,6 @@ NppParameters::NppParameters() : _pXmlDoc(NULL),_pXmlUserDoc(NULL), _pXmlUserSty
 	//Initialize current directory to startup directory
 	::GetCurrentDirectory(MAX_PATH, _currentDirectory);
 
-	_appdataNppDir[0] = '\0';
 	TCHAR notepadStylePath[MAX_PATH];
 	lstrcpy(notepadStylePath, _nppPath);
 	PathAppend(notepadStylePath, notepadStyleFile);
@@ -4726,26 +4744,43 @@ const char * NppParameters::getNativeLangMenuStringA( int itemID )
 	return NULL;
 }
 
-UserLangContainer::UserLangContainer()
+UserLangContainer::UserLangContainer():
+	_name(TEXT("new user define")),
+	_ext(TEXT("")),
+	_isCaseIgnored(false),
+	_isCommentLineSymbol(false),
+	_isCommentSymbol(false)
 {
-	_name = TEXT("new user define");
-	_ext = TEXT("");
-
 	// Keywords list of Delimiters (index 0)
 	lstrcpy(_keywordLists[0], TEXT("000000"));
 	for (int i = 1 ; i < nbKeywodList ; i++)
 	{
 		*_keywordLists[i] = '\0';
 	}
+
+	for (int i = 0; i < nbPrefixListAllowed; i++)
+	{
+		_isPrefix[i] = false;
+	}
 }
 
-UserLangContainer::UserLangContainer( const TCHAR *name, const TCHAR *ext ) : _name(name), _ext(ext)
+UserLangContainer::UserLangContainer( const TCHAR *name, const TCHAR *ext ) :
+	_name(name),
+	_ext(ext),
+	_isCaseIgnored(false),
+	_isCommentLineSymbol(false),
+	_isCommentSymbol(false)
 {
 	// Keywords list of Delimiters (index 0)
 	lstrcpy(_keywordLists[0], TEXT("000000"));
-	for (int j = 1 ; j < nbKeywodList ; j++)
+	for (int i = 1 ; i < nbKeywodList ; i++)
 	{
-		*_keywordLists[j] = '\0';
+		*_keywordLists[i] = '\0';
+	}
+
+	for (int i = 0; i < nbPrefixListAllowed; i++)
+	{
+		_isPrefix[i] = false;
 	}
 }
 
@@ -4773,6 +4808,14 @@ const UserLangContainer & UserLangContainer::operator=( const UserLangContainer 
 		for (int i = 0 ; i < nbKeywodList ; i++)
 		{
 			lstrcpy(_keywordLists[i], ulc._keywordLists[i]);
+		}
+
+		_isCaseIgnored = ulc._isCaseIgnored;
+		_isCommentLineSymbol = ulc._isCommentLineSymbol;
+		_isCommentSymbol = ulc._isCommentSymbol;
+		for (int i = 0; i < nbPrefixListAllowed; i++)
+		{
+			_isPrefix[i] = ulc._isPrefix[i];
 		}
 	}
 	return *this;

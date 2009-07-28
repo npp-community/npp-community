@@ -247,8 +247,13 @@ std::generic_string purgeMenuItemString(const TCHAR * menuItemStr, bool keepAmpe
 	return cleanedName;
 };
 
+#define initSize 1024
+
 WcharMbcsConvertor::WcharMbcsConvertor() :
-	_multiByteStr(NULL), _wideCharStr(NULL), _multiByteAllocLen(0), _wideCharAllocLen(0), initSize(1024)
+	_multiByteStr(NULL),
+	_multiByteAllocLen(0),
+	_wideCharStr(NULL),
+	_wideCharAllocLen(0)
 {
 }
 

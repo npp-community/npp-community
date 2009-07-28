@@ -26,52 +26,17 @@
 #define WM_MOUSEWHEEL 0x020A
 #endif //WM_MOUSEWHEEL
 
-
 class TaskList : public Window
 {
 public:
-	TaskList() : Window(), _currentIndex(0), _hFont(NULL), _hFontSelected(NULL) {
-		_rc.left = 0;
-		_rc.top = 0;
-		_rc.right = 150;
-		_rc.bottom = 0;
-	};
+	TaskList();
+	virtual ~TaskList();
 
-	virtual ~TaskList() {};
-
-	virtual void destroy(){
-		if (_hFont)
-			DeleteObject(_hFont);
-		if (_hFontSelected)
-			DeleteObject(_hFontSelected);
-		::DestroyWindow(_hSelf);
-		_hSelf = NULL;
-	};
+	virtual void destroy();
 
 	void init(HINSTANCE hInst, HWND hwnd, HIMAGELIST hImaLst, int nbItem, int index2set);
 
-	void setFont(TCHAR *fontName, size_t fontSize) {
-		if (_hFont)
-			::DeleteObject(_hFont);
-		if (_hFontSelected)
-			::DeleteObject(_hFontSelected);
-
-		_hFont = ::CreateFont(fontSize, 0, 0, 0,
-			                   FW_NORMAL,
-				               0, 0, 0, 0,
-				               0, 0, 0, 0,
-					           fontName);
-
-		_hFontSelected = ::CreateFont(fontSize, 0, 0, 0,
-			                   FW_BOLD,
-				               0, 0, 0, 0,
-				               0, 0, 0, 0,
-					           fontName);
-
-		if (_hFont)
-			::SendMessage(_hSelf, WM_SETFONT, reinterpret_cast<WPARAM>(_hFont), 0);
-	};
-
+	void setFont(TCHAR *fontName, size_t fontSize);
 
 	RECT adjustSize();
 	int getCurrentIndex() const {return _currentIndex;}
@@ -98,6 +63,5 @@ protected:
 	int _currentIndex;
 	RECT _rc;
 };
-
 
 #endif // TASKLIST_H

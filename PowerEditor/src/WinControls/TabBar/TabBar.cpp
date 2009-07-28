@@ -82,6 +82,16 @@ struct CloseButtonZone {
 	int _fromRight; // distance from right in pixzl
 };
 
+
+TabBar::TabBar() :
+	_nbItem(0), _hasImgLst(false),
+	_hFont(NULL), _hLargeFont(NULL), _hVerticalFont(NULL), _hVerticalLargeFont(NULL),
+	_ctrlID(-1), _isTraditional(true),
+	_isVertical(false), _isMultiLine(false)
+{
+
+}
+
 TabBar::~TabBar()
 {
 	if (_hSelf)
@@ -290,10 +300,15 @@ long TabBar::getRowCount() const
 }
 
 TabBarPlus::TabBarPlus() :
-	TabBar(), _isDragging(false), _tabBarDefaultProc(NULL), _currentHoverTabItem(-1),
-	_isCloseHover(false), _whichCloseClickDown(-1), _lmbdHit(false), _closeButtonZone(new CloseButtonZone())
+	_isDragging(false), _isDraggingInside(false),
+	_nSrcTab(0), _nTabDragged(0),
+	_tabBarDefaultProc(NULL),
+	_currentHoverTabItem(-1),
+	_closeButtonZone(new CloseButtonZone()),
+	_isCloseHover(false), _whichCloseClickDown(-1), _lmbdHit(false)
 {
-
+	memset(&_draggingPoint, 0, sizeof(POINT));
+	memset(&_currentHoverTabRect, 0, sizeof(RECT));
 }
 
 

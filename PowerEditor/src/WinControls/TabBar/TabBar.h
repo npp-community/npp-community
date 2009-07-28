@@ -44,8 +44,7 @@ struct TBHDR {
 class TabBar : public Window
 {
 public:
-	TabBar() : Window(), _nbItem(0), _hasImgLst(false), _hFont(NULL){};
-
+	TabBar();
 	virtual ~TabBar();
 
 	virtual void destroy();

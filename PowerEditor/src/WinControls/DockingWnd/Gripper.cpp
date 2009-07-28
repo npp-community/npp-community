@@ -94,6 +94,8 @@ Gripper::Gripper()
 	_startMovingFromTab	= FALSE;
 	_iItem				= 0;
 
+	_pRes               = 0;
+
 	_hdc				= NULL;
 	_hbm				= NULL;
 	_hbrush				= NULL;

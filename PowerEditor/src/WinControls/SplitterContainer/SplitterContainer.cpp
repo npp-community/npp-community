@@ -25,8 +25,11 @@
 bool SplitterContainer::_isRegistered = false;
 
 SplitterContainer::SplitterContainer():
-	Window(), _x(0), _y(0), _hPopupMenu(NULL),
-	_dwSplitterStyle(SV_ENABLERDBLCLK | SV_ENABLELDBLCLK | SV_RESIZEWTHPERCNT)
+	_pWin0(NULL), _pWin1(NULL),
+	_splitterSize(0), _ratio(1),
+	_x(0), _y(0), _hPopupMenu(NULL),
+	_dwSplitterStyle(SV_ENABLERDBLCLK | SV_ENABLELDBLCLK | SV_RESIZEWTHPERCNT),
+	_splitterMode(DYNAMIC)
 {
 }
 

@@ -28,9 +28,11 @@ class ValueDlg : public StaticDialog
 {
 public :
         ValueDlg() :
-			StaticDialog(),
-			_nbNumber(DEFAULT_NB_NUMBER)
-		{}
+			_nbNumber(DEFAULT_NB_NUMBER),
+			_defaultValue(0)
+		{
+			memset(&_p, 0, sizeof(POINT));
+		}
         void init(HINSTANCE hInst, HWND parent, int valueToSet, const TCHAR *text);
         int doDialog(POINT p, bool isRTL = false);
 		void setNBNumber(int nbNumber);
@@ -42,7 +44,7 @@ protected :
 private :
 	int _nbNumber;
     int _defaultValue;
-	TCHAR _name[32];
+	std::generic_string _name;
 	POINT _p;
 
 };

@@ -65,14 +65,19 @@ enum UDD_Style
 class StringDlg : public StaticDialog
 {
 public :
-	StringDlg() : StaticDialog() {};
-	void init(HINSTANCE hInst, HWND parent, TCHAR *title, TCHAR *staticName, TCHAR *text2Set, int txtLen = 0) {
+	StringDlg() :
+		_txtLen(0)
+	{
+	}
+
+	void init(HINSTANCE hInst, HWND parent, TCHAR *title, TCHAR *staticName, TCHAR *text2Set, int txtLen = 0)
+	{
 		Window::init(hInst, parent);
-		lstrcpy(_title, title);
-		lstrcpy(_static, staticName);
-		lstrcpy(_textValue, text2Set);
+		_title = title;
+		_static = staticName;
+		_textValue = text2Set;
 		_txtLen = txtLen;
-	};
+	}
 
 	long doDialog();
 
@@ -80,9 +85,9 @@ protected :
 	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/);
 
 private :
-	TCHAR _title[64];
-	TCHAR _textValue[256];
-	TCHAR _static[32];
+	std::generic_string _title;
+	std::generic_string _textValue;
+	std::generic_string _static;
 	int _txtLen;
 };
 
@@ -97,9 +102,9 @@ BOOL CALLBACK StringDlg::run_dlgProc( UINT Message, WPARAM wParam, LPARAM /*lPar
 	{
 	case WM_INITDIALOG :
 		{
-			::SetWindowText(_hSelf, _title);
-			::SetDlgItemText(_hSelf, IDC_STRING_STATIC, _static);
-			::SetDlgItemText(_hSelf, IDC_STRING_EDIT, _textValue);
+			::SetWindowText(_hSelf, _title.c_str());
+			::SetDlgItemText(_hSelf, IDC_STRING_STATIC, _static.c_str());
+			::SetDlgItemText(_hSelf, IDC_STRING_EDIT, _textValue.c_str());
 			if (_txtLen)
 				::SendDlgItemMessage(_hSelf, IDC_STRING_EDIT, EM_SETLIMITTEXT, _txtLen, 0);
 
@@ -110,19 +115,21 @@ BOOL CALLBACK StringDlg::run_dlgProc( UINT Message, WPARAM wParam, LPARAM /*lPar
 		{
 			switch (wParam)
 			{
-			case IDOK :
+				case IDOK :
 				{
-					::GetDlgItemText(_hSelf, IDC_STRING_EDIT, _textValue, 256);
-					::EndDialog(_hSelf, int(_textValue));
+					TCHAR val[256];
+					::GetDlgItemText(_hSelf, IDC_STRING_EDIT, val, 256);
+					_textValue = val;
+					::EndDialog(_hSelf, _textValue.length());
 					return TRUE;
 				}
 
-			case IDCANCEL :
-				::EndDialog(_hSelf, 0);
-				return TRUE;
+				case IDCANCEL :
+					::EndDialog(_hSelf, 0);
+					return TRUE;
 
-			default:
-				return FALSE;
+				default:
+					return FALSE;
 			}
 		}
 	default :
@@ -1364,11 +1371,14 @@ int SymbolsStyleDialog::getGroupIndexFromCombo( int ctrlID, bool & isFontSize ) 
 TCHAR styleName[][32] = {TEXT("DEFAULT"), TEXT("FOLDEROPEN"), TEXT("FOLDERCLOSE"), TEXT("KEYWORD1"), TEXT("KEYWORD2"), TEXT("KEYWORD3"), TEXT("KEYWORD4"), TEXT("COMMENT"), TEXT("COMMENT LINE"), TEXT("NUMBER"), TEXT("OPERATOR"), TEXT("DELIMINER1"), TEXT("DELIMINER2"), TEXT("DELIMINER3")};
 
 
-UserDefineDialog::UserDefineDialog(): SharedParametersDialog(), _status(UNDOCK), _yScrollPos(0), _prevHightVal(0), _isDirty(false)
+UserDefineDialog::UserDefineDialog():
+	_pCurrentUserLang(new UserLangContainer()),
+	_status(UNDOCK), _currentHight(0), _yScrollPos(0),
+	_prevHightVal(0), _isDirty(false)
 {
-	_pCurrentUserLang = new UserLangContainer();
+	memset(&_dlgPos, 0, sizeof(RECT));
 
-    // @REF #01 NE CHANGER PAS D'ORDRE !!!
+    // @REF #01 DO NOT CHANGE THE ORDER!!!
 	_pCurrentUserLang->_styleArray.addStyler(SCE_USER_IDENTIFIER, styleName[0]);
 	_pCurrentUserLang->_styleArray.addStyler(SCE_USER_BLOCK_OPERATOR_OPEN, styleName[1]);
 	_pCurrentUserLang->_styleArray.addStyler(SCE_USER_BLOCK_OPERATOR_CLOSE, styleName[2]);
@@ -1398,7 +1408,7 @@ void UserDefineDialog::changeStyle()
 
     long style = ::GetWindowLongPtr(_hSelf, GWL_STYLE);
     if (!style)
-        ::MessageBox(NULL, TEXT("echou GetWindowLongPtr"), TEXT(""), MB_OK);
+        ::MessageBox(NULL, TEXT("GetWindowLongPtr failed"), TEXT(""), MB_OK);
 
     style = (_status == DOCK)?
         ((style & ~WS_POPUP) & ~DS_MODALFRAME & ~WS_CAPTION) | WS_CHILD :
@@ -1406,7 +1416,7 @@ void UserDefineDialog::changeStyle()
 
     long result = ::SetWindowLongPtr(_hSelf, GWL_STYLE, style);
     if (!result)
-        ::MessageBox(NULL, TEXT("echou SetWindowLongPtr"), TEXT(""), MB_OK);
+        ::MessageBox(NULL, TEXT("SetWindowLongPtr failed"), TEXT(""), MB_OK);
 
     if (_status == DOCK)
         getActualPosSize();

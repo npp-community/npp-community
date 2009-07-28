@@ -29,10 +29,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 ShortcutMapper::ShortcutMapper() :
-	StaticDialog(),
 	_babygrid(NULL),
 	_rightClickMenu(NULL),
-	_currentState(STATE_MENU)
+	_currentState(STATE_MENU),
+	_hTabCtrl(NULL)
 {
 	generic_strncpy(tabNames[0], TEXT("Main menu"), maxTabName);
 	generic_strncpy(tabNames[1], TEXT("Macros"), maxTabName);

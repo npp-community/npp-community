@@ -48,8 +48,15 @@ inline static BOOL ModifyStyleEx(HWND hWnd, DWORD dwRemove, DWORD dwAdd) {
 
 struct NumericStringEquivalence
 {
+	NumericStringEquivalence()
+	{
+	}
+
 	bool operator()(const TCHAR* s1, const TCHAR* s2) const
-	{ return numstrcmp(s1, s2) < 0; }
+	{
+		return numstrcmp(s1, s2) < 0;
+	}
+
 	static inline int numstrcmp_get(const TCHAR **str, int *length)
 	{
 		const TCHAR *p = *str;
@@ -59,6 +66,7 @@ struct NumericStringEquivalence
 		*str = p;
 		return (value);
 	}
+
 	static int numstrcmp(const TCHAR *str1, const TCHAR *str2)
 	{
 		TCHAR *p1, *p2;
@@ -165,10 +173,16 @@ END_WINDOW_MAP()
 
 RECT WindowsDlg::_lastKnownLocation;
 
-WindowsDlg::WindowsDlg() : MyBaseClass(WindowsDlgMap), _isSorted(false)
+WindowsDlg::WindowsDlg() :
+	MyBaseClass(WindowsDlgMap),
+	_hList(NULL),
+	_szMinButton(SIZEZERO),
+	_szMinListCtrl(SIZEZERO),
+	_pTab(NULL),
+	_lastSort(-1),
+	_isSorted(false),
+	_dlgNode(NULL)
 {
-	_szMinButton = SIZEZERO;
-	_szMinListCtrl = SIZEZERO;
 }
 
 void WindowsDlg::init(HINSTANCE hInst, HWND parent, DocTabView *pTab)
@@ -732,13 +746,16 @@ void WindowsDlg::doSortToTabs()
 	delete[] nmdlg.Items;
 }
 
-WindowsMenu::WindowsMenu()
+WindowsMenu::WindowsMenu():
+	_hMenu(NULL)
 {}
 
 WindowsMenu::~WindowsMenu()
 {
 	if (_hMenu)
+	{
 		DestroyMenu(_hMenu);
+	}
 }
 
 void WindowsMenu::init(HINSTANCE hInst, HMENU hMainMenu, const TCHAR *translation)

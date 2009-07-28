@@ -103,7 +103,6 @@ protected:
 
 	static WcharMbcsConvertor * _pSelf;
 
-	const int initSize;
 	char *_multiByteStr;
 	size_t _multiByteAllocLen;
 	wchar_t *_wideCharStr;

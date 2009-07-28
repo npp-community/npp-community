@@ -14,7 +14,7 @@ FileManager * FileManager::_pSelf = new FileManager();
 
 const int blockSize = 128 * 1024 + 4;
 
-// Ordre important!! Ne le changes pas!
+// Order is important. DO NOT CHANGE!
 //SC_EOL_CRLF (0), SC_EOL_CR (1), or SC_EOL_LF (2).
 
 const int CR = 0x0D;
@@ -326,25 +326,25 @@ void Buffer::setDeferredReload() {	//triggers a reload on the next Document acce
 }
 
 Buffer::Buffer( FileManager * pManager, BufferID id, Document doc, DocFileStatus type, const TCHAR *fileName ) :
-	_pManager(pManager), _id(id), _isDirty(false), _doc(doc), _isFileReadOnly(false),
-	_isUserReadOnly(false), _recentTag(-1), _references(0),
-	_canNotify(false), _timeStamp(0), _needReloading(false)
+	_pManager(pManager), _canNotify(false), _references(0), _id(id),
+	_doc(doc), _lang(L_TXT), _isDirty(false),
+	_isUserReadOnly(false), _needLexer(false), //new buffers do not need lexing, Scintilla takes care of that
+	_currentStatus(type), _timeStamp(0), _isFileReadOnly(false),
+	_fileName(NULL), _needReloading(false), _recentTag(-1)
 {
+	memset(&_userLangExt, 0, sizeof(_userLangExt));
+	memset(&_fullPathName, 0, sizeof(_fullPathName));
+
 	NppParameters *pNppParamInst = NppParameters::getInstance();
 	const NewDocDefaultSettings & ndds = (pNppParamInst->getNppGUI()).getNewDocDefaultSettings();
-	_format = ndds._format;
 	_unicodeMode = ndds._encoding;
+	_format = ndds._format;
 
-	_userLangExt[0] = 0;
-	_fullPathName[0] = 0;
-	_fileName = NULL;
 	setFileName(fileName, ndds._lang);
 	updateTimeStamp();
 	checkFileState();
-	_currentStatus = type;
-	_isDirty = false;
 
-	_needLexer = false;	//new buffers do not need lexing, Scintilla takes care of that
+	_isDirty = false;
 	_canNotify = true;
 }
 

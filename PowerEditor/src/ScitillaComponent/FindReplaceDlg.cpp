@@ -494,7 +494,15 @@ void FindReplaceDlg::updateCombos()
 class Finder : public DockingDlgInterface {
 	friend class FindReplaceDlg;
 public:
-	Finder() : DockingDlgInterface(IDD_FINDRESULT), _pMainFoundInfos(&_foundInfos1), _pMainMarkings(&_markings1) {
+	Finder() :
+		DockingDlgInterface(IDD_FINDRESULT),
+		_ppEditView(NULL),
+		_pMainFoundInfos(&_foundInfos1),
+		_pMainMarkings(&_markings1),
+		nFoundFiles(0),
+		_lastFileHeaderPos(0),
+		_lastSearchHeaderPos(0)
+	{
 		_MarkingsStruct._length = 0;
 		_MarkingsStruct._markings = NULL;
 	};
@@ -656,8 +664,6 @@ private:
 	static FoundInfo EmptyFoundInfo;
 	static SearchResultMarking EmptySearchResultMarking;
 };
-
-
 
 FoundInfo Finder::EmptyFoundInfo(0, 0, TEXT(""));
 SearchResultMarking Finder::EmptySearchResultMarking;
@@ -2125,11 +2131,26 @@ void FindReplaceDlg::updateCombo( int comboID )
 }
 
 FindReplaceDlg::FindReplaceDlg() :
-	StaticDialog(),
-	_pFinder(NULL), _isRTL(false), _isRecursive(true),_isInHiddenDir(false), _fileNameLenMax(1024),
+	_currentStatus(FIND_DLG),
+	_doPurge(false),
+	_doMarkLine(false),
+	_doStyleFoundToken(false),
+	_isInSelection(false),
+	_ppEditView(NULL),
+	_pFinder(NULL), _isRTL(false),
+	_findAllResult(0),
+	_isRecursive(true),
+	_isInHiddenDir(false),
+	_fileNameLenMax(1024),
+	// JOCE: weird.  Probably assumes Unicode == wide char.
+	_uniFileName(new char[(_fileNameLenMax + 3) * 2]),
 	_tab(NULL)
 {
-	_uniFileName = new char[(_fileNameLenMax + 3) * 2];
+	memset(&_findClosePos, 0, sizeof(RECT));
+	memset(&_replaceClosePos, 0, sizeof(RECT));
+	memset(&_findInFilesClosePos, 0, sizeof(RECT));
+
+	memset(&_findAllResultStr, 0, 1024 * sizeof(TCHAR));
 }
 
 void FindReplaceDlg::changeTabName( DIALOG_TYPE index, const TCHAR *name2change )
