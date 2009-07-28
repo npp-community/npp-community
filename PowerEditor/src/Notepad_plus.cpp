@@ -246,8 +246,8 @@ Notepad_plus::Notepad_plus():
 Notepad_plus::~Notepad_plus()
 {
 	(NppParameters::getInstance())->destroyInstance();
-	MainFileManager->destroyInstance();
-	(WcharMbcsConvertor::getInstance())->destroyInstance();
+	FileManager::destroyInstance();
+	WcharMbcsConvertor::destroyInstance();
 	if (_pTrayIco)
 		delete _pTrayIco;
 
@@ -603,7 +603,7 @@ bool Notepad_plus::saveGUIParams()
 						(TabBarPlus::isMultiLine() ? TAB_MULTILINE:0) |\
 						(nppGUI._tabStatus & TAB_HIDE);
 	nppGUI._splitterPos = _subSplitter->isVertical()?POS_VERTICAL:POS_HORIZOTAL;
-	UserDefineDialog *udd = _pEditView->getUserDefineDlg();
+	UserDefineDialog *udd = ScintillaEditView::getUserDefineDlg();
 	bool b = udd->isDocked();
 	nppGUI._userDefineDlgStatus = (b?UDD_DOCKED:0) | (udd->isVisible()?UDD_SHOW:0);
 
@@ -3760,7 +3760,7 @@ void Notepad_plus::command(int id)
 			assert(_toolBar);
 		    bool isUDDlgVisible = false;
 
-		    UserDefineDialog *udd = _pEditView->getUserDefineDlg();
+		    UserDefineDialog *udd = ScintillaEditView::getUserDefineDlg();
 
 		    if (!udd->isCreated())
 		    {
@@ -5440,7 +5440,7 @@ bool Notepad_plus::reloadLang()
 		changeDlgLang(_colEditorDlg->getHSelf(), "ColumnEditor");
 	}
 
-	UserDefineDialog *udd = _pEditView->getUserDefineDlg();
+	UserDefineDialog *udd = ScintillaEditView::getUserDefineDlg();
 	if (udd && udd->isCreated())
 	{
 		changeUserDefineLang();
@@ -6459,7 +6459,7 @@ void Notepad_plus::changeUserDefineLang()
 	userDefineDlgNode = userDefineDlgNode->FirstChild("UserDefine");
 	if (!userDefineDlgNode) return;
 
-	UserDefineDialog *userDefineDlg = _pEditView->getUserDefineDlg();
+	UserDefineDialog *userDefineDlg = ScintillaEditView::getUserDefineDlg();
 
 	HWND hDlg = userDefineDlg->getHSelf();
 #ifdef UNICODE
@@ -7837,7 +7837,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
             //--User Define Dialog Section--//
 			int uddStatus = nppGUI._userDefineDlgStatus;
-		    UserDefineDialog *udd = _pEditView->getUserDefineDlg();
+		    UserDefineDialog *udd = ScintillaEditView::getUserDefineDlg();
 
 			bool uddShow = false;
 			switch (uddStatus)
@@ -9378,8 +9378,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		}
 		case NPPM_ISTABBARHIDDEN :
 		{
-			assert(_mainDocTab);
-			return _mainDocTab->getHideTabBarStatus();
+			return DocTabView::getHideTabBarStatus();
 		}
 
 

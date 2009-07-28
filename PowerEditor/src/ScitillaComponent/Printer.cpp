@@ -26,7 +26,7 @@ static void replaceStr(std::generic_string & str, std::generic_string str2BeRepl
 {
 	size_t pos = str.find(str2BeReplaced);
 
-	if (pos != str.npos)
+	if (pos != std::generic_string::npos)
 		str.replace(pos, str2BeReplaced.length(), replacement);
 }
 
@@ -369,7 +369,7 @@ size_t Printer::doPrint(bool justDoIt)
 					std::generic_string headerLeft(headerL);
 					size_t pos = headerLeft.find(pageVar);
 
-					if (pos != headerLeft.npos)
+					if (pos != std::generic_string::npos)
 						headerLeft.replace(pos, lstrlen(pageVar), pageString);
 
 					::ExtTextOut(_pdlg.hDC, frPrint.rc.left + 5, frPrint.rc.top - headerLineHeight / 2,
@@ -381,7 +381,7 @@ size_t Printer::doPrint(bool justDoIt)
 				{
 					std::generic_string headerMiddle(headerM);
 					size_t pos = headerMiddle.find(pageVar);
-					if (pos != headerMiddle.npos)
+					if (pos != std::generic_string::npos)
 						headerMiddle.replace(pos, lstrlen(pageVar), pageString);
 
 					::GetTextExtentPoint32(_pdlg.hDC, headerMiddle.c_str(), static_cast<int>(headerMiddle.length()), &size);
@@ -393,7 +393,7 @@ size_t Printer::doPrint(bool justDoIt)
 				{
 					std::generic_string headerRight(headerR);
 					size_t pos = headerRight.find(pageVar);
-					if (pos != headerRight.npos)
+					if (pos != std::generic_string::npos)
 						headerRight.replace(pos, lstrlen(pageVar), pageString);
 
 					::GetTextExtentPoint32(_pdlg.hDC, headerRight.c_str(), static_cast<int>(headerRight.length()), &size);
@@ -436,7 +436,7 @@ size_t Printer::doPrint(bool justDoIt)
 				{
 					std::generic_string footerLeft(footerL);
 					size_t pos = footerLeft.find(pageVar);
-					if (pos != footerLeft.npos)
+					if (pos != std::generic_string::npos)
 						footerLeft.replace(pos, lstrlen(pageVar), pageString);
 
 					::ExtTextOut(_pdlg.hDC, frPrint.rc.left + 5, frPrint.rc.bottom + footerLineHeight / 2,
@@ -448,7 +448,7 @@ size_t Printer::doPrint(bool justDoIt)
 				{
 					std::generic_string footerMiddle(footerM);
 					size_t pos = footerMiddle.find(pageVar);
-					if (pos != footerMiddle.npos)
+					if (pos != std::generic_string::npos)
 						footerMiddle.replace(pos, lstrlen(pageVar), pageString);
 
 					::GetTextExtentPoint32(_pdlg.hDC, footerMiddle.c_str(), static_cast<int>(footerMiddle.length()), &size);
@@ -460,7 +460,7 @@ size_t Printer::doPrint(bool justDoIt)
 				{
 					std::generic_string footerRight(footerR);
 					size_t pos = footerRight.find(pageVar);
-					if (pos != footerRight.npos)
+					if (pos != std::generic_string::npos)
 						footerRight.replace(pos, lstrlen(pageVar), pageString);
 					::GetTextExtentPoint32(_pdlg.hDC, footerRight.c_str(), static_cast<int>(footerRight.length()), &size);
 					::ExtTextOut(_pdlg.hDC, frPrint.rc.right - size.cx, frPrint.rc.bottom + footerLineHeight / 2,

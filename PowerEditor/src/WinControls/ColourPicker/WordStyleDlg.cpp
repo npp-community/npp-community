@@ -969,14 +969,14 @@ void WordStyleDlg::setVisualFromStyleList()
 	{
 		LexerStyler & lexerStyler = _lsArray.getLexerFromIndex(_currentLexerIndex - 1);
 
-		NppParameters *pNppParams = NppParameters::getInstance();
-		LangType lType = pNppParams->getLangIDFromStr(lexerStyler.getLexerName());
+		LangType lType = NppParameters::getLangIDFromStr(lexerStyler.getLexerName());
 		if (lType == L_TXT)
 		{
 			std::generic_string str = lexerStyler.getLexerName();
 			str += TEXT(" is not defined in NppParameters::getLangIDFromStr()");
 				printStr(str.c_str());
 		}
+		NppParameters *pNppParams = NppParameters::getInstance();
 		const TCHAR *kws = pNppParams->getWordList(lType, style._keywordClass);
 		if (!kws)
 			kws = TEXT("");
