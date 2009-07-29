@@ -267,7 +267,7 @@ LRESULT CALLBACK Splitter::spliterWndProc(UINT uMsg, WPARAM wParam, LPARAM lPara
 		}
 		return 0;
 	*/
-	case WM_LBUTTONDOWN:
+		case WM_LBUTTONDOWN:
 		{
 			POINT p;
 			p.x = LOWORD(lParam);
@@ -293,11 +293,11 @@ LRESULT CALLBACK Splitter::spliterWndProc(UINT uMsg, WPARAM wParam, LPARAM lPara
 		}
 		return 0;
 
-	case WM_RBUTTONDOWN :
-		::SendMessage(_hParent, WM_DOPOPUPMENU, wParam, lParam);
-		return TRUE;
+		case WM_RBUTTONDOWN :
+			::SendMessage(_hParent, WM_DOPOPUPMENU, wParam, lParam);
+			return TRUE;
 
-	case WM_MOUSEMOVE:
+		case WM_MOUSEMOVE:
 		{
 			POINT p;
 			p.x = LOWORD(lParam);
@@ -368,7 +368,7 @@ LRESULT CALLBACK Splitter::spliterWndProc(UINT uMsg, WPARAM wParam, LPARAM lPara
 			return 0;
 		}
 
-	case WM_LBUTTONUP:
+		case WM_LBUTTONUP:
 		{
 			if (!_isFixed)
 			{
@@ -376,7 +376,8 @@ LRESULT CALLBACK Splitter::spliterWndProc(UINT uMsg, WPARAM wParam, LPARAM lPara
 			}
 			return 0;
 		}
-	case WM_CAPTURECHANGED:
+
+		case WM_CAPTURECHANGED:
 		{
 			if (_isDraged)
 			{
@@ -387,13 +388,16 @@ LRESULT CALLBACK Splitter::spliterWndProc(UINT uMsg, WPARAM wParam, LPARAM lPara
 			return 0;
 		}
 
-	case WM_PAINT :
-		drawSplitter();
-		return 0;
+		case WM_PAINT :
+			drawSplitter();
+			return 0;
 
-	case WM_CLOSE:
-		destroy();
-		return 0;
+		case WM_CLOSE:
+			destroy();
+			return 0;
+
+		default:
+		break;
 	}
 	return ::DefWindowProc(_hSelf, uMsg, wParam, lParam);
 }

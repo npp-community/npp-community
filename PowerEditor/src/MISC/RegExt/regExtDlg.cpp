@@ -138,6 +138,7 @@ BOOL CALLBACK RegExtDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
 					::EndDialog(_hSelf, 0);
 					return TRUE;
 
+				NO_DEFAULT_CASE;
 			}
 
 			if (HIWORD(wParam) == EN_CHANGE)
@@ -212,10 +213,12 @@ BOOL CALLBACK RegExtDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
 				}
 			}
 		}
+		break;
+
 		default :
 			return FALSE;
 	}
-	//return FALSE;
+	return FALSE;
 }
 
 void RegExtDlg::getRegisteredExts()

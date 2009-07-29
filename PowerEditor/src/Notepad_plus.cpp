@@ -3006,7 +3006,8 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 				ClientToScreen(notifRebar->getHSelf(), &pt);
 				_toolBar->doPopop(pt);
 				return TRUE;
-				break; }
+			}
+			NO_DEFAULT_CASE;
 		}
 		//Else forward notification to window of rebarband
 		REBARBANDINFO rbBand;
@@ -3344,6 +3345,8 @@ void Notepad_plus::specialCmd(int id, int param)
 			}
 			break;
 		}
+
+		NO_DEFAULT_CASE;
 	}
 }
 
@@ -4377,6 +4380,8 @@ void Notepad_plus::command(int id)
 					}
 					break;
 				}
+
+				NO_DEFAULT_CASE;
 			}
 
 			if (idEncoding != -1)
@@ -4937,6 +4942,9 @@ void Notepad_plus::command(int id)
 			case IDC_NEXT_DOC :
 				_macro.push_back(recordedMacroStep(id));
 				break;
+
+			NO_DEFAULT_CASE;
+
 		}
 
 }
@@ -6065,6 +6073,7 @@ void Notepad_plus::changeLangTabContextMenu()
 					element->Attribute("order", &ordre);
 					switch (ordre)
 					{
+						// JOCE Plain numerical values?? makes sense?
 						case 0 :
 							pClose = element->Attribute("name"); break;
 						case 1 :
@@ -6097,6 +6106,8 @@ void Notepad_plus::changeLangTabContextMenu()
 							pGoToNewInst = element->Attribute("name"); break;
 						case 15 :
 							pOpenInNewInst = element->Attribute("name"); break;
+
+						NO_DEFAULT_CASE;
 					}
 				}
 			}
@@ -6511,9 +6522,12 @@ void Notepad_plus::changeUserDefineLang()
 			{
 				switch(id)
 				{
+					// JOCE Plain numerical values?? makes sense?
 					case 0: case 1: case 2: case 3: case 4:
 					case 5: case 6: case 7: case 8:
 						translatedText[id] = name; break;
+
+					NO_DEFAULT_CASE;
 				}
 			}
 		}
@@ -6569,6 +6583,8 @@ void Notepad_plus::changeUserDefineLang()
 				case 1 : changeStyleCtrlsLang(hDlgArrary[i], keywordsID[j], translatedText); break;
 				case 2 : changeStyleCtrlsLang(hDlgArrary[i], commentID[j], translatedText); break;
 				case 3 : changeStyleCtrlsLang(hDlgArrary[i], operatorID[j], translatedText); break;
+
+				NO_DEFAULT_CASE;
 			}
 		}
 		TiXmlNodeA *node = userDefineDlgNode->FirstChild(nodeNameArray[i]);
@@ -7905,6 +7921,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			{
 				return ::SendMessage(dis->hwndItem, WM_DRAWITEM, wParam, lParam);
 			}
+			return TRUE;
 		}
 
 		case WM_DOCK_USERDEFINE_DLG:
@@ -8247,6 +8264,8 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 #endif
 					break;
 				}
+
+				NO_DEFAULT_CASE;
 			}
 
             return TRUE;
@@ -8436,12 +8455,18 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			assert(_subDocTab);
 			int nbDocPrimary = _mainDocTab->nbItem();
 			int nbDocSecond = _subDocTab->nbItem();
-			if (lParam == ALL_OPEN_FILES)
-				return nbDocPrimary + nbDocSecond;
-			else if (lParam == PRIMARY_VIEW)
-				return  nbDocPrimary;
-			else if (lParam == SECOND_VIEW)
-				return  nbDocSecond;
+			switch(lParam)
+			{
+				case ALL_OPEN_FILES:
+					return nbDocPrimary + nbDocSecond;
+				case PRIMARY_VIEW:
+					return  nbDocPrimary;
+				case SECOND_VIEW:
+					return  nbDocSecond;
+
+				NO_DEFAULT_CASE;
+			}
+			return TRUE;
 		}
 
 		case NPPM_GETOPENFILENAMESPRIMARY :
@@ -8522,6 +8547,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			{
 				case APPCOMMAND_BROWSER_BACKWARD :
 				case APPCOMMAND_BROWSER_FORWARD :
+				{
 					assert(_mainDocTab);
 					assert(_subDocTab);
 					int nbDoc = viewVisible(MAIN_VIEW)?_mainDocTab->nbItem():0;
@@ -8529,6 +8555,10 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 					if (nbDoc > 1)
 						activateNextDoc((GET_APPCOMMAND_LPARAM(lParam) == APPCOMMAND_BROWSER_FORWARD)?dirDown:dirUp);
 					_linkTriggered = true;
+				}
+				break;
+
+				NO_DEFAULT_CASE;
 			}
 			return ::DefWindowProc(hwnd, Message, wParam, lParam);
 		}
@@ -9226,6 +9256,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 					return TRUE;
 				}
 */
+				NO_DEFAULT_CASE;
 			}
 			return TRUE;
 		}

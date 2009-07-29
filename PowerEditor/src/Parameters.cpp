@@ -4191,6 +4191,7 @@ void NppParameters::writeExcludedLangList(TiXmlElement *element)
 
 		switch (nGrp)
 		{
+			// JOCE Plain numerical values?? makes sense?
 			case 0 :
 				g0 |= nMask;
 				break;
@@ -4215,6 +4216,8 @@ void NppParameters::writeExcludedLangList(TiXmlElement *element)
 			case 7 :
 				g7 |= nMask;
 				break;
+
+			NO_DEFAULT_CASE;
 		}
 	}
 

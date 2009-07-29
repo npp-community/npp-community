@@ -388,6 +388,9 @@ BOOL CALLBACK SharedParametersDialog::run_dlgProc(UINT Message, WPARAM wParam, L
 			}
 			return TRUE;
 		}
+
+		default:
+		break;
 	}
 	return FALSE;
 }
@@ -541,11 +544,16 @@ BOOL CALLBACK KeyWordsStyleDialog::run_dlgProc(UINT Message, WPARAM wParam, LPAR
 
 				case IDC_KEYWORD4_PREFIX_CHECK :
 					return setPropertyByCheck(_hSelf, wParam, _pUserLang->_isPrefix[3]);
+
+				NO_DEFAULT_CASE;
 			}
 		}
+		break;
+
 		default :
-			return SharedParametersDialog::run_dlgProc(Message, wParam, lParam);
+		break;
 	}
+	return SharedParametersDialog::run_dlgProc(Message, wParam, lParam);
 }
 
 void KeyWordsStyleDialog::setKeywords2List(int id)
@@ -736,11 +744,15 @@ BOOL CALLBACK CommentStyleDialog::run_dlgProc(UINT Message, WPARAM wParam, LPARA
 				case IDC_COMMENTSYMBOL_CHECK :
 					return setPropertyByCheck(_hSelf, wParam, _pUserLang->_isCommentSymbol);
 
+				NO_DEFAULT_CASE;
 			}
 		}
-		default :
-			return SharedParametersDialog::run_dlgProc(Message, wParam, lParam);
+		break;
+
+		default:
+		break;
 	}
+	return SharedParametersDialog::run_dlgProc(Message, wParam, lParam);
 }
 
 
@@ -1854,9 +1866,13 @@ BOOL CALLBACK UserDefineDialog::run_dlgProc(UINT message, WPARAM wParam, LPARAM 
 			}
 			::SetScrollPos(_hSelf, SB_VERT, _yScrollPos, TRUE);
 			::ScrollWindow(_hSelf, 0, oldy-_yScrollPos, NULL, NULL);
+			return TRUE;
 		}
 		case NPPM_MODELESSDIALOG :
 			return ::SendMessage(_hParent, NPPM_MODELESSDIALOG, wParam, lParam);
+
+		default:
+		break;
     }
 
 	return FALSE;

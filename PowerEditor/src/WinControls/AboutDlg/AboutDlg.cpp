@@ -113,11 +113,15 @@ BOOL CALLBACK AboutDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
 					break;
 			}
 		}
+		break;
 
 		case WM_DESTROY :
 		{
 			return TRUE;
 		}
+
+		default:
+		break;
 	}
 	return FALSE;
 }

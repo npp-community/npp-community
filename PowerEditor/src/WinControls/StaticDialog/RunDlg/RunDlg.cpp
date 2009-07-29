@@ -277,6 +277,10 @@ BOOL CALLBACK RunDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lParam*/
 					break;
 			}
 		}
+		break;
+
+		default:
+		break;
 	}
 	return FALSE;
 }

@@ -145,8 +145,11 @@ BOOL CALLBACK ColourPopup::run_dlgProc(UINT message, WPARAM wParam, LPARAM lPara
 							DeleteObject(hbrush);
 							FrameRect(hdc, &rc, (HBRUSH) GetStockObject(GRAY_BRUSH));
 							break;
+
+						NO_DEFAULT_CASE;
 					}
 					// *** FALL THROUGH ***
+					//lint -fallthrough
 				case ODA_SELECT:
 					rc = pdis->rcItem;
 					if (pdis->itemState & ODS_SELECTED)
@@ -234,6 +237,7 @@ BOOL CALLBACK ColourPopup::run_dlgProc(UINT message, WPARAM wParam, LPARAM lPara
                         ::SendMessage(_hParent, WM_PICKUP_COLOR, _colour, 0);
 					    return TRUE;
 		            }
+		            return FALSE;
                 }
 
                 default :
@@ -248,6 +252,8 @@ BOOL CALLBACK ColourPopup::run_dlgProc(UINT message, WPARAM wParam, LPARAM lPara
 			return TRUE;
 		}
 
+		default:
+		break;
 	}
 	return FALSE;
 }

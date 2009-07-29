@@ -238,6 +238,9 @@ BOOL CALLBACK ColourStaticTextHooker::colourStaticProc(HWND hwnd, UINT Message, 
 
 		    return TRUE;
         }
+
+		default:
+		break;
     }
     return ::CallWindowProc(_oldProc, hwnd, Message, wParam, lParam);
 }
@@ -598,6 +601,8 @@ BOOL CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPar
 										_isThemeDirty = false;
 										apply();
 										break;
+
+									NO_DEFAULT_CASE;
 								}
 								return TRUE;
 							}
@@ -648,9 +653,12 @@ BOOL CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPar
 				}
 			}
 		}
+		break;
+
 		default :
-			return FALSE;
+		break;
 	}
+	return FALSE;
 }
 
 void WordStyleDlg::loadLangListFromNppParam()

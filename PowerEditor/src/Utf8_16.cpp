@@ -380,6 +380,8 @@ size_t Utf8_16_Write::convert(char* p, size_t _size)
             }
             m_nBufSize = (const char*)pCur - (const char*)m_pNewBuf;
         }
+        break;
+
         default:
             break;
     }

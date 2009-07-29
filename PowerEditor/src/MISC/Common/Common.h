@@ -113,5 +113,18 @@ private:
 	WcharMbcsConvertor& operator= (const WcharMbcsConvertor&);
 };
 
+#define ERROR_MSG_SIZE 1024
+
+#ifdef DEBUG
+	#define NO_DEFAULT_CASE default: {\
+		TCHAR errorMsg[ERROR_MSG_SIZE];\
+		sprintf_s(errorMsg, ERROR_MSG_SIZE, "Unhanded default case in %s, line %d", __FILE__, __LINE__ );\
+		::MessageBox(NULL, TEXT("Unhandled default case."), errorMsg, MB_OK|MB_ICONWARNING);\
+		}\
+		break
+#else
+	#define NO_DEFAULT_CASE default: break
+#endif
+
 
 #endif //M30_IDE_COMMUN_H

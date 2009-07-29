@@ -335,6 +335,10 @@ static BOOL CALLBACK fileDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 					break;
 			}
 		}
+		break;
+
+		default:
+		break;
 	}
 	return oldProc(hwnd, message, wParam, lParam);
 };

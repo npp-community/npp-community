@@ -172,6 +172,7 @@ LRESULT SplitterContainer::runProc(UINT message, WPARAM wParam, LPARAM lParam)
 				case RIGHT_ROTATION:
 					rotateTo(RIGHT);
 					return TRUE;
+				NO_DEFAULT_CASE;
 			}
 			return TRUE;
 		}

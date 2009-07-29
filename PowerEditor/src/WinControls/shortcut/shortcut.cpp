@@ -945,6 +945,8 @@ BOOL CALLBACK ScintillaKeyMap::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /
 								showCurrentSettings();
 								return TRUE;
 							}
+
+							NO_DEFAULT_CASE;
 						}
 					}
 					return FALSE;

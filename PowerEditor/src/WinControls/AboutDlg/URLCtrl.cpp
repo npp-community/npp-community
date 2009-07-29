@@ -273,6 +273,9 @@ LRESULT URLCtrl::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 	    // HTCLIENT instead.
 	    case WM_NCHITTEST:
 		    return HTCLIENT;
+
+		default:
+		break;
     }
     return ::CallWindowProc(_oldproc, hwnd, Message, wParam, lParam);
 }

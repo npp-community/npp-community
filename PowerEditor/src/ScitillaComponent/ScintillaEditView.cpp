@@ -401,6 +401,9 @@ LRESULT ScintillaEditView::scintillaNew_Proc(HWND hwnd, UINT Message, WPARAM wPa
 		{
 			break;
 		}
+
+		default:
+		break;
 	}
 	return _callWindowProc(_scintillaDefaultProc, hwnd, Message, wParam, lParam);
 }
@@ -732,6 +735,7 @@ void ScintillaEditView::setCppLexer(LangType langType)
 					case SCE_HJ_DOUBLESTRING : cppID = SCE_C_STRING; break;
 					case SCE_HJ_SINGLESTRING : cppID = SCE_C_CHARACTER; break;
 					case SCE_HJ_REGEX : cppID = SCE_C_REGEX; break;
+					NO_DEFAULT_CASE;
 				}
 				style._styleID = cppID;
 				setStyle(style);

@@ -211,32 +211,33 @@ BOOL CALLBACK WindowsDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam
 		{
 			switch (wParam)
 			{
-			case IDOK :
-				activateCurrent();
-				return TRUE;
+				case IDOK :
+					activateCurrent();
+					return TRUE;
 
-			case IDCANCEL :
-				::GetWindowRect(_hSelf, &_lastKnownLocation);
-				EndDialog(_hSelf, IDCANCEL);
-				return TRUE;
+				case IDCANCEL :
+					::GetWindowRect(_hSelf, &_lastKnownLocation);
+					EndDialog(_hSelf, IDCANCEL);
+					return TRUE;
 
-			case IDC_WINDOWS_SAVE:
-				doSave();
-				return TRUE;
+				case IDC_WINDOWS_SAVE:
+					doSave();
+					return TRUE;
 
-			case IDC_WINDOWS_CLOSE:
-				doClose();
-				return TRUE;
+				case IDC_WINDOWS_CLOSE:
+					doClose();
+					return TRUE;
 
-			case IDC_WINDOWS_SORT:
-				doSortToTabs();
-				_isSorted = false;
-				updateButtonState();
-				break;
+				case IDC_WINDOWS_SORT:
+					doSortToTabs();
+					_isSorted = false;
+					updateButtonState();
+					return TRUE;
 
-			default :
-				break;
+				default :
+					break;
 			}
+			return TRUE;
 		}
 
 		case WM_DESTROY :
@@ -370,6 +371,9 @@ BOOL CALLBACK WindowsDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam
 				}
 			}
 		}
+		break;
+
+		default:
 		break;
 	}
 	return MyBaseClass::run_dlgProc(message, wParam, lParam);
@@ -526,19 +530,21 @@ LRESULT WindowsDlg::onWinMgr(WPARAM wp, LPARAM lp)
 	if (nmw.code==NMWINMGR::GET_SIZEINFO) {
 		switch(wp)
 		{
-		case IDOK:
-		case IDCANCEL:
-		case IDC_WINDOWS_SAVE:
-		case IDC_WINDOWS_CLOSE:
-		case IDC_WINDOWS_SORT:
-			nmw.sizeinfo.szMin = _szMinButton;
-			nmw.processed = TRUE;
-			return TRUE;
+			case IDOK:
+			case IDCANCEL:
+			case IDC_WINDOWS_SAVE:
+			case IDC_WINDOWS_CLOSE:
+			case IDC_WINDOWS_SORT:
+				nmw.sizeinfo.szMin = _szMinButton;
+				nmw.processed = TRUE;
+				return TRUE;
 
-		case IDC_WINDOWS_LIST:
-			nmw.sizeinfo.szMin = _szMinListCtrl;
-			nmw.processed = TRUE;
-			return TRUE;
+			case IDC_WINDOWS_LIST:
+				nmw.sizeinfo.szMin = _szMinListCtrl;
+				nmw.processed = TRUE;
+				return TRUE;
+
+			NO_DEFAULT_CASE;
 		}
 	}
 	return MyBaseClass::onWinMgr(wp, lp);

@@ -357,6 +357,10 @@ BOOL CALLBACK PreferenceDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPa
 					return TRUE;
 			}
 		}
+		break;
+
+		default:
+		break;
 	}
 	return FALSE;
 }
@@ -546,13 +550,21 @@ BOOL CALLBACK BarsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*
 #endif
 								}
 								return TRUE;
+
 								default:
 									break;
 							}
 						}
+						break;
+
+						NO_DEFAULT_CASE;
 					}
 			}
 		}
+		break;
+
+		default:
+		break;
 	}
 	return FALSE;
 }
@@ -791,9 +803,16 @@ BOOL CALLBACK MarginsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPar
 									break;
 							}
 						}
+						break;
+
+						NO_DEFAULT_CASE;
 					}
 			}
 		}
+		break;
+
+		default:
+		break;
 	}
 	return FALSE;
 }
@@ -911,6 +930,8 @@ BOOL CALLBACK SettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPa
 						nppGUI._definedSessionExt = sessionExt;
 						return TRUE;
 					}
+
+					NO_DEFAULT_CASE;
 				}
 			}
 
@@ -1077,8 +1098,14 @@ BOOL CALLBACK SettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPa
 					::SendMessage(grandParent, NPPM_INTERNAL_UPDATETITLEBAR, 0, 0);
 					return TRUE;
 				}
+
+				NO_DEFAULT_CASE;
 			}
 		}
+		break;
+
+		default:
+		break;
 	}
 	return FALSE;
 }
@@ -1177,6 +1204,8 @@ BOOL CALLBACK DefaultNewDocDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM 
 			ETDTProc enableDlgTheme = (ETDTProc)pNppParam->getEnableThemeDlgTexture();
 			if (enableDlgTheme)
 				enableDlgTheme(_hSelf, ETDT_ENABLETAB);
+
+			return TRUE;
 		}
 
 		case WM_COMMAND :
@@ -1194,6 +1223,7 @@ BOOL CALLBACK DefaultNewDocDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM 
 						pNppParam->setWorkingDir(nppGUI._defaultDirExp);
 						return TRUE;
 					}
+					NO_DEFAULT_CASE;
 				}
 			}
 
@@ -1272,6 +1302,10 @@ BOOL CALLBACK DefaultNewDocDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM 
 					return FALSE;
 			}
 		}
+		break;
+
+		default:
+		break;
 	}
 	return FALSE;
 }
@@ -1449,8 +1483,16 @@ BOOL CALLBACK LangMenuDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPara
 					::DrawMenuBar(grandParent);
 					return TRUE;
 				}
+				break;
+
+				default:
+				break;
 			}
 		}
+		break;
+
+		default:
+		break;
 	}
 	return FALSE;
 }
@@ -1482,6 +1524,7 @@ BOOL CALLBACK PrintSettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM 
 				case SC_PRINT_COLOURONWHITE :
 					ID2Check = IDC_RADIO_NOBG;
 					break;
+				NO_DEFAULT_CASE;
 			}
 			::SendDlgItemMessage(_hSelf, ID2Check, BM_SETCHECK, BST_CHECKED, 0);
 
@@ -1555,9 +1598,14 @@ BOOL CALLBACK PrintSettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM 
 				case IDC_RADIO_NOBG :
 					nppGUI._printSettings._printOption = SC_PRINT_COLOURONWHITE;
 					break;
+
+				NO_DEFAULT_CASE;
 			}
 			return TRUE;
 		}
+
+		default:
+		break;
 	}
 	return FALSE;
 }
@@ -1715,6 +1763,7 @@ BOOL CALLBACK PrintSettings2Dlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM
 					case IDC_EDIT_FLEFT : focusedEditStatic = IDC_FL_STATIC; groupStatic = IDC_FGB_STATIC; break;
 					case IDC_EDIT_FMIDDLE : focusedEditStatic = IDC_FM_STATIC; groupStatic = IDC_FGB_STATIC; break;
 					case IDC_EDIT_FRIGHT : focusedEditStatic = IDC_FR_STATIC; groupStatic = IDC_FGB_STATIC; break;
+					NO_DEFAULT_CASE;
 				}
 
 				::GetDlgItemText(_hSelf, groupStatic, str, stringSize);
@@ -1763,6 +1812,9 @@ BOOL CALLBACK PrintSettings2Dlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM
 					case IDC_COMBO_VARLIST :
 					{
 					}
+					break;
+
+					default:
 					break;
 				}
 				return TRUE;
@@ -1813,9 +1865,14 @@ BOOL CALLBACK PrintSettings2Dlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM
 				}
 				break;
 
+				default:
+				break;
 			}
 			return TRUE;
 		}
+
+		default:
+		break;
 	}
 	return FALSE;
 }
@@ -1888,6 +1945,8 @@ BOOL CALLBACK BackupDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPara
 						lstrcpy(nppGUI._backupDir, inputDir);
 						return TRUE;
 					}
+
+					NO_DEFAULT_CASE;
 				}
 			}
 
@@ -1981,6 +2040,9 @@ BOOL CALLBACK BackupDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPara
 			}
 
 		}
+
+		default:
+		break;
 	}
 	return FALSE;
 }

@@ -85,6 +85,7 @@ BOOL CALLBACK RunMacroDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lPa
 				case RM_RUN_EOF:
 					check(IDC_M_RUN_EOF);
 					break;
+				NO_DEFAULT_CASE;
 			}
 			::SendDlgItemMessage(_hSelf, IDC_M_RUN_TIMES, EM_LIMITTEXT, 4, 0);
 			goToCenter();
@@ -137,6 +138,9 @@ BOOL CALLBACK RunMacroDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lPa
 					}
 			}
 		}
+		break;
+
+		NO_DEFAULT_CASE;
 	}
 	return FALSE;
 }

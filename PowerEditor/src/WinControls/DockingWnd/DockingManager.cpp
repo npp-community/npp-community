@@ -318,6 +318,8 @@ LRESULT DockingManager::runProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 								_dockData->rcRegion[iCont].right -= offset;
 							}
 							break;
+
+						NO_DEFAULT_CASE;
 					}
 					onSize();
 					break;

@@ -206,6 +206,7 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 				if (nmh.code == TCN_SELCHANGE) {
 					int index = TabCtrl_GetCurSel(_hTabCtrl);
 					switch (index) {
+						// JOCE Plain numerical values?? makes sense?
 						case 0:
 							_currentState = STATE_MENU;
 							break;
@@ -221,6 +222,7 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 						case 4:
 							_currentState = STATE_SCINTILLA;
 							break;
+						NO_DEFAULT_CASE;
 					}
 					fillOutBabyGrid();
 				}
@@ -448,14 +450,20 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 							case STATE_SCINTILLA: {
 								_rightClickMenu->enableItem(IDM_BABYGRID_DELETE, false);
 								break; }
+							NO_DEFAULT_CASE;
 						}
 
 						_rightClickMenu->display(p);
 						return TRUE;
 					}
 				}
+				break;
+
+				NO_DEFAULT_CASE;
 			}
 		}
+		break;
+
 		default:
 			return FALSE;
 	}
