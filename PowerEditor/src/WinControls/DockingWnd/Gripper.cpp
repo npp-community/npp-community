@@ -430,7 +430,7 @@ void Gripper::doTabReordering(POINT pt)
 			/* test if cursor points in tab window */
 			if (::PtInRect(&rc, pt) == TRUE)
 			{
-				TCHITTESTINFO	info	= {0};
+				TCHITTESTINFO	info	= {{0,0},0};
 
 				if (_hTab == NULL)
 				{

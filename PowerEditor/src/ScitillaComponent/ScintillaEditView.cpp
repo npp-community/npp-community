@@ -2178,11 +2178,18 @@ TCHAR * int2str(TCHAR *str, int strLen, int number, int base, int nbDigits, bool
 		int nbBit2Shift = (nbDigits >= nbBits)?nbBits:(nbBits - nbDigits);
 		unsigned long mask = MASK_ULONG_BITFORT >> nbBit2Shift;
 		int i = 0;
+		// Strange things are happening to the loop index variable, but I'm not touching this code with a 10 foot pole.
+		//lint -e440
+		// for clause irregularity: variable 'Symbol' tested in 2nd expression does not match 'Symbol' modified in 3r
+		//lint -e442
+		// for clause irregularity: testing direction inconsistent with increment direction
 		for (; mask > 0 ; i++)
 		{
 			str[i] = (mask & number)?'1':'0';
 			mask >>= 1;
 		}
+		//lint +e440
+		//lint +e442
 		str[i] = '\0';
 	}
 

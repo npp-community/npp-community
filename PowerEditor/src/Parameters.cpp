@@ -3424,7 +3424,7 @@ bool NppParameters::writeScintillaParams(const ScintillaViewParams & svp, bool w
 	(scintNode->ToElement())->SetAttribute(TEXT("currentLineHilitingShow"), svp._currentLineHilitingShow?TEXT("show"):TEXT("hide"));
 	(scintNode->ToElement())->SetAttribute(TEXT("wrapSymbolShow"), svp._wrapSymbolShow?TEXT("show"):TEXT("hide"));
 	(scintNode->ToElement())->SetAttribute(TEXT("Wrap"), svp._doWrap?TEXT("yes"):TEXT("no"));
-	TCHAR *edgeStr = NULL;
+	const TCHAR *edgeStr = NULL;
 	if (svp._edgeMode == EDGE_NONE)
 		edgeStr = TEXT("no");
 	else if (svp._edgeMode == EDGE_LINE)

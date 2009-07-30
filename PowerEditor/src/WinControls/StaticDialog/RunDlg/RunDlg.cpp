@@ -97,6 +97,12 @@ static int whichVar(TCHAR *str)
 	return VAR_NOT_RECOGNIZED;
 }
 
+// Strange things are happening to the loop index variable, but I'm not touching this code with a 10 foot pole.
+//lint -e445
+// reuse of for loop variable 'Symbol' at 'Location' could cause chaos
+//lint -e850
+// for loop index variable ’Symbol’ whose type category is ’String’ modified in body of the for loop
+
 // Since I'm sure the length will be 256, I won't check the lstrlen : watch out!
 void expandNppEnvironmentStrs(const TCHAR *strSrc, TCHAR *stringDest, size_t strDestLen, HWND hWnd)
 {
@@ -173,6 +179,8 @@ void expandNppEnvironmentStrs(const TCHAR *strSrc, TCHAR *stringDest, size_t str
 	}
 	stringDest[j] = '\0';
 }
+//lint +e445
+//lint +e850
 
 HINSTANCE Command::run(HWND hWnd)
 {

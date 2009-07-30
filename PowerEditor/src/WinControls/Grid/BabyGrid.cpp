@@ -109,7 +109,8 @@ TCHAR data[1000];
 
 
 
-CREATESTRUCT cs,*lpcs;
+CREATESTRUCT cs;
+const CREATESTRUCT *lpcs;
 
 
 int         AddGrid(UINT);

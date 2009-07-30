@@ -144,7 +144,12 @@ bool AutoCompletion::showWordComplete(bool autoInsert)
 		return true;
 	}
 
-	sort(wordArray.begin(), wordArray.end());
+	{
+		std::vector<std::generic_string>::iterator begin = wordArray.begin();
+		std::vector<std::generic_string>::iterator end = wordArray.end();
+		sort(begin, end);
+	}
+
 	std::generic_string words(TEXT(""));
 
 	for (size_t i = 0 ; i < wordArray.size() ; i++)

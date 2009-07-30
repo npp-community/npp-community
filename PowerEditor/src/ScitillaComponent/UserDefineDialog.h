@@ -173,7 +173,7 @@ public :
 	}
 
 	void destroy() {
-		// A Ajouter les fils...
+		// JOCE destroy all children...
 	};
 
 	int getWidth() const {

@@ -640,7 +640,7 @@ LRESULT DockingCont::runProcTab(HWND hwnd, UINT Message, WPARAM wParam, LPARAM l
 		}
 		case WM_LBUTTONUP:
 		{
-			TCHITTESTINFO	info	= {0};
+			TCHITTESTINFO	info	= {{0,0},0};
 
 			// get selected sub item
 			info.pt.x = LOWORD(lParam);
@@ -659,7 +659,7 @@ LRESULT DockingCont::runProcTab(HWND hwnd, UINT Message, WPARAM wParam, LPARAM l
 		case WM_MBUTTONUP:
 		{
 			TCITEM			tcItem	= {0};
-			TCHITTESTINFO	info	= {0};
+			TCHITTESTINFO	info	= {{0,0},0};
 
 			// get selected sub item
 			info.pt.x = LOWORD(lParam);
@@ -681,7 +681,7 @@ LRESULT DockingCont::runProcTab(HWND hwnd, UINT Message, WPARAM wParam, LPARAM l
 		}
 		case WM_MOUSEMOVE:
 		{
-			TCHITTESTINFO	info	= {0};
+			TCHITTESTINFO	info	= {{0,0},0};
 
 			// get selected sub item
 			info.pt.x = LOWORD(lParam);
@@ -749,7 +749,7 @@ LRESULT DockingCont::runProcTab(HWND hwnd, UINT Message, WPARAM wParam, LPARAM l
 		{
 			TCITEM			tcItem	= {0};
 			RECT			rc		= {0};
-			TCHITTESTINFO	info	= {0};
+			TCHITTESTINFO	info	= {{0,0},0};
 
 			// get selected sub item
 			info.pt.x = LOWORD(lParam);
@@ -779,7 +779,7 @@ LRESULT DockingCont::runProcTab(HWND hwnd, UINT Message, WPARAM wParam, LPARAM l
 
 			if ((lpnmhdr->hwndFrom == _hContTab) && (lpnmhdr->code == TCN_GETOBJECT))
 			{
-				TCHITTESTINFO	info	= {0};
+				TCHITTESTINFO	info	= {{0,0},0};
 
 				// get selected sub item
 				info.pt.x = LOWORD(lParam);

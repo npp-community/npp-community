@@ -47,7 +47,7 @@ public :
 	virtual ~StaticDialog();
 	virtual void create(int dialogID, bool isRTL = false);
 
-    virtual bool isCreated() const {
+    bool isCreated() const {
 		return (_hSelf != NULL);
 	};
 

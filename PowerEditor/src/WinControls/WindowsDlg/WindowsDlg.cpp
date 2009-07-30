@@ -480,6 +480,9 @@ BOOL WindowsDlg::onInitDialog()
 	GetClientRect(_hList, &rc);
 	LONG width = rc.right - rc.left;
 
+	// The following Linw warning is acceptable in the current situation.
+	// Assignment of string literal to variable 'Symbol' (Location) is not const safe
+	//lint -e1778
 	LVCOLUMN lvColumn;
 	memset(&lvColumn, 0, sizeof(lvColumn));
 	lvColumn.mask = LVCF_WIDTH|LVCF_TEXT|LVCF_SUBITEM|LVCF_FMT;
@@ -496,6 +499,7 @@ BOOL WindowsDlg::onInitDialog()
 	lvColumn.pszText = TEXT("Type");
 	lvColumn.cx = 40;
 	SendMessage(_hList, LVM_INSERTCOLUMN, 2, LPARAM(&lvColumn));
+	//lint +e1778
 
 	fitColumnsToSize();
 

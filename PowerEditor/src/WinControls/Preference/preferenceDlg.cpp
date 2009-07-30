@@ -1620,7 +1620,12 @@ void trim(std::generic_string & str)
 		pos = str.find_first_not_of(' ');
 		if(pos != std::generic_string::npos) str.erase(0, pos);
 	}
-	else str.erase(str.begin(), str.end());
+	else
+	{
+		std::generic_string::iterator begin = str.begin();
+		std::generic_string::iterator end = str.end();
+		str.erase(begin, end);
+	}
 };
 
 BOOL CALLBACK PrintSettings2Dlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)

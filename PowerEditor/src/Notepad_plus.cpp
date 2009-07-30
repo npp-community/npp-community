@@ -4577,7 +4577,7 @@ void Notepad_plus::command(int id)
 			{
 				if (_nativeLangEncoding == CP_BIG5)
 				{
-					char *authorName = "«J¤µ§^";
+					const char *authorName = "«J¤µ§^";
 					HWND hItem = ::GetDlgItem(_aboutDlg->getHSelf(), IDC_AUTHOR_NAME);
 #ifdef UNICODE
 					WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
@@ -10505,7 +10505,7 @@ void Notepad_plus::setFindReplaceFolderFilter(const TCHAR *dir, const TCHAR *fil
 
 int Notepad_plus::doSaveOrNot(const TCHAR *fn)
 {
-	TCHAR pattern[64] = TEXT("Save file \"%s\" ?");
+	const TCHAR* pattern = TEXT("Save file \"%s\" ?");
 	TCHAR phrase[512];
 	wsprintf(phrase, pattern, fn);
 	return doActionOrNot(TEXT("Save"), phrase, MB_YESNOCANCEL | MB_ICONQUESTION | MB_APPLMODAL);
@@ -10513,8 +10513,8 @@ int Notepad_plus::doSaveOrNot(const TCHAR *fn)
 
 int Notepad_plus::doReloadOrNot(const TCHAR *fn, bool dirty)
 {
-	TCHAR* pattern = TEXT("%s\r\rThis file has been modified by another program.\rDo you want to reload it%s?");
-	TCHAR* lose_info_str = dirty ? TEXT(" and lose the changes made in Notepad++") : TEXT("");
+	const TCHAR* pattern = TEXT("%s\r\rThis file has been modified by another program.\rDo you want to reload it%s?");
+	const TCHAR* lose_info_str = dirty ? TEXT(" and lose the changes made in Notepad++") : TEXT("");
 	TCHAR phrase[512];
 	wsprintf(phrase, pattern, fn, lose_info_str);
 	int icon = dirty ? MB_ICONEXCLAMATION : MB_ICONQUESTION;
@@ -10523,7 +10523,7 @@ int Notepad_plus::doReloadOrNot(const TCHAR *fn, bool dirty)
 
 int Notepad_plus::doCloseOrNot(const TCHAR *fn)
 {
-	TCHAR pattern[128] = TEXT("The file \"%s\" doesn't exist anymore.\rKeep this file in editor?");
+	const TCHAR* pattern = TEXT("The file \"%s\" doesn't exist anymore.\rKeep this file in editor?");
 	TCHAR phrase[512];
 	wsprintf(phrase, pattern, fn);
 	return doActionOrNot(TEXT("Keep non existing file"), phrase, MB_YESNO | MB_ICONQUESTION | MB_APPLMODAL);
@@ -10531,7 +10531,7 @@ int Notepad_plus::doCloseOrNot(const TCHAR *fn)
 
 int Notepad_plus::doDeleteOrNot(const TCHAR *fn)
 {
-	TCHAR pattern[128] = TEXT("The file \"%s\"\rwill be deleted from your disk and this document will be closed.\rContinue?");
+	const TCHAR* pattern = TEXT("The file \"%s\"\rwill be deleted from your disk and this document will be closed.\rContinue?");
 	TCHAR phrase[512];
 	wsprintf(phrase, pattern, fn);
 	return doActionOrNot(TEXT("Delete file"), phrase, MB_YESNO | MB_ICONQUESTION | MB_APPLMODAL);
@@ -10558,7 +10558,7 @@ void Notepad_plus::enableConvertMenuItems(formatType f) const
 void Notepad_plus::setDisplayFormat(formatType f)
 {
 	assert(_statusBar);
-	std::generic_string str;
+	const TCHAR * str;
 	switch (f)
 	{
 		case MAC_FORMAT :
@@ -10570,13 +10570,13 @@ void Notepad_plus::setDisplayFormat(formatType f)
 		default :
 			str = TEXT("Dos\\Windows");
 	}
-	_statusBar->setText(str.c_str(), STATUSBAR_EOF_FORMAT);
+	_statusBar->setText(str, STATUSBAR_EOF_FORMAT);
 };
 
 void Notepad_plus::setUniModeText(UniMode um)
 {
 	assert(_statusBar);
-	TCHAR *uniModeText;
+	const TCHAR *uniModeText;
 	switch (um)
 	{
 		case uniUTF8:
