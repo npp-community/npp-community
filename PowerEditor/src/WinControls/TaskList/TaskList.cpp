@@ -32,10 +32,7 @@ TaskList::TaskList() :
 
 TaskList::~TaskList()
 {
-	if (_hSelf)
-	{
-		TaskList::destroy();
-	}
+	TaskList::destroy();
 }
 
 void TaskList::destroy()
@@ -43,14 +40,16 @@ void TaskList::destroy()
 	if (_hFont)
 	{
 		DeleteObject(_hFont);
+		_hFont = NULL;
 	}
 
 	if (_hFontSelected)
 	{
 		DeleteObject(_hFontSelected);
+		_hFontSelected = NULL;
 	}
-	::DestroyWindow(_hSelf);
-	_hSelf = NULL;
+
+	Window::destroy();
 }
 
 void TaskList::init(HINSTANCE hInst, HWND parent, HIMAGELIST hImaLst, int nbItem, int index2set)

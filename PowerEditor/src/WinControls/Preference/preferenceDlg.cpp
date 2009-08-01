@@ -40,7 +40,11 @@ const int BLINKRATE_INTERVAL = 50;
 class SettingsDlg : public StaticDialog
 {
 public :
-	SettingsDlg() {};
+	SettingsDlg() {}
+	~SettingsDlg()
+	{
+		SettingsDlg::destroy();
+	}
 	virtual void destroy() {
 		_nbHistoryVal.destroy();
 		StaticDialog::destroy();
@@ -56,7 +60,7 @@ private :
 class BarsDlg : public StaticDialog
 {
 public :
-	BarsDlg() {};
+	BarsDlg() {}
 private :
 	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 };
@@ -64,7 +68,11 @@ private :
 class MarginsDlg : public StaticDialog
 {
 public :
-	MarginsDlg() {};
+	MarginsDlg() {}
+	~MarginsDlg()
+	{
+		MarginsDlg::destroy();
+	}
 	virtual void destroy() {
 		_tabSizeVal.destroy();
 		_verticalEdgeLineNbColVal.destroy();
@@ -88,7 +96,7 @@ struct LangID_Name
 class DefaultNewDocDlg : public StaticDialog
 {
 public :
-	DefaultNewDocDlg() {};
+	DefaultNewDocDlg() {}
 private :
 	std::vector<LangID_Name> _langList;
 	void makeOpenAnsiAsUtf8(bool doIt){
@@ -102,7 +110,7 @@ private :
 class LangMenuDlg : public StaticDialog
 {
 public :
-	LangMenuDlg() {};
+	LangMenuDlg() {}
 private :
 	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 	std::vector<LangMenuItem> _langList;
@@ -111,7 +119,7 @@ private :
 class PrintSettingsDlg : public StaticDialog
 {
 public :
-	PrintSettingsDlg() {};
+	PrintSettingsDlg() {}
 private :
 	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 };
@@ -119,7 +127,16 @@ private :
 class BackupDlg : public StaticDialog
 {
 public :
-	BackupDlg() {};
+	BackupDlg() {}
+	~BackupDlg()
+	{
+		BackupDlg::destroy();
+	}
+	void destroy()
+	{
+		_nbCharVal.destroy();
+		StaticDialog::destroy();
+	}
 private :
 	URLCtrl _nbCharVal;
 	void updateBackupGUI();
@@ -135,7 +152,7 @@ struct strCouple {
 class PrintSettings2Dlg : public StaticDialog
 {
 public :
-	PrintSettings2Dlg():_focusedEditCtrl(0), _selStart(0), _selEnd(0){};
+	PrintSettings2Dlg():_focusedEditCtrl(0), _selStart(0), _selEnd(0){}
 private :
 	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 	std::vector<strCouple> varList;
@@ -167,35 +184,7 @@ PreferenceDlg::PreferenceDlg():
 
 PreferenceDlg::~PreferenceDlg()
 {
-	delete _ctrlTab;
-	_ctrlTab = NULL;
-
-	delete _barsDlg;
-	_barsDlg = NULL;
-
-	delete _marginsDlg;
-	_marginsDlg = NULL;
-
-	delete _settingsDlg;
-	_settingsDlg = NULL;
-
-	delete _fileAssocDlg;
-	_fileAssocDlg = NULL;
-
-	delete _langMenuDlg;
-	_langMenuDlg = NULL;
-
-	delete _printSettingsDlg;
-	_printSettingsDlg = NULL;
-
-	delete _printSettings2Dlg;
-	_printSettings2Dlg = NULL;
-
-	delete _defaultNewDocDlg;
-	_defaultNewDocDlg = NULL;
-
-	delete _backupDlg;
-	_backupDlg = NULL;
+	PreferenceDlg::destroy();
 
 	delete _wVector;
 }
@@ -212,45 +201,55 @@ void PreferenceDlg::doDialog(bool isRTL)
 
 void PreferenceDlg::destroy()
 {
-	if (_ctrlTab)
-	{
-		_ctrlTab->destroy();
+	// The proper destroy() calls should be handled by the destructors.
+	if (_ctrlTab){
+		delete _ctrlTab;
+		_ctrlTab = NULL;
 	}
 
 	if (_barsDlg) {
-		_barsDlg->destroy();
+		delete _barsDlg;
+		_barsDlg = NULL;
 	}
 
 	if (_marginsDlg) {
-		_marginsDlg->destroy();
+		delete _marginsDlg;
+		_marginsDlg = NULL;
 	}
 
 	if (_settingsDlg) {
-		_settingsDlg->destroy();
+		delete _settingsDlg;
+		_settingsDlg = NULL;
 	}
 
 	if (_fileAssocDlg) {
-		_fileAssocDlg->destroy();
+		delete _fileAssocDlg;
+		_fileAssocDlg = NULL;
 	}
 
 	if (_langMenuDlg) {
-		_langMenuDlg->destroy();
+		delete _langMenuDlg;
+		_langMenuDlg = NULL;
 	}
 
 	if (_printSettingsDlg) {
-		_printSettingsDlg->destroy();
+		delete _printSettingsDlg;
+		_printSettingsDlg = NULL;
 	}
 
 	if (_printSettings2Dlg) {
-		_printSettings2Dlg->destroy();
+		delete _printSettingsDlg;
+		_printSettings2Dlg = NULL;
 	}
 
 	if (_defaultNewDocDlg) {
-		_defaultNewDocDlg->destroy();
+		delete _defaultNewDocDlg;
+		_defaultNewDocDlg = NULL;
 	}
 
 	if (_backupDlg) {
-		_backupDlg->destroy();
+		delete _backupDlg;
+		_backupDlg = NULL;
 	}
 
 	StaticDialog::destroy();

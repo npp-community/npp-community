@@ -34,9 +34,6 @@ public :
 		_ptOldPos.x = 0;
 		_ptOldPos.y = 0;
 	}
-	~DockingSplitter(){}
-
-	virtual void destroy() {}
 
 public:
 	void init(HINSTANCE hInst, HWND hWnd, HWND hMessage, UINT flags);

@@ -160,7 +160,6 @@ public:
 	virtual ~Notepad_plus();
 	void init(HINSTANCE, HWND, const TCHAR *cmdLine, CmdLineParams *cmdLineParams);
 	void killAllChildren();
-	virtual void destroy();
 
     static const TCHAR * getClassName() {
 		return _className;

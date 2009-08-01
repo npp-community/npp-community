@@ -34,10 +34,7 @@ ToolBar::ToolBar():
 
 ToolBar::~ToolBar()
 {
-	if (_hSelf)
-	{
-		ToolBar::destroy();
-	}
+	ToolBar::destroy();
 }
 
 bool ToolBar::init( HINSTANCE hInst, HWND hPere, toolBarStatusType type,
@@ -121,11 +118,20 @@ void ToolBar::destroy() {
 		_pRebar->removeBand(_rbBand.wID);
 		_pRebar = NULL;
 	}
-	delete [] _pTBB;
-	::DestroyWindow(_hSelf);
-	_hSelf = NULL;
-	_toolBarIcons->destroy();
-	delete _toolBarIcons;
+
+	if (_pTBB)
+	{
+		delete [] _pTBB;
+		_pTBB = NULL;
+	}
+
+	if (_toolBarIcons)
+	{
+		delete _toolBarIcons;
+		_toolBarIcons = NULL;
+	}
+
+	Window::destroy();
 };
 
 int ToolBar::getWidth() const {
@@ -367,10 +373,7 @@ void ToolBar::setDisableImageList() {
 
 ReBar::~ReBar()
 {
-	if (_hSelf)
-	{
-		ReBar::destroy();
-	}
+	ReBar::destroy();
 }
 
 void ReBar::init(HINSTANCE hInst, HWND hPere)

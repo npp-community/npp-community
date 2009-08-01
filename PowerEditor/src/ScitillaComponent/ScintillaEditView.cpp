@@ -2727,11 +2727,6 @@ ScintillaEditView::~ScintillaEditView()
 		::FreeLibrary(_hLib);
 	}
 
-	if (_hSelf)
-	{
-		ScintillaEditView::destroy();
-	}
-
 	for (BufferStyleMap::iterator it(_hotspotStyles.begin()); it != _hotspotStyles.end(); ++it )
 	{
 		for (StyleMap::iterator it2(it->second->begin()) ; it2 != it->second->end() ; ++it2)

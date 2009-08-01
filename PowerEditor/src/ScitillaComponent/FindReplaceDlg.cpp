@@ -2067,6 +2067,7 @@ void FindReplaceDlg::combo2ExtendedMode(int comboID)
 
 FindReplaceDlg::~FindReplaceDlg()
 {
+	FindReplaceDlg::destroy();
 	if (_pFinder)
 		delete _pFinder;
 	delete [] _uniFileName;
@@ -2648,6 +2649,12 @@ void FindIncrementDlg::addToRebar(ReBar * rebar)
 
 	_pRebar->addBand(&_rbBand, true);
 }
+
+FindIncrementDlg::~FindIncrementDlg()
+{
+	FindIncrementDlg::destroy();
+}
+
 
 void FindIncrementDlg::init( HINSTANCE hInst, HWND hPere, FindReplaceDlg *pFRDlg, bool isRTL /*= false*/ )
 {

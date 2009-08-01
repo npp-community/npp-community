@@ -86,11 +86,6 @@ DockingManager::DockingManager()
 
 DockingManager::~DockingManager()
 {
-	if (_hSelf)
-	{
-		DockingManager::destroy();
-	}
-
 	// delete 4 splitters
 	for (int i = 0; i < DOCKCONT_MAX; i++)
 	{
@@ -955,12 +950,6 @@ void DockingManager::setDockedContSize(int iCont, int iSize)
 	}
 	onSize();
 }
-
-void DockingManager::destroy()
-{
-	::DestroyWindow(_hSelf);
-	_hSelf = NULL;
-};
 
 int DockingManager::FindEmptyContainer()
 {

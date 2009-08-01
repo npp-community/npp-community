@@ -199,6 +199,7 @@ class FindIncrementDlg : public StaticDialog
 {
 public :
 	FindIncrementDlg() : _pFRDlg(NULL), _pRebar(NULL) {};
+	~FindIncrementDlg();
 	void init(HINSTANCE hInst, HWND hPere, FindReplaceDlg *pFRDlg, bool isRTL = false);
 	virtual void destroy();
 	virtual void display(bool toShow = true) const;

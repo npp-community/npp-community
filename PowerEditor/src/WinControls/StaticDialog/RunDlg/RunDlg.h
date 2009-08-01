@@ -42,7 +42,7 @@ private :
 class RunDlg : public Command, public StaticDialog
 {
 public :
-	RunDlg() : StaticDialog() {};
+	RunDlg() : StaticDialog() {}
 
 	void doDialog(bool isRTL = false);
 

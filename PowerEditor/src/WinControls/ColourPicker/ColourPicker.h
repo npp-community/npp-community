@@ -32,12 +32,8 @@ class ColourPopup;
 class ColourPicker : public Window
 {
 public :
-	ColourPicker() : Window(),  _currentColour(RGB(0xFF, 0x00, 0x00)), _pColourPopup(NULL), _isEnabled(true) {};
-    ~ColourPicker(){};
+	ColourPicker() : Window(),  _currentColour(RGB(0xFF, 0x00, 0x00)), _pColourPopup(NULL), _isEnabled(true) {}
 	virtual void init(HINSTANCE hInst, HWND parent);
-	virtual void destroy() {
-		DestroyWindow(_hSelf);
-	};
     void setColour(COLORREF c) {
         _currentColour = c;
         //drawSelf();

@@ -27,9 +27,7 @@ class BabyGridWrapper : public Window
 {
 public :
 	BabyGridWrapper() : Window(){};
-    ~BabyGridWrapper();
 	virtual void init(HINSTANCE hInst, HWND parent, int id);
-	virtual void destroy();
 	void setLineColNumber(size_t nbRow, size_t nbCol);
 
 	void setCursorColour(COLORREF coulour);

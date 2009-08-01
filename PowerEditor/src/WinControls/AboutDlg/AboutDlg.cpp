@@ -126,6 +126,11 @@ BOOL CALLBACK AboutDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
+AboutDlg::~AboutDlg()
+{
+	AboutDlg::destroy();
+}
+
 void AboutDlg::doDialog()
 {
 	if (!isCreated())

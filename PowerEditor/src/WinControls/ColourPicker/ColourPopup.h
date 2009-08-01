@@ -36,19 +36,9 @@ class ColourPopup : public Window
 public :
     ColourPopup();
 	ColourPopup(COLORREF defaultColor);
-	~ColourPopup(){}
-
-	bool isCreated() const {
-		return (_hSelf != NULL);
-	};
-
 	void create(int dialogID);
 
     void doDialog(POINT p);
-
-    virtual void destroy() {
-	    ::DestroyWindow(_hSelf);
-	}
 
     COLORREF getSelColour(){return _colour;};
 

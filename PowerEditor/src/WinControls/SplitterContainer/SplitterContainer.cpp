@@ -44,10 +44,13 @@ SplitterContainer::~SplitterContainer()
 void SplitterContainer::destroy()
 {
 	if (_hPopupMenu)
+	{
 		::DestroyMenu(_hPopupMenu);
+		_hPopupMenu = NULL;
+	}
 	_splitter.destroy();
-	::DestroyWindow(_hSelf);
-	_hSelf = NULL;
+
+	Window::destroy();
 }
 
 void SplitterContainer::create(Window *pWin0, Window *pWin1, int splitterSize,

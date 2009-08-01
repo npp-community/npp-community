@@ -25,17 +25,18 @@
 class StatusBar : public Window
 {
 public :
-	StatusBar() : Window(), _partWidthArray(NULL), _hloc(NULL), _lpParts(NULL) {};
+	StatusBar() : Window(), _partWidthArray(NULL), _hloc(NULL), _lpParts(NULL) {}
 	virtual ~StatusBar(){
-		StatusBar::destroy();
         if (_hloc)
         {
             ::LocalUnlock(_hloc);
             ::LocalFree(_hloc);
         }
 		if (_partWidthArray)
+		{
 			delete [] _partWidthArray;
-    };
+		}
+    }
 
 	virtual void init(HINSTANCE hInst, HWND hPere, int nbParts);
 
@@ -45,29 +46,26 @@ public :
 
 		_partWidthArray[whichPart] = width;
 		return true;
-	};
-	virtual void destroy() {
-		::DestroyWindow(_hSelf);
-	};
+	}
 
     virtual void reSizeTo(RECT & rc) {
         ::MoveWindow(_hSelf, rc.left, rc.top, rc.right, rc.bottom, TRUE);
         adjustParts(rc.right);
         redraw();
-    };
+    }
 
 
 	int getHeight() const {
 		if (!::IsWindowVisible(_hSelf))
 			return 0;
 		return Window::getHeight();
-	};
+	}
 
     bool setText(const TCHAR *str, int whichPart) const {
         if (whichPart > _nbParts)
             return false;
 		return (::SendMessage(_hSelf, SB_SETTEXT, whichPart, (LPARAM)str) == TRUE);
-    };
+    }
 
 	void adjustParts(int clientWidth);
 

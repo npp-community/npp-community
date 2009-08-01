@@ -85,7 +85,7 @@ DockingCont::DockingCont()
 
 DockingCont::~DockingCont()
 {
-	::DeleteObject(_hFont);
+	DockingCont::destroy();
 }
 
 
@@ -1420,9 +1420,16 @@ void DockingCont::setCaptionTop( BOOL isTopCaption )
 
 void DockingCont::destroy()
 {
-	for (INT iTb = _vTbData.size(); iTb > 0; iTb--)
+	if (_hFont)
 	{
-		delete _vTbData[iTb-1];
+		::DeleteObject(_hFont);
+		_hFont = NULL;
 	}
+
+	for (std::vector<tTbData *>::iterator it(_vTbData.begin()); it != _vTbData.end(); ++it)
+	{
+		delete (*it);
+	}
+	_vTbData.clear();
 	::DestroyWindow(_hSelf);
 }

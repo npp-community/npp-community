@@ -43,17 +43,13 @@ ShortcutMapper::ShortcutMapper() :
 
 ShortcutMapper::~ShortcutMapper()
 {
-	if (_hSelf)
-	{
-		ShortcutMapper::destroy();
-	}
+	ShortcutMapper::destroy();
 }
 
 void ShortcutMapper::destroy()
 {
 	if (_babygrid)
 	{
-		_babygrid->destroy();
 		delete _babygrid;
 		_babygrid = NULL;
 	}

@@ -141,13 +141,6 @@ public:
 	ScintillaEditView();
 
 	virtual ~ScintillaEditView();
-	virtual void destroy()
-	{
-
-		::DestroyWindow(_hSelf);
-		_hSelf = NULL;
-	};
-
 	virtual void init(HINSTANCE hInst, HWND hPere);
 
 	LRESULT execute(UINT Msg, WPARAM wParam=0, LPARAM lParam=0) const {

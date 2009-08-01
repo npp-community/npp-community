@@ -575,12 +575,6 @@ void Notepad_plus::killAllChildren()
 	}
 }
 
-
-void Notepad_plus::destroy()
-{
-	::DestroyWindow(_hSelf);
-}
-
 bool Notepad_plus::saveGUIParams()
 {
 	assert(_rebarTop);

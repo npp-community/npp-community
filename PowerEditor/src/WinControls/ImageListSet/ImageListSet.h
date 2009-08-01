@@ -24,13 +24,21 @@
 class IconList
 {
 public :
-	IconList() : _hImglst(NULL) {};
+	IconList() : _hImglst(NULL) {}
+	~IconList()
+	{
+		IconList::destroy();
+	}
 
 	void create(HINSTANCE hInst, int iconSize);
 	void create(int iconSize, HINSTANCE hInst, int *iconIDArray, int iconIDArraySize);
 
 	void destroy() {
-		ImageList_Destroy(_hImglst);
+		if (_hImglst)
+		{
+			ImageList_Destroy(_hImglst);
+			_hImglst = NULL;
+		}
 	}
 
 	HIMAGELIST getHandle() const {return _hImglst;}
@@ -82,6 +90,7 @@ class ToolBarIcons : public IconLists
 {
 public :
 	ToolBarIcons() : _nbCmd(0) {};
+	~ToolBarIcons();
 
 	void init(ToolBarButtonUnit *buttonUnitArray, int arraySize);
 	void create(HINSTANCE hInst, int iconSize);

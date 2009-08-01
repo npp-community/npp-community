@@ -94,28 +94,36 @@ TabBar::TabBar() :
 
 TabBar::~TabBar()
 {
-	if (_hSelf)
-	{
-		TabBar::destroy();
-	}
+	TabBar::destroy();
 };
 
 void TabBar::destroy()
 {
 	if (_hFont)
+	{
 		DeleteObject(_hFont);
+		_hFont = NULL;
+	}
 
 	if (_hLargeFont)
+	{
 		DeleteObject(_hLargeFont);
+		_hLargeFont = NULL;
+	}
 
 	if (_hVerticalFont)
+	{
 		DeleteObject(_hVerticalFont);
+		_hVerticalFont = NULL;
+	}
 
 	if (_hVerticalLargeFont)
+	{
 		DeleteObject(_hVerticalLargeFont);
+		_hVerticalLargeFont = NULL;
+	}
 
-	::DestroyWindow(_hSelf);
-	_hSelf = NULL;
+	Window::destroy();
 };
 
 

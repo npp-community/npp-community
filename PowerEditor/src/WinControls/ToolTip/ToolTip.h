@@ -27,12 +27,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 class ToolTip : public Window
 {
 public :
-	ToolTip() : _bTrackMouse(FALSE) {};
-
-	void destroy(){
-		::DestroyWindow(_hSelf);
-		_hSelf = NULL;
-	};
+	ToolTip() : _bTrackMouse(FALSE) {}
 
 // Attributes
 public:

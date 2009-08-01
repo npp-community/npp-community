@@ -45,20 +45,6 @@ void BabyGridWrapper::init(HINSTANCE hInst, HWND parent, int id)
 					(LPVOID)/*this*/NULL);
 }
 
-BabyGridWrapper::~BabyGridWrapper()
-{
-	BabyGridWrapper::destroy();
-}
-
-void BabyGridWrapper::destroy()
-{
-	if (_hSelf)
-	{
-		::DestroyWindow(_hSelf);
-		_hSelf = NULL;
-	}
-}
-
 void BabyGridWrapper::setLineColNumber( size_t nbRow, size_t nbCol )
 {
 	::SendMessage(_hSelf, BGM_SETGRIDDIM, nbRow, nbCol);

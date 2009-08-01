@@ -29,7 +29,6 @@ public :
 		Window::init(hInst, parent);
 		_hSelf = hSelf;
 	};
-	virtual void destroy() {};
 };
 
 #endif // WINDOW_INTERFACE_H
