@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
-	Name="notepadPlus.vc.7"
+	Version="8.00"
+	Name="notepadPlus.vc.8"
 	ProjectGUID="{FCF60E65-1B78-4D1D-AB59-4FC00AC8C248}"
 	RootNamespace="Notepad++"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -21,7 +20,7 @@
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC70.vsprops"
 			CharacterSet="2"
 			>
 			<Tool
@@ -41,20 +40,22 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/EHa"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\scintilla\include;..\src;..\src\MISC;..\src\MISC\Common;..\src\MISC\Exception;..\src\MISC\PluginsManager;..\src\MISC\Process;..\src\MISC\RegExt;..\src\ScitillaComponent;..\src\TinyXml;..\src\TinyXml\tinyXmlA;..\src\WinControls;..\src\WinControls\AboutDlg;..\src\WinControls\ColourPicker;..\src\WinControls\ContextMenu;..\src\WinControls\DockingWnd;..\src\WinControls\Grid;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\Preference;..\src\WinControls\shortcut;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\StaticDialog\RunDlg;..\src\WinControls\StatusBar;..\src\WinControls\TabBar;..\src\WinControls\TaskList;..\src\WinControls\ToolBar;..\src\WinControls\ToolTip;..\src\WinControls\TrayIcon;..\src\WinControls\WindowsDlg"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;TIXML_USE_STL;TIXMLA_USE_STL"
+				FavorSizeOrSpeed="0"
+				AdditionalIncludeDirectories="..\src\WinControls\AboutDlg;..\..\scintilla\include;..\include;..\src\WinControls;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\TabBar;..\src\WinControls\ToolBar;..\src\MISC\Process;..\src\ScitillaComponent;..\src\MISC;..\src\MISC\SysMsg;..\src\WinControls\StatusBar;..\src;..\src\WinControls\StaticDialog\RunDlg;..\src\tinyxml;..\src\WinControls\ColourPicker;..\src\Win32Explr;..\src\MISC\RegExt;..\src\WinControls\TrayIcon;..\src\WinControls\shortcut;..\src\WinControls\Grid;..\src\WinControls\ContextMenu;..\src\MISC\PluginsManager;..\src\WinControls\Preference;..\src\WinControls\WindowsDlg;..\src\WinControls\TaskList;..\src\WinControls\DockingWnd;..\src\WinControls\ToolTip;..\src\MISC\Exception;..\src\MISC\Common;..\src\tinyxml\tinyXmlA"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;TIXML_USE_STL;TIXMLA_USE_STL"
 				MinimalRebuild="true"
-				ExceptionHandling="0"
+				ExceptionHandling="2"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=""
-				WarningLevel="3"
+				DefaultCharIsUnsigned="true"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="precompiled_headers.h"
+				PrecompiledHeaderFile="$(IntDir)\$(TargetName).pch"
+				WarningLevel="4"
+				WarnAsError="true"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
-				ForcedIncludeFiles="Common.h"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -78,8 +79,6 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/notepadPlus.pdb"
 				SubSystem="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -101,6 +100,9 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine="IF NOT EXIST ..\bin\config.xml COPY ..\src\config.model.xml ..\bin\config.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\config.model.xml COPY ..\src\config.model.xml ..\bin\config.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.xml COPY ..\src\langs.model.xml ..\bin\langs.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.model.xml COPY ..\src\langs.model.xml ..\bin\langs.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.xml COPY ..\src\stylers.model.xml ..\bin\stylers.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.model.xml COPY ..\src\stylers.model.xml ..\bin\stylers.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\LINEDRAW.TTF COPY ..\src\font\LINEDRAW.TTF ..\bin\LINEDRAW.TTF&#x0D;&#x0A;IF NOT EXIST ..\bin\contextMenu.xml COPY ..\src\contextMenu.xml ..\bin\contextMenu.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\shortcuts.xml COPY ..\src\shortcuts.xml ..\bin\shortcuts.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\userDefineLang.xml COPY ..\src\userDefineLang.xml ..\bin\userDefineLang.xml&#x0D;&#x0A;"
 			/>
@@ -110,7 +112,7 @@
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC70.vsprops"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
@@ -131,22 +133,25 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/EHa"
 				Optimization="2"
-				InlineFunctionExpansion="1"
-				FavorSizeOrSpeed="2"
+				InlineFunctionExpansion="2"
+				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\..\scintilla\include;..\src;..\src\MISC;..\src\MISC\Common;..\src\MISC\Exception;..\src\MISC\PluginsManager;..\src\MISC\Process;..\src\MISC\RegExt;..\src\ScitillaComponent;..\src\TinyXml;..\src\TinyXml\tinyXmlA;..\src\WinControls;..\src\WinControls\AboutDlg;..\src\WinControls\ColourPicker;..\src\WinControls\ContextMenu;..\src\WinControls\DockingWnd;..\src\WinControls\Grid;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\Preference;..\src\WinControls\shortcut;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\StaticDialog\RunDlg;..\src\WinControls\StatusBar;..\src\WinControls\TabBar;..\src\WinControls\TaskList;..\src\WinControls\ToolBar;..\src\WinControls\ToolTip;..\src\WinControls\TrayIcon;..\src\WinControls\WindowsDlg"
+				WholeProgramOptimization="true"
+				AdditionalIncludeDirectories="..\src\WinControls\AboutDlg;..\..\scintilla\include;..\include;..\src\WinControls;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\TabBar;..\src\WinControls\ToolBar;..\src\MISC\Process;..\src\ScitillaComponent;..\src\MISC;..\src\MISC\SysMsg;..\src\WinControls\StatusBar;..\src;..\src\WinControls\StaticDialog\RunDlg;..\src\tinyxml;..\src\WinControls\ColourPicker;..\src\Win32Explr;..\src\MISC\RegExt;..\src\WinControls\TrayIcon;..\src\WinControls\shortcut;..\src\WinControls\Grid;..\src\WinControls\ContextMenu;..\src\MISC\PluginsManager;..\src\WinControls\Preference;..\src\WinControls\WindowsDlg;..\src\WinControls\TaskList;..\src\WinControls\DockingWnd;..\src\WinControls\ToolTip;..\src\MISC\Exception;..\src\MISC\Common;..\src\tinyxml\tinyXmlA"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;TIXMLA_USE_STL"
 				StringPooling="true"
-				ExceptionHandling="0"
+				ExceptionHandling="2"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
+				DefaultCharIsUnsigned="true"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="precompiled_headers.h"
+				PrecompiledHeaderFile="$(IntDir)\$(TargetName).pch"
+				WarningLevel="4"
+				WarnAsError="true"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
-				ForcedIncludeFiles="Common.h"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -159,7 +164,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/OPT:WIN98"
 				AdditionalDependencies="comctl32.lib shlwapi.lib shell32.lib Oleacc.lib"
 				ShowProgress="2"
 				OutputFile="../bin/notepad++A.exe"
@@ -167,12 +171,12 @@
 				LinkIncremental="1"
 				TypeLibraryFile=""
 				TypeLibraryResourceID="1"
-				GenerateDebugInformation="false"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile=""
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
+				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -194,6 +198,9 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine="IF NOT EXIST ..\bin\config.xml COPY ..\src\config.model.xml ..\bin\config.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\config.model.xml COPY ..\src\config.model.xml ..\bin\config.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.xml COPY ..\src\langs.model.xml ..\bin\langs.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.model.xml COPY ..\src\langs.model.xml ..\bin\langs.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.xml COPY ..\src\stylers.model.xml ..\bin\stylers.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.model.xml COPY ..\src\stylers.model.xml ..\bin\stylers.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\LINEDRAW.TTF COPY ..\src\font\LINEDRAW.TTF ..\bin\LINEDRAW.TTF&#x0D;&#x0A;IF NOT EXIST ..\bin\contextMenu.xml COPY ..\src\contextMenu.xml ..\bin\contextMenu.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\shortcuts.xml COPY ..\src\shortcuts.xml ..\bin\shortcuts.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\userDefineLang.xml COPY ..\src\userDefineLang.xml ..\bin\userDefineLang.xml&#x0D;&#x0A;"
 			/>
@@ -203,7 +210,7 @@
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC70.vsprops"
 			CharacterSet="1"
 			>
 			<Tool
@@ -223,20 +230,22 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/EHa"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\scintilla\include;..\src;..\src\MISC;..\src\MISC\Common;..\src\MISC\Exception;..\src\MISC\PluginsManager;..\src\MISC\Process;..\src\MISC\RegExt;..\src\ScitillaComponent;..\src\TinyXml;..\src\TinyXml\tinyXmlA;..\src\WinControls;..\src\WinControls\AboutDlg;..\src\WinControls\ColourPicker;..\src\WinControls\ContextMenu;..\src\WinControls\DockingWnd;..\src\WinControls\Grid;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\Preference;..\src\WinControls\shortcut;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\StaticDialog\RunDlg;..\src\WinControls\StatusBar;..\src\WinControls\TabBar;..\src\WinControls\TaskList;..\src\WinControls\ToolBar;..\src\WinControls\ToolTip;..\src\WinControls\TrayIcon;..\src\WinControls\WindowsDlg"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;TIXML_USE_STL;TIXMLA_USE_STL"
+				FavorSizeOrSpeed="0"
+				AdditionalIncludeDirectories="..\src\WinControls\AboutDlg;..\..\scintilla\include;..\include;..\src\WinControls;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\TabBar;..\src\WinControls\ToolBar;..\src\MISC\Process;..\src\ScitillaComponent;..\src\MISC;..\src\MISC\SysMsg;..\src\WinControls\StatusBar;..\src;..\src\WinControls\StaticDialog\RunDlg;..\src\tinyxml;..\src\WinControls\ColourPicker;..\src\Win32Explr;..\src\MISC\RegExt;..\src\WinControls\TrayIcon;..\src\WinControls\shortcut;..\src\WinControls\Grid;..\src\WinControls\ContextMenu;..\src\MISC\PluginsManager;..\src\WinControls\Preference;..\src\WinControls\WindowsDlg;..\src\WinControls\TaskList;..\src\WinControls\DockingWnd;..\src\WinControls\ToolTip;..\src\MISC\Exception;..\src\MISC\Common;..\src\tinyxml\tinyXmlA"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;TIXML_USE_STL;TIXMLA_USE_STL"
 				MinimalRebuild="true"
-				ExceptionHandling="0"
+				ExceptionHandling="2"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=""
-				WarningLevel="3"
+				DefaultCharIsUnsigned="true"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="precompiled_headers.h"
+				PrecompiledHeaderFile="$(IntDir)\$(TargetName).pch"
+				WarningLevel="4"
+				WarnAsError="true"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
-				ForcedIncludeFiles="Common.h"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -249,20 +258,17 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="/fixed:no"
 				AdditionalDependencies="unicows.lib comctl32.lib shlwapi.lib shell32.lib"
 				ShowProgress="2"
 				OutputFile="../bin/notepad++Debug.exe"
 				Version="1.0"
 				LinkIncremental="1"
-				IgnoreAllDefaultLibraries="false"
-				IgnoreDefaultLibraryNames=""
 				TypeLibraryFile="/TLBID"
 				TypeLibraryResourceID="5"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/notepadPlus.pdb"
 				SubSystem="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -284,6 +290,9 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine="IF NOT EXIST ..\bin\config.xml COPY ..\src\config.model.xml ..\bin\config.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\config.model.xml COPY ..\src\config.model.xml ..\bin\config.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.xml COPY ..\src\langs.model.xml ..\bin\langs.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.model.xml COPY ..\src\langs.model.xml ..\bin\langs.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.xml COPY ..\src\stylers.model.xml ..\bin\stylers.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.model.xml COPY ..\src\stylers.model.xml ..\bin\stylers.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\LINEDRAW.TTF COPY ..\src\font\LINEDRAW.TTF ..\bin\LINEDRAW.TTF&#x0D;&#x0A;IF NOT EXIST ..\bin\contextMenu.xml COPY ..\src\contextMenu.xml ..\bin\contextMenu.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\shortcuts.xml COPY ..\src\shortcuts.xml ..\bin\shortcuts.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\userDefineLang.xml COPY ..\src\userDefineLang.xml ..\bin\userDefineLang.xml&#x0D;&#x0A;"
 			/>
@@ -293,7 +302,7 @@
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC70.vsprops"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -314,22 +323,25 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/EHa"
 				Optimization="2"
-				InlineFunctionExpansion="1"
-				FavorSizeOrSpeed="2"
+				InlineFunctionExpansion="2"
+				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\..\scintilla\include;..\src;..\src\MISC;..\src\MISC\Common;..\src\MISC\Exception;..\src\MISC\PluginsManager;..\src\MISC\Process;..\src\MISC\RegExt;..\src\ScitillaComponent;..\src\TinyXml;..\src\TinyXml\tinyXmlA;..\src\WinControls;..\src\WinControls\AboutDlg;..\src\WinControls\ColourPicker;..\src\WinControls\ContextMenu;..\src\WinControls\DockingWnd;..\src\WinControls\Grid;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\Preference;..\src\WinControls\shortcut;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\StaticDialog\RunDlg;..\src\WinControls\StatusBar;..\src\WinControls\TabBar;..\src\WinControls\TaskList;..\src\WinControls\ToolBar;..\src\WinControls\ToolTip;..\src\WinControls\TrayIcon;..\src\WinControls\WindowsDlg"
+				WholeProgramOptimization="true"
+				AdditionalIncludeDirectories="..\src\WinControls\AboutDlg;..\..\scintilla\include;..\include;..\src\WinControls;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\TabBar;..\src\WinControls\ToolBar;..\src\MISC\Process;..\src\ScitillaComponent;..\src\MISC;..\src\MISC\SysMsg;..\src\WinControls\StatusBar;..\src;..\src\WinControls\StaticDialog\RunDlg;..\src\tinyxml;..\src\WinControls\ColourPicker;..\src\Win32Explr;..\src\MISC\RegExt;..\src\WinControls\TrayIcon;..\src\WinControls\shortcut;..\src\WinControls\Grid;..\src\WinControls\ContextMenu;..\src\MISC\PluginsManager;..\src\WinControls\Preference;..\src\WinControls\WindowsDlg;..\src\WinControls\TaskList;..\src\WinControls\DockingWnd;..\src\WinControls\ToolTip;..\src\MISC\Exception;..\src\MISC\Common;..\src\tinyxml\tinyXmlA"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;TIXMLA_USE_STL"
 				StringPooling="true"
-				ExceptionHandling="0"
+				ExceptionHandling="2"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
+				DefaultCharIsUnsigned="true"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="precompiled_headers.h"
+				PrecompiledHeaderFile="$(IntDir)\$(TargetName).pch"
+				WarningLevel="4"
+				WarnAsError="true"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
-				ForcedIncludeFiles="Common.h"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -342,7 +354,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/OPT:WIN98"
 				AdditionalDependencies="unicows.lib comctl32.lib shlwapi.lib shell32.lib Oleacc.lib"
 				ShowProgress="2"
 				OutputFile="../bin/notepad++.exe"
@@ -350,12 +361,12 @@
 				LinkIncremental="1"
 				TypeLibraryFile=""
 				TypeLibraryResourceID="1"
-				GenerateDebugInformation="false"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile=""
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
+				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -375,6 +386,9 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -402,6 +416,42 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\precompiled_headers.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug Unicode|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release Unicode|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath="..\src\UniConversion.cpp"
 				>
 			</File>
@@ -410,16 +460,12 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\ValueDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\winmain.cpp"
 				>
-				<FileConfiguration
-					Name="Debug Unicode|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						GeneratePreprocessedFile="0"
-					/>
-				</FileConfiguration>
 			</File>
 			<Filter
 				Name="MISC"
@@ -445,7 +491,27 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Misc\Exception\Win32Exception.cpp"
+					RelativePath="..\src\MISC\Exception\Win32Exception.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Parameters"
+				>
+				<File
+					RelativePath="..\src\npp_session.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\npp_styles.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\npp_winver.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Parameters_def.cpp"
 					>
 				</File>
 			</Filter>
@@ -535,6 +601,10 @@
 						RelativePath="..\src\TinyXml\tinyXmlA\tinyxmlerrorA.cpp"
 						>
 					</File>
+					<File
+						RelativePath="..\src\TinyXml\tinyXmlA\tinyxmlparserA.cpp"
+						>
+					</File>
 				</Filter>
 			</Filter>
 			<Filter
@@ -561,11 +631,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\WinControls\ContextMenu\ContextMenu.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\WinControls\TabBar\ControlsTab.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\src\WinControls\DockingWnd\DockingCont.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\WinControls\DockingWnd\DockingDlgInterface.cpp"
 					>
 				</File>
 				<File
@@ -637,6 +715,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\WinControls\TaskList\TaskListDlg.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\WinControls\ToolBar\ToolBar.cpp"
 					>
 				</File>
@@ -675,10 +757,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc"
 			>
 			<File
-				RelativePath="..\src\constant.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\keys.h"
 				>
 			</File>
@@ -687,7 +765,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\lesDlgs.h"
+				RelativePath="..\src\localizationString.h"
 				>
 			</File>
 			<File
@@ -703,7 +781,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\precompiled_headers.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\resource.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\targetver.h"
 				>
 			</File>
 			<File
@@ -712,6 +798,14 @@
 			</File>
 			<File
 				RelativePath="..\src\Utf8_16.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\ValueDlg.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\xpm_icons.h"
 				>
 			</File>
 			<Filter
@@ -754,7 +848,27 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Misc\Exception\Win32Exception.h"
+					RelativePath="..\src\MISC\Exception\Win32Exception.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Parameters"
+				>
+				<File
+					RelativePath="..\src\npp_session.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\npp_styles.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\npp_winver.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Parameters_def.h"
 					>
 				</File>
 			</Filter>
@@ -770,6 +884,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\ScitillaComponent\BufferID.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\ScitillaComponent\colors.h"
 					>
 				</File>
@@ -778,11 +896,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\ScitillaComponent\columnEditor_rc.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\ScitillaComponent\DocTabView.h"
 					>
 				</File>
 				<File
 					RelativePath="..\src\ScitillaComponent\FindReplaceDlg.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\ScitillaComponent\FindReplaceDlg_rc.h"
 					>
 				</File>
 				<File
@@ -799,6 +925,10 @@
 				</File>
 				<File
 					RelativePath="..\src\ScitillaComponent\ScintillaEditView.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\ScitillaComponent\ScintillaRef.h"
 					>
 				</File>
 				<File
@@ -844,10 +974,6 @@
 						RelativePath="..\src\TinyXml\tinyXmlA\tinyxmlA.h"
 						>
 					</File>
-					<File
-						RelativePath="..\src\TinyXml\tinyXmlA\tinyxmlparserA.cpp"
-						>
-					</File>
 				</Filter>
 			</Filter>
 			<Filter
@@ -874,7 +1000,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\WinControls\DockingWnd\common_func.h"
+					RelativePath="..\src\WinControls\ColourPicker\ColourPopupResource.h"
 					>
 				</File>
 				<File
@@ -910,6 +1036,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\WinControls\DockingWnd\DropData.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\WinControls\OpenSaveFileDialog\FileDialog.h"
 					>
 				</File>
@@ -922,11 +1052,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\WinControls\Preference\preference_rc.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\WinControls\Preference\preferenceDlg.h"
 					>
 				</File>
 				<File
 					RelativePath="..\src\WinControls\StaticDialog\RunDlg\RunDlg.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\WinControls\StaticDialog\RunDlg\RunDlg_rc.h"
 					>
 				</File>
 				<File
@@ -947,6 +1085,10 @@
 				</File>
 				<File
 					RelativePath="..\src\WinControls\Grid\ShortcutMapper_rc.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\WinControls\shortcut\shortcutRc.h"
 					>
 				</File>
 				<File
@@ -998,6 +1140,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\WinControls\TreeView\TreeView.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\WinControls\AboutDlg\URLCtrl.h"
 					>
 				</File>
@@ -1025,6 +1171,10 @@
 					RelativePath="..\src\WinControls\ColourPicker\WordStyleDlg.h"
 					>
 				</File>
+				<File
+					RelativePath="..\src\WinControls\ColourPicker\WordStyleDlgRes.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -1036,6 +1186,154 @@
 				RelativePath="..\src\notepad++.exe.manifest"
 				>
 			</File>
+			<Filter
+				Name="Bitmaps"
+				>
+				<File
+					RelativePath="..\src\icons\closeAll.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\closeFile.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\closeTabButton.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\closeTabButton_hover.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\closeTabButton_inact.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\closeTabButton_push.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\copy.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\cut.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\find.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\findReplace.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\indentGuide.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\invisibleChar.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\newFile.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\openFile.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\paste.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\playRecord.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\playRecord_m.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\print.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\redo.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\saveAll.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\saveFile.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\saveRecord.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\showPannel.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\startRecord.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\stopRecord.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\syncH.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\syncV.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\undo.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\wrap.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\zoomIn.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\zoomOut.bmp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Cursors"
+				>
+				<File
+					RelativePath="..\src\cursors\drag.cur"
+					>
+				</File>
+				<File
+					RelativePath="..\src\cursors\drag_interdit.cur"
+					>
+				</File>
+				<File
+					RelativePath="..\src\cursors\drag_out.cur"
+					>
+				</File>
+				<File
+					RelativePath="..\src\cursors\drag_plus.cur"
+					>
+				</File>
+			</Filter>
 			<Filter
 				Name="Icons"
 				>
@@ -1060,15 +1358,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\default_close.ico"
-					>
-				</File>
-				<File
-					RelativePath="..\src\default_new.ico"
-					>
-				</File>
-				<File
-					RelativePath="..\src\default_open.ico"
+					RelativePath="..\src\icons\delete.ico"
 					>
 				</File>
 				<File
@@ -1100,23 +1390,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\hot_close.ico"
-					>
-				</File>
-				<File
-					RelativePath="..\src\hot_new.ico"
-					>
-				</File>
-				<File
-					RelativePath="..\src\hot_open.ico"
-					>
-				</File>
-				<File
-					RelativePath="..\src\icons\icon10.ico"
-					>
-				</File>
-				<File
-					RelativePath="..\src\icons\imp_off.ico"
+					RelativePath="..\src\icons\findResult.ico"
 					>
 				</File>
 				<File
@@ -1168,6 +1442,30 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\icons\playrecord_dis.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\playrecord_m_dis.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\playrecord_m_off.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\playrecord_m_on.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\playrecord_off.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\playrecord_on.ico"
+					>
+				</File>
+				<File
 					RelativePath="..\src\icons\readonly.ico"
 					>
 				</File>
@@ -1212,6 +1510,42 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\icons\saverecord_dis.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\saverecord_off.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\saverecord_on.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\startrecord_dis.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\startrecord_off.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\startrecord_on.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\stoprecord_dis.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\stoprecord_off.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\stoprecord_on.ico"
+					>
+				</File>
+				<File
 					RelativePath="..\src\icons\supp_off.ico"
 					>
 				</File>
@@ -1225,6 +1559,30 @@
 				</File>
 				<File
 					RelativePath="..\src\icons\suppall_on.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\syncH_dis.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\syncH_off.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\syncH_on.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\syncV_dis.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\syncV_off.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\syncV_on.ico"
 					>
 				</File>
 				<File
@@ -1337,74 +1695,6 @@
 				</File>
 				<File
 					RelativePath="..\src\WinControls\ColourPicker\WordStyleDlg.rc"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Cursors"
-				>
-				<File
-					RelativePath="..\src\cursors\drag.cur"
-					>
-				</File>
-				<File
-					RelativePath="..\src\cursors\drag_interdit.cur"
-					>
-				</File>
-				<File
-					RelativePath="..\src\cursors\drag_plus.cur"
-					>
-				</File>
-				<File
-					RelativePath="..\src\cursors\up.cur"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Bitmaps"
-				>
-				<File
-					RelativePath="..\src\icons\closeAll.bmp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\icons\closefile.bmp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\icons\find.bmp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\icons\findReplace.bmp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\icons\indentGuide.bmp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\icons\invisibleChar.bmp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\icons\saveAll.bmp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\icons\showPannel.bmp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\icons\wrap.bmp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\icons\zoomIn.bmp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\icons\zoomOut.bmp"
 					>
 				</File>
 			</Filter>

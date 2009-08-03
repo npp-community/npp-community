@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="SciLexer"
+	Name="SciLexer.vc.9"
 	ProjectGUID="{55121E73-EAE3-438B-A537-BABBCA29B084}"
 	RootNamespace="SciLexer"
 	Keyword="Win32Proj"
@@ -71,11 +71,11 @@
 				LinkIncremental="2"
 				ModuleDefinitionFile="..\win32\Scintilla.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/SciLexer.7.pdb"
+				ProgramDatabaseFile="$(OutDir)/SciLexer.9.pdb"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary="$(OutDir)/SciLexer.7.lib"
+				ImportLibrary="$(OutDir)/SciLexer.9.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -130,7 +130,9 @@
 				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="..\include;..\src"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SCILEXER7_EXPORTS;SCI_LEXER;_CRT_SECURE_NO_WARNINGS"
+				StringPooling="true"
 				RuntimeLibrary="0"
+				EnableFunctionLevelLinking="true"
 				DefaultCharIsUnsigned="true"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="precompiled_headers.h"
@@ -160,7 +162,7 @@
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary="$(OutDir)/SciLexer.7.lib"
+				ImportLibrary="$(OutDir)/SciLexer.9.lib"
 				TargetMachine="1"
 			/>
 			<Tool
