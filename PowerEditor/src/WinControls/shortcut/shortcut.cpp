@@ -511,7 +511,7 @@ BYTE Shortcut::getAcceleratorModifiers()
 	return ( FVIRTKEY | (_keyCombo._isCtrl?FCONTROL:0) | (_keyCombo._isAlt?FALT:0) | (_keyCombo._isShift?FSHIFT:0) );
 }
 
-Shortcut & Shortcut::operator=( const Shortcut & sc )
+const Shortcut & Shortcut::operator=( const Shortcut & sc )
 {
 	//Do not allow setting empty names
 	//So either we have an empty name or the other name has to be set

@@ -853,7 +853,7 @@ void WordStyleDlg::setStyleListFromLexer(int index)
     for (int i = 0 ; i < lexerStyler.getNbStyler() ; i++)
     {
         Style & style = lexerStyler.getStyler(i);
-		::SendDlgItemMessage(_hSelf, IDC_STYLES_LIST, LB_ADDSTRING, 0, (LPARAM)style._styleDesc);
+		::SendDlgItemMessage(_hSelf, IDC_STYLES_LIST, LB_ADDSTRING, 0, (LPARAM)style._styleDesc.c_str());
     }
 	::SendDlgItemMessage(_hSelf, IDC_STYLES_LIST, LB_SETCURSEL, 0, 0);
     setVisualFromStyleList();
@@ -866,7 +866,7 @@ void WordStyleDlg::setVisualFromStyleList()
     Style & style = getCurrentStyler();
 
 	// Global override style
-	if (lstrcmp(style._styleDesc, TEXT("Global override")) == 0)
+	if (style._styleDesc == TEXT("Global override"))
 	{
 		showGlobalOverrideCtrls(true);
 	}
@@ -920,18 +920,10 @@ void WordStyleDlg::setVisualFromStyleList()
 
 	//-- font name
 	isEnable = false;
-	int iFontName;
-	if (style._fontName != NULL)
-	{
-		iFontName = ::SendMessage(_hFontNameCombo, CB_FINDSTRING, 1, (LPARAM)style._fontName);
-		if (iFontName == CB_ERR)
-			iFontName = 0;
-		isEnable = true;
-	}
-	else
-	{
+	int iFontName = ::SendMessage(_hFontNameCombo, CB_FINDSTRING, 1, (LPARAM)style._fontName.c_str());
+	if (iFontName == CB_ERR)
 		iFontName = 0;
-	}
+	isEnable = true;
 	::SendMessage(_hFontNameCombo, CB_SETCURSEL, iFontName, 0);
 	enableFontName(isEnable);
 

@@ -1837,9 +1837,6 @@ void NppParameters::writeUserDefinedLang()
 		_pXmlUserLangDoc = new TiXmlDocument(_userDefineLangPath);
 	}
 
-	//before remove the branch, we allocate and copy the TCHAR * which will be destroyed
-	stylerStrOp(DUP);
-
 	TiXmlNode *root = _pXmlUserLangDoc->FirstChild(TEXT("NotepadPlus"));
 	if (root)
 	{
@@ -1855,7 +1852,6 @@ void NppParameters::writeUserDefinedLang()
 		insertUserLang2Tree(root, _userLangArray[i]);
 	}
 	_pXmlUserLangDoc->SaveFile();
-	stylerStrOp(FREE);
 }
 
 void NppParameters::insertCmd(TiXmlNode *shortcutsRoot, const CommandShortcut & cmd)
@@ -4488,10 +4484,10 @@ void NppParameters::writeStyle2Element(Style & style2Wite, Style & style2Sync, T
 	    element->SetAttribute(TEXT("colorStyle"), style2Wite._colorStyle);
     }
 
-    if (style2Wite._fontName)
+    if (!style2Wite._fontName.empty())
     {
         const TCHAR *oldFontName = element->Attribute(TEXT("fontName"));
-        if (lstrcmp(oldFontName, style2Wite._fontName))
+        if (style2Wite._fontName != oldFontName)
         {
 		    element->SetAttribute(TEXT("fontName"), style2Wite._fontName);
             style2Sync._fontName = style2Wite._fontName = element->Attribute(TEXT("fontName"));
@@ -4587,7 +4583,7 @@ void NppParameters::insertUserLang2Tree(TiXmlNode *node, UserLangContainer *user
 			styleElement->SetAttribute(TEXT("colorStyle"), style2Wite._colorStyle);
 		}
 
-		if (style2Wite._fontName)
+		if (!style2Wite._fontName.empty())
 		{
 			styleElement->SetAttribute(TEXT("fontName"), style2Wite._fontName);
 		}
@@ -4607,40 +4603,6 @@ void NppParameters::insertUserLang2Tree(TiXmlNode *node, UserLangContainer *user
 				styleElement->SetAttribute(TEXT("fontSize"), TEXT(""));
 			else
 				styleElement->SetAttribute(TEXT("fontSize"), style2Wite._fontSize);
-		}
-	}
-}
-
-void NppParameters::stylerStrOp(bool op)
-{
-	for (int i = 0 ; i < _nbUserLang ; i++)
-	{
-		int nbStyler = _userLangArray[i]->_styleArray.getNbStyler();
-		for (int j = 0 ; j < nbStyler ; j++)
-		{
-			Style & style = _userLangArray[i]->_styleArray.getStyler(j);
-
-			if (op == DUP)
-			{
-				TCHAR *str = new TCHAR[lstrlen(style._styleDesc) + 1];
-				style._styleDesc = lstrcpy(str, style._styleDesc);
-				if (style._fontName)
-				{
-					str = new TCHAR[lstrlen(style._fontName) + 1];
-					style._fontName = lstrcpy(str, style._fontName);
-				}
-				else
-				{
-					str = new TCHAR[2];
-					str[0] = str[1] = '\0';
-					style._fontName = str;
-				}
-			}
-			else
-			{
-				delete [] style._styleDesc;
-				delete [] style._fontName;
-			}
 		}
 	}
 }

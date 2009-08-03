@@ -30,11 +30,9 @@
 
 Style::Style() :
 	_styleID(-1),
-	_styleDesc(NULL),
 	_fgColor(COLORREF(-1)),
 	_bgColor(COLORREF(-1)),
 	_colorStyle(COLORSTYLE_ALL),
-	_fontName(NULL),
 	_fontStyle(-1),
 	_fontSize(-1),
 	_keywordClass(-1),
@@ -206,7 +204,10 @@ void StyleArray::addStyler(int styleID, TiXmlNode *styleNode)
 		}
 
 		str = element->Attribute(TEXT("fontName"));
-		_styleArray[_nbStyler]._fontName = str;
+		if (str)
+		{
+			_styleArray[_nbStyler]._fontName = str;
+		}
 
 		str = element->Attribute(TEXT("fontStyle"));
 		if (str)
@@ -263,7 +264,7 @@ int StyleArray::getStylerIndexByName( const TCHAR *name ) const
 
 	for (int i = 0 ; i < _nbStyler ; i++)
 	{
-		if (!lstrcmp(_styleArray[i]._styleDesc, name))
+		if (_styleArray[i]._styleDesc == name)
 		{
 			return i;
 		}

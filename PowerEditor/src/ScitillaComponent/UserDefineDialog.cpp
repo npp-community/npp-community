@@ -212,7 +212,7 @@ void SharedParametersDialog::styleUpdate(const Style & style, ColourPicker *pFgC
 	pBgColourPicker->redraw();
 
 	HWND hFontCombo = ::GetDlgItem(_hSelf, fontComboId);
-	int i = ::SendMessage(hFontCombo, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)style._fontName);
+	int i = ::SendMessage(hFontCombo, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)style._fontName.c_str());
 	if (i == CB_ERR)
 		i = 0;
 	::SendMessage(hFontCombo, CB_SETCURSEL, i, 0);

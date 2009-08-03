@@ -38,12 +38,12 @@ class TiXmlNode;
 struct Style
 {
 	int _styleID;
-	const TCHAR *_styleDesc;
+	std::generic_string _styleDesc;
 
 	COLORREF _fgColor;
 	COLORREF _bgColor;
 	int _colorStyle;
-	const TCHAR *_fontName;
+	std::generic_string _fontName;
 	int _fontStyle;
 	int _fontSize;
 

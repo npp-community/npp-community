@@ -110,7 +110,7 @@ protected:
 
 private:
 	// Since there's no public ctor, we need to void the default assignment operator.
-	WcharMbcsConvertor& operator= (const WcharMbcsConvertor&);
+	const WcharMbcsConvertor& operator= (const WcharMbcsConvertor&);
 };
 
 #define ERROR_MSG_SIZE 1024

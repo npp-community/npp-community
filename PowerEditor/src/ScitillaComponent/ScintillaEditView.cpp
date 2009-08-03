@@ -418,11 +418,11 @@ void ScintillaEditView::setSpecialStyle(const Style & styleToSet)
     if ( styleToSet._colorStyle & COLORSTYLE_BACKGROUND )
 	    execute(SCI_STYLESETBACK, styleID, styleToSet._bgColor);
 
-    if (styleToSet._fontName && lstrcmp(styleToSet._fontName, TEXT("")) != 0)
+    if (styleToSet._fontName != TEXT(""))
 	{
 #ifdef UNICODE
 		WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
-		const char * fontNameA = wmc->wchar2char(styleToSet._fontName, CP_ACP);
+		const char * fontNameA = wmc->wchar2char(styleToSet._fontName.c_str(), CP_ACP);
 		execute(SCI_STYLESETFONT, (WPARAM)styleID, (LPARAM)fontNameA);
 #else
 		execute(SCI_STYLESETFONT, (WPARAM)styleID, (LPARAM)styleToSet._fontName);
@@ -479,7 +479,7 @@ void ScintillaEditView::setStyle(const Style& styleToSet)
 					}
 				}
 			}
-			if (go.enableFont && style._fontName && style._fontName[0])
+			if (go.enableFont && !style._fontName.empty())
 				styleCopy._fontName = style._fontName;
 			if (go.enableFontSize && (style._fontSize > 0))
 				styleCopy._fontSize = style._fontSize;
@@ -2731,10 +2731,6 @@ ScintillaEditView::~ScintillaEditView()
 	{
 		for (StyleMap::iterator it2(it->second->begin()) ; it2 != it->second->end() ; ++it2)
 		{
-			if (it2->second->_fontName != NULL)
-			{
-				delete [] it2->second->_fontName;
-			}
 			delete it2->second;
 		}
 		delete it->second;

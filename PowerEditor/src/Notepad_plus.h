@@ -158,7 +158,7 @@ class Notepad_plus : public Window {
 public:
 	Notepad_plus();
 	virtual ~Notepad_plus();
-	void init(HINSTANCE, HWND, const TCHAR *cmdLine, CmdLineParams *cmdLineParams);
+	void init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLine, CmdLineParams *cmdLineParams);
 	void killAllChildren();
 
     static const TCHAR * getClassName() {
