@@ -36,7 +36,10 @@ public :
 	}
 
 public:
+	//(Warning -- Member with different signature hides virtual member 'Window::init(struct HINSTANCE__ *, struct HWND__ *)'
+	//lint -e1411
 	void init(HINSTANCE hInst, HWND hWnd, HWND hMessage, UINT flags);
+	//lint +e1411
 
 protected:
 

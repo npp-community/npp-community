@@ -33,7 +33,10 @@ public :
 		{
 			memset(&_p, 0, sizeof(POINT));
 		}
+		//(Warning -- Member with different signature hides virtual member 'Window::init(struct HINSTANCE__ *, struct HWND__ *)'
+		//lint -e1411
         void init(HINSTANCE hInst, HWND parent, int valueToSet, const TCHAR *text);
+		//lint +e1411
         int doDialog(POINT p, bool isRTL = false);
 		void setNBNumber(int nbNumber);
 		int reSizeValueBox();

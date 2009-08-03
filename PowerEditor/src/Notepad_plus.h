@@ -158,7 +158,10 @@ class Notepad_plus : public Window {
 public:
 	Notepad_plus();
 	virtual ~Notepad_plus();
+	//(Warning -- Member with different signature hides virtual member 'Window::init(struct HINSTANCE__ *, struct HWND__ *)'
+	//lint -e1411
 	void init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLine, CmdLineParams *cmdLineParams);
+	//lint +e1411
 	void killAllChildren();
 
     static const TCHAR * getClassName() {

@@ -34,7 +34,10 @@ public:
 
 	virtual void destroy();
 
+	//(Warning -- Member with different signature hides virtual member 'Window::init(struct HINSTANCE__ *, struct HWND__ *)'
+	//lint -e1411
 	void init(HINSTANCE hInst, HWND hwnd, HIMAGELIST hImaLst, int nbItem, int index2set);
+	//lint +e1411
 
 	void setFont(TCHAR *fontName, size_t fontSize);
 

@@ -919,11 +919,10 @@ void WordStyleDlg::setVisualFromStyleList()
 	enableBg(isEnable);
 
 	//-- font name
-	isEnable = false;
+	isEnable = true;
 	int iFontName = ::SendMessage(_hFontNameCombo, CB_FINDSTRING, 1, (LPARAM)style._fontName.c_str());
 	if (iFontName == CB_ERR)
 		iFontName = 0;
-	isEnable = true;
 	::SendMessage(_hFontNameCombo, CB_SETCURSEL, iFontName, 0);
 	enableFontName(isEnable);
 

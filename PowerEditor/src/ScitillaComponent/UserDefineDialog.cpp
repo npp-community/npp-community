@@ -70,6 +70,8 @@ public :
 	{
 	}
 
+	//(Warning -- Member with different signature hides virtual member 'Window::init(struct HINSTANCE__ *, struct HWND__ *)'
+	//lint -e1411
 	void init(HINSTANCE hInst, HWND parent, TCHAR *title, TCHAR *staticName, TCHAR *text2Set, int txtLen = 0)
 	{
 		Window::init(hInst, parent);
@@ -78,6 +80,7 @@ public :
 		_textValue = text2Set;
 		_txtLen = txtLen;
 	}
+	//lint +e1411
 
 	long doDialog();
 

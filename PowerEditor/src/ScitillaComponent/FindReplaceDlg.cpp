@@ -506,15 +506,18 @@ public:
 	{
 		_MarkingsStruct._length = 0;
 		_MarkingsStruct._markings = NULL;
-	};
+	}
 
 	~Finder() {
 		_scintView.destroy();
 	}
+	//(Warning -- Member with different signature hides virtual member 'Window::init(struct HINSTANCE__ *, struct HWND__ *)'
+	//lint -e1411
 	void init(HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView) {
 		DockingDlgInterface::init(hInst, hPere);
 		_ppEditView = ppEditView;
-	};
+	}
+	//lint +e1411
 
 	void addSearchLine(const TCHAR *searchName) {
 		std::generic_string str = TEXT("Search \"");
@@ -528,7 +531,7 @@ public:
 
 		_pMainFoundInfos->push_back(EmptyFoundInfo);
 		_pMainMarkings->push_back(EmptySearchResultMarking);
-	};
+	}
 
 	void addFileNameTitle(const TCHAR * fileName) {
 		std::generic_string str = TEXT("  ");
@@ -542,7 +545,7 @@ public:
 
 		_pMainFoundInfos->push_back(EmptyFoundInfo);
 		_pMainMarkings->push_back(EmptySearchResultMarking);
-	};
+	}
 
 	void addFileHitCount(int count) {
 		TCHAR text[20];
@@ -551,7 +554,7 @@ public:
 		_scintView.insertGenericTextFrom(_lastFileHeaderPos, text);
 		setFinderReadOnly(true);
 		nFoundFiles++;
-	};
+	}
 
 	void addSearchHitCount(int count) {
 		TCHAR text[50];
@@ -559,7 +562,7 @@ public:
 		setFinderReadOnly(false);
 		_scintView.insertGenericTextFrom(_lastSearchHeaderPos, text);
 		setFinderReadOnly(true);
-	};
+	}
 
 
 	void add(FoundInfo fi, SearchResultMarking mi, const TCHAR* foundline, int lineNb) {
@@ -584,7 +587,7 @@ public:
 		_scintView.addGenericText(str.c_str(), &mi._start, &mi._end);
 		setFinderReadOnly(true);
 		_pMainMarkings->push_back(mi);
-	};
+	}
 
 	void setFinderStyle();
 
@@ -594,7 +597,7 @@ public:
 		setFinderReadOnly(false);
 		_scintView.execute(SCI_CLEARALL);
 		setFinderReadOnly(true);
-	};
+	}
 
 	void beginNewFilesSearch() {
 		_scintView.execute(SCI_SETLEXER, SCLEX_NULL);
@@ -606,7 +609,7 @@ public:
 
 		// fold all old searches (1st level only)
 		_scintView.collapse(searchHeaderLevel - SC_FOLDLEVELBASE, fold_collapse);
-	};
+	}
 
 	void finishFilesSearch(int count) {
 		std::vector<FoundInfo>* _pOldFoundInfos;
@@ -628,7 +631,7 @@ public:
 		_scintView.execute(SCI_SETSEL, 0, 0);
 
 		_scintView.execute(SCI_SETLEXER, SCLEX_SEARCHRESULT);
-	};
+	}
 
 
 	void gotoNextFoundResult(int direction);
