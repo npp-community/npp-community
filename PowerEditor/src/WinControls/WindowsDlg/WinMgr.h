@@ -173,6 +173,11 @@ public:
 #define RCTOFIT(id)			WINRECT(WRCT_TOFIT,id,0),
 #define RCSPACE(val)			RCFIXED(-1,val)
 
+
+// Somehow, it seems that the assignment operator in CWinGroupIterator throws lint on its ass:
+// 'error 1941: (Note -- Assignment operator for class 'CWinGroupIterator' does not return a const reference to class)'
+// Let's remove that warning here.
+//lint -e1941
 //////////////////
 // Use this to iterate the entries in a group.
 //
@@ -196,6 +201,7 @@ public:
 	WINRECT* pWINRECT()	{ return pCur; }
 	WINRECT* Next()		{ return pCur = pCur ? pCur->Next() : NULL;}
 };
+//lint +e1941
 
 // Registered WinMgr message
 extern const UINT WM_WINMGR;
@@ -217,7 +223,15 @@ struct NMWINMGR : public NMHDR {
 	BOOL processed;
 
 	// ctor: initialize to zeroes
-	NMWINMGR() { memset(this,0,sizeof(NMWINMGR)); }
+	NMWINMGR()
+	{
+		hwndFrom = NULL;
+		idFrom = NULL;
+		code = 0;
+		memset(&sizebar.ptMoved, 0, sizeof(POINT));
+		memset(&sizeinfo, 0, sizeof(SIZEINFO));
+		processed = FALSE;
+	}
 };
 
 ///////////////////

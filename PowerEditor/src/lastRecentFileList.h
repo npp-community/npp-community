@@ -13,7 +13,7 @@ class LastRecentFileList
 {
 public :
 	LastRecentFileList();
-	virtual ~LastRecentFileList();
+	~LastRecentFileList();
 
 	void initMenu(HMENU hMenu, int idBase, int posBase);
 
