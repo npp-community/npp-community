@@ -3,7 +3,7 @@
 
 struct RecentItem {
 	int _id;
-	std::generic_string _name;
+	generic_string _name;
 	RecentItem(const TCHAR * name) : _id(-1), _name(name) {};
 };
 

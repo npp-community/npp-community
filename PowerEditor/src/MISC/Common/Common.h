@@ -88,6 +88,8 @@ std::string wstring2string(const std::wstring & rwString, UINT codepage);
 
 TCHAR *BuildMenuFileName(TCHAR *buffer, int len, int pos, const TCHAR *filename);
 
+void PathRemoveFileSpec(generic_string & path);
+
 class WcharMbcsConvertor
 {
 public:

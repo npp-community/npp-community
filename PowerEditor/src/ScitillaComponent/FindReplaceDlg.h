@@ -48,14 +48,6 @@ enum DIALOG_TYPE {FIND_DLG, REPLACE_DLG, FINDINFILES_DLG};
 
 enum InWhat{ALL_OPEN_DOCS, FILES_IN_DIR, CURRENT_DOC};
 
-struct FoundInfo {
-	FoundInfo(int start, int end, const TCHAR *fullPath)
-		: _start(start), _end(end), _fullPath(fullPath) {};
-	int _start;
-	int _end;
-	std::generic_string _fullPath;
-};
-
 struct TargetRange {
 	int targetStart;
 	int targetEnd;
@@ -115,7 +107,7 @@ public :
 	};
 	const TCHAR * getDir2Search() const {return _directory.c_str();};
 
-	void getPatterns(std::vector<std::generic_string> & patternVect);
+	void getPatterns(std::vector<generic_string> & patternVect);
 
 	void launchFindInFilesDlg() {
 		doDialog(FINDINFILES_DLG);
@@ -123,10 +115,10 @@ public :
 
 	void setFindInFilesDirFilter(const TCHAR *dir, const TCHAR *filters);
 
-	std::generic_string getText2search() const;
+	generic_string getText2search() const;
 
-	const std::generic_string & getFilters() const {return _filters;};
-	const std::generic_string & getDirectory() const {return _directory;};
+	const generic_string & getFilters() const {return _filters;};
+	const generic_string & getDirectory() const {return _directory;};
 	const FindOption & getCurrentOptions() const {return _options;};
 	bool isRecursive() const { return _isRecursive; };
 	bool isInHiddenDir() const { return _isInHiddenDir; };
@@ -145,7 +137,7 @@ public :
 protected :
 	virtual BOOL CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
 	void addText2Combo(const TCHAR * txt2add, HWND comboID, bool isUTF8 = false);
-	std::generic_string getTextFromCombo(HWND hCombo, bool isUnicode = false) const;
+	generic_string getTextFromCombo(HWND hCombo, bool isUnicode = false) const;
 	static LONG originalFinderProc;
 
 	// Window procedure for the finder
@@ -173,8 +165,8 @@ private :
 	// JOCE either remove the magic number, or use a std::string if possible.
 	TCHAR _findAllResultStr[1024];
 
-	std::generic_string _filters;
-	std::generic_string _directory;
+	generic_string _filters;
+	generic_string _directory;
 	bool _isRecursive;
 	bool _isInHiddenDir;
 
@@ -198,8 +190,8 @@ private :
 	void updateCombos();
 	void updateCombo(int comboID);
 	void fillFindHistory();
-	void fillComboHistory(int id, int count, std::generic_string **pStrings);
-	void saveComboHistory(int id, int maxcount, int& oldcount, std::generic_string **pStrings);
+	void fillComboHistory(int id, int count, generic_string **pStrings);
+	void saveComboHistory(int id, int maxcount, int& oldcount, generic_string **pStrings);
 };
 
 //FindIncrementDlg: incremental search dialog, docked in rebar

@@ -18,6 +18,12 @@
 #include "precompiled_headers.h"
 #include "PluginsManager.h"
 
+#include "tinyxml.h"
+
+#include "Parameters.h"
+#include "resource.h"
+
+
 const TCHAR * USERMSG = TEXT("This plugin is not compatible with current version of Notepad++.\n\n\
 Do you want to remove this plugin from plugins directory to prevent this message from the next launch time?");
 
@@ -148,7 +154,7 @@ bool PluginsManager::loadPlugins(const TCHAR *dir)
 					}
 
 					TCHAR xmlPath[MAX_PATH];
-					lstrcpy(xmlPath, nppParams->getNppPath());
+					lstrcpy(xmlPath, nppParams->getNppPath().c_str());
 					PathAppend(xmlPath, TEXT("plugins\\Config"));
 					PathAppend(xmlPath, pi->_moduleName);
 					PathRemoveExtension(xmlPath);
@@ -230,7 +236,7 @@ bool PluginsManager::getShortcutByCmdID(int cmdID, ShortcutKey *sk)
 	if (cmdID == 0 || !sk)
 		return false;
 
-	const vector<PluginCmdShortcut> & pluginCmdSCList = (NppParameters::getInstance())->getPluginCommandList();
+	const std::vector<PluginCmdShortcut> & pluginCmdSCList = (NppParameters::getInstance())->getPluginCommandList();
 
 	for (size_t i = 0 ; i < pluginCmdSCList.size() ; i++)
 	{
@@ -254,7 +260,7 @@ void PluginsManager::setMenu(HMENU hMenu, const TCHAR *menuName)
 {
 	if (hasPlugins())
 	{
-		vector<PluginCmdShortcut> & pluginCmdSCList = (NppParameters::getInstance())->getPluginCommandList();
+		std::vector<PluginCmdShortcut> & pluginCmdSCList = (NppParameters::getInstance())->getPluginCommandList();
 		const TCHAR *nom_menu = (menuName && menuName[0])?menuName:TEXT("Plugins");
 
 		_hPluginsMenu = ::CreateMenu();

@@ -130,7 +130,7 @@ void FileDialog::setExtFilter(const TCHAR *extText, const TCHAR *ext, ...)
     //if (_nbExt < nbExtMax)
     //    lstrcpy(_extArray[_nbExt++], ext);
     //
-	std::generic_string exts;
+	generic_string exts;
 
     va_list pArg;
     va_start(pArg, ext);
@@ -157,7 +157,7 @@ void FileDialog::setExtFilter(const TCHAR *extText, const TCHAR *ext, ...)
 
 int FileDialog::setExtsFilter(const TCHAR *extText, const TCHAR *exts)
 {
-    std::generic_string extFilter = extText;
+    generic_string extFilter = extText;
 	TCHAR *oldFilter = NULL;
 
     extFilter += TEXT(" (");
@@ -253,7 +253,7 @@ stringVector * FileDialog::doOpenMultiFilesDlg()
 		TCHAR fn[MAX_PATH];
 		TCHAR *pFn = _fileName + lstrlen(_fileName) + 1;
 		if (!(*pFn))
-			_fileNames.push_back(std::generic_string(_fileName));
+			_fileNames.push_back(generic_string(_fileName));
 		else
 		{
 			lstrcpy(fn, _fileName);
@@ -266,7 +266,7 @@ stringVector * FileDialog::doOpenMultiFilesDlg()
 		{
 			fn[term] = '\0';
 			lstrcat(fn, pFn);
-			_fileNames.push_back(std::generic_string(fn));
+			_fileNames.push_back(generic_string(fn));
 			pFn += lstrlen(pFn) + 1;
 		}
 

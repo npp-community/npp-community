@@ -58,7 +58,7 @@ class TiXmlElement;
 
 struct Session;
 
-void cutString(const TCHAR *str2cut, std::vector<std::generic_string> & patternVect);
+void cutString(const TCHAR *str2cut, std::vector<generic_string> & patternVect);
 /*
 struct HeaderLineState {
 	HeaderLineState() : _headerLineNumber(0), _isCollapsed(false){};
@@ -162,9 +162,9 @@ struct NewDocDefaultSettings
 struct LangMenuItem {
 	LangType _langType;
 	int	_cmdID;
-	std::generic_string _langName;
+	generic_string _langName;
 
-	LangMenuItem(LangType lt, int cmdID = 0, std::generic_string langName = TEXT("")):
+	LangMenuItem(LangType lt, int cmdID = 0, generic_string langName = TEXT("")):
 	_langType(lt), _cmdID(cmdID), _langName(langName){};
 };
 
@@ -172,17 +172,17 @@ struct PrintSettings {
 	bool _printLineNumber;
 	int _printOption;
 
-	std::generic_string _headerLeft;
-	std::generic_string _headerMiddle;
-	std::generic_string _headerRight;
-	std::generic_string _headerFontName;
+	generic_string _headerLeft;
+	generic_string _headerMiddle;
+	generic_string _headerRight;
+	generic_string _headerFontName;
 	int _headerFontStyle;
 	int _headerFontSize;
 
-	std::generic_string _footerLeft;
-	std::generic_string _footerMiddle;
-	std::generic_string _footerRight;
-	std::generic_string _footerFontName;
+	generic_string _footerLeft;
+	generic_string _footerMiddle;
+	generic_string _footerRight;
+	generic_string _footerFontName;
 	int _footerFontStyle;
 	int _footerFontSize;
 
@@ -291,7 +291,7 @@ struct NppGUI
 	size_t  _autocFromLen;
 	bool _funcParams;
 
-	std::generic_string _definedSessionExt;
+	generic_string _definedSessionExt;
 	bool _neverUpdate;
 	bool _doesExistUpdater;
 	int _caretBlinkRate;
@@ -302,7 +302,7 @@ struct NppGUI
 	OpenSaveDirSetting _openSaveDir;
 	TCHAR _defaultDir[MAX_PATH];
 	TCHAR _defaultDirExp[MAX_PATH];	//expanded environment variables
-	std::generic_string _themeName;
+	generic_string _themeName;
 };
 
 struct ScintillaViewParams
@@ -436,8 +436,8 @@ public :
 	const TCHAR * getExtention() {return _ext.c_str();}
 
 private:
-	std::generic_string _name;
-	std::generic_string _ext;
+	generic_string _name;
+	generic_string _ext;
 
 	StyleArray _styleArray;
 	// JOCE: WHAT!?!  This is a *GIANT* buffer (9 * 30K!) that is allocated for no apparent good reason...
@@ -474,10 +474,10 @@ struct FindHistory {
 					_isFifRecuisive(true), _isFifInHiddenFolder(false), _searchMode(normal), _transparencyMode(onLossingFocus),
 					_transparency(150), _isDlgAlwaysVisible(false), _isFilterFollowDoc(false), _isFolderFollowDoc(false)
 	{
-		memset(_pFindHistoryPath, 0, NB_MAX_FINDHISTORY_PATH * sizeof(std::generic_string*));
-		memset(_pFindHistoryFilter, 0, NB_MAX_FINDHISTORY_FILTER * sizeof(std::generic_string*));
-		memset(_pFindHistoryFind, 0, NB_MAX_FINDHISTORY_FIND * sizeof(std::generic_string*));
-		memset(_pFindHistoryReplace, 0, NB_MAX_FINDHISTORY_REPLACE * sizeof(std::generic_string*));
+		memset(_pFindHistoryPath, 0, NB_MAX_FINDHISTORY_PATH * sizeof(generic_string*));
+		memset(_pFindHistoryFilter, 0, NB_MAX_FINDHISTORY_FILTER * sizeof(generic_string*));
+		memset(_pFindHistoryFind, 0, NB_MAX_FINDHISTORY_FIND * sizeof(generic_string*));
+		memset(_pFindHistoryReplace, 0, NB_MAX_FINDHISTORY_REPLACE * sizeof(generic_string*));
 	}
 
 	int _nbMaxFindHistoryPath;
@@ -490,10 +490,10 @@ struct FindHistory {
 	int _nbFindHistoryFind;
 	int _nbFindHistoryReplace;
 
-	std::generic_string* _pFindHistoryPath[NB_MAX_FINDHISTORY_PATH];
-	std::generic_string* _pFindHistoryFilter[NB_MAX_FINDHISTORY_FILTER];
-	std::generic_string* _pFindHistoryFind[NB_MAX_FINDHISTORY_FIND];
-	std::generic_string* _pFindHistoryReplace[NB_MAX_FINDHISTORY_REPLACE];
+	generic_string* _pFindHistoryPath[NB_MAX_FINDHISTORY_PATH];
+	generic_string* _pFindHistoryFilter[NB_MAX_FINDHISTORY_FILTER];
+	generic_string* _pFindHistoryFind[NB_MAX_FINDHISTORY_FIND];
+	generic_string* _pFindHistoryReplace[NB_MAX_FINDHISTORY_REPLACE];
 
 	bool _isMatchWord;
 	bool _isMatchCase;
@@ -558,20 +558,20 @@ public :
 		TCHAR *_xmlFileName;
 	};
 
-	void addThemeFromXml(std::generic_string xmlFullPath) {
-		_themeList.push_back(std::pair<std::generic_string, std::generic_string>(getThemeFromXmlFileName(xmlFullPath.c_str()), xmlFullPath));
+	void addThemeFromXml(generic_string xmlFullPath) {
+		_themeList.push_back(std::pair<generic_string, generic_string>(getThemeFromXmlFileName(xmlFullPath.c_str()), xmlFullPath));
 	};
 
-	void addDefaultThemeFromXml(std::generic_string xmlFullPath) {
-		_themeList.push_back(std::pair<std::generic_string, std::generic_string>(TEXT("Default (styles.xml)"), xmlFullPath));
+	void addDefaultThemeFromXml(generic_string xmlFullPath) {
+		_themeList.push_back(std::pair<generic_string, generic_string>(TEXT("Default (styles.xml)"), xmlFullPath));
 	};
 
-	std::generic_string getThemeFromXmlFileName(const TCHAR *fn) const;
+	generic_string getThemeFromXmlFileName(const TCHAR *fn) const;
 
-	std::generic_string getXmlFilePathFromThemeName(const TCHAR *themeName) const {
+	generic_string getXmlFilePathFromThemeName(const TCHAR *themeName) const {
 		if (!themeName || themeName[0])
 			return TEXT("");
-		std::generic_string themePath = _stylesXmlPath;
+		generic_string themePath = _stylesXmlPath;
 		return themePath;
 	};
 
@@ -588,15 +588,15 @@ public :
 	};
 
 
-	std::pair<std::generic_string, std::generic_string> & getElementFromIndex(size_t index) {
+	std::pair<generic_string, generic_string> & getElementFromIndex(size_t index) {
 		//if (index >= _themeList.size())
-			//return std::pair<std::generic_string, std::generic_string>(TEXT(""), TEXT(""));
+			//return std::pair<generic_string, generic_string>(TEXT(""), TEXT(""));
 		return _themeList[index];
 	};
 
 private :
-	std::vector< std::pair< std::generic_string, std::generic_string > > _themeList;
-	std::generic_string _stylesXmlPath;
+	std::vector< std::pair< generic_string, generic_string > > _themeList;
+	generic_string _stylesXmlPath;
 };
 
 #define NB_LANG 80
@@ -661,7 +661,7 @@ public:
 
 	int getNbLRFile() const {return _nbFile;};
 
-	std::generic_string *getLRFile(int index) const {
+	generic_string *getLRFile(int index) const {
 		return _LRFileList[index];
 	};
 
@@ -708,7 +708,7 @@ public:
     };
 
 	void setFontList(HWND hWnd);
-	const std::vector<std::generic_string> & getFontList() const {return _fontlist;};
+	const std::vector<generic_string> & getFontList() const {return _fontlist;};
 
 	int getNbUserLang() const {return _nbUserLang;};
 	UserLangContainer & getULCFromIndex(int i) {return *_userLangArray[i];};
@@ -760,7 +760,7 @@ public:
 
 		for (int i = 0 ; i < _nbUserLang ; i++)
 		{
-			std::vector<std::generic_string> extVect;
+			std::vector<generic_string> extVect;
 			cutString(_userLangArray[i]->_ext.c_str(), extVect);
 			for (size_t j = 0 ; j < extVect.size() ; j++)
 				if (!generic_stricmp(extVect[j].c_str(), ext))
@@ -849,9 +849,9 @@ public:
 	WNDPROC getEnableThemeDlgTexture() const {return _enableThemeDialogTextureFuncAddr;};
 
 	struct FindDlgTabTitiles {
-		std::generic_string _find;
-		std::generic_string _replace;
-		std::generic_string _findInFiles;
+		generic_string _find;
+		generic_string _replace;
+		generic_string _findInFiles;
 		FindDlgTabTitiles() : _find(TEXT("")), _replace(TEXT("")), _findInFiles(TEXT("")) {};
 		bool isWellFilled() {
 			return (lstrcmp(_find.c_str(), TEXT("")) != 0 && lstrcmp(_replace.c_str(), TEXT("")) && lstrcmp(_findInFiles.c_str(), TEXT("")));
@@ -910,7 +910,7 @@ private:
 	int _nbLang;
 
 	// JOCE use a std::vector instead!
-	std::generic_string *_LRFileList[NB_MAX_LRF_FILE];
+	generic_string *_LRFileList[NB_MAX_LRF_FILE];
 	int _nbFile;
 	int _nbMaxFile;
 
@@ -933,7 +933,7 @@ private:
 	LexerStylerArray _lexerStylerArray;
     StyleArray _widgetStyleArray;
 
-	std::vector<std::generic_string> _fontlist;
+	std::vector<generic_string> _fontlist;
 
 	HMODULE _hUser32;
 	HMODULE _hUXTheme;
@@ -956,7 +956,7 @@ private:
 #endif
 	ThemeSwitcher _themeSwitcher;
 
-	//std::vector<std::generic_string> _noMenuCmdNames;
+	//std::vector<generic_string> _noMenuCmdNames;
 	std::vector<MenuItemUnit> _contextMenuItems;
 	Session* _session;
 
@@ -978,7 +978,7 @@ private:
 
 	static int CALLBACK EnumFontFamExProc(ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX * /*lpntme*/, int /*FontType*/, LPARAM lParam)
 	{
-		std::vector<std::generic_string> *pStrVect = (std::vector<std::generic_string> *)lParam;
+		std::vector<generic_string> *pStrVect = (std::vector<generic_string> *)lParam;
         size_t vectSize = pStrVect->size();
 
 		//Search through all the fonts, EnumFontFamiliesEx never states anything about order

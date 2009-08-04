@@ -55,7 +55,7 @@ protected :
 	bool            _isFloating;
 	int				_iDockedPos;
 	generic_string  _moduleName;
-	generic_string  _pluginName;
+	TCHAR		    _pluginName[MAX_PATH];
 };
 
 #endif // DOCKINGDLGINTERFACE_H
