@@ -640,16 +640,14 @@ TiXmlNodeA* TiXmlElementA::Clone() const
 	CopyToClone( clone );
 
 	// Clone the attributes, then clone the children.
-	TiXmlAttributeA* attribute = 0;
-	for(	attribute = attributeSet.First();
-	attribute;
-	attribute = attribute->Next() )
+	for(TiXmlAttributeA* attribute = attributeSet.First();
+		attribute;
+		attribute = attribute->Next() )
 	{
 		clone->SetAttribute( attribute->Name(), attribute->Value() );
 	}
 
-	TiXmlNodeA* node = 0;
-	for ( node = firstChild; node; node = node->NextSibling() )
+	for ( TiXmlNodeA* node = firstChild; node; node = node->NextSibling() )
 	{
 		clone->LinkEndChild( node->Clone() );
 	}
@@ -714,9 +712,8 @@ bool TiXmlDocumentA::LoadFile( const char* filename )
 	if ( fopen_s( &file, value.c_str (), "r" ) == 0 )
 	{
 		// Get the file size, so we can pre-allocate the string. HUGE speed impact.
-		long length = 0;
 		fseek( file, 0, SEEK_END );
-		length = ftell( file );
+		long length = ftell( file );
 		fseek( file, 0, SEEK_SET );
 
 		// Strange case, but good to handle up front.
@@ -760,8 +757,8 @@ bool TiXmlDocumentA::LoadUnicodeFilePath( const TCHAR* filename )
 
 	// There was a really terrifying little bug here. The code:
 	//		value = filename
-	// in the STL case, cause the assignment method of the std::generic_string to
-	// be called. What is strange, is that the std::generic_string had the same
+	// in the STL case, cause the assignment method of the string to
+	// be called. What is strange, is that the string had the same
 	// address as it's c_str() method, and so bad things happen. Looks
 	// like a bug in the Microsoft STL implementation.
 	// See STL_STRING_BUG above.
@@ -773,9 +770,8 @@ bool TiXmlDocumentA::LoadUnicodeFilePath( const TCHAR* filename )
 	if ( file )
 	{
 		// Get the file size, so we can pre-allocate the generic_string. HUGE speed impact.
-		long length = 0;
 		fseek( file, 0, SEEK_END );
-		length = ftell( file );
+		long length = ftell( file );
 		fseek( file, 0, SEEK_SET );
 
 		// Strange case, but good to handle up front.
@@ -834,8 +830,7 @@ TiXmlNodeA* TiXmlDocumentA::Clone() const
 	clone->error = error;
 	clone->errorDesc = errorDesc.c_str ();
 
-	TiXmlNodeA* node = 0;
-	for ( node = firstChild; node; node = node->NextSibling() )
+	for ( TiXmlNodeA* node = firstChild; node; node = node->NextSibling() )
 	{
 		clone->LinkEndChild( node->Clone() );
 	}
@@ -1003,8 +998,7 @@ void TiXmlTextA::StreamOut( TIXMLA_OSTREAM * stream ) const
 
 TiXmlNodeA* TiXmlTextA::Clone() const
 {
-	TiXmlTextA* clone = 0;
-	clone = new TiXmlTextA( "" );
+	TiXmlTextA* clone = new TiXmlTextA( "" );
 
 	if ( !clone )
 		return 0;

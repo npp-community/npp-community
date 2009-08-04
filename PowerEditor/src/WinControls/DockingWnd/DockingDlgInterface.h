@@ -42,7 +42,7 @@ public:
 	virtual void display(bool toShow = true) const;
 
 	const TCHAR * getPluginFileName() const {
-		return _moduleName;
+		return _moduleName.c_str();
 	};
 
 protected :
@@ -54,8 +54,8 @@ protected :
 	int				_dlgID;
 	bool            _isFloating;
 	int				_iDockedPos;
-	TCHAR            _moduleName[MAX_PATH];
-	TCHAR			_pluginName[MAX_PATH];
+	generic_string  _moduleName;
+	generic_string  _pluginName;
 };
 
 #endif // DOCKINGDLGINTERFACE_H

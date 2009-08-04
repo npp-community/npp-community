@@ -28,9 +28,7 @@ class RegExtDlg : public StaticDialog
 {
 public :
 	RegExtDlg() : _isCustomize(false){};
-	~RegExtDlg(){};
 	void doDialog(bool isRTL = false);
-
 
 private :
 	bool _isCustomize;

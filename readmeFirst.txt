@@ -3,6 +3,10 @@ What is Notepad++ ?
 
 Notepad++ is a free (free as in "free speech", but also as in "free beer") source code editor and Notepad replacement, which supports several programming languages, running under the MS Windows environment.
 
+Obtaining Sources
+=================
+
+Source code for Notepad++ is available using git or svn.  See the main Sourceforge project page for links.
 
 To build Notepad++ package from source code:
 ============================================

@@ -120,7 +120,7 @@ LanguageName ScintillaEditView::langNames[L_EXTERNAL+1] = {
 
 int getNbDigits(int aNum, int base)
 {
-	int nbDigits = 1;
+	int bnDigits = 1;
 	int divider = base;
 
 	for (;;)
@@ -131,13 +131,13 @@ int getNbDigits(int aNum, int base)
 		else
 		{
 			divider *= base;
-			nbDigits++;
+			bnDigits++;
 		}
 	}
-	if ((base == 16) && (nbDigits % 2 != 0))
-		nbDigits += 1;
+	if ((base == 16) && (bnDigits % 2 != 0))
+		bnDigits += 1;
 
-	return nbDigits;
+	return bnDigits;
 };
 
 void ScintillaEditView::init(HINSTANCE hInst, HWND hPere)
@@ -276,7 +276,7 @@ LRESULT ScintillaEditView::scintillaNew_Proc(HWND hwnd, UINT Message, WPARAM wPa
 					execute(SCI_BEGINUNDOACTION);
 
 					ColumnModeInfo colInfos = getColumnModeSelectInfo();
-					std::generic_string str(1, (TCHAR)wParam);
+					generic_string str(1, (TCHAR)wParam);
 					columnReplace(colInfos, str.c_str());
 
 					int selStart = execute(SCI_GETSELECTIONSTART)+1;
@@ -401,6 +401,9 @@ LRESULT ScintillaEditView::scintillaNew_Proc(HWND hwnd, UINT Message, WPARAM wPa
 		{
 			break;
 		}
+
+		default:
+		break;
 	}
 	return _callWindowProc(_scintillaDefaultProc, hwnd, Message, wParam, lParam);
 }
@@ -415,11 +418,11 @@ void ScintillaEditView::setSpecialStyle(const Style & styleToSet)
     if ( styleToSet._colorStyle & COLORSTYLE_BACKGROUND )
 	    execute(SCI_STYLESETBACK, styleID, styleToSet._bgColor);
 
-    if (styleToSet._fontName && lstrcmp(styleToSet._fontName, TEXT("")) != 0)
+    if (styleToSet._fontName != TEXT(""))
 	{
 #ifdef UNICODE
 		WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
-		const char * fontNameA = wmc->wchar2char(styleToSet._fontName, CP_ACP);
+		const char * fontNameA = wmc->wchar2char(styleToSet._fontName.c_str(), CP_ACP);
 		execute(SCI_STYLESETFONT, (WPARAM)styleID, (LPARAM)fontNameA);
 #else
 		execute(SCI_STYLESETFONT, (WPARAM)styleID, (LPARAM)styleToSet._fontName);
@@ -476,7 +479,7 @@ void ScintillaEditView::setStyle(const Style& styleToSet)
 					}
 				}
 			}
-			if (go.enableFont && style._fontName && style._fontName[0])
+			if (go.enableFont && !style._fontName.empty())
 				styleCopy._fontName = style._fontName;
 			if (go.enableFontSize && (style._fontSize > 0))
 				styleCopy._fontSize = style._fontSize;
@@ -732,6 +735,7 @@ void ScintillaEditView::setCppLexer(LangType langType)
 					case SCE_HJ_DOUBLESTRING : cppID = SCE_C_STRING; break;
 					case SCE_HJ_SINGLESTRING : cppID = SCE_C_CHARACTER; break;
 					case SCE_HJ_REGEX : cppID = SCE_C_REGEX; break;
+					NO_DEFAULT_CASE;
 				}
 				style._styleID = cppID;
 				setStyle(style);
@@ -2158,9 +2162,9 @@ bool ScintillaEditView::expandWordSelection()
 	return false;
 }
 
-TCHAR * int2str(TCHAR *str, int strLen, int number, int base, int nbChiffre, bool isZeroLeading)
+TCHAR * int2str(TCHAR *str, int strLen, int number, int base, int nbDigits, bool isZeroLeading)
 {
-	if (nbChiffre >= strLen) return NULL;
+	if (nbDigits >= strLen) return NULL;
 	TCHAR f[64];
 	TCHAR fStr[2] = TEXT("d");
 	if (base == 16)
@@ -2171,14 +2175,21 @@ TCHAR * int2str(TCHAR *str, int strLen, int number, int base, int nbChiffre, boo
 	{
 		const unsigned int MASK_ULONG_BITFORT = 0x80000000;
 		int nbBits = sizeof(unsigned int) * 8;
-		int nbBit2Shift = (nbChiffre >= nbBits)?nbBits:(nbBits - nbChiffre);
+		int nbBit2Shift = (nbDigits >= nbBits)?nbBits:(nbBits - nbDigits);
 		unsigned long mask = MASK_ULONG_BITFORT >> nbBit2Shift;
 		int i = 0;
+		// Strange things are happening to the loop index variable, but I'm not touching this code with a 10 foot pole.
+		//lint -e440
+		// for clause irregularity: variable 'Symbol' tested in 2nd expression does not match 'Symbol' modified in 3r
+		//lint -e442
+		// for clause irregularity: testing direction inconsistent with increment direction
 		for (; mask > 0 ; i++)
 		{
 			str[i] = (mask & number)?'1':'0';
 			mask >>= 1;
 		}
+		//lint +e440
+		//lint +e442
 		str[i] = '\0';
 	}
 
@@ -2198,7 +2209,7 @@ TCHAR * int2str(TCHAR *str, int strLen, int number, int base, int nbChiffre, boo
 			wsprintf(str, f, number);
 		}
 		int i = lstrlen(str);
-		for ( ; i < nbChiffre ; i++)
+		for ( ; i < nbDigits ; i++)
 			str[i] = ' ';
 		str[i] = '\0';
 	}
@@ -2206,7 +2217,7 @@ TCHAR * int2str(TCHAR *str, int strLen, int number, int base, int nbChiffre, boo
 	{
 		if (base != 2)
 		{
-			wsprintf(f, TEXT("%%.%d%s"), nbChiffre, fStr);
+			wsprintf(f, TEXT("%%.%d%s"), nbDigits, fStr);
 			wsprintf(str, f, number);
 		}
 		// else already done.
@@ -2234,8 +2245,8 @@ ColumnModeInfo ScintillaEditView::getColumnModeSelectInfo()
 			startCol = endCol;
 			endCol = tmp;
 
-			selStartAbsPos = execute(SCI_FINDCOLUMN, startLine, startCol);
-			selEndAbsPos = execute(SCI_FINDCOLUMN, endLine, endCol);
+			execute(SCI_FINDCOLUMN, startLine, startCol);
+			execute(SCI_FINDCOLUMN, endLine, endCol);
 		}
 
 		bool zeroCharSelMode = true;
@@ -2697,8 +2708,11 @@ void ScintillaEditView::reapplyHotspotStyles()
 }
 
 ScintillaEditView::ScintillaEditView() :
-	Window(), _pScintillaFunc(NULL),_pScintillaPtr(NULL),
-	_folderStyle(FOLDER_STYLE_BOX), _lineNumbersShown(false), _wrapRestoreNeeded(false),
+	_pScintillaFunc(NULL),_pScintillaPtr(NULL),_callWindowProc(NULL),
+	_currentBufferID(BUFFER_INVALID), _currentBuffer(NULL),
+	_folderStyle(FOLDER_STYLE_BOX), _pParameter(NULL),
+	_codepage(CP_ACP), _oemCodepage(CP_ACP),
+	 _lineNumbersShown(false), _wrapRestoreNeeded(false),
 	_currentHotspotStyleMap(NULL), _currentHotspotOriginMap(NULL)
 {
 	++_refCount;
@@ -2713,19 +2727,10 @@ ScintillaEditView::~ScintillaEditView()
 		::FreeLibrary(_hLib);
 	}
 
-	if (_hSelf)
-	{
-		ScintillaEditView::destroy();
-	}
-
 	for (BufferStyleMap::iterator it(_hotspotStyles.begin()); it != _hotspotStyles.end(); ++it )
 	{
 		for (StyleMap::iterator it2(it->second->begin()) ; it2 != it->second->end() ; ++it2)
 		{
-			if (it2->second->_fontName != NULL)
-			{
-				delete [] it2->second->_fontName;
-			}
 			delete it2->second;
 		}
 		delete it->second;
@@ -3314,11 +3319,11 @@ int ScintillaEditView::codepage2CharSet() const
 {
 	switch (_codepage)
 	{
-		case CP_CHINESE_TRADITIONAL : return SC_CHARSET_CHINESEBIG5;
-		case CP_CHINESE_SIMPLIFIED : return SC_CHARSET_GB2312;
-		case CP_KOREAN : return SC_CHARSET_HANGUL;
-		case CP_JAPANESE : return SC_CHARSET_SHIFTJIS;
-		case CP_GREEK : return SC_CHARSET_GREEK;
-		default : return 0;
+	case CP_CHINESE_TRADITIONAL : return SC_CHARSET_CHINESEBIG5;
+	case CP_CHINESE_SIMPLIFIED : return SC_CHARSET_GB2312;
+	case CP_KOREAN : return SC_CHARSET_HANGUL;
+	case CP_JAPANESE : return SC_CHARSET_SHIFTJIS;
+	case CP_GREEK : return SC_CHARSET_GREEK;
+	default : return 0;
 	}
 }

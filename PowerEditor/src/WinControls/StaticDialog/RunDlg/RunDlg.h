@@ -30,11 +30,11 @@ class Command {
 public :
 	Command(){};
 	Command(TCHAR *cmd) : _cmdLine(cmd){};
-	Command(std::generic_string cmd) : _cmdLine(cmd){};
+	Command(generic_string cmd) : _cmdLine(cmd){};
 	HINSTANCE run(HWND hWnd);
 
 protected :
-	std::generic_string _cmdLine;
+	generic_string _cmdLine;
 private :
 	void extractArgs(TCHAR *cmd2Exec, TCHAR *args, const TCHAR *cmdEntier);
 };
@@ -42,7 +42,7 @@ private :
 class RunDlg : public Command, public StaticDialog
 {
 public :
-	RunDlg() : StaticDialog() {};
+	RunDlg() : StaticDialog() {}
 
 	void doDialog(bool isRTL = false);
 

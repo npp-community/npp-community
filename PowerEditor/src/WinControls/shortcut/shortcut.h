@@ -47,7 +47,7 @@ public:
 
 	BYTE getAcceleratorModifiers();
 
-	Shortcut & operator=(const Shortcut & sc);
+	const Shortcut & operator=(const Shortcut & sc);
 	friend const bool operator==(const Shortcut & a, const Shortcut & b);
 
 	friend inline const bool operator!=(const Shortcut & a, const Shortcut & b) {
@@ -188,17 +188,15 @@ class PluginCmdShortcut : public CommandShortcut {
 //friend class NppParameters;
 public:
 	PluginCmdShortcut(Shortcut sc, int id, const TCHAR *moduleName, int internalID) :
-		CommandShortcut(sc, id), _id(id), _internalID(internalID) {
-		lstrcpy(_moduleName, moduleName);
-	};
+		CommandShortcut(sc, id), _id(id), _moduleName(moduleName), _internalID(internalID) {};
 	bool isValid() const;
-	const TCHAR * getModuleName() const {return _moduleName;};
+	const TCHAR * getModuleName() const {return _moduleName.c_str();};
 	int getInternalID() const {return _internalID;};
 	long getID() const {return _id;};
 
 private :
-	long _id;
-	TCHAR _moduleName[nameLenMax];
+	unsigned long _id;
+	generic_string _moduleName;
 	int _internalID;
 };
 

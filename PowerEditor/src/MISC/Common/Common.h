@@ -40,7 +40,7 @@
 	#define generic_fopen(pFile, filename, mode) if(_wfopen_s(&pFile, filename, mode) != 0){pFile = NULL;}
 	#define generic_fgets fgetws
 	#define generic_stat _wstat
-	#define generic_string wstring
+	//#define generic_string std::wstring
 	#define COPYDATA_FILENAMES COPYDATA_FILENAMESW
 #else
 	#define NppMainEntry WinMain
@@ -61,9 +61,11 @@
 	#define generic_fopen(pFile, filename, mode) if(fopen_s(&pFile, filename, mode) != 0){pFile = NULL;}
 	#define generic_fgets fgets
 	#define generic_stat _stat
-	#define generic_string string
+	//#define generic_string std::string
 	#define COPYDATA_FILENAMES COPYDATA_FILENAMESA
 #endif
+
+typedef std::basic_string<TCHAR, std::char_traits<TCHAR>, std::allocator<TCHAR> > generic_string;
 
 void folderBrowser(HWND parent, int outputCtrlID, const TCHAR *defaultStr = NULL);
 
@@ -75,8 +77,8 @@ void printStr(const TCHAR *str2print);
 void writeLog(const TCHAR *logFileName, const char *log2write);
 int filter(unsigned int code);
 int getCpFromStringValue(const char * encodingStr);
-std::generic_string purgeMenuItemString(const TCHAR * menuItemStr, bool keepAmpersand = false);
-std::vector<std::generic_string> tokenizeString(const std::generic_string & tokenString, const char delim);
+generic_string purgeMenuItemString(const TCHAR * menuItemStr, bool keepAmpersand = false);
+std::vector<generic_string> tokenizeString(const generic_string & tokenString, const char delim);
 
 void ClientRectToScreenRect(HWND hWnd, RECT* rect);
 void ScreenRectToClientRect(HWND hWnd, RECT* rect);
@@ -103,7 +105,6 @@ protected:
 
 	static WcharMbcsConvertor * _pSelf;
 
-	const int initSize;
 	char *_multiByteStr;
 	size_t _multiByteAllocLen;
 	wchar_t *_wideCharStr;
@@ -111,8 +112,21 @@ protected:
 
 private:
 	// Since there's no public ctor, we need to void the default assignment operator.
-	WcharMbcsConvertor& operator= (const WcharMbcsConvertor&);
+	const WcharMbcsConvertor& operator= (const WcharMbcsConvertor&);
 };
+
+#define ERROR_MSG_SIZE 1024
+
+#ifdef DEBUG
+	#define NO_DEFAULT_CASE default: {\
+		TCHAR errorMsg[ERROR_MSG_SIZE];\
+		sprintf_s(errorMsg, ERROR_MSG_SIZE, "Unhanded default case in %s, line %d", __FILE__, __LINE__ );\
+		::MessageBox(NULL, TEXT("Unhandled default case."), errorMsg, MB_OK|MB_ICONWARNING);\
+		}\
+		break
+#else
+	#define NO_DEFAULT_CASE default: break
+#endif
 
 
 #endif //M30_IDE_COMMUN_H

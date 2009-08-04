@@ -19,17 +19,17 @@
 #include "FileDialog.h"
 #include "Parameters.h"
 
-static std::generic_string changeExt(std::generic_string fn, std::generic_string ext)
+static generic_string changeExt(generic_string fn, generic_string ext)
 {
 	if (ext == TEXT(""))
 		return fn;
 
-	std::generic_string fnExt = fn;
+	generic_string fnExt = fn;
 
 	size_t index = fnExt.find_last_of(TEXT("."));
-	std::generic_string extension = TEXT(".");
+	generic_string extension = TEXT(".");
 	extension += ext;
-	if (index == std::generic_string::npos)
+	if (index == generic_string::npos)
 	{
 		fnExt += extension;
 	}
@@ -73,7 +73,7 @@ FileDialog *FileDialog::staticThis = NULL;
 //int FileDialog::_dialogFileBoxId = (NppParameters::getInstance())->getWinVersion() < WV_W2K?edt1:cmb13;
 
 FileDialog::FileDialog(HWND hwnd, HINSTANCE hInst)
-	: _nbCharFileExt(0), _nbExt(0), _fileExt(NULL)
+	: _fileExt(NULL), _nbCharFileExt(0), _nbExt(0)
 {
 	staticThis = this;
 
@@ -114,6 +114,8 @@ FileDialog::~FileDialog()
 		_fileExt = NULL;
 	}
 }
+// Lint gets confused with the variable args variable...
+//lint -e438 Last value assigned to variable 'Symbol' not used
 
 // This function set and concatenate the filter into the list box of FileDialog.
 // The 1st parameter is the description of the file type, the 2nd .. Nth parameter(s) is (are)
@@ -124,6 +126,10 @@ FileDialog::~FileDialog()
 // FileDialog.setExtFilter(TEXT("Makefile"), TEXT("makefile"), TEXT("GNUmakefile"), NULL);
 void FileDialog::setExtFilter(const TCHAR *extText, const TCHAR *ext, ...)
 {
+    // fill out the ext array for save as file dialog
+    //if (_nbExt < nbExtMax)
+    //    lstrcpy(_extArray[_nbExt++], ext);
+    //
 	std::generic_string exts;
 
     va_list pArg;
@@ -147,6 +153,7 @@ void FileDialog::setExtFilter(const TCHAR *extText, const TCHAR *ext, ...)
 
 	setExtsFilter(extText, exts.c_str());
 }
+//lint +e438 (Warning -- Last value assigned to variable 'pArg' not used)
 
 int FileDialog::setExtsFilter(const TCHAR *extText, const TCHAR *exts)
 {
@@ -177,7 +184,6 @@ int FileDialog::setExtsFilter(const TCHAR *extText, const TCHAR *exts)
 	{
 		memcpy(_fileExt, oldFilter, _nbCharFileExt * sizeof(TCHAR));
 		delete[] oldFilter;
-		oldFilter = NULL;
 	}
 
 	// Append new filter
@@ -304,7 +310,7 @@ TCHAR * FileDialog::doSaveDlg()
 
 static HWND hFileDlg = NULL;
 static WNDPROC oldProc = NULL;
-static std::generic_string currentExt = TEXT("");
+static generic_string currentExt = TEXT("");
 
 static BOOL CALLBACK fileDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message)
@@ -323,7 +329,7 @@ static BOOL CALLBACK fileDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 
 					if (currentExt != TEXT(""))
 					{
-						std::generic_string fnExt = changeExt(fn, currentExt);
+						generic_string fnExt = changeExt(fn, currentExt);
 						::SetWindowText(fnControl, fnExt.c_str());
 					}
 					return oldProc(hwnd, message, wParam, lParam);
@@ -348,7 +354,7 @@ static TCHAR * get1stExt(TCHAR *ext) { // precondition : ext should be under the
 	return begin;
 };
 
-static std::generic_string addExt(HWND textCtrl, HWND typeCtrl) {
+static generic_string addExt(HWND textCtrl, HWND typeCtrl) {
 	TCHAR fn[MAX_PATH];
 	::GetWindowText(textCtrl, fn, MAX_PATH);
 
@@ -361,11 +367,11 @@ static std::generic_string addExt(HWND textCtrl, HWND typeCtrl) {
 	TCHAR *pExt = get1stExt(ext);
 	if (*fn != '\0')
 	{
-		std::generic_string fnExt = changeExt(fn, pExt);
+		generic_string fnExt = changeExt(fn, pExt);
 		::SetWindowText(textCtrl, fnExt.c_str());
 	}
 
-	std::generic_string returnExt = pExt;
+	generic_string returnExt = pExt;
 	delete[] ext;
 	return returnExt;
 };

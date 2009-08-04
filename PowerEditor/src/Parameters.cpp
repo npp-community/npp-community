@@ -417,7 +417,7 @@ bool LocalizationSwitcher::switchToLang(wchar_t *lang2switch) const
 #endif
 
 
-std::generic_string ThemeSwitcher::getThemeFromXmlFileName(const TCHAR *xmlFullPath) const
+generic_string ThemeSwitcher::getThemeFromXmlFileName(const TCHAR *xmlFullPath) const
 {
 	if (!xmlFullPath[0])
 	{
@@ -426,22 +426,41 @@ std::generic_string ThemeSwitcher::getThemeFromXmlFileName(const TCHAR *xmlFullP
 	TCHAR fn[MAX_PATH];
 	lstrcpy(fn, ::PathFindFileName(xmlFullPath));
 	PathRemoveExtension(fn);
-	std::generic_string themeName = fn;
+	generic_string themeName = fn;
 	return themeName;
 }
 
 NppParameters * NppParameters::_pSelf = new NppParameters;
 int FileDialog::_dialogFileBoxId = getWinVersion() < WV_W2K?edt1:cmb13;
 
-NppParameters::NppParameters() : _pXmlDoc(NULL),_pXmlUserDoc(NULL), _pXmlUserStylerDoc(NULL),\
-								_pXmlUserLangDoc(NULL), /*_pXmlNativeLangDoc(NULL), */_pXmlNativeLangDocA(NULL),\
-								_nbLang(0), _nbFile(0), _nbMaxFile(10), _pXmlToolIconsDoc(NULL),\
-								_pXmlShortcutDoc(NULL), _pXmlContextMenuDoc(NULL), _pXmlSessionDoc(NULL),\
-								_nbUserLang(0), _nbExternalLang(0), _hUser32(NULL), _hUXTheme(NULL),\
-								_transparentFuncAddr(NULL), _enableThemeDialogTextureFuncAddr(NULL),\
-								_isTaskListRBUTTONUP_Active(false), _fileSaveDlgFilterIndex(-1), _asNotepadStyle(false), _isFindReplacing(false)
+NppParameters::NppParameters() :
+	_isTaskListRBUTTONUP_Active(false),
+	_isFindReplacing(false),
+	_pXmlDoc(NULL), _pXmlUserDoc(NULL), _pXmlUserStylerDoc(NULL),
+	_pXmlUserLangDoc(NULL), _pXmlToolIconsDoc(NULL), _pXmlShortcutDoc(NULL),
+	_pXmlContextMenuDoc(NULL), _pXmlSessionDoc(NULL), _pXmlNativeLangDocA(NULL),
+	_nbLang(0), _nbFile(0), _nbMaxFile(10), _nbUserLang(0), _nbExternalLang(0),
+	_fileSaveDlgFilterIndex(-1),
+	_hUser32(NULL), _hUXTheme(NULL),
+	_transparentFuncAddr(NULL), _enableThemeDialogTextureFuncAddr(NULL),
+	_session(new Session()),
+	_pAccelerator(NULL), _pScintAccelerator(NULL),
+	_asNotepadStyle(false)
 {
-	_session = new Session();
+	memset(&_langList, 0, NB_LANG * sizeof(Lang *));
+	memset(&_LRFileList, 0, NB_MAX_LRF_FILE * sizeof(generic_string *));
+	memset(&_userLangArray, 0, NB_MAX_USER_LANG * sizeof(UserLangContainer *));
+	memset(&_userDefineLangPath, 0, MAX_PATH * sizeof(TCHAR));
+	memset(&_externalLangArray, 0, NB_MAX_EXTERNAL_LANG * sizeof(ExternalLangContainer *));
+
+	memset(&_shortcutsPath, 0 , MAX_PATH * sizeof(TCHAR));
+	memset(&_contextMenuPath, 0 , MAX_PATH * sizeof(TCHAR));
+	memset(&_sessionPath, 0 , MAX_PATH * sizeof(TCHAR));
+	memset(&_nppPath, 0 , MAX_PATH * sizeof(TCHAR));
+	memset(&_userPath, 0 , MAX_PATH * sizeof(TCHAR));
+	memset(&_stylerPath, 0 , MAX_PATH * sizeof(TCHAR));
+	memset(&_appdataNppDir, 0 , MAX_PATH * sizeof(TCHAR));
+	memset(&_currentDirectory, 0 , MAX_PATH * sizeof(TCHAR));
 
 	_findHistory._nbFindHistoryPath = 0;
 	_findHistory._nbFindHistoryFilter = 0;
@@ -453,14 +472,13 @@ NppParameters::NppParameters() : _pXmlDoc(NULL),_pXmlUserDoc(NULL), _pXmlUserSty
 	::GetModuleFileName(NULL, nppPath, MAX_PATH);
 
 	PathRemoveFileSpec(nppPath);
-	lstrcpy(_nppPath, nppPath);
+	_nppPath = nppPath;
 
 	//Initialize current directory to startup directory
 	::GetCurrentDirectory(MAX_PATH, _currentDirectory);
 
-	_appdataNppDir[0] = '\0';
 	TCHAR notepadStylePath[MAX_PATH];
-	lstrcpy(notepadStylePath, _nppPath);
+	lstrcpy(notepadStylePath, _nppPath.c_str());
 	PathAppend(notepadStylePath, notepadStyleFile);
 
 	_asNotepadStyle = (PathFileExists(notepadStylePath) == TRUE);
@@ -488,7 +506,7 @@ NppParameters::~NppParameters()
 
 	delete _session;
 }
-void cutString(const TCHAR *str2cut, std::vector<std::generic_string> & patternVect)
+void cutString(const TCHAR *str2cut, std::vector<generic_string> & patternVect)
 {
 	TCHAR str2scan[MAX_PATH];
 	lstrcpy(str2scan, str2cut);
@@ -551,7 +569,7 @@ bool NppParameters::reloadStylers(TCHAR *stylePath)
 bool NppParameters::reloadLang()
 {
 	TCHAR nativeLangPath[MAX_PATH];
-	lstrcpy(nativeLangPath, _nppPath);
+	lstrcpy(nativeLangPath, _nppPath.c_str());
 	PathAppend(nativeLangPath, TEXT("nativeLang.xml"));
 
 	if (!PathFileExists(nativeLangPath))
@@ -585,7 +603,7 @@ bool NppParameters::load()
 
 	// Make localConf.xml path
 	TCHAR localConfPath[MAX_PATH];
-	lstrcpy(localConfPath, _nppPath);
+	lstrcpy(localConfPath, _nppPath.c_str());
 	PathAppend(localConfPath, localConfFile);
 
 	// Test if localConf.xml exist
@@ -593,7 +611,7 @@ bool NppParameters::load()
 
 	if (isLocal)
 	{
-		lstrcpy(_userPath, _nppPath);
+		lstrcpy(_userPath, _nppPath.c_str());
 	}
 	else
 	{
@@ -629,13 +647,13 @@ bool NppParameters::load()
 	// langs.xml : for every user statically //
 	//---------------------------------------//
 	TCHAR langs_xml_path[MAX_PATH];
-	lstrcpy(langs_xml_path, _nppPath);
+	lstrcpy(langs_xml_path, _nppPath.c_str());
 
 	PathAppend(langs_xml_path, TEXT("langs.xml"));
 	if (!PathFileExists(langs_xml_path))
 	{
 		TCHAR srcLangsPath[MAX_PATH];
-		lstrcpy(srcLangsPath, _nppPath);
+		lstrcpy(srcLangsPath, _nppPath.c_str());
 		PathAppend(srcLangsPath, TEXT("langs.model.xml"));
 
 		::CopyFile(srcLangsPath, langs_xml_path, TRUE);
@@ -661,7 +679,7 @@ bool NppParameters::load()
 	PathAppend(configPath, TEXT("config.xml"));
 
 	TCHAR srcConfigPath[MAX_PATH];
-	lstrcpy(srcConfigPath, _nppPath);
+	lstrcpy(srcConfigPath, _nppPath.c_str());
 	PathAppend(srcConfigPath, TEXT("config.model.xml"));
 
 	if (!::PathFileExists(configPath))
@@ -707,7 +725,7 @@ bool NppParameters::load()
 	if (!PathFileExists(_stylerPath))
 	{
 		TCHAR srcStylersPath[MAX_PATH];
-		lstrcpy(srcStylersPath, _nppPath);
+		lstrcpy(srcStylersPath, _nppPath.c_str());
 		PathAppend(srcStylersPath, TEXT("stylers.model.xml"));
 
 		::CopyFile(srcStylersPath, _stylerPath, TRUE);
@@ -763,7 +781,7 @@ bool NppParameters::load()
 
 	if (!PathFileExists(nativeLangPath))
 	{
-		lstrcpy(nativeLangPath, _nppPath);
+		lstrcpy(nativeLangPath, _nppPath.c_str());
 		PathAppend(nativeLangPath, TEXT("nativeLang.xml"));
 	}
 
@@ -804,7 +822,7 @@ bool NppParameters::load()
 	if (!PathFileExists(_shortcutsPath))
 	{
 		TCHAR srcShortcutsPath[MAX_PATH];
-		lstrcpy(srcShortcutsPath, _nppPath);
+		lstrcpy(srcShortcutsPath, _nppPath.c_str());
 		PathAppend(srcShortcutsPath, TEXT("shortcuts.xml"));
 
 		::CopyFile(srcShortcutsPath, _shortcutsPath, TRUE);
@@ -838,7 +856,7 @@ bool NppParameters::load()
 	if (!PathFileExists(_contextMenuPath))
 	{
 		TCHAR srcContextMenuPath[MAX_PATH];
-		lstrcpy(srcContextMenuPath, _nppPath);
+		lstrcpy(srcContextMenuPath, _nppPath.c_str());
 		PathAppend(srcContextMenuPath, TEXT("contextMenu.xml"));
 
 		::CopyFile(srcContextMenuPath, _contextMenuPath, TRUE);
@@ -1252,7 +1270,7 @@ void NppParameters::setWorkingDir(const TCHAR * newPath)
 		}
 		else
 		{
-			lstrcpyn(_currentDirectory, _nppPath, MAX_PATH);
+			lstrcpyn(_currentDirectory, _nppPath.c_str(), MAX_PATH);
 		}
 	}
 }
@@ -1413,7 +1431,7 @@ void NppParameters::feedFileListParameters(TiXmlNode *node)
 		const TCHAR *filePath = (childNode->ToElement())->Attribute(TEXT("filename"));
 		if (filePath)
 		{
-			_LRFileList[_nbFile] = new std::generic_string(filePath);
+			_LRFileList[_nbFile] = new generic_string(filePath);
 			_nbFile++;
 		}
 	}
@@ -1434,7 +1452,7 @@ void NppParameters::feedFindHistoryParameters(TiXmlNode *node)
 			const TCHAR *filePath = (childNode->ToElement())->Attribute(TEXT("name"));
 			if (filePath)
 			{
-				_findHistory._pFindHistoryPath[_findHistory._nbFindHistoryPath++] = new std::generic_string(filePath);
+				_findHistory._pFindHistoryPath[_findHistory._nbFindHistoryPath++] = new generic_string(filePath);
 			}
 		}
 	}
@@ -1449,7 +1467,7 @@ void NppParameters::feedFindHistoryParameters(TiXmlNode *node)
 			const TCHAR *fileFilter = (childNode->ToElement())->Attribute(TEXT("name"));
 			if (fileFilter)
 			{
-				_findHistory._pFindHistoryFilter[_findHistory._nbFindHistoryFilter++] = new std::generic_string(fileFilter);
+				_findHistory._pFindHistoryFilter[_findHistory._nbFindHistoryFilter++] = new generic_string(fileFilter);
 			}
 		}
 	}
@@ -1464,7 +1482,7 @@ void NppParameters::feedFindHistoryParameters(TiXmlNode *node)
 			const TCHAR *fileFind = (childNode->ToElement())->Attribute(TEXT("name"));
 			if (fileFind)
 			{
-				_findHistory._pFindHistoryFind[_findHistory._nbFindHistoryFind++] = new std::generic_string(fileFind);
+				_findHistory._pFindHistoryFind[_findHistory._nbFindHistoryFind++] = new generic_string(fileFind);
 			}
 		}
 	}
@@ -1479,7 +1497,7 @@ void NppParameters::feedFindHistoryParameters(TiXmlNode *node)
 			const TCHAR *fileReplace = (childNode->ToElement())->Attribute(TEXT("name"));
 			if (fileReplace)
 			{
-				_findHistory._pFindHistoryReplace[_findHistory._nbFindHistoryReplace++] = new std::generic_string(fileReplace);
+				_findHistory._pFindHistoryReplace[_findHistory._nbFindHistoryReplace++] = new generic_string(fileReplace);
 			}
 		}
 	}
@@ -1819,9 +1837,6 @@ void NppParameters::writeUserDefinedLang()
 		_pXmlUserLangDoc = new TiXmlDocument(_userDefineLangPath);
 	}
 
-	//before remove the branch, we allocate and copy the TCHAR * which will be destroyed
-	stylerStrOp(DUP);
-
 	TiXmlNode *root = _pXmlUserLangDoc->FirstChild(TEXT("NotepadPlus"));
 	if (root)
 	{
@@ -1837,7 +1852,6 @@ void NppParameters::writeUserDefinedLang()
 		insertUserLang2Tree(root, _userLangArray[i]);
 	}
 	_pXmlUserLangDoc->SaveFile();
-	stylerStrOp(FREE);
 }
 
 void NppParameters::insertCmd(TiXmlNode *shortcutsRoot, const CommandShortcut & cmd)
@@ -2203,8 +2217,8 @@ bool NppParameters::feedStylerArray(TiXmlNode *node)
 	    TiXmlElement *element = childNode->ToElement();
 	    const TCHAR *styleIDStr = element->Attribute(TEXT("styleID"));
 
-        int styleID = -1;
-		if ((styleID = decStrVal(styleIDStr)) != -1)
+        int styleID = decStrVal(styleIDStr);
+		if (styleID != -1)
 		{
 		    _widgetStyleArray.addStyler(styleID, childNode);
         }
@@ -2234,8 +2248,8 @@ void LexerStylerArray::addLexerStyler(const TCHAR *lexerName, const TCHAR *lexer
 
 		if (styleIDStr)
 		{
-			int styleID = -1;
-			if ((styleID = decStrVal(styleIDStr)) != -1)
+			int styleID = decStrVal(styleIDStr);
+			if (styleID != -1)
 			{
 				ls.addStyler(styleID, childNode);
 			}
@@ -2350,10 +2364,6 @@ void NppParameters::feedKeyWordsParameters(TiXmlNode *node)
 			}
 		}
 	}
-}
-
-extern "C" {
-typedef DWORD (WINAPI * EESFUNC) (LPCTSTR, LPTSTR, DWORD);
 }
 
 void NppParameters::feedGUIParameters(TiXmlNode *node)
@@ -3036,7 +3046,7 @@ void NppParameters::feedGUIParameters(TiXmlNode *node)
 			}
 			const TCHAR *pDir = element->Attribute(TEXT("dir"));
 			if (pDir)
-				lstrcpy(_nppGUI._backupDir, pDir);
+				_nppGUI._backupDir = pDir;
 		}
 		else if (!lstrcmp(nm, TEXT("DockingManager")))
 		{
@@ -3410,7 +3420,7 @@ bool NppParameters::writeScintillaParams(const ScintillaViewParams & svp, bool w
 	(scintNode->ToElement())->SetAttribute(TEXT("currentLineHilitingShow"), svp._currentLineHilitingShow?TEXT("show"):TEXT("hide"));
 	(scintNode->ToElement())->SetAttribute(TEXT("wrapSymbolShow"), svp._wrapSymbolShow?TEXT("show"):TEXT("hide"));
 	(scintNode->ToElement())->SetAttribute(TEXT("Wrap"), svp._doWrap?TEXT("yes"):TEXT("no"));
-	TCHAR *edgeStr = NULL;
+	const TCHAR *edgeStr = NULL;
 	if (svp._edgeMode == EDGE_NONE)
 		edgeStr = TEXT("no");
 	else if (svp._edgeMode == EDGE_LINE)
@@ -3709,7 +3719,7 @@ bool NppParameters::writeGUIParams()
 		{
 			element->SetAttribute(TEXT("action"), _nppGUI._backup);
 			element->SetAttribute(TEXT("useCustumDir"), _nppGUI._useDir?TEXT("yes"):TEXT("no"));
-			element->SetAttribute(TEXT("dir"), _nppGUI._backupDir);
+			element->SetAttribute(TEXT("dir"), _nppGUI._backupDir.c_str());
 			backExist = true;
 		}
 		else if (!lstrcmp(nm, TEXT("MRU")))
@@ -3906,7 +3916,7 @@ bool NppParameters::writeGUIParams()
 		GUIConfigElement->SetAttribute(TEXT("name"), TEXT("Backup"));
 		GUIConfigElement->SetAttribute(TEXT("action"), _nppGUI._backup);
 		GUIConfigElement->SetAttribute(TEXT("useCustumDir"), _nppGUI._useDir?TEXT("yes"):TEXT("no"));
-		GUIConfigElement->SetAttribute(TEXT("dir"), _nppGUI._backupDir);
+		GUIConfigElement->SetAttribute(TEXT("dir"), _nppGUI._backupDir.c_str());
 	}
 
 	if (!doTaskListExist)
@@ -3953,7 +3963,6 @@ bool NppParameters::writeGUIParams()
 		GUIConfigElement->SetAttribute(TEXT("triggerFromNbChar"), _nppGUI._autocFromLen);
 		const TCHAR * pStr = _nppGUI._funcParams?TEXT("yes"):TEXT("no");
 		GUIConfigElement->SetAttribute(TEXT("funcParams"), pStr);
-		autocExist = true;
 	}
 
 	if (dockingParamNode)
@@ -4178,6 +4187,7 @@ void NppParameters::writeExcludedLangList(TiXmlElement *element)
 
 		switch (nGrp)
 		{
+			// JOCE Plain numerical values?? makes sense?
 			case 0 :
 				g0 |= nMask;
 				break;
@@ -4202,6 +4212,8 @@ void NppParameters::writeExcludedLangList(TiXmlElement *element)
 			case 7 :
 				g7 |= nMask;
 				break;
+
+			NO_DEFAULT_CASE;
 		}
 	}
 
@@ -4472,10 +4484,10 @@ void NppParameters::writeStyle2Element(Style & style2Wite, Style & style2Sync, T
 	    element->SetAttribute(TEXT("colorStyle"), style2Wite._colorStyle);
     }
 
-    if (style2Wite._fontName)
+    if (!style2Wite._fontName.empty())
     {
         const TCHAR *oldFontName = element->Attribute(TEXT("fontName"));
-        if (lstrcmp(oldFontName, style2Wite._fontName))
+        if (style2Wite._fontName != oldFontName)
         {
 		    element->SetAttribute(TEXT("fontName"), style2Wite._fontName);
             style2Sync._fontName = style2Wite._fontName = element->Attribute(TEXT("fontName"));
@@ -4571,7 +4583,7 @@ void NppParameters::insertUserLang2Tree(TiXmlNode *node, UserLangContainer *user
 			styleElement->SetAttribute(TEXT("colorStyle"), style2Wite._colorStyle);
 		}
 
-		if (style2Wite._fontName)
+		if (!style2Wite._fontName.empty())
 		{
 			styleElement->SetAttribute(TEXT("fontName"), style2Wite._fontName);
 		}
@@ -4591,40 +4603,6 @@ void NppParameters::insertUserLang2Tree(TiXmlNode *node, UserLangContainer *user
 				styleElement->SetAttribute(TEXT("fontSize"), TEXT(""));
 			else
 				styleElement->SetAttribute(TEXT("fontSize"), style2Wite._fontSize);
-		}
-	}
-}
-
-void NppParameters::stylerStrOp(bool op)
-{
-	for (int i = 0 ; i < _nbUserLang ; i++)
-	{
-		int nbStyler = _userLangArray[i]->_styleArray.getNbStyler();
-		for (int j = 0 ; j < nbStyler ; j++)
-		{
-			Style & style = _userLangArray[i]->_styleArray.getStyler(j);
-
-			if (op == DUP)
-			{
-				TCHAR *str = new TCHAR[lstrlen(style._styleDesc) + 1];
-				style._styleDesc = lstrcpy(str, style._styleDesc);
-				if (style._fontName)
-				{
-					str = new TCHAR[lstrlen(style._fontName) + 1];
-					style._fontName = lstrcpy(str, style._fontName);
-				}
-				else
-				{
-					str = new TCHAR[2];
-					str[0] = str[1] = '\0';
-					style._fontName = str;
-				}
-			}
-			else
-			{
-				delete [] style._styleDesc;
-				delete [] style._fontName;
-			}
 		}
 	}
 }
@@ -4731,30 +4709,47 @@ const char * NppParameters::getNativeLangMenuStringA( int itemID )
 	return NULL;
 }
 
-UserLangContainer::UserLangContainer()
+UserLangContainer::UserLangContainer():
+	_name(TEXT("new user define")),
+	_ext(TEXT("")),
+	_isCaseIgnored(false),
+	_isCommentLineSymbol(false),
+	_isCommentSymbol(false)
 {
-	_name = TEXT("new user define");
-	_ext = TEXT("");
-
 	// Keywords list of Delimiters (index 0)
 	lstrcpy(_keywordLists[0], TEXT("000000"));
 	for (int i = 1 ; i < nbKeywodList ; i++)
 	{
 		*_keywordLists[i] = '\0';
 	}
-}
 
-UserLangContainer::UserLangContainer( const TCHAR *name, const TCHAR *ext ) : _name(name), _ext(ext)
-{
-	// Keywords list of Delimiters (index 0)
-	lstrcpy(_keywordLists[0], TEXT("000000"));
-	for (int j = 1 ; j < nbKeywodList ; j++)
+	for (int i = 0; i < nbPrefixListAllowed; i++)
 	{
-		*_keywordLists[j] = '\0';
+		_isPrefix[i] = false;
 	}
 }
 
-UserLangContainer & UserLangContainer::operator=( const UserLangContainer & ulc )
+UserLangContainer::UserLangContainer( const TCHAR *name, const TCHAR *ext ) :
+	_name(name),
+	_ext(ext),
+	_isCaseIgnored(false),
+	_isCommentLineSymbol(false),
+	_isCommentSymbol(false)
+{
+	// Keywords list of Delimiters (index 0)
+	lstrcpy(_keywordLists[0], TEXT("000000"));
+	for (int i = 1 ; i < nbKeywodList ; i++)
+	{
+		*_keywordLists[i] = '\0';
+	}
+
+	for (int i = 0; i < nbPrefixListAllowed; i++)
+	{
+		_isPrefix[i] = false;
+	}
+}
+
+const UserLangContainer & UserLangContainer::operator=( const UserLangContainer & ulc )
 {
 	if (this != &ulc)
 	{
@@ -4778,6 +4773,14 @@ UserLangContainer & UserLangContainer::operator=( const UserLangContainer & ulc 
 		for (int i = 0 ; i < nbKeywodList ; i++)
 		{
 			lstrcpy(_keywordLists[i], ulc._keywordLists[i]);
+		}
+
+		_isCaseIgnored = ulc._isCaseIgnored;
+		_isCommentLineSymbol = ulc._isCommentLineSymbol;
+		_isCommentSymbol = ulc._isCommentSymbol;
+		for (int i = 0; i < nbPrefixListAllowed; i++)
+		{
+			_isPrefix[i] = ulc._isPrefix[i];
 		}
 	}
 	return *this;

@@ -39,10 +39,11 @@ static LRESULT CALLBACK hookProc(UINT nCode, WPARAM wParam, LPARAM lParam)
 };
 
 TaskListDlg::TaskListDlg() :
-	StaticDialog(),
-	_taskList(NULL)
+	_taskList(NULL),
+	_hImalist(NULL),
+	_initDir(dirDown),
+	_hHooker(NULL)
 {
-
 }
 
 TaskListDlg::~TaskListDlg()
@@ -74,7 +75,7 @@ BOOL CALLBACK TaskListDlg::run_dlgProc( UINT Message, WPARAM wParam, LPARAM lPar
 {
 	switch (Message)
 	{
-	case WM_INITDIALOG :
+		case WM_INITDIALOG :
 		{
 			::SendMessage(_hParent, WM_GETTASKLISTINFO, (WPARAM)&_taskListInfo, 0);
 			int nbTotal = _taskListInfo._tlfsLst.size();
@@ -111,7 +112,7 @@ BOOL CALLBACK TaskListDlg::run_dlgProc( UINT Message, WPARAM wParam, LPARAM lPar
 			return FALSE;
 		}
 
-	case WM_DESTROY :
+		case WM_DESTROY :
 		{
 			if (_taskList)
 			{
@@ -123,7 +124,7 @@ BOOL CALLBACK TaskListDlg::run_dlgProc( UINT Message, WPARAM wParam, LPARAM lPar
 		}
 
 
-	case WM_RBUTTONUP:
+		case WM_RBUTTONUP:
 		{
 			assert(_taskList);
 			::SendMessage(_hSelf, WM_COMMAND, ID_PICKEDUP, _taskList->getCurrentIndex());
@@ -131,13 +132,13 @@ BOOL CALLBACK TaskListDlg::run_dlgProc( UINT Message, WPARAM wParam, LPARAM lPar
 		}
 
 
-	case WM_DRAWITEM :
+		case WM_DRAWITEM :
 		{
 			drawItem((DRAWITEMSTRUCT *)lParam);
 			return TRUE;
 		}
 
-	case WM_NOTIFY:
+		case WM_NOTIFY:
 		{
 			switch (((LPNMHDR)lParam)->code)
 			{
@@ -167,11 +168,11 @@ BOOL CALLBACK TaskListDlg::run_dlgProc( UINT Message, WPARAM wParam, LPARAM lPar
 			break;
 		}
 
-	case WM_COMMAND :
+		case WM_COMMAND :
 		{
 			switch (wParam)
 			{
-			case ID_PICKEDUP :
+				case ID_PICKEDUP :
 				{
 					int listIndex = lParam;
 					int view2set = _taskListInfo._tlfsLst[listIndex]._iView;
@@ -181,13 +182,13 @@ BOOL CALLBACK TaskListDlg::run_dlgProc( UINT Message, WPARAM wParam, LPARAM lPar
 					return TRUE;
 				}
 
-			default:
-				return FALSE;
+				default:
+					return FALSE;
 			}
 		}
 
-	default :
-		return FALSE;
+		default :
+			return FALSE;
 	}
 
 	return FALSE;

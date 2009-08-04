@@ -77,8 +77,6 @@ public :
 	int getDockedContSize(int iCont);
 	void setDockedContSize(int iCont, int iSize);
 
-	virtual void destroy();
-
 private :
 
 	static LRESULT CALLBACK staticWinProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);

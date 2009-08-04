@@ -117,6 +117,11 @@ static COLORREF getParentDlgBkColor(HWND hWnd)
 	return crRet;
 }
 
+URLCtrl::~URLCtrl()
+{
+	URLCtrl::destroy();
+}
+
 void URLCtrl::create(HWND itemHandle, TCHAR * link, COLORREF linkColor)
 {
 	// turn on notify style
@@ -124,7 +129,7 @@ void URLCtrl::create(HWND itemHandle, TCHAR * link, COLORREF linkColor)
 
 	// set the URL text (not the display text)
 	if (link)
-		lstrcpy(_URL, link);
+		_URL = link;
 
 	// set the hyperlink colour
     _linkColor = linkColor;
@@ -253,9 +258,9 @@ LRESULT URLCtrl::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 ::UpdateWindow(hwnd);
 
 			    // Open a browser
-			    if(_URL[0])
+			    if(_URL != TEXT(""))
 			    {
-                    ::ShellExecute(NULL, TEXT("open"), _URL, NULL, NULL, SW_SHOWNORMAL);
+                    ::ShellExecute(NULL, TEXT("open"), _URL.c_str(), NULL, NULL, SW_SHOWNORMAL);
 			    }
 			    else
 			    {
@@ -273,6 +278,25 @@ LRESULT URLCtrl::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 	    // HTCLIENT instead.
 	    case WM_NCHITTEST:
 		    return HTCLIENT;
+
+		default:
+		break;
     }
     return ::CallWindowProc(_oldproc, hwnd, Message, wParam, lParam);
+}
+
+void URLCtrl::destroy()
+{
+	if(_hfUnderlined)
+	{
+		::DeleteObject(_hfUnderlined);
+		_hfUnderlined = NULL;
+	}
+
+	if(_hCursor)
+	{
+		::DestroyCursor(_hCursor);
+		_hCursor = NULL;
+	}
+	Window::destroy();
 }

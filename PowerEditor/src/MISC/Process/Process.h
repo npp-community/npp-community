@@ -23,20 +23,10 @@ enum progType {WIN32_PROG, CONSOLE_PROG};
 class Process
 {
 public:
-    Process(progType pt = WIN32_PROG) : _type(pt) {};
-    Process(const TCHAR *cmd, const TCHAR *args, const TCHAR *cDir, progType pt = WIN32_PROG)
-		: _type(pt), _stdoutStr(TEXT("")), _stderrStr(TEXT("")), _hPipeOutR(NULL),
-		_hPipeErrR(NULL), _hProcess(NULL), _hProcessThread(NULL) {
+    Process(progType pt = WIN32_PROG);
+    Process(const TCHAR *cmd, const TCHAR *args, const TCHAR *cDir, progType pt = WIN32_PROG);
 
-		lstrcpy(_command, cmd);
-		lstrcpy(_args,  args);
-		lstrcpy(_curDir, cDir);
-		//_pid = id;
-
-		_bProcessEnd = TRUE;
-	};
-
-	BOOL run();
+    BOOL run();
 
 	const TCHAR * getStdout() const {
 		return _stdoutStr.c_str();
@@ -51,20 +41,20 @@ public:
 	};
 
 	bool hasStdout() {
-		return (_stdoutStr.compare(TEXT("")) != 0);
+		return _stdoutStr != TEXT("");
 	};
 
 	bool hasStderr() {
-		return (_stderrStr.compare(TEXT("")) != 0);
+		return _stderrStr != TEXT("");
 	};
 
 protected:
     progType _type;
 
 	// INPUTS
-    TCHAR _command[MAX_PATH];
-	TCHAR _args[MAX_PATH];
-	TCHAR _curDir[MAX_PATH];
+    std::generic_string _command;
+	std::generic_string _args;
+	std::generic_string _curDir;
 
 	// OUTPUTS
 	std::generic_string _stdoutStr;
@@ -78,8 +68,6 @@ protected:
 	HANDLE _hProcessThread;
 
 	BOOL	_bProcessEnd;
-
-    //UINT _pid;   // process ID assigned by caller
 
 	static DWORD WINAPI staticListenerStdOut(void * myself){
 		((Process *)myself)->listenerStdOut();

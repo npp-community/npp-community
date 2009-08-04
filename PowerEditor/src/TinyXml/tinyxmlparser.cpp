@@ -398,7 +398,6 @@ void TiXmlDocument::StreamIn( TIXML_ISTREAM * in, TIXML_STRING * tag )
 				node->StreamIn( in, tag );
 				bool isElement = node->ToElement() != 0;
 				delete node;
-				node = 0;
 
 				// If this is the root element, we're done. Parsing will be
 				// done by the >> operator.
@@ -507,7 +506,6 @@ TiXmlNode* TiXmlNode::Identify( const TCHAR* p )
 		return 0;
 	}
 
-	TiXmlDocument* doc = GetDocument();
 	p = SkipWhiteSpace( p );
 
 	if ( !p || !*p )
@@ -562,6 +560,7 @@ TiXmlNode* TiXmlNode::Identify( const TCHAR* p )
 	}
 	else
 	{
+		TiXmlDocument* doc = GetDocument();
 		if ( doc )
 			doc->SetError( TIXML_ERROR_OUT_OF_MEMORY, 0, 0 );
 	}
@@ -666,7 +665,6 @@ void TiXmlElement::StreamIn (TIXML_ISTREAM * in, TIXML_STRING * tag)
 					return;
 				node->StreamIn( in, tag );
 				delete node;
-				node = 0;
 
 				// No return: go around from the beginning: text, closing tag, or node.
 			}
@@ -811,8 +809,11 @@ const TCHAR* TiXmlElement::ReadValue( const TCHAR* p, TiXmlParsingData* data )
 
 			if ( !textNode )
 			{
-				if ( document ) document->SetError( TIXML_ERROR_OUT_OF_MEMORY, 0, 0 );
-				    return 0;
+				if ( document )
+				{
+					document->SetError( TIXML_ERROR_OUT_OF_MEMORY, 0, 0 );
+				}
+				return 0;
 			}
 
 			p = textNode->Parse( p, data );
@@ -960,10 +961,6 @@ const TCHAR* TiXmlAttribute::Parse( const TCHAR* p, TiXmlParsingData* data )
 {
 	p = SkipWhiteSpace( p );
 	if ( !p || !*p ) return 0;
-
-	int tabsize = 4;
-	if ( document )
-		tabsize = document->TabSize();
 
 //	TiXmlParsingData data( p, prevData );
 	if ( data )

@@ -27,6 +27,7 @@
 #include "Buffer.h"
 
 #include "Parameters.h"
+#include "npp_winver.h"
 
 typedef std::vector<const TCHAR*> ParamVector;
 
@@ -71,7 +72,7 @@ void parseCommandLine(TCHAR * commandLine, ParamVector & paramVector) {
 		switch(commandLine[i]) {
 			case '\"': {										//quoted filename, ignore any following whitespace
 				if (!isInFile) {	//" will always be treated as start or end of param, in case the user forgot to add an space
-					paramVector.push_back(commandLine+i+1);	//add next param(since zero terminated std::generic_string original, no overflow of +1)
+					paramVector.push_back(commandLine+i+1);	//add next param(since zero terminated generic_string original, no overflow of +1)
 				}
 				isInFile = !isInFile;
 				isInWhiteSpace = false;
@@ -92,7 +93,7 @@ void parseCommandLine(TCHAR * commandLine, ParamVector & paramVector) {
 				break; }
 		}
 	}
-	//the commandline std::generic_string is now a list of zero terminated strings concatenated, and the vector contains all the substrings
+	//the commandline generic_string is now a list of zero terminated strings concatenated, and the vector contains all the substrings
 }
 
 bool isInList(const TCHAR *token2Find, ParamVector & params) {
@@ -108,7 +109,7 @@ bool isInList(const TCHAR *token2Find, ParamVector & params) {
 	return false;
 };
 
-bool getParamVal(TCHAR c, ParamVector & params, std::generic_string & value) {
+bool getParamVal(TCHAR c, ParamVector & params, generic_string & value) {
 	value = TEXT("");
 	int nrItems = params.size();
 
@@ -125,14 +126,14 @@ bool getParamVal(TCHAR c, ParamVector & params, std::generic_string & value) {
 }
 
 LangType getLangTypeFromParam(ParamVector & params) {
-	std::generic_string langStr;
+	generic_string langStr;
 	if (!getParamVal('l', params, langStr))
 		return L_EXTERNAL;
 	return NppParameters::getLangIDFromStr(langStr.c_str());
 };
 
 int getNumberFromParam(char paramName, ParamVector & params, bool & isParamePresent) {
-	std::generic_string numStr;
+	generic_string numStr;
 	if (!getParamVal(paramName, params, numStr))
 	{
 		isParamePresent = false;
@@ -143,14 +144,14 @@ int getNumberFromParam(char paramName, ParamVector & params, bool & isParamePres
 };
 /*
 int getLn2GoFromParam(ParamVector & params) {
-	std::generic_string lineNumStr;
+	generic_string lineNumStr;
 	if (!getParamVal('n', params, lineNumStr))
 		return -1;
 	return generic_atoi(lineNumStr.c_str());
 };
 
 int getPointXFromParam(ParamVector & params) {
-	std::generic_string pointXStr;
+	generic_string pointXStr;
 	if (!getParamVal('x', params, pointXStr))
 		return -1;
 	return generic_atoi(pointXStr.c_str());
@@ -201,7 +202,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 		cmdLineParams._isNoSession = true;
 	}
 
-	std::generic_string quotFileName = TEXT("");
+	generic_string quotFileName = TEXT("");
     // tell the running instance the FULL path to the new files to load
 	size_t nrFilesToOpen = params.size();
 	const TCHAR * currentFile;
@@ -226,7 +227,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 	}
 
 	//Only after loading all the file paths set the working directory
-	::SetCurrentDirectory(NppParameters::getInstance()->getNppPath());	//force working directory to path of module, preventing lock
+	::SetCurrentDirectory(NppParameters::getInstance()->getNppPath().c_str());	//force working directory to path of module, preventing lock
 
 	if ((!isMultiInst) && (!TheFirstOne))
 	{
@@ -241,7 +242,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
         {
 			// First of all, destroy static object NppParameters
 			pNppParameters->destroyInstance();
-			MainFileManager->destroyInstance();
+			FileManager::destroyInstance();
 
 			int sw;
 
@@ -281,15 +282,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 
 	NppGUI & nppGui = (NppGUI &)pNppParameters->getNppGUI();
 
-	std::generic_string updaterDir = pNppParameters->getNppPath();
+	generic_string updaterDir = pNppParameters->getNppPath();
 	updaterDir += TEXT("\\updater\\");
 
-	std::generic_string updaterFullPath = updaterDir + TEXT("gup.exe");
+	generic_string updaterFullPath = updaterDir + TEXT("gup.exe");
 
-	std::generic_string version = TEXT("-v");
+	generic_string version = TEXT("-v");
 	version += VERSION_VALUE;
 
-	winVer curWinVer = notepad_plus_plus.getWinVersion();
+	winVer curWinVer = getWinVersion();
 
 	bool isUpExist = nppGui._doesExistUpdater = (::PathFileExists(updaterFullPath.c_str()) == TRUE);
 	bool doUpdate = !nppGui._neverUpdate;
@@ -312,7 +313,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 	Win32Exception::installHandler();
 	try {
 		notepad_plus_plus.init(hInstance, NULL, quotFileName.c_str(), &cmdLineParams);
-		bool unicodeSupported = notepad_plus_plus.getWinVersion() >= WV_NT;
+		bool unicodeSupported = getWinVersion() >= WV_NT;
 		bool going = true;
 		while (going)
 		{
@@ -376,12 +377,12 @@ void doException(Notepad_plus & notepad_plus_plus) {
 
 	TCHAR tmpDir[1024];
 	GetTempPath(1024, tmpDir);
-	std::generic_string emergencySavedDir = tmpDir;
+	generic_string emergencySavedDir = tmpDir;
 	emergencySavedDir += TEXT("\\N++RECOV");
 
 	bool res = notepad_plus_plus.emergency(emergencySavedDir);
 	if (res) {
-		std::generic_string displayText = TEXT("Notepad++ was able to successfully recover some unsaved documents, or nothing to be saved could be found.\r\nYou can find the results at :\r\n");
+		generic_string displayText = TEXT("Notepad++ was able to successfully recover some unsaved documents, or nothing to be saved could be found.\r\nYou can find the results at :\r\n");
 		displayText += emergencySavedDir;
 		::MessageBox(Notepad_plus::gNppHWND, displayText.c_str(), TEXT("Recovery success"), MB_OK | MB_ICONINFORMATION);
 	} else {

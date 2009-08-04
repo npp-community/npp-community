@@ -24,7 +24,6 @@
 #include "shortcutRc.h"
 
 #include "keys.h"
-const int KEY_STR_LEN = 16;
 
 struct KeyIDNAME {
 	const TCHAR * name;
@@ -161,7 +160,7 @@ static int keyTranslate(int keyIn) {
 	}
 }
 
-#define nrKeys sizeof(namedKeyArray)/sizeof(KeyIDNAME)
+#define nrKeys (sizeof(namedKeyArray)/sizeof(KeyIDNAME))
 
 
 
@@ -188,9 +187,9 @@ UCHAR vkeyValue[] = {\
 0x76, 0x77, 0x78, 0x79, 0x7A, 0x7B};
 */
 
-std::generic_string Shortcut::toString() const
+generic_string Shortcut::toString() const
 {
-	std::generic_string sc = TEXT("");
+	generic_string sc = TEXT("");
 	if (!isEnabled())
 		return sc;
 
@@ -201,7 +200,7 @@ std::generic_string Shortcut::toString() const
 	if (_keyCombo._isShift)
 		sc += TEXT("Shift+");
 
-	std::generic_string keyString;
+	generic_string keyString;
 	getKeyStrFromVal(_keyCombo._key, keyString);
 	sc += keyString;
 	return sc;
@@ -227,12 +226,12 @@ void Shortcut::setName(const TCHAR * name) {
 	_name[i] = 0;
 }
 
-std::generic_string ScintillaKeyMap::toString() const {
+generic_string ScintillaKeyMap::toString() const {
 	return toString(0);
 }
 
-std::generic_string ScintillaKeyMap::toString(int index) const {
-	std::generic_string sc = TEXT("");
+generic_string ScintillaKeyMap::toString(int index) const {
+	generic_string sc = TEXT("");
 	if (!isEnabled())
 		return sc;
 
@@ -244,7 +243,7 @@ std::generic_string ScintillaKeyMap::toString(int index) const {
 	if (kc._isShift)
 		sc += TEXT("Shift+");
 
-	std::generic_string keyString;
+	generic_string keyString;
 	getKeyStrFromVal(kc._key, keyString);
 	sc += keyString;
 	return sc;
@@ -293,7 +292,7 @@ size_t ScintillaKeyMap::getSize() const {
 	return size;
 }
 
-void getKeyStrFromVal(UCHAR keyVal, std::generic_string & str)
+void getKeyStrFromVal(UCHAR keyVal, generic_string & str)
 {
 	str = TEXT("");
 	bool found = false;
@@ -310,7 +309,7 @@ void getKeyStrFromVal(UCHAR keyVal, std::generic_string & str)
 		str = TEXT("Unlisted");
 }
 
-void getNameStrFromCmd(INT cmd, std::generic_string & str)
+void getNameStrFromCmd(INT cmd, generic_string & str)
 {
 	if ((cmd >= ID_MACRO) && (cmd < ID_MACRO_LIMIT))
 	{
@@ -340,6 +339,7 @@ void getNameStrFromCmd(INT cmd, std::generic_string & str)
 	}
 	else
 	{
+		// JOCE: Used only to get the class name.  We should move the class name elsewhere, where it brings less baggage with it.
 		HWND hNotepad_plus = ::FindWindow(Notepad_plus::getClassName(), NULL);
 		const int commandSize = 64;
 		TCHAR cmdName[commandSize];
@@ -498,7 +498,8 @@ Shortcut::Shortcut( const TCHAR *name, bool isCtrl, bool isAlt, bool isShift, UC
 	_keyCombo._key = key;
 }
 
-Shortcut::Shortcut( const Shortcut & sc )
+Shortcut::Shortcut( const Shortcut & sc ) :
+	StaticDialog()
 {
 	setName(sc.getMenuName());
 	_keyCombo = sc._keyCombo;
@@ -510,7 +511,7 @@ BYTE Shortcut::getAcceleratorModifiers()
 	return ( FVIRTKEY | (_keyCombo._isCtrl?FCONTROL:0) | (_keyCombo._isAlt?FALT:0) | (_keyCombo._isShift?FSHIFT:0) );
 }
 
-Shortcut & Shortcut::operator=( const Shortcut & sc )
+const Shortcut & Shortcut::operator=( const Shortcut & sc )
 {
 	//Do not allow setting empty names
 	//So either we have an empty name or the other name has to be set
@@ -536,10 +537,10 @@ bool Shortcut::isValid() const
 	return true;
 }
 
-std::generic_string Shortcut::toMenuItemString() const
+generic_string Shortcut::toMenuItemString() const
 {
-	//std::generic_string suitable for menu
-	std::generic_string str = _menuName;
+	//generic_string suitable for menu
+	generic_string str = _menuName;
 	if(isEnabled())
 	{
 		str += TEXT("\t");
@@ -567,9 +568,8 @@ void Accelerator::updateShortcuts()
 	_pAccelArray = new ACCEL[nbMenu+nbMacro+nbUserCmd+nbPluginCmd];
 
 	int offset = 0;
-	size_t i = 0;
 	//no validation performed, it might be that invalid shortcuts are being used by default. Allows user to 'hack', might be a good thing
-	for(i = 0; i < nbMenu; i++) {
+	for(size_t i = 0; i < nbMenu; i++) {
 		if (shortcuts[i].isEnabled()) {// && shortcuts[i].isValid()) {
 			_pAccelArray[offset].cmd = (WORD)(shortcuts[i].getID());
 			_pAccelArray[offset].fVirt = shortcuts[i].getAcceleratorModifiers();
@@ -578,7 +578,7 @@ void Accelerator::updateShortcuts()
 		}
 	}
 
-	for(i = 0; i < nbMacro; i++) {
+	for(size_t i = 0; i < nbMacro; i++) {
 		if (macros[i].isEnabled()) {// && macros[i].isValid()) {
 			_pAccelArray[offset].cmd = (WORD)(macros[i].getID());
 			_pAccelArray[offset].fVirt = macros[i].getAcceleratorModifiers();
@@ -587,7 +587,7 @@ void Accelerator::updateShortcuts()
 		}
 	}
 
-	for(i = 0; i < nbUserCmd; i++) {
+	for(size_t i = 0; i < nbUserCmd; i++) {
 		if (userCommands[i].isEnabled()) {// && userCommands[i].isValid()) {
 			_pAccelArray[offset].cmd = (WORD)(userCommands[i].getID());
 			_pAccelArray[offset].fVirt = userCommands[i].getAcceleratorModifiers();
@@ -596,7 +596,7 @@ void Accelerator::updateShortcuts()
 		}
 	}
 
-	for(i = 0; i < nbPluginCmd; i++) {
+	for(size_t i = 0; i < nbPluginCmd; i++) {
 		if (pluginCommands[i].isEnabled()) {// && pluginCommands[i].isValid()) {
 			_pAccelArray[offset].cmd = (WORD)(pluginCommands[i].getID());
 			_pAccelArray[offset].fVirt = pluginCommands[i].getAcceleratorModifiers();
@@ -781,7 +781,7 @@ void ScintillaAccelerator::updateMenuItemByID(ScintillaKeyMap skm, int id)
 		}
 		i++;
 	}
-	std::generic_string menuItem = cmdName;
+	generic_string menuItem = cmdName;
 	if (skm.isEnabled())
 	{
 		menuItem += TEXT("\t");
@@ -901,7 +901,7 @@ BOOL CALLBACK ScintillaKeyMap::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /
 					if (res > -1) {
 						if (res == oldsize) {
 							::SendDlgItemMessage(_hSelf, IDC_LIST_KEYS, LB_INSERTSTRING, (WPARAM)-1, (LPARAM)toString(res).c_str());
-						}else {	//update current std::generic_string, can happen if it was disabled
+						}else {	//update current generic_string, can happen if it was disabled
 							updateListItem(res);
 						}
 						::SendDlgItemMessage(_hSelf, IDC_LIST_KEYS, LB_SETCURSEL, res, 0);
@@ -945,6 +945,8 @@ BOOL CALLBACK ScintillaKeyMap::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /
 								showCurrentSettings();
 								return TRUE;
 							}
+
+							NO_DEFAULT_CASE;
 						}
 					}
 					return FALSE;
@@ -960,7 +962,8 @@ int ScintillaKeyMap::doDialog()
 	return ::DialogBoxParam(_hInst, MAKEINTRESOURCE(IDD_SHORTCUTSCINT_DLG), _hParent,  (DLGPROC)dlgProc, (LPARAM)this);
 }
 
-ScintillaKeyMap::ScintillaKeyMap( Shortcut sc, long scintillaKeyID, unsigned long id ) : Shortcut(sc), _menuCmdID(id), _scintillaKeyID(scintillaKeyID)
+ScintillaKeyMap::ScintillaKeyMap( Shortcut sc, long scintillaKeyID, unsigned long id ) :
+	Shortcut(sc), _scintillaKeyID(scintillaKeyID), _menuCmdID(id)
 {
 	_keyCombos.clear();
 	_keyCombos.push_back(_keyCombo);

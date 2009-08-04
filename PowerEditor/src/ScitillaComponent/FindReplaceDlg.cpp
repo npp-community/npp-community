@@ -38,7 +38,7 @@ struct FoundInfo {
 		: _start(start), _end(end), _fullPath(fullPath) {};
 	int _start;
 	int _end;
-	std::generic_string _fullPath;
+	generic_string _fullPath;
 };
 
 //This class contains generic search functions as static functions for easy access
@@ -62,9 +62,8 @@ private:
 int Searching::convertExtendedToString(const TCHAR * query, TCHAR * result, int length) {	//query may equal to result, since it always gets smaller
 	int i = 0, j = 0;
 	int charLeft = length;
-	bool isGood = true;
 	TCHAR current;
-	while(i < length) {	//because the backslash escape quences always reduce the size of the std::generic_string, no overflow checks have to be made for target, assuming parameters are correct
+	while(i < length) {	//because the backslash escape quences always reduce the size of the generic_string, no overflow checks have to be made for target, assuming parameters are correct
 		current = query[i];
 		charLeft--;
 		if (current == '\\' && charLeft) {	//possible escape sequence
@@ -111,11 +110,11 @@ int Searching::convertExtendedToString(const TCHAR * query, TCHAR * result, int 
 					}
 					//not enough chars to make parameter, use default method as fallback
 					}
+					//lint -fallthrough
 				default: {	//unknown sequence, treat as regular text
 					result[j] = '\\';
 					j++;
 					result[j] = current;
-					isGood = false;
 					break;
 				}
 			}
@@ -281,14 +280,14 @@ void FindReplaceDlg::addText2Combo(const TCHAR * txt2add, HWND hCombo, bool isUT
 
 
 #ifdef UNICODE
-std::generic_string FindReplaceDlg::getTextFromCombo(HWND hCombo, bool /*isUnicode*/) const
+generic_string FindReplaceDlg::getTextFromCombo(HWND hCombo, bool /*isUnicode*/) const
 {
 	TCHAR str[FINDREPLACE_MAXLENGTH];
 	::SendMessage(hCombo, WM_GETTEXT, FINDREPLACE_MAXLENGTH - 1, (LPARAM)str);
-	return std::generic_string(str);
+	return generic_string(str);
 }
 #else
-std::generic_string FindReplaceDlg::getTextFromCombo(HWND hCombo, bool isUnicode) const
+generic_string FindReplaceDlg::getTextFromCombo(HWND hCombo, bool isUnicode) const
 {
 	TCHAR str[FINDREPLACE_MAXLENGTH];
 	bool isWin9x = getWinVersion() <= WV_ME;
@@ -312,7 +311,7 @@ std::generic_string FindReplaceDlg::getTextFromCombo(HWND hCombo, bool isUnicode
 		::SendMessage(hCombo, WM_GETTEXT, FINDREPLACE_MAXLENGTH - 1, (LPARAM)str);
 	}
 
-	return std::generic_string(str);
+	return generic_string(str);
 }
 #endif
 
@@ -439,7 +438,7 @@ void FindReplaceDlg::fillFindHistory()
 	}
 }
 
-void FindReplaceDlg::fillComboHistory(int id, int count, std::generic_string **pStrings)
+void FindReplaceDlg::fillComboHistory(int id, int count, generic_string **pStrings)
 {
 	int i;
 	bool isUnicode = false;
@@ -465,7 +464,7 @@ void FindReplaceDlg::saveFindHistory()
 	saveComboHistory(IDREPLACEWITH,                 findHistory._nbMaxFindHistoryReplace, findHistory._nbFindHistoryReplace, findHistory._pFindHistoryReplace);
 }
 
-void FindReplaceDlg::saveComboHistory(int id, int maxcount, int & oldcount, std::generic_string **pStrings)
+void FindReplaceDlg::saveComboHistory(int id, int maxcount, int & oldcount, generic_string **pStrings)
 {
 	int i, count;
 	HWND hCombo;
@@ -480,7 +479,7 @@ void FindReplaceDlg::saveComboHistory(int id, int maxcount, int & oldcount, std:
 		if (i < oldcount)
 			*pStrings[i] = text;
 		else
-			pStrings[i] = new std::generic_string(text);
+			pStrings[i] = new generic_string(text);
 	}
 	for (; i < oldcount; i++) delete pStrings[i];
 	oldcount = count;
@@ -496,21 +495,32 @@ void FindReplaceDlg::updateCombos()
 class Finder : public DockingDlgInterface {
 	friend class FindReplaceDlg;
 public:
-	Finder() : DockingDlgInterface(IDD_FINDRESULT), _pMainFoundInfos(&_foundInfos1), _pMainMarkings(&_markings1) {
+	Finder() :
+		DockingDlgInterface(IDD_FINDRESULT),
+		_ppEditView(NULL),
+		_pMainFoundInfos(&_foundInfos1),
+		_pMainMarkings(&_markings1),
+		nFoundFiles(0),
+		_lastFileHeaderPos(0),
+		_lastSearchHeaderPos(0)
+	{
 		_MarkingsStruct._length = 0;
 		_MarkingsStruct._markings = NULL;
-	};
+	}
 
 	~Finder() {
 		_scintView.destroy();
 	}
+	//(Warning -- Member with different signature hides virtual member 'Window::init(struct HINSTANCE__ *, struct HWND__ *)'
+	//lint -e1411
 	void init(HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView) {
 		DockingDlgInterface::init(hInst, hPere);
 		_ppEditView = ppEditView;
-	};
+	}
+	//lint +e1411
 
 	void addSearchLine(const TCHAR *searchName) {
-		std::generic_string str = TEXT("Search \"");
+		generic_string str = TEXT("Search \"");
 		str += searchName;
 		str += TEXT("\"\r\n");
 
@@ -521,10 +531,10 @@ public:
 
 		_pMainFoundInfos->push_back(EmptyFoundInfo);
 		_pMainMarkings->push_back(EmptySearchResultMarking);
-	};
+	}
 
 	void addFileNameTitle(const TCHAR * fileName) {
-		std::generic_string str = TEXT("  ");
+		generic_string str = TEXT("  ");
 		str += fileName;
 		str += TEXT("\r\n");
 
@@ -535,7 +545,7 @@ public:
 
 		_pMainFoundInfos->push_back(EmptyFoundInfo);
 		_pMainMarkings->push_back(EmptySearchResultMarking);
-	};
+	}
 
 	void addFileHitCount(int count) {
 		TCHAR text[20];
@@ -544,7 +554,7 @@ public:
 		_scintView.insertGenericTextFrom(_lastFileHeaderPos, text);
 		setFinderReadOnly(true);
 		nFoundFiles++;
-	};
+	}
 
 	void addSearchHitCount(int count) {
 		TCHAR text[50];
@@ -552,12 +562,12 @@ public:
 		setFinderReadOnly(false);
 		_scintView.insertGenericTextFrom(_lastSearchHeaderPos, text);
 		setFinderReadOnly(true);
-	};
+	}
 
 
 	void add(FoundInfo fi, SearchResultMarking mi, const TCHAR* foundline, int lineNb) {
 		_pMainFoundInfos->push_back(fi);
-		std::generic_string str = TEXT("\tLine ");
+		generic_string str = TEXT("\tLine ");
 
 		TCHAR lnb[16];
 		wsprintf(lnb, TEXT("%d"), lineNb);
@@ -577,7 +587,7 @@ public:
 		_scintView.addGenericText(str.c_str(), &mi._start, &mi._end);
 		setFinderReadOnly(true);
 		_pMainMarkings->push_back(mi);
-	};
+	}
 
 	void setFinderStyle();
 
@@ -587,7 +597,7 @@ public:
 		setFinderReadOnly(false);
 		_scintView.execute(SCI_CLEARALL);
 		setFinderReadOnly(true);
-	};
+	}
 
 	void beginNewFilesSearch() {
 		_scintView.execute(SCI_SETLEXER, SCLEX_NULL);
@@ -599,7 +609,7 @@ public:
 
 		// fold all old searches (1st level only)
 		_scintView.collapse(searchHeaderLevel - SC_FOLDLEVELBASE, fold_collapse);
-	};
+	}
 
 	void finishFilesSearch(int count) {
 		std::vector<FoundInfo>* _pOldFoundInfos;
@@ -621,7 +631,7 @@ public:
 		_scintView.execute(SCI_SETSEL, 0, 0);
 
 		_scintView.execute(SCI_SETLEXER, SCLEX_SEARCHRESULT);
-	};
+	}
 
 
 	void gotoNextFoundResult(int direction);
@@ -659,8 +669,6 @@ private:
 	static SearchResultMarking EmptySearchResultMarking;
 };
 
-
-
 FoundInfo Finder::EmptyFoundInfo(0, 0, TEXT(""));
 SearchResultMarking Finder::EmptySearchResultMarking;
 
@@ -697,6 +705,9 @@ bool Finder::notify(SCNotification *notification)
 				isDoubleClicked = false;
 			}
 			break;
+
+		default:
+		break;
 	}
 	return false;
 }
@@ -964,7 +975,7 @@ BOOL CALLBACK FindReplaceDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 					bool isUnicode = (*_ppEditView)->getCurrentBuffer()->getUnicodeMode() != uni8Bit;
 
 					HWND hFindCombo = ::GetDlgItem(_hSelf, IDFINDWHAT);
-					std::generic_string str2Search = getTextFromCombo(hFindCombo, isUnicode);
+					generic_string str2Search = getTextFromCombo(hFindCombo, isUnicode);
 					updateCombo(IDFINDWHAT);
 
 					nppParamInst->_isFindReplacing = true;
@@ -980,8 +991,8 @@ BOOL CALLBACK FindReplaceDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 						bool isUnicode = (*_ppEditView)->getCurrentBuffer()->getUnicodeMode() != uni8Bit;
 						HWND hFindCombo = ::GetDlgItem(_hSelf, IDFINDWHAT);
 						HWND hReplaceCombo = ::GetDlgItem(_hSelf, IDREPLACEWITH);
-						std::generic_string str2Search = getTextFromCombo(hFindCombo, isUnicode);
-						std::generic_string str2Replace = getTextFromCombo(hReplaceCombo, isUnicode);
+						generic_string str2Search = getTextFromCombo(hFindCombo, isUnicode);
+						generic_string str2Replace = getTextFromCombo(hReplaceCombo, isUnicode);
 						updateCombos();
 
 						nppParamInst->_isFindReplacing = true;
@@ -1057,7 +1068,7 @@ BOOL CALLBACK FindReplaceDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 					if ((lstrlen(directory) > 0) && (directory[lstrlen(directory)-1] != '\\'))
 						_directory += TEXT("\\");
 
-					std::generic_string msg = TEXT("Are you sure you want to replace all occurances in :\r");
+					generic_string msg = TEXT("Are you sure you want to replace all occurances in :\r");
 					msg += _directory;
 					msg += TEXT("\rfor file type : ");
 					msg += _filters[0]?_filters:TEXT("*.*");
@@ -1099,12 +1110,17 @@ BOOL CALLBACK FindReplaceDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 						(*_ppEditView)->execute(SCI_ENDUNDOACTION);
 						nppParamInst->_isFindReplacing = false;
 
-						TCHAR result[64];
+						generic_string result = TEXT("");
+
 						if (nbReplaced < 0)
-							lstrcpy(result, TEXT("The regular expression to search is formed badly"));
+							result = TEXT("The regular expression to search is formed badly");
 						else
-							wsprintf(result, TEXT("%d occurrences were replaced."), nbReplaced);
-						::MessageBox(_hSelf, result, TEXT("Replace All"), MB_OK);
+						{
+							TCHAR moreInfo[64];
+							wsprintf(moreInfo, TEXT("%d occurrences were replaced."), nbReplaced);
+							result = moreInfo;
+						}
+						::MessageBox(_hSelf, result.c_str(), TEXT("Replace All"), MB_OK);
 					}
 				}
 				return TRUE;
@@ -1114,12 +1130,17 @@ BOOL CALLBACK FindReplaceDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 					if (_currentStatus == FIND_DLG)
 					{
 						int nbCounted = processAll(ProcessCountAll, NULL, NULL);
-						TCHAR result[128];
+						generic_string result = TEXT("");
+
 						if (nbCounted < 0)
-							lstrcpy(result, TEXT("The regular expression to search is formed badly.\r\nIs it resulting in nothing?"));
+							result = TEXT("The regular expression to search is formed badly.\r\nIs it resulting in nothing?");
 						else
-							wsprintf(result, TEXT("%d match(es) to occurrence(s)"), nbCounted);
-						::MessageBox(_hSelf, result, TEXT("Count"), MB_OK);
+						{
+							TCHAR moreInfo[128];
+							wsprintf(moreInfo, TEXT("%d match(es) to occurrence(s)"), nbCounted);
+							result = moreInfo;
+						}
+						::MessageBox(_hSelf, result.c_str(), TEXT("Count"), MB_OK);
 					}
 				}
 				return TRUE;
@@ -1133,12 +1154,16 @@ BOOL CALLBACK FindReplaceDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 						nppParamInst->_isFindReplacing = true;
 						int nbMarked = processAll(ProcessMarkAll, NULL, NULL);
 						nppParamInst->_isFindReplacing = false;
-						TCHAR result[128];
+						generic_string result = TEXT("");
 						if (nbMarked < 0)
-							lstrcpy(result, TEXT("The regular expression to search is formed badly.\r\nIs it resulting in nothing?"));
+							result = TEXT("The regular expression to search is formed badly.\r\nIs it resulting in nothing?");
 						else
-							wsprintf(result, TEXT("%d match(es) to occurrence(s)"), nbMarked);
-						::MessageBox(_hSelf, result, TEXT("Mark"), MB_OK);
+						{
+							TCHAR moreInfo[128];
+							wsprintf(moreInfo, TEXT("%d match(es) to occurrence(s)"), nbMarked);
+							result = moreInfo;
+						}
+						::MessageBox(_hSelf, result.c_str(), TEXT("Mark"), MB_OK);
 					}
 				}
 				return TRUE;
@@ -1327,6 +1352,9 @@ BOOL CALLBACK FindReplaceDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 			}
 			break;
 		}
+
+		default:
+		break;
 	}
 	return FALSE;
 }
@@ -1349,7 +1377,7 @@ bool FindReplaceDlg::processFindNext(const TCHAR *txt2find, FindOption *options,
 	lstrcpy(pText, txt2find);
 
 	if (pOptions->_searchType == FindExtended) {
-		stringSizeFind = Searching::convertExtendedToString(txt2find, pText, stringSizeFind);
+		Searching::convertExtendedToString(txt2find, pText, stringSizeFind);
 	}
 
 	int docLength = int((*_ppEditView)->execute(SCI_GETLENGTH));
@@ -1421,7 +1449,7 @@ bool FindReplaceDlg::processFindNext(const TCHAR *txt2find, FindOption *options,
 			//failed, or failed twice with wrap
 			if (NotIncremental==pOptions->_incrementalType) //incremental search doesnt trigger messages
 			{
-				std::generic_string msg = TEXT("Can't find the text:\r\n\"");
+				generic_string msg = TEXT("Can't find the text:\r\n\"");
 				msg += pText;
 				msg += TEXT("\"");
 				::MessageBox(_hSelf, msg.c_str(), TEXT("Find"), MB_OK);
@@ -1472,8 +1500,8 @@ bool FindReplaceDlg::processReplace(const TCHAR *txt2find, const TCHAR *txt2repl
 	lstrcpy(pTextReplace, txt2replace);
 
 	if (pOptions->_searchType == FindExtended) {
-		stringSizeFind = Searching::convertExtendedToString(txt2find, pTextFind, stringSizeFind);
-		stringSizeReplace = Searching::convertExtendedToString(txt2replace, pTextReplace, stringSizeReplace);
+		Searching::convertExtendedToString(txt2find, pTextFind, stringSizeFind);
+		Searching::convertExtendedToString(txt2replace, pTextReplace, stringSizeReplace);
 	}
 
 	bool isRegExp = pOptions->_searchType == FindRegex;
@@ -1617,7 +1645,7 @@ int FindReplaceDlg::processRange(ProcessOperation op, const TCHAR *txt2find, con
 	if (!txt2find)
 	{
 		HWND hFindCombo = ::GetDlgItem(_hSelf, IDFINDWHAT);
-		std::generic_string str2Search = getTextFromCombo(hFindCombo, isUnicode);
+		generic_string str2Search = getTextFromCombo(hFindCombo, isUnicode);
 		stringSizeFind = str2Search.length();
 		pTextFind = new TCHAR[stringSizeFind + 1];
 		lstrcpy(pTextFind, str2Search.c_str());
@@ -1641,7 +1669,7 @@ int FindReplaceDlg::processRange(ProcessOperation op, const TCHAR *txt2find, con
 		if (!txt2replace)
 		{
 			HWND hReplaceCombo = ::GetDlgItem(_hSelf, IDREPLACEWITH);
-			std::generic_string str2Replace = getTextFromCombo(hReplaceCombo, isUnicode);
+			generic_string str2Replace = getTextFromCombo(hReplaceCombo, isUnicode);
 			stringSizeReplace = str2Replace.length();
 			pTextReplace = new TCHAR[stringSizeReplace + 1];
 			lstrcpy(pTextReplace, str2Replace.c_str());
@@ -1655,9 +1683,9 @@ int FindReplaceDlg::processRange(ProcessOperation op, const TCHAR *txt2find, con
 	}
 
 	if (pOptions->_searchType == FindExtended) {
-		stringSizeFind = Searching::convertExtendedToString(pTextFind, pTextFind, stringSizeFind);
+		Searching::convertExtendedToString(pTextFind, pTextFind, stringSizeFind);
 		if (op == ProcessReplaceAll)
-			stringSizeReplace = Searching::convertExtendedToString(pTextReplace, pTextReplace, stringSizeReplace);
+			Searching::convertExtendedToString(pTextReplace, pTextReplace, stringSizeReplace);
 	}
 
 	bool isRegExp = pOptions->_searchType == FindRegex;
@@ -1676,12 +1704,9 @@ int FindReplaceDlg::processRange(ProcessOperation op, const TCHAR *txt2find, con
 		}
 	}
 
-	int targetStart = 0;
-	int targetEnd = 0;
-
 	//Initial range for searching
 	(*_ppEditView)->execute(SCI_SETSEARCHFLAGS, flags);
-	targetStart = (*_ppEditView)->searchInTarget(pTextFind, startRange, endRange);
+	int targetStart = (*_ppEditView)->searchInTarget(pTextFind, startRange, endRange);
 
 	if ((targetStart != -1) && (op == ProcessFindAll))	//add new filetitle if this file results in hits
 	{
@@ -1691,7 +1716,7 @@ int FindReplaceDlg::processRange(ProcessOperation op, const TCHAR *txt2find, con
 	{
 		//int posFindBefore = posFind;
 		targetStart = int((*_ppEditView)->execute(SCI_GETTARGETSTART));
-		targetEnd = int((*_ppEditView)->execute(SCI_GETTARGETEND));
+		int targetEnd = int((*_ppEditView)->execute(SCI_GETTARGETEND));
 		if (targetEnd > endRange) {	//we found a result but outside our range, therefore do not process it
 			break;
 		}
@@ -1724,7 +1749,7 @@ int FindReplaceDlg::processRange(ProcessOperation op, const TCHAR *txt2find, con
 				int end_mark = targetEnd - lstart;
 
 				(*_ppEditView)->getGenericText(lineBuf, lstart, lend, &start_mark, &end_mark);
-				std::generic_string line;
+				generic_string line;
 #ifdef UNICODE
 				line = lineBuf;
 #else
@@ -2003,7 +2028,7 @@ void FindReplaceDlg::enableFindInFilesControls(bool isEnable)
     ::ShowWindow(::GetDlgItem(_hSelf, IDD_FINDINFILES_FOLDERFOLLOWSDOC_CHECK), isEnable?SW_SHOW:SW_HIDE);
 }
 
-void FindReplaceDlg::getPatterns(std::vector<std::generic_string> & patternVect)
+void FindReplaceDlg::getPatterns(std::vector<generic_string> & patternVect)
 {
 	cutString(_filters.c_str(), patternVect);
 }
@@ -2013,7 +2038,7 @@ void FindReplaceDlg::combo2ExtendedMode(int comboID)
 	HWND hFindCombo = ::GetDlgItem(_hSelf, comboID);
 	if (!hFindCombo) return;
 
-	std::generic_string str2transform = getTextFromCombo(hFindCombo);
+	generic_string str2transform = getTextFromCombo(hFindCombo);
 
     // Count the number of character '\n' and '\r'
     size_t nbEOL = 0;
@@ -2059,6 +2084,7 @@ void FindReplaceDlg::combo2ExtendedMode(int comboID)
 
 FindReplaceDlg::~FindReplaceDlg()
 {
+	FindReplaceDlg::destroy();
 	if (_pFinder)
 		delete _pFinder;
 	delete [] _uniFileName;
@@ -2130,11 +2156,26 @@ void FindReplaceDlg::updateCombo( int comboID )
 }
 
 FindReplaceDlg::FindReplaceDlg() :
-	StaticDialog(),
-	_pFinder(NULL), _isRTL(false), _isRecursive(true),_isInHiddenDir(false), _fileNameLenMax(1024),
+	_currentStatus(FIND_DLG),
+	_doPurge(false),
+	_doMarkLine(false),
+	_doStyleFoundToken(false),
+	_isInSelection(false),
+	_ppEditView(NULL),
+	_pFinder(NULL), _isRTL(false),
+	_findAllResult(0),
+	_isRecursive(true),
+	_isInHiddenDir(false),
+	_fileNameLenMax(1024),
+	// JOCE: weird.  Probably assumes Unicode == wide char.
+	_uniFileName(new char[(_fileNameLenMax + 3) * 2]),
 	_tab(NULL)
 {
-	_uniFileName = new char[(_fileNameLenMax + 3) * 2];
+	memset(&_findClosePos, 0, sizeof(RECT));
+	memset(&_replaceClosePos, 0, sizeof(RECT));
+	memset(&_findInFilesClosePos, 0, sizeof(RECT));
+
+	memset(&_findAllResultStr, 0, 1024 * sizeof(TCHAR));
 }
 
 void FindReplaceDlg::changeTabName( DIALOG_TYPE index, const TCHAR *name2change )
@@ -2230,7 +2271,7 @@ void FindReplaceDlg::setFindInFilesDirFilter( const TCHAR *dir, const TCHAR *fil
 	}
 }
 
-std::generic_string FindReplaceDlg::getText2search() const
+generic_string FindReplaceDlg::getText2search() const
 {
 	return getTextFromCombo(::GetDlgItem(_hSelf, IDFINDWHAT));
 }
@@ -2474,7 +2515,7 @@ BOOL CALLBACK FindIncrementDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM 
 							fo._whichDirection = DIR_UP;
 					}
 
-					std::generic_string str2Search = _pFRDlg->getTextFromCombo(::GetDlgItem(_hSelf, IDC_INCFINDTEXT), isUnicode);
+					generic_string str2Search = _pFRDlg->getTextFromCombo(::GetDlgItem(_hSelf, IDC_INCFINDTEXT), isUnicode);
 					_pFRDlg->processFindNext(str2Search.c_str(), &fo, &findStatus);
 					setFindStatus(findStatus);
 				}
@@ -2491,14 +2532,17 @@ BOOL CALLBACK FindIncrementDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM 
 							fo._isMatchCase = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_INCFINDMATCHCASE, BM_GETCHECK, 0, 0));
 							fo._incrementalType = FirstIncremental;
 
-							std::generic_string str2Search = _pFRDlg->getTextFromCombo(::GetDlgItem(_hSelf, IDC_INCFINDTEXT), isUnicode);
+							generic_string str2Search = _pFRDlg->getTextFromCombo(::GetDlgItem(_hSelf, IDC_INCFINDTEXT), isUnicode);
 							_pFRDlg->processFindNext(str2Search.c_str(), &fo, &findStatus);
 							setFindStatus(findStatus);
+							return TRUE;
 						}
-					return TRUE;
-					case EN_KILLFOCUS :
-					case EN_SETFOCUS :
-						break;
+
+						case EN_KILLFOCUS :
+						case EN_SETFOCUS :
+							break;
+
+						NO_DEFAULT_CASE;
 					}
 				}
 				return TRUE;
@@ -2509,7 +2553,8 @@ BOOL CALLBACK FindIncrementDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM 
 					fo._isWholeWord = false;
 					fo._incrementalType = FirstIncremental;
 					fo._isMatchCase = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_INCFINDMATCHCASE, BM_GETCHECK, 0, 0));
-					std::generic_string str2Search = _pFRDlg->getTextFromCombo(::GetDlgItem(_hSelf, IDC_INCFINDTEXT), isUnicode);
+
+					generic_string str2Search = _pFRDlg->getTextFromCombo(::GetDlgItem(_hSelf, IDC_INCFINDTEXT), isUnicode);
 					bool isFound = _pFRDlg->processFindNext(str2Search.c_str(), &fo, &findStatus);
 					setFindStatus(findStatus);
 					if (!isFound)
@@ -2519,6 +2564,7 @@ BOOL CALLBACK FindIncrementDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM 
 						(*(_pFRDlg->_ppEditView))->execute(SCI_SETSEL, (WPARAM)-1, range.cpMin);
 					}
 				}
+				return TRUE;
 
 				case IDC_INCFINDHILITEALL :
 				{
@@ -2527,7 +2573,7 @@ BOOL CALLBACK FindIncrementDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM 
 					fo._incrementalType = FirstIncremental;
 					fo._isMatchCase = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_INCFINDMATCHCASE, BM_GETCHECK, 0, 0));
 
-					std::generic_string str2Search = _pFRDlg->getTextFromCombo(::GetDlgItem(_hSelf, IDC_INCFINDTEXT), isUnicode);
+					generic_string str2Search = _pFRDlg->getTextFromCombo(::GetDlgItem(_hSelf, IDC_INCFINDTEXT), isUnicode);
 					bool isHiLieAll = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_INCFINDHILITEALL, BM_GETCHECK, 0, 0));
 					if (str2Search == TEXT(""))
 						isHiLieAll = false;
@@ -2535,8 +2581,10 @@ BOOL CALLBACK FindIncrementDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM 
 				}
 				return TRUE;
 
+				NO_DEFAULT_CASE;
 			}
 		}
+		break;
 
 		case WM_ERASEBKGND:
 		{
@@ -2558,6 +2606,9 @@ BOOL CALLBACK FindIncrementDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM 
 			return FALSE;
 			break;
 		}
+
+		default:
+		break;
 	}
 	return FALSE;
 }
@@ -2615,6 +2666,12 @@ void FindIncrementDlg::addToRebar(ReBar * rebar)
 
 	_pRebar->addBand(&_rbBand, true);
 }
+
+FindIncrementDlg::~FindIncrementDlg()
+{
+	FindIncrementDlg::destroy();
+}
+
 
 void FindIncrementDlg::init( HINSTANCE hInst, HWND hPere, FindReplaceDlg *pFRDlg, bool isRTL /*= false*/ )
 {

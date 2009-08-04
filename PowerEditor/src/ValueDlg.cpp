@@ -23,7 +23,7 @@ void ValueDlg::init( HINSTANCE hInst, HWND parent, int valueToSet, const TCHAR *
 {
 	Window::init(hInst, parent);
 	_defaultValue = valueToSet;
-	lstrcpy(_name, text);
+	_name = text;
 }
 
 int ValueDlg::doDialog( POINT p, bool isRTL /*= false*/ )
@@ -78,7 +78,7 @@ BOOL CALLBACK ValueDlg::run_dlgProc( UINT Message, WPARAM wParam, LPARAM /*lPara
 	{
 	case WM_INITDIALOG :
 		{
-			::SetDlgItemText(_hSelf, IDC_VALUE_STATIC, _name);
+			::SetDlgItemText(_hSelf, IDC_VALUE_STATIC, _name.c_str());
 			::SetDlgItemInt(_hSelf, IDC_VALUE_EDIT, _defaultValue, FALSE);
 
 			RECT rc;

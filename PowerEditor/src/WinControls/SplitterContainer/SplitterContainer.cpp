@@ -25,8 +25,11 @@
 bool SplitterContainer::_isRegistered = false;
 
 SplitterContainer::SplitterContainer():
-	Window(), _x(0), _y(0), _hPopupMenu(NULL),
-	_dwSplitterStyle(SV_ENABLERDBLCLK | SV_ENABLELDBLCLK | SV_RESIZEWTHPERCNT)
+	_pWin0(NULL), _pWin1(NULL),
+	_splitterSize(0), _ratio(1),
+	_x(0), _y(0), _hPopupMenu(NULL),
+	_dwSplitterStyle(SV_ENABLERDBLCLK | SV_ENABLELDBLCLK | SV_RESIZEWTHPERCNT),
+	_splitterMode(DYNAMIC)
 {
 }
 
@@ -41,10 +44,13 @@ SplitterContainer::~SplitterContainer()
 void SplitterContainer::destroy()
 {
 	if (_hPopupMenu)
+	{
 		::DestroyMenu(_hPopupMenu);
+		_hPopupMenu = NULL;
+	}
 	_splitter.destroy();
-	::DestroyWindow(_hSelf);
-	_hSelf = NULL;
+
+	Window::destroy();
 }
 
 void SplitterContainer::create(Window *pWin0, Window *pWin1, int splitterSize,
@@ -169,6 +175,7 @@ LRESULT SplitterContainer::runProc(UINT message, WPARAM wParam, LPARAM lParam)
 				case RIGHT_ROTATION:
 					rotateTo(RIGHT);
 					return TRUE;
+				NO_DEFAULT_CASE;
 			}
 			return TRUE;
 		}

@@ -59,10 +59,6 @@ class Splitter : public Window
 {
 public:
 	Splitter();
-	~Splitter(){};
-	void destroy() {
-		::DestroyWindow(_hSelf);
-	};
 	void resizeSpliter(RECT *pRect = NULL);
 	void init(HINSTANCE hInst, HWND hPere, int splitterSize,
 			int iSplitRatio, DWORD dwFlags);

@@ -141,13 +141,6 @@ public:
 	ScintillaEditView();
 
 	virtual ~ScintillaEditView();
-	virtual void destroy()
-	{
-
-		::DestroyWindow(_hSelf);
-		_hSelf = NULL;
-	};
-
 	virtual void init(HINSTANCE hInst, HWND hPere);
 
 	LRESULT execute(UINT Msg, WPARAM wParam=0, LPARAM lParam=0) const {
@@ -295,29 +288,7 @@ public:
 
 	bool isSelecting() const;
 	void setHiLiteResultWords(const TCHAR *keywords);
-/*
-	pair<size_t, bool> getLineUndoState(size_t currentLine) {
-		Buffer * buf = getCurrentBuffer();
-		return buf->getLineUndoState(currentLine);
-	};
-	void setLineUndoState(size_t currentLine, size_t undoLevel, bool isSaved = false) {
-		Buffer * buf = getCurrentBuffer();
-		buf->setLineUndoState(currentLine, undoLevel, isSaved);
-	};
 
-	void markSavedLines() {
-		for (int i = 0 ; i <= lastZeroBasedLineNumber() ; i++)
-		{
-			if ((execute(SCI_MARKERGET, i) & (1 << MARK_LINEMODIFIEDUNSAVED)) != 0)
-			{
-				execute(SCI_MARKERDELETE, i, MARK_LINEMODIFIEDUNSAVED);
-				execute(SCI_MARKERADD, i, MARK_LINEMODIFIEDSAVED);
-				//pair<size_t, bool> st = getLineUndoState(i);
-				setLineUndoState(i, 0, true);
-			}
-		}
-	};
-*/
 protected:
 	static HINSTANCE _hLib;
 	static int _refCount;
@@ -332,25 +303,18 @@ protected:
 
 	SCINTILLA_FUNC _pScintillaFunc;
 	SCINTILLA_PTR  _pScintillaPtr;
-
 	static WNDPROC _scintillaDefaultProc;
 	CallWindowProcFunc _callWindowProc;
-
 	BufferID attachDefaultDoc();
 
 	//Store the current buffer so it can be retrieved later
 	BufferID _currentBufferID;
 	Buffer * _currentBuffer;
-
 	folderStyle _folderStyle;
-
     NppParameters *_pParameter;
-
 	int _codepage;
 	int _oemCodepage;
-
 	bool _lineNumbersShown;
-
 	bool _wrapRestoreNeeded;
 
 	typedef std::map<int, Style*> StyleMap;

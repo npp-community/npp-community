@@ -93,14 +93,13 @@ void SmartHighlighter::highlightView(ScintillaEditView * pHighlightView)
 	fo._isMatchCase = false;
 	fo._isWholeWord = true;
 
-	const TCHAR * searchText = NULL;
 #ifdef UNICODE
 	WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
 	unsigned int cp = pHighlightView->execute(SCI_GETCODEPAGE);
 	const TCHAR * text2FindW = wmc->char2wchar(text2Find, cp);
-	searchText = text2FindW;
+	const TCHAR * searchText = text2FindW;
 #else
-	searchText = text2Find;
+	const TCHAR * searchText = text2Find;
 #endif
 
 	for(; currentLine < lastLine; currentLine++) {
@@ -176,6 +175,7 @@ bool SmartHighlighter::isWordChar(char ch) const
 		case '>':
 		case '\\':
 			return false;
+		default:
+			return true;
 	}
-	return true;
 };

@@ -26,18 +26,18 @@ struct Position
 	int _xOffset;
 	int _selMode;
 	int _scrollWidth;
-	Position() : _firstVisibleLine(0), _startPos(0), _endPos(0), _xOffset(0), _scrollWidth(1), _selMode(0) {};
+	Position() : _firstVisibleLine(0), _startPos(0), _endPos(0), _xOffset(0), _selMode(0), _scrollWidth(1) {}
 };
 
 struct sessionFileInfo : public Position {
 	sessionFileInfo(const TCHAR *fn);
 	sessionFileInfo(const TCHAR *fn, const TCHAR *ln, Position pos);
 
-	sessionFileInfo(std::generic_string fn) : _fileName(fn){};
-	sessionFileInfo(std::generic_string fn, Position pos) : Position(pos), _fileName(fn){};
+	sessionFileInfo(generic_string fn) : _fileName(fn){};
+	sessionFileInfo(generic_string fn, Position pos) : Position(pos), _fileName(fn){};
 
-	std::generic_string _fileName;
-	std::generic_string	_langName;
+	generic_string _fileName;
+	generic_string	_langName;
 	std::vector<size_t> marks;
 };
 

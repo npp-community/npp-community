@@ -18,6 +18,30 @@
 #include "precompiled_headers.h"
 #include "process.h"
 
+Process::Process(progType pt) :
+	_type(pt),
+	_exitCode(STILL_ACTIVE),
+	_hPipeOutR(NULL),
+	_hPipeErrR(NULL),
+	_hProcess(NULL),
+	_hProcessThread(NULL),
+	_bProcessEnd(TRUE)
+{}
+
+Process::Process(const TCHAR *cmd, const TCHAR *args, const TCHAR *cDir, progType pt) :
+	_type(pt),
+	_command(cmd),
+	_args(args),
+	_curDir(cDir),
+	_exitCode(STILL_ACTIVE),
+	_hPipeOutR(NULL),
+	_hPipeErrR(NULL),
+	_hProcess(NULL),
+	_hProcessThread(NULL),
+	_bProcessEnd(TRUE)
+{
+}
+
 BOOL Process::run()
 {
 	BOOL result = TRUE;
@@ -56,7 +80,7 @@ BOOL Process::run()
 		startup.hStdOutput = hPipeOutW;
 		startup.hStdError = hPipeErrW;
 
-		std::generic_string cmd = TEXT("\"");
+		generic_string cmd = TEXT("\"");
 		cmd += _command;
 		cmd += TEXT("\"");
 
@@ -65,14 +89,14 @@ BOOL Process::run()
 			cmd += TEXT(" ");
 			cmd += _args;
 		}
-        BOOL started = ::CreateProcess(NULL,        // command is part of input std::generic_string
-						(TCHAR *)cmd.c_str(),         // (writeable) command std::generic_string
+        BOOL started = ::CreateProcess(NULL,        // command is part of input generic_string
+						(TCHAR *)cmd.c_str(),         // (writeable) command generic_string
 						NULL,        // process security
 						NULL,        // thread security
 						TRUE,        // inherit handles flag
 						(_type == WIN32_PROG)?NULL:CREATE_SUSPENDED,           // flags
 						NULL,        // inherit environment
-						_curDir,        // inherit directory
+						_curDir.c_str(),        // inherit directory
 						&startup,    // STARTUPINFO
 						&procinfo);  // PROCESS_INFORMATION
 
@@ -194,7 +218,6 @@ void Process::listenerStdOut()
 
 		if (!::PeekNamedPipe(_hPipeOutR, bufferOut, taille, &outbytesRead, &bytesAvail, NULL))
 		{
-			bytesAvail = 0;
 			break;
 		}
 
@@ -202,11 +225,13 @@ void Process::listenerStdOut()
 		{
 			result = :: ReadFile(_hPipeOutR, bufferOut, taille, &outbytesRead, NULL);
 			if ((!result) && (outbytesRead == 0))
+			{
 				break;
+			}
 		}
 		//outbytesRead = lstrlen(bufferOut);
 		bufferOut[outbytesRead] = '\0';
-		std::generic_string s;
+		generic_string s;
 		s.assign(bufferOut);
 		_stdoutStr += s;
 
@@ -253,7 +278,6 @@ void Process::listenerStdErr()
 
 		if (!::PeekNamedPipe(_hPipeErrR, bufferErr, taille, &errbytesRead, &bytesAvail, NULL))
 		{
-			bytesAvail = 0;
 			break;
 		}
 
@@ -261,18 +285,22 @@ void Process::listenerStdErr()
 		{
 			result = :: ReadFile(_hPipeErrR, bufferErr, taille, &errbytesRead, NULL);
 			if ((!result) && (errbytesRead == 0))
+			{
 				break;
+			}
 		}
 		//outbytesRead = lstrlen(bufferOut);
 		bufferErr[errbytesRead] = '\0';
-		std::generic_string s;
+		generic_string s;
 		s.assign(bufferErr);
 		_stderrStr += s;
 
 		if (::GetExitCodeProcess(_hProcess, (unsigned long*)&nExitCode))
 		{
 			if (nExitCode != STILL_ACTIVE)
+			{
 				break; // EOF condition
+			}
 		}
 	}
 

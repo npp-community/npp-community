@@ -33,10 +33,10 @@ class TaskList;
 struct TaskLstFnStatus {
 	int _iView;
 	int _docIndex;
-	std::generic_string _fn;
+	generic_string _fn;
 	int _status;
-	TaskLstFnStatus(std::generic_string str, int status) : _fn(str), _status(status){};
-	TaskLstFnStatus(int iView, int docIndex, std::generic_string str, int status) : _iView(iView), _docIndex(docIndex), _fn(str), _status(status) {};
+	TaskLstFnStatus(generic_string str, int status) : _fn(str), _status(status){};
+	TaskLstFnStatus(int iView, int docIndex, generic_string str, int status) : _iView(iView), _docIndex(docIndex), _fn(str), _status(status) {};
 };
 
 struct TaskListInfo {

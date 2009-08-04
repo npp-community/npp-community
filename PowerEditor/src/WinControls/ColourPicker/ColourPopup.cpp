@@ -20,6 +20,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "precompiled_headers.h"
 #include "ColourPopup.h"
 #include "ColourPopupResource.h"
+#include "colors.h"
 
 DWORD colourItems[] = {
 	RGB(  0,   0,   0),	RGB( 64,   0,   0),	RGB(128,   0,   0),	RGB(128,  64,  64),	RGB(255,   0,   0),	RGB(255, 128, 128),
@@ -31,6 +32,20 @@ DWORD colourItems[] = {
 	RGB( 64,   0,  64),	RGB( 64,   0,  64),	RGB(128,   0, 128),	RGB(128,   0,  64),	RGB(128, 128, 192),	RGB(255, 128, 192),
 	RGB(255, 128, 255),	RGB(255,   0, 255), RGB(255,   0, 128),	RGB(128,   0, 255), RGB( 64,   0, 128),	RGB(255, 255, 255),
 };
+
+ColourPopup::ColourPopup() :
+	_colour(black),
+	isColourChooserLaunched(false)
+{
+	memset(&_rc, 0, sizeof(RECT));
+}
+
+ColourPopup::ColourPopup(COLORREF defaultColor) :
+	_colour(defaultColor),
+	isColourChooserLaunched(false)
+{
+	memset(&_rc, 0, sizeof(RECT));
+}
 
 void ColourPopup::create(int dialogID)
 {
@@ -130,8 +145,11 @@ BOOL CALLBACK ColourPopup::run_dlgProc(UINT message, WPARAM wParam, LPARAM lPara
 							DeleteObject(hbrush);
 							FrameRect(hdc, &rc, (HBRUSH) GetStockObject(GRAY_BRUSH));
 							break;
+
+						NO_DEFAULT_CASE;
 					}
 					// *** FALL THROUGH ***
+					//lint -fallthrough
 				case ODA_SELECT:
 					rc = pdis->rcItem;
 					if (pdis->itemState & ODS_SELECTED)
@@ -219,6 +237,7 @@ BOOL CALLBACK ColourPopup::run_dlgProc(UINT message, WPARAM wParam, LPARAM lPara
                         ::SendMessage(_hParent, WM_PICKUP_COLOR, _colour, 0);
 					    return TRUE;
 		            }
+		            return FALSE;
                 }
 
                 default :
@@ -233,6 +252,8 @@ BOOL CALLBACK ColourPopup::run_dlgProc(UINT message, WPARAM wParam, LPARAM lPara
 			return TRUE;
 		}
 
+		default:
+		break;
 	}
 	return FALSE;
 }

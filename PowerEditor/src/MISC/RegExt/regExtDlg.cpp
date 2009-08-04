@@ -138,6 +138,7 @@ BOOL CALLBACK RegExtDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
 					::EndDialog(_hSelf, 0);
 					return TRUE;
 
+				NO_DEFAULT_CASE;
 			}
 
 			if (HIWORD(wParam) == EN_CHANGE)
@@ -212,10 +213,12 @@ BOOL CALLBACK RegExtDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
 				}
 			}
 		}
+		break;
+
 		default :
 			return FALSE;
 	}
-	//return FALSE;
+	return FALSE;
 }
 
 void RegExtDlg::getRegisteredExts()
@@ -224,7 +227,6 @@ void RegExtDlg::getRegisteredExts()
 	for (int i = 0 ; i < nbRegisteredKey ; i++)
 	{
 		TCHAR extName[extNameLen];
-		//FILETIME fileTime;
 		int extNameActualLen = extNameLen;
 		int res = ::RegEnumKeyEx(HKEY_CLASSES_ROOT, i, extName, (LPDWORD)&extNameActualLen, NULL, NULL, NULL, NULL);
 		if ((res == ERROR_SUCCESS) && (extName[0] == '.'))
@@ -234,10 +236,8 @@ void RegExtDlg::getRegisteredExts()
 			int valDataLen = extNameLen * sizeof(TCHAR);
 			int valType;
 			HKEY hKey2Check;
-			extNameActualLen = extNameLen;
 			::RegOpenKeyEx(HKEY_CLASSES_ROOT, extName, 0, KEY_ALL_ACCESS, &hKey2Check);
 			::RegQueryValueEx(hKey2Check, TEXT(""), NULL, (LPDWORD)&valType, (LPBYTE)valData, (LPDWORD)&valDataLen);
-			//::RegEnumValue(hKey2Check, 0, valName, (LPDWORD)&extNameActualLen, NULL, (LPDWORD)&valType, (LPBYTE)valData, (LPDWORD)&valDataLen);
 			if ((valType == REG_SZ) && (!lstrcmp(valData, nppName)))
 				::SendDlgItemMessage(_hSelf, IDC_REGEXT_REGISTEREDEXTS_LIST, LB_ADDSTRING, 0, (LPARAM)extName);
 			::RegCloseKey(hKey2Check);
@@ -323,12 +323,12 @@ void RegExtDlg::writeNppPath()
 	HKEY  hKey, hRootKey;
 	DWORD dwDisp;
 	long  nRet;
-	TCHAR regStr[MAX_PATH] = TEXT("");
-	lstrcat(lstrcat(regStr, nppName), TEXT("\\shell\\open\\command"));
+	generic_string regStr(nppName);
+	regStr += TEXT("\\shell\\open\\command");
 
 	nRet = ::RegCreateKeyEx(
 				HKEY_CLASSES_ROOT,
-				regStr,
+				regStr.c_str(),
 				0,
 				NULL,
 				0,
@@ -359,11 +359,11 @@ void RegExtDlg::writeNppPath()
 	}
 
 	//Set default icon value
-	lstrcpy(regStr, nppName);
-	lstrcat(regStr, TEXT("\\DefaultIcon"));
+	regStr = nppName;
+	regStr += TEXT("\\DefaultIcon");
 	nRet = ::RegCreateKeyEx(
 				HKEY_CLASSES_ROOT,
-				regStr,
+				regStr.c_str(),
 				0,
 				NULL,
 				0,

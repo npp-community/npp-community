@@ -28,10 +28,15 @@ class ValueDlg : public StaticDialog
 {
 public :
         ValueDlg() :
-			StaticDialog(),
-			_nbNumber(DEFAULT_NB_NUMBER)
-		{}
+			_nbNumber(DEFAULT_NB_NUMBER),
+			_defaultValue(0)
+		{
+			memset(&_p, 0, sizeof(POINT));
+		}
+		//(Warning -- Member with different signature hides virtual member 'Window::init(struct HINSTANCE__ *, struct HWND__ *)'
+		//lint -e1411
         void init(HINSTANCE hInst, HWND parent, int valueToSet, const TCHAR *text);
+		//lint +e1411
         int doDialog(POINT p, bool isRTL = false);
 		void setNBNumber(int nbNumber);
 		int reSizeValueBox();
@@ -42,7 +47,7 @@ protected :
 private :
 	int _nbNumber;
     int _defaultValue;
-	TCHAR _name[32];
+	generic_string _name;
 	POINT _p;
 
 };

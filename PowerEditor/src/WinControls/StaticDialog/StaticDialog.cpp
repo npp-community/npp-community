@@ -22,9 +22,13 @@
 
 StaticDialog::~StaticDialog()
 {
-	if (isCreated()) {
+	if (Window::isCreated()) {
 		::SetWindowLongPtr(_hSelf, GWL_USERDATA, (long)NULL);	//Prevent run_dlgProc from doing anything, since its virtual
-		destroy();
+
+		// Can't call an actual virtual function in a destructor,
+		// as the virtual table is destroyed or in the process of being destroyed.
+		// We can only call the one from this class.
+		StaticDialog::destroy();
 	}
 }
 
@@ -191,7 +195,9 @@ POINT StaticDialog::getLeftTopPoint(HWND hwnd/*, POINT & p*/) const
 
 void StaticDialog::destroy()
 {
-	::SendMessage(_hParent, NPPM_MODELESSDIALOG, MODELESSDIALOGREMOVE, (WPARAM)_hSelf);
-	::DestroyWindow(_hSelf);
-	_hSelf = NULL;
+	if (_hSelf)
+	{
+		::SendMessage(_hParent, NPPM_MODELESSDIALOG, MODELESSDIALOGREMOVE, (WPARAM)_hSelf);
+	}
+	Window::destroy();
 };

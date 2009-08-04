@@ -48,6 +48,14 @@ enum DIALOG_TYPE {FIND_DLG, REPLACE_DLG, FINDINFILES_DLG};
 
 enum InWhat{ALL_OPEN_DOCS, FILES_IN_DIR, CURRENT_DOC};
 
+struct FoundInfo {
+	FoundInfo(int start, int end, const TCHAR *fullPath)
+		: _start(start), _end(end), _fullPath(fullPath) {};
+	int _start;
+	int _end;
+	std::generic_string _fullPath;
+};
+
 struct TargetRange {
 	int targetStart;
 	int targetEnd;
@@ -161,6 +169,8 @@ private :
 	bool _isRTL;
 
 	int _findAllResult;
+
+	// JOCE either remove the magic number, or use a std::string if possible.
 	TCHAR _findAllResultStr[1024];
 
 	std::generic_string _filters;
@@ -197,6 +207,7 @@ class FindIncrementDlg : public StaticDialog
 {
 public :
 	FindIncrementDlg() : _pFRDlg(NULL), _pRebar(NULL) {};
+	~FindIncrementDlg();
 	void init(HINSTANCE hInst, HWND hPere, FindReplaceDlg *pFRDlg, bool isRTL = false);
 	virtual void destroy();
 	virtual void display(bool toShow = true) const;

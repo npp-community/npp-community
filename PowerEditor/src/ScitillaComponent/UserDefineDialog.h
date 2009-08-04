@@ -70,8 +70,6 @@ protected :
 	virtual int getGroupIndexFromCombo(int ctrlID, bool & isFontSize) const = 0;
 	virtual int getStylerIndexFromCP(HWND hWnd, bool & isFG, ColourPicker **ppCP) const = 0;
 	virtual int getGroupeIndexFromCheck(int ctrlID, int & fontStyleMask) const = 0;
-
-
 };
 
 class FolderStyleDialog : public SharedParametersDialog
@@ -175,7 +173,7 @@ public :
 	}
 
 	void destroy() {
-		// A Ajouter les fils...
+		// JOCE destroy all children...
 	};
 
 	int getWidth() const {

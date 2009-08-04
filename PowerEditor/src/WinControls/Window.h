@@ -22,7 +22,14 @@ class Window
 {
 public:
 	Window(): _hInst(NULL), _hParent(NULL), _hSelf(NULL){};
-	virtual ~Window() {};
+	virtual ~Window()
+	{
+		Window::destroy();
+	}
+
+	virtual bool isCreated() const {
+		return (_hSelf != NULL);
+	}
 
 	virtual void init(HINSTANCE hInst, HWND parent)
 	{
@@ -30,7 +37,14 @@ public:
 		_hParent = parent;
 	}
 
-	virtual void destroy() = 0;
+	virtual void destroy()
+	{
+		if (_hSelf)
+		{
+			::DestroyWindow(_hSelf);
+			_hSelf = NULL;
+		}
+	}
 
 	virtual void display(bool toShow = true) const {
 		::ShowWindow(_hSelf, toShow?SW_SHOW:SW_HIDE);

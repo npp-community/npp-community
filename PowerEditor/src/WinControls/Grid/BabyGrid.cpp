@@ -13,6 +13,9 @@ Modified by Don HO <don.h@free.fr>
 #include "precompiled_headers.h"
 #include "babygrid.h"
 
+// Disable Lint check of the indentation. The coding style in this file totally throws it off.
+//lint -e539 Did not expect positive indentation from Location
+
 #define MAX_GRIDS 20
 
 #define MAX_ROWS 32000
@@ -106,7 +109,8 @@ TCHAR data[1000];
 
 
 
-CREATESTRUCT cs,*lpcs;
+CREATESTRUCT cs;
+const CREATESTRUCT *lpcs;
 
 
 int         AddGrid(UINT);
@@ -245,73 +249,6 @@ void SetCell(_BGCELL *cell,int row, int col)
 	 cell->row = row;
 	 cell->col = col;
 	}
-/*
-int DetermineDataType(TCHAR* data)
-    {
-     //return values:
-     //       1 = Text or Alpha
-     //       2 = Numeric
-     //       3 = Boolean TRUE
-     //       4 = Boolean FALSE
-	 //       5 = Graphic - user drawn (cell text begins with ~)
-     int j,k,numberofperiods,numberofpositives,numberofnegatives;
-     TCHAR tbuffer[1000];
-     BOOL DIGIT,ALPHA,PERIOD,WHITESPACE,SYMBOL,POSITIVE,NEGATIVE;
-     lstrcpy(tbuffer,data);
-     k=lstrlen(tbuffer);
-     strupr(tbuffer);
-     //is it boolean?
-     if(!lstrcmp(tbuffer,"TRUE"))
-         {
-          return 3;
-         }
-     if(!lstrcmp(tbuffer,"FALSE"))
-         {
-          return 4;
-         }
-	 //is it graphic (~)
-	 if(tbuffer[0]=='~')
-		 {
-		  return 5;
-		 }
-     DIGIT=FALSE;
-     ALPHA=FALSE;
-     PERIOD=FALSE;
-     WHITESPACE=FALSE;
-	 SYMBOL=FALSE;
-	 POSITIVE=FALSE;
-	 NEGATIVE=FALSE;
-
-     numberofperiods=0;
-	 numberofpositives=0;
-	 numberofnegatives=0;
-     for(j=0;j<k;j++)
-         {
-         if(iswalpha(tbuffer[j])){ALPHA=TRUE;}
-         if(iswdigit(tbuffer[j])){DIGIT=TRUE;}
-         if(iswspace(tbuffer[j])){WHITESPACE=TRUE;}
-         if(tbuffer[j]=='.'){PERIOD=TRUE;numberofperiods++;}
-		 if(tbuffer[j]=='+'){if(j>0){ALPHA=TRUE;}}
-		 if(tbuffer[j]=='-'){if(j>0){ALPHA=TRUE;}}
-         }
-     if((ALPHA)||(WHITESPACE))
-         {
-          return 1;
-         }
-     if((DIGIT)&&(!ALPHA)&&(!WHITESPACE))
-         {
-          if(numberofperiods>1)
-              {
-               return 1;
-              }
-          else
-              {
-               return 2;
-              }
-         }
-     return 1;
-    }
-*/
 
 void CalcVisibleCellBoundaries(int SelfIndex)
 {
@@ -427,7 +364,6 @@ void DisplayColumn(HWND hWnd,int SI,int c,int offset,HFONT hfont,HFONT hcolumnhe
 	RECT rect,rectsave;
     HFONT holdfont;
 	int r;
-	TCHAR buffer[1000];
 	int iDataType,iProtection;
 	if(BGHS[SI].columnwidths[c]==0){return;}
 
@@ -481,8 +417,8 @@ void DisplayColumn(HWND hWnd,int SI,int c,int offset,HFONT hfont,HFONT hcolumnhe
         }
 
 	 SetCell(&BGcell,r,c);
-	 lstrcpy(buffer, TEXT(""));
-	 SendMessage(hWnd,BGM_GETCELLDATA,(WPARAM)&BGcell,(LPARAM)buffer);
+	 generic_string buffer = TEXT("");
+	 SendMessage(hWnd,BGM_GETCELLDATA,(WPARAM)&BGcell,(LPARAM)buffer.c_str());
 	 if(BGHS[SI].COLUMNSNUMBERED)
 	 {
 	  if(c>0)
@@ -493,12 +429,14 @@ void DisplayColumn(HWND hWnd,int SI,int c,int offset,HFONT hfont,HFONT hcolumnhe
 	   if(high == 0){high = 32;}else{high+=64;}
 	   if(low == 0){low=26;}
 	   low += 64;
-	   wsprintf(buffer, TEXT("%c%c"), high,low);
+	   TCHAR info[64];
+	   wsprintf(info, TEXT("%c%c"), high,low);
+	   buffer = info;
 	  }
 	 }
 	 rectsave=rect;
 	 DrawEdge(gdc,&rect,EDGE_ETCHED,BF_MIDDLE|BF_RECT|BF_ADJUST);
-	 DrawTextEx(gdc,buffer,-1,&rect,DT_END_ELLIPSIS|DT_CENTER|DT_WORDBREAK|DT_NOPREFIX,NULL);
+	 DrawTextEx(gdc,(LPTSTR)buffer.c_str(),-1,&rect,DT_END_ELLIPSIS|DT_CENTER|DT_WORDBREAK|DT_NOPREFIX,NULL);
 	 rect=rectsave;
 
 	 r=BGHS[SI].topvisiblerow;
@@ -528,11 +466,13 @@ void DisplayColumn(HWND hWnd,int SI,int c,int offset,HFONT hfont,HFONT hcolumnhe
 		 rect.bottom = rect.top + BGHS[SI].rowheight;
 		 rectsave=rect;
 		 SetCell(&BGcell,r,c);
-		 lstrcpy(buffer, TEXT(""));
-		 SendMessage(hWnd,BGM_GETCELLDATA,(WPARAM)&BGcell,(LPARAM)buffer);
+		 buffer = TEXT("");
+		 SendMessage(hWnd,BGM_GETCELLDATA,(WPARAM)&BGcell,(LPARAM)buffer.c_str());
 		 if((c==0)&&(BGHS[SI].ROWSNUMBERED))
 		 {
-		  wsprintf(buffer, TEXT("%d"), r);
+			TCHAR info[64];
+			wsprintf(info, TEXT("%d"), r);
+			buffer = info;
 		 }
 		 if(c==0)
 		 {
@@ -605,17 +545,17 @@ void DisplayColumn(HWND hWnd,int SI,int c,int offset,HFONT hfont,HFONT hcolumnhe
 		 {
           if(BGHS[SI].ELLIPSIS)
               {
-              DrawTextEx(gdc,buffer,-1,&rect,DT_END_ELLIPSIS|DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX,NULL);
+				  DrawTextEx(gdc, (LPTSTR)buffer.c_str(),-1,&rect,DT_END_ELLIPSIS|DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX,NULL);
               }
           else
               {
-			   DrawTextEx(gdc,buffer,-1,&rect,DT_LEFT|DT_WORDBREAK|DT_EDITCONTROL|DT_NOPREFIX,NULL);
+				  DrawTextEx(gdc,(LPTSTR)buffer.c_str(),-1,&rect,DT_LEFT|DT_WORDBREAK|DT_EDITCONTROL|DT_NOPREFIX,NULL);
               }
 		 }
 
 		 if(iDataType == 2)//NUMERIC
 		 {
-		  DrawTextEx(gdc,buffer,-1,&rect,DT_END_ELLIPSIS|DT_RIGHT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX,NULL);
+			 DrawTextEx(gdc,(LPTSTR)buffer.c_str(),-1,&rect,DT_END_ELLIPSIS|DT_RIGHT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX,NULL);
 		 }
 
 		 if(iDataType == 3)//BOOLEAN TRUE
@@ -657,8 +597,8 @@ void DisplayColumn(HWND hWnd,int SI,int c,int offset,HFONT hfont,HFONT hcolumnhe
 		 if(iDataType == 5) //user drawn graphic
 			 {
 			   WPARAM wParam;
-               buffer[0]=0x20;
-               BGHS[SI].ownerdrawitem = generic_atoi(buffer);
+               buffer = TEXT(" ");
+			   BGHS[SI].ownerdrawitem = generic_atoi(buffer.c_str());
 							 wParam=MAKEWPARAM((UINT)::GetMenu(hWnd),BGN_OWNERDRAW);
 			   SendMessage(GetParent(hWnd),WM_COMMAND,wParam,(LPARAM)&rect);
 			 }
@@ -691,14 +631,9 @@ void DisplayColumn(HWND hWnd,int SI,int c,int offset,HFONT hfont,HFONT hcolumnhe
                  SelectObject(gdc,holdpen);
 
              }
-
-
      SelectObject(gdc,holdfont);
      DeleteObject(holdfont);
 	 ReleaseDC(hWnd,gdc);
-
-
-
 }
 
 
@@ -707,7 +642,7 @@ void DisplayColumn(HWND hWnd,int SI,int c,int offset,HFONT hfont,HFONT hcolumnhe
 
 void DrawCursor(HWND hWnd,int SI)
 	{
-	   RECT rect,rectwhole;
+	   RECT rect;
 	   HDC gdc;
 	   HPEN hpen,holdpen;
 	   int rop;
@@ -719,7 +654,6 @@ void DrawCursor(HWND hWnd,int SI)
        if(BGHS[SI].cursorcol < BGHS[SI].homecol){return;}
 
 	   rect = GetCellRect(hWnd,SI,BGHS[SI].cursorrow,BGHS[SI].cursorcol);
-	   rectwhole=rect;
 	   gdc=GetDC(hWnd);
        BGHS[SI].activecellrect = rect;
 	   rop=GetROP2(gdc);
@@ -800,13 +734,11 @@ void SetHomeRow(HWND hWnd,int SI,int row,int col)
                BGHS[SI].homerow++;
               }
          }
-	 cellrect=GetCellRect(hWnd,SI,row,col);
 		 {
 			 while((row < BGHS[SI].homerow))
 				 {
 				  BGHS[SI].homerow --;
 				  InvalidateRect(hWnd,&gridrect,FALSE);
-				  cellrect=GetCellRect(hWnd,SI,row,col);
 				 }
 		 }
 	 //set the vertical scrollbar position
@@ -818,7 +750,6 @@ void SetHomeRow(HWND hWnd,int SI,int row,int col)
 void SetHomeCol(HWND hWnd,int SI,int row,int col)
 	{
       RECT gridrect,cellrect;
-      BOOL LASTCOLVISIBLE;
       //get rect of grid window
       GetClientRect(hWnd,&gridrect);
       //get rect of current cell
@@ -829,36 +760,15 @@ void SetHomeCol(HWND hWnd,int SI,int row,int col)
            //scroll right is needed
            BGHS[SI].homecol++;
            //see if last column is visible
-           cellrect = GetCellRect(hWnd,SI,row,BGHS[SI].cols);
-           if(cellrect.right <= gridrect.right)
-               {
-                LASTCOLVISIBLE=TRUE;
-               }
-           else
-               {
-                LASTCOLVISIBLE=FALSE;
-               }
            cellrect = GetCellRect(hWnd,SI,row,col);
            InvalidateRect(hWnd,&gridrect,FALSE);
           }
-      cellrect = GetCellRect(hWnd,SI,row,col);
       while((BGHS[SI].cursorcol < BGHS[SI].homecol)&&(BGHS[SI].homecol > 1))
 
           {
            //scroll left is needed
            BGHS[SI].homecol--;
            //see if last column is visible
-           cellrect = GetCellRect(hWnd,SI,row,BGHS[SI].cols);
-           if(cellrect.right <= gridrect.right)
-               {
-                LASTCOLVISIBLE=TRUE;
-               }
-           else
-               {
-                LASTCOLVISIBLE=FALSE;
-               }
-
-           cellrect = GetCellRect(hWnd,SI,row,col);
            InvalidateRect(hWnd,&gridrect,FALSE);
           }
           {
@@ -1378,18 +1288,15 @@ LRESULT CALLBACK GridProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int wmId, wmEvent;
 	PAINTSTRUCT ps;
-	HDC hdc;
 	TCHAR buffer[1000];
 	int SelfIndex;
 	int ReturnValue;
-    UINT SelfMenu;
 	HINSTANCE hInst;
     int iDataType;
     static int ASCII;
 
 
 	SelfIndex=FindGrid((UINT)GetMenu(hWnd));
-    SelfMenu=BGHS[SelfIndex].gridmenu;
 
 	//update the grid width and height variable
 	{
@@ -1418,7 +1325,7 @@ LRESULT CALLBACK GridProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 
 		case WM_PAINT:
-			hdc = BeginPaint(hWnd, &ps);
+			BeginPaint(hWnd, &ps);
 			RECT rt;
 			GetClientRect(hWnd, &rt);
 			CalcVisibleCellBoundaries(SelfIndex);
@@ -1731,7 +1638,7 @@ LRESULT CALLBACK GridProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                        SIZE size;
                        int required_width;
                        int current_width;
-                       int required_height = 30;
+                       int required_height;
                        int current_height;
                        int longestline;
                        HFONT holdfont;
@@ -1746,7 +1653,6 @@ LRESULT CALLBACK GridProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                            }
                        //if there are \n codes in the generic_string, find the longest line
                        longestline=FindLongestLine(hdc,(TCHAR*)lParam,&size);
-                       //GetTextExtentPoint32(hdc,(TCHAR*)lParam,lstrlen((TCHAR*)lParam),&size);
                        required_width = longestline+15;
                        required_height = size.cy;
                        //count lines
@@ -2123,6 +2029,7 @@ LRESULT CALLBACK GridProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				{
 				 BGHS[SelfIndex].textcolor = RGB(0,0,0);
 				}
+			break;
 
         case WM_MOUSEMOVE:
               int x,y,r,c,t,z;
@@ -2961,7 +2868,7 @@ LRESULT CALLBACK GridProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
              static int SI,cheight;
              static int savewidth,saveheight;
-             int intin,intout;
+             int intout;
              SI=SelfIndex;
 
 
@@ -2979,7 +2886,6 @@ LRESULT CALLBACK GridProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
              if((BGHS[SI].SHOWINTEGRALROWS)&&(BGHS[SI].VSCROLL))
                  {
                   saveheight=HIWORD(lParam);
-                  intin=saveheight;
                   savewidth=LOWORD(lParam);
                   cheight=HIWORD(lParam);
                   cheight-=BGHS[SI].titleheight;
@@ -3175,7 +3081,6 @@ int BinarySearchListBox(HWND lbhWnd,TCHAR* searchtext)
       int p;
      BOOL FOUND;
 
-     FOUND=FALSE;
      //get count of items in listbox
      lbcount = SendMessage(lbhWnd,LB_GETCOUNT,0,0);
      if(lbcount == 0)

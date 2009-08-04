@@ -20,7 +20,7 @@ Thumbs.db
 *.ilk
 *.log
 [Bb]in
-[Dd]ebug*/
+[Db]ebug*/
 *.lib
 *.sbr
 obj/
@@ -35,4 +35,3 @@ UpgradeReport*.*
 *.BASE.h
 *.LOCAL.h
 *.REMOTE.h
-

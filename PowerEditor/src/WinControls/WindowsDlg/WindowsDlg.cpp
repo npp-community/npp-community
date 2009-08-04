@@ -48,8 +48,15 @@ inline static BOOL ModifyStyleEx(HWND hWnd, DWORD dwRemove, DWORD dwAdd) {
 
 struct NumericStringEquivalence
 {
+	NumericStringEquivalence()
+	{
+	}
+
 	bool operator()(const TCHAR* s1, const TCHAR* s2) const
-	{ return numstrcmp(s1, s2) < 0; }
+	{
+		return numstrcmp(s1, s2) < 0;
+	}
+
 	static inline int numstrcmp_get(const TCHAR **str, int *length)
 	{
 		const TCHAR *p = *str;
@@ -59,6 +66,7 @@ struct NumericStringEquivalence
 		*str = p;
 		return (value);
 	}
+
 	static int numstrcmp(const TCHAR *str1, const TCHAR *str2)
 	{
 		TCHAR *p1, *p2;
@@ -165,10 +173,16 @@ END_WINDOW_MAP()
 
 RECT WindowsDlg::_lastKnownLocation;
 
-WindowsDlg::WindowsDlg() : MyBaseClass(WindowsDlgMap), _isSorted(false)
+WindowsDlg::WindowsDlg() :
+	MyBaseClass(WindowsDlgMap),
+	_hList(NULL),
+	_szMinButton(SIZEZERO),
+	_szMinListCtrl(SIZEZERO),
+	_pTab(NULL),
+	_lastSort(-1),
+	_isSorted(false),
+	_dlgNode(NULL)
 {
-	_szMinButton = SIZEZERO;
-	_szMinListCtrl = SIZEZERO;
 }
 
 void WindowsDlg::init(HINSTANCE hInst, HWND parent, DocTabView *pTab)
@@ -197,32 +211,33 @@ BOOL CALLBACK WindowsDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam
 		{
 			switch (wParam)
 			{
-			case IDOK :
-				activateCurrent();
-				return TRUE;
+				case IDOK :
+					activateCurrent();
+					return TRUE;
 
-			case IDCANCEL :
-				::GetWindowRect(_hSelf, &_lastKnownLocation);
-				EndDialog(_hSelf, IDCANCEL);
-				return TRUE;
+				case IDCANCEL :
+					::GetWindowRect(_hSelf, &_lastKnownLocation);
+					EndDialog(_hSelf, IDCANCEL);
+					return TRUE;
 
-			case IDC_WINDOWS_SAVE:
-				doSave();
-				return TRUE;
+				case IDC_WINDOWS_SAVE:
+					doSave();
+					return TRUE;
 
-			case IDC_WINDOWS_CLOSE:
-				doClose();
-				return TRUE;
+				case IDC_WINDOWS_CLOSE:
+					doClose();
+					return TRUE;
 
-			case IDC_WINDOWS_SORT:
-				doSortToTabs();
-				_isSorted = false;
-				updateButtonState();
-				break;
+				case IDC_WINDOWS_SORT:
+					doSortToTabs();
+					_isSorted = false;
+					updateButtonState();
+					return TRUE;
 
-			default :
-				break;
+				default :
+					break;
 			}
+			return TRUE;
 		}
 
 		case WM_DESTROY :
@@ -357,6 +372,9 @@ BOOL CALLBACK WindowsDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam
 			}
 		}
 		break;
+
+		default:
+		break;
 	}
 	return MyBaseClass::run_dlgProc(message, wParam, lParam);
 }
@@ -462,6 +480,9 @@ BOOL WindowsDlg::onInitDialog()
 	GetClientRect(_hList, &rc);
 	LONG width = rc.right - rc.left;
 
+	// The following Linw warning is acceptable in the current situation.
+	// Assignment of string literal to variable 'Symbol' (Location) is not const safe
+	//lint -e1778
 	LVCOLUMN lvColumn;
 	memset(&lvColumn, 0, sizeof(lvColumn));
 	lvColumn.mask = LVCF_WIDTH|LVCF_TEXT|LVCF_SUBITEM|LVCF_FMT;
@@ -478,6 +499,7 @@ BOOL WindowsDlg::onInitDialog()
 	lvColumn.pszText = TEXT("Type");
 	lvColumn.cx = 40;
 	SendMessage(_hList, LVM_INSERTCOLUMN, 2, LPARAM(&lvColumn));
+	//lint +e1778
 
 	fitColumnsToSize();
 
@@ -512,19 +534,21 @@ LRESULT WindowsDlg::onWinMgr(WPARAM wp, LPARAM lp)
 	if (nmw.code==NMWINMGR::GET_SIZEINFO) {
 		switch(wp)
 		{
-		case IDOK:
-		case IDCANCEL:
-		case IDC_WINDOWS_SAVE:
-		case IDC_WINDOWS_CLOSE:
-		case IDC_WINDOWS_SORT:
-			nmw.sizeinfo.szMin = _szMinButton;
-			nmw.processed = TRUE;
-			return TRUE;
+			case IDOK:
+			case IDCANCEL:
+			case IDC_WINDOWS_SAVE:
+			case IDC_WINDOWS_CLOSE:
+			case IDC_WINDOWS_SORT:
+				nmw.sizeinfo.szMin = _szMinButton;
+				nmw.processed = TRUE;
+				return TRUE;
 
-		case IDC_WINDOWS_LIST:
-			nmw.sizeinfo.szMin = _szMinListCtrl;
-			nmw.processed = TRUE;
-			return TRUE;
+			case IDC_WINDOWS_LIST:
+				nmw.sizeinfo.szMin = _szMinListCtrl;
+				nmw.processed = TRUE;
+				return TRUE;
+
+			NO_DEFAULT_CASE;
 		}
 	}
 	return MyBaseClass::onWinMgr(wp, lp);
@@ -732,13 +756,16 @@ void WindowsDlg::doSortToTabs()
 	delete[] nmdlg.Items;
 }
 
-WindowsMenu::WindowsMenu()
+WindowsMenu::WindowsMenu():
+	_hMenu(NULL)
 {}
 
 WindowsMenu::~WindowsMenu()
 {
 	if (_hMenu)
+	{
 		DestroyMenu(_hMenu);
+	}
 }
 
 void WindowsMenu::init(HINSTANCE hInst, HMENU hMainMenu, const TCHAR *translation)
@@ -747,12 +774,12 @@ void WindowsMenu::init(HINSTANCE hInst, HMENU hMainMenu, const TCHAR *translatio
 
 	if (translation && translation[0])
 	{
-		std::generic_string windowStr(translation);
+		generic_string windowStr(translation);
 		windowStr += TEXT("...");
 		::ModifyMenu(_hMenu, IDM_WINDOW_WINDOWS, MF_BYCOMMAND, IDM_WINDOW_WINDOWS, windowStr.c_str());
 	}
 
-	UINT pos = 0;
+	UINT pos;
 	for(pos = GetMenuItemCount(hMainMenu) - 1; pos > 0; --pos)
 	{
 		if ((GetMenuState(hMainMenu, pos, MF_BYPOSITION) & MF_POPUP) != MF_POPUP)

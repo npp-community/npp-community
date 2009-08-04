@@ -111,8 +111,7 @@ public :
 	~ReBar();
 
 	virtual void destroy() {
-		::DestroyWindow(_hSelf);
-		_hSelf = NULL;
+		Window::destroy();
 		usedIDs.clear();
 	};
 

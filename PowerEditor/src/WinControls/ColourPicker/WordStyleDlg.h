@@ -81,18 +81,17 @@ private :
 	HWND _hFontNameStaticText;
 	HWND _hFontSizeStaticText;
 	HWND _hStyleInfoStaticText;
-	//TCHAR _originalWarning[256];
 
 	LexerStylerArray _lsArray;
     StyleArray _globalStyles;
-	std::generic_string _themeName;
+	generic_string _themeName;
 
 	LexerStylerArray _styles2restored;
 	StyleArray _gstyles2restored;
 	GlobalOverride _gOverride2restored;
 	bool _restoreInvalid;
 
-	ColourStaticTextHooker* colourHooker;
+	ColourStaticTextHooker* _colourHooker;
 
 	bool _isDirty;
 	bool _isThemeDirty;
@@ -112,7 +111,7 @@ private :
 	void updateFontSize();
 	void updateUserKeywords();
 	void switchToTheme();
-	void updateThemeName(std::generic_string themeName);
+	void updateThemeName(generic_string themeName);
 
 	void loadLangListFromNppParam();
 

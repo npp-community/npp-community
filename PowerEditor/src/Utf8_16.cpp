@@ -31,9 +31,12 @@ const Utf8_16::utf8 Utf8_16::k_Boms[][3] = {
 
 Utf8_16_Read::Utf8_16_Read() {
 	m_eEncoding		= uni8Bit;
-	m_nBufSize		= 0;
+	m_pBuf          = NULL;
 	m_pNewBuf		= NULL;
+	m_nBufSize		= 0;
+	m_nSkip         = 0;
 	m_bFirstRead	= true;
+	m_nLen          = 0;
 }
 
 Utf8_16_Read::~Utf8_16_Read()
@@ -377,6 +380,8 @@ size_t Utf8_16_Write::convert(char* p, size_t _size)
             }
             m_nBufSize = (const char*)pCur - (const char*)m_pNewBuf;
         }
+        break;
+
         default:
             break;
     }

@@ -40,7 +40,11 @@ const int BLINKRATE_INTERVAL = 50;
 class SettingsDlg : public StaticDialog
 {
 public :
-	SettingsDlg() {};
+	SettingsDlg() {}
+	~SettingsDlg()
+	{
+		SettingsDlg::destroy();
+	}
 	virtual void destroy() {
 		_nbHistoryVal.destroy();
 		StaticDialog::destroy();
@@ -56,7 +60,7 @@ private :
 class BarsDlg : public StaticDialog
 {
 public :
-	BarsDlg() {};
+	BarsDlg() {}
 private :
 	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 };
@@ -64,7 +68,11 @@ private :
 class MarginsDlg : public StaticDialog
 {
 public :
-	MarginsDlg() {};
+	MarginsDlg() {}
+	~MarginsDlg()
+	{
+		MarginsDlg::destroy();
+	}
 	virtual void destroy() {
 		_tabSizeVal.destroy();
 		_verticalEdgeLineNbColVal.destroy();
@@ -81,14 +89,14 @@ private :
 struct LangID_Name
 {
 	LangType _id;
-	std::generic_string _name;
-	LangID_Name(LangType id, std::generic_string name) : _id(id), _name(name){};
+	generic_string _name;
+	LangID_Name(LangType id, generic_string name) : _id(id), _name(name){};
 };
 
 class DefaultNewDocDlg : public StaticDialog
 {
 public :
-	DefaultNewDocDlg() {};
+	DefaultNewDocDlg() {}
 private :
 	std::vector<LangID_Name> _langList;
 	void makeOpenAnsiAsUtf8(bool doIt){
@@ -102,7 +110,7 @@ private :
 class LangMenuDlg : public StaticDialog
 {
 public :
-	LangMenuDlg() {};
+	LangMenuDlg() {}
 private :
 	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 	std::vector<LangMenuItem> _langList;
@@ -111,7 +119,7 @@ private :
 class PrintSettingsDlg : public StaticDialog
 {
 public :
-	PrintSettingsDlg() {};
+	PrintSettingsDlg() {}
 private :
 	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 };
@@ -119,7 +127,16 @@ private :
 class BackupDlg : public StaticDialog
 {
 public :
-	BackupDlg() {};
+	BackupDlg() {}
+	~BackupDlg()
+	{
+		BackupDlg::destroy();
+	}
+	void destroy()
+	{
+		_nbCharVal.destroy();
+		StaticDialog::destroy();
+	}
 private :
 	URLCtrl _nbCharVal;
 	void updateBackupGUI();
@@ -127,15 +144,15 @@ private :
 };
 
 struct strCouple {
-	std::generic_string _varDesc;
-	std::generic_string _var;
+	generic_string _varDesc;
+	generic_string _var;
 	strCouple(TCHAR *varDesc, TCHAR *var): _varDesc(varDesc), _var(var){};
 };
 
 class PrintSettings2Dlg : public StaticDialog
 {
 public :
-	PrintSettings2Dlg():_focusedEditCtrl(0), _selStart(0), _selEnd(0){};
+	PrintSettings2Dlg():_focusedEditCtrl(0), _selStart(0), _selEnd(0){}
 private :
 	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 	std::vector<strCouple> varList;
@@ -167,35 +184,7 @@ PreferenceDlg::PreferenceDlg():
 
 PreferenceDlg::~PreferenceDlg()
 {
-	delete _ctrlTab;
-	_ctrlTab = NULL;
-
-	delete _barsDlg;
-	_barsDlg = NULL;
-
-	delete _marginsDlg;
-	_marginsDlg = NULL;
-
-	delete _settingsDlg;
-	_settingsDlg = NULL;
-
-	delete _fileAssocDlg;
-	_fileAssocDlg = NULL;
-
-	delete _langMenuDlg;
-	_langMenuDlg = NULL;
-
-	delete _printSettingsDlg;
-	_printSettingsDlg = NULL;
-
-	delete _printSettings2Dlg;
-	_printSettings2Dlg = NULL;
-
-	delete _defaultNewDocDlg;
-	_defaultNewDocDlg = NULL;
-
-	delete _backupDlg;
-	_backupDlg = NULL;
+	PreferenceDlg::destroy();
 
 	delete _wVector;
 }
@@ -212,45 +201,55 @@ void PreferenceDlg::doDialog(bool isRTL)
 
 void PreferenceDlg::destroy()
 {
-	if (_ctrlTab)
-	{
-		_ctrlTab->destroy();
+	// The proper destroy() calls should be handled by the destructors.
+	if (_ctrlTab){
+		delete _ctrlTab;
+		_ctrlTab = NULL;
 	}
 
 	if (_barsDlg) {
-		_barsDlg->destroy();
+		delete _barsDlg;
+		_barsDlg = NULL;
 	}
 
 	if (_marginsDlg) {
-		_marginsDlg->destroy();
+		delete _marginsDlg;
+		_marginsDlg = NULL;
 	}
 
 	if (_settingsDlg) {
-		_settingsDlg->destroy();
+		delete _settingsDlg;
+		_settingsDlg = NULL;
 	}
 
 	if (_fileAssocDlg) {
-		_fileAssocDlg->destroy();
+		delete _fileAssocDlg;
+		_fileAssocDlg = NULL;
 	}
 
 	if (_langMenuDlg) {
-		_langMenuDlg->destroy();
+		delete _langMenuDlg;
+		_langMenuDlg = NULL;
 	}
 
 	if (_printSettingsDlg) {
-		_printSettingsDlg->destroy();
+		delete _printSettingsDlg;
+		_printSettingsDlg = NULL;
 	}
 
 	if (_printSettings2Dlg) {
-		_printSettings2Dlg->destroy();
+		delete _printSettingsDlg;
+		_printSettings2Dlg = NULL;
 	}
 
 	if (_defaultNewDocDlg) {
-		_defaultNewDocDlg->destroy();
+		delete _defaultNewDocDlg;
+		_defaultNewDocDlg = NULL;
 	}
 
 	if (_backupDlg) {
-		_backupDlg->destroy();
+		delete _backupDlg;
+		_backupDlg = NULL;
 	}
 
 	StaticDialog::destroy();
@@ -357,6 +356,10 @@ BOOL CALLBACK PreferenceDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPa
 					return TRUE;
 			}
 		}
+		break;
+
+		default:
+		break;
 	}
 	return FALSE;
 }
@@ -546,13 +549,21 @@ BOOL CALLBACK BarsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*
 #endif
 								}
 								return TRUE;
+
 								default:
 									break;
 							}
 						}
+						break;
+
+						NO_DEFAULT_CASE;
 					}
 			}
 		}
+		break;
+
+		default:
+		break;
 	}
 	return FALSE;
 }
@@ -791,9 +802,16 @@ BOOL CALLBACK MarginsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPar
 									break;
 							}
 						}
+						break;
+
+						NO_DEFAULT_CASE;
 					}
 			}
 		}
+		break;
+
+		default:
+		break;
 	}
 	return FALSE;
 }
@@ -911,6 +929,8 @@ BOOL CALLBACK SettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPa
 						nppGUI._definedSessionExt = sessionExt;
 						return TRUE;
 					}
+
+					NO_DEFAULT_CASE;
 				}
 			}
 
@@ -1077,8 +1097,14 @@ BOOL CALLBACK SettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPa
 					::SendMessage(grandParent, NPPM_INTERNAL_UPDATETITLEBAR, 0, 0);
 					return TRUE;
 				}
+
+				NO_DEFAULT_CASE;
 			}
 		}
+		break;
+
+		default:
+		break;
 	}
 	return FALSE;
 }
@@ -1133,7 +1159,7 @@ BOOL CALLBACK DefaultNewDocDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM 
 			int index = 0;
 			for (int i = L_TXT ; i < pNppParam->L_END ; i++)
 			{
-				std::generic_string str;
+				generic_string str;
 				if ((LangType)i != L_USER)
 				{
 					int cmdID = pNppParam->langTypeToCommandID((LangType)i);
@@ -1177,6 +1203,8 @@ BOOL CALLBACK DefaultNewDocDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM 
 			ETDTProc enableDlgTheme = (ETDTProc)pNppParam->getEnableThemeDlgTexture();
 			if (enableDlgTheme)
 				enableDlgTheme(_hSelf, ETDT_ENABLETAB);
+
+			return TRUE;
 		}
 
 		case WM_COMMAND :
@@ -1194,6 +1222,7 @@ BOOL CALLBACK DefaultNewDocDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM 
 						pNppParam->setWorkingDir(nppGUI._defaultDirExp);
 						return TRUE;
 					}
+					NO_DEFAULT_CASE;
 				}
 			}
 
@@ -1272,6 +1301,10 @@ BOOL CALLBACK DefaultNewDocDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM 
 					return FALSE;
 			}
 		}
+		break;
+
+		default:
+		break;
 	}
 	return FALSE;
 }
@@ -1287,7 +1320,7 @@ BOOL CALLBACK LangMenuDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPara
 		{
 			for (int i = L_TXT ; i < pNppParam->L_END ; i++)
 			{
-				std::generic_string str;
+				generic_string str;
 				if ((LangType)i != L_USER)
 				{
 					int cmdID = pNppParam->langTypeToCommandID((LangType)i);
@@ -1425,7 +1458,7 @@ BOOL CALLBACK LangMenuDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPara
 							{
 								TiXmlElement *element = childNode->ToElement();
 
-								if (std::generic_string(element->Attribute(TEXT("name"))) == lmi._langName)
+								if (generic_string(element->Attribute(TEXT("name"))) == lmi._langName)
 								{
 									element->SetAttribute(TEXT("excluded"), (LOWORD(wParam)==IDC_BUTTON_REMOVE)?TEXT("yes"):TEXT("no"));
 									pNppParam->getExternalLexerDoc()->at(x)->SaveFile();
@@ -1449,8 +1482,16 @@ BOOL CALLBACK LangMenuDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPara
 					::DrawMenuBar(grandParent);
 					return TRUE;
 				}
+				break;
+
+				default:
+				break;
 			}
 		}
+		break;
+
+		default:
+		break;
 	}
 	return FALSE;
 }
@@ -1482,6 +1523,7 @@ BOOL CALLBACK PrintSettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM 
 				case SC_PRINT_COLOURONWHITE :
 					ID2Check = IDC_RADIO_NOBG;
 					break;
+				NO_DEFAULT_CASE;
 			}
 			::SendDlgItemMessage(_hSelf, ID2Check, BM_SETCHECK, BST_CHECKED, 0);
 
@@ -1555,24 +1597,34 @@ BOOL CALLBACK PrintSettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM 
 				case IDC_RADIO_NOBG :
 					nppGUI._printSettings._printOption = SC_PRINT_COLOURONWHITE;
 					break;
+
+				NO_DEFAULT_CASE;
 			}
 			return TRUE;
 		}
+
+		default:
+		break;
 	}
 	return FALSE;
 }
 
-void trim(std::generic_string & str)
+void trim(generic_string & str)
 {
-	std::generic_string::size_type pos = str.find_last_not_of(' ');
+	generic_string::size_type pos = str.find_last_not_of(' ');
 
-	if (pos != std::generic_string::npos)
+	if (pos != generic_string::npos)
 	{
 		str.erase(pos + 1);
 		pos = str.find_first_not_of(' ');
-		if(pos != std::generic_string::npos) str.erase(0, pos);
+		if(pos != generic_string::npos) str.erase(0, pos);
 	}
-	else str.erase(str.begin(), str.end());
+	else
+	{
+		generic_string::iterator begin = str.begin();
+		generic_string::iterator end = str.end();
+		str.erase(begin, end);
+	}
 };
 
 BOOL CALLBACK PrintSettings2Dlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
@@ -1598,7 +1650,7 @@ BOOL CALLBACK PrintSettings2Dlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM
 				::SendDlgItemMessage(_hSelf, IDC_COMBO_HFONTSIZE, CB_ADDSTRING, 0, (LPARAM)intStr);
 				::SendDlgItemMessage(_hSelf, IDC_COMBO_FFONTSIZE, CB_ADDSTRING, 0, (LPARAM)intStr);
 			}
-			const std::vector<std::generic_string> & fontlist = pNppParam->getFontList();
+			const std::vector<generic_string> & fontlist = pNppParam->getFontList();
 			for (size_t i = 0 ; i < fontlist.size() ; i++)
 			{
 				int j = ::SendDlgItemMessage(_hSelf, IDC_COMBO_HFONTNAME, CB_ADDSTRING, 0, (LPARAM)fontlist[i].c_str());
@@ -1715,10 +1767,11 @@ BOOL CALLBACK PrintSettings2Dlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM
 					case IDC_EDIT_FLEFT : focusedEditStatic = IDC_FL_STATIC; groupStatic = IDC_FGB_STATIC; break;
 					case IDC_EDIT_FMIDDLE : focusedEditStatic = IDC_FM_STATIC; groupStatic = IDC_FGB_STATIC; break;
 					case IDC_EDIT_FRIGHT : focusedEditStatic = IDC_FR_STATIC; groupStatic = IDC_FGB_STATIC; break;
+					NO_DEFAULT_CASE;
 				}
 
 				::GetDlgItemText(_hSelf, groupStatic, str, stringSize);
-				std::generic_string title = str;
+				generic_string title = str;
 				title += TEXT(" ");
 				::GetDlgItemText(_hSelf, focusedEditStatic, str, stringSize);
 				title += str;
@@ -1764,6 +1817,9 @@ BOOL CALLBACK PrintSettings2Dlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM
 					{
 					}
 					break;
+
+					default:
+					break;
 				}
 				return TRUE;
 
@@ -1806,16 +1862,21 @@ BOOL CALLBACK PrintSettings2Dlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM
 					::SendDlgItemMessage(_hSelf, _focusedEditCtrl, WM_GETTEXT, stringSize, (LPARAM)str);
 					//::MessageBox(NULL, str, TEXT(""), MB_OK);
 
-					std::generic_string str2Set(str);
+					generic_string str2Set(str);
 					str2Set.replace(_selStart, _selEnd - _selStart, varStr);
 
 					::SetDlgItemText(_hSelf, _focusedEditCtrl, str2Set.c_str());
 				}
 				break;
 
+				default:
+				break;
 			}
 			return TRUE;
 		}
+
+		default:
+		break;
 	}
 	return FALSE;
 }
@@ -1855,7 +1916,7 @@ BOOL CALLBACK BackupDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPara
 			if (nppGUI._useDir)
 				::SendDlgItemMessage(_hSelf, IDC_BACKUPDIR_CHECK, BM_SETCHECK, BST_CHECKED, 0);
 
-			::SendDlgItemMessage(_hSelf, IDC_BACKUPDIR_EDIT, WM_SETTEXT, 0, (LPARAM)nppGUI._backupDir);
+			::SendDlgItemMessage(_hSelf, IDC_BACKUPDIR_EDIT, WM_SETTEXT, 0, (LPARAM)nppGUI._backupDir.c_str());
 
 			bool isEnableAutoC = nppGUI._autocStatus != nppGUI.autoc_none;
 
@@ -1885,9 +1946,11 @@ BOOL CALLBACK BackupDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPara
 					{
 						TCHAR inputDir[MAX_PATH];
 						::SendDlgItemMessage(_hSelf, IDC_BACKUPDIR_EDIT, WM_GETTEXT, MAX_PATH, (LPARAM)inputDir);
-						lstrcpy(nppGUI._backupDir, inputDir);
+						nppGUI._backupDir = inputDir;
 						return TRUE;
 					}
+
+					NO_DEFAULT_CASE;
 				}
 			}
 
@@ -1981,6 +2044,9 @@ BOOL CALLBACK BackupDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPara
 			}
 
 		}
+
+		default:
+		break;
 	}
 	return FALSE;
 }

@@ -84,8 +84,8 @@ struct CmdLineParams {
 	};
 
 	LangType _langType;
-	CmdLineParams() : _isNoPlugin(false), _isReadOnly(false), _isNoSession(false), _isNoTab(false),\
-        _line2go(-1), _column2go(-1), _langType(L_EXTERNAL), _isPointXValid(false), _isPointYValid(false)
+	CmdLineParams() : _isNoPlugin(false), _isReadOnly(false), _isNoSession(false), _isNoTab(false),
+        _line2go(-1), _column2go(-1), _isPointXValid(false), _isPointYValid(false), _langType(L_EXTERNAL)
     {
         _point.x = 0;
         _point.y = 0;
@@ -104,19 +104,17 @@ struct FloatingWindowInfo {
 };
 
 struct PlugingDlgDockingInfo {
-	TCHAR _name[MAX_PATH];
+	generic_string _name;
 	int _internalID;
 
 	int _currContainer;
 	int _prevContainer;
 	bool _isVisible;
 
-	PlugingDlgDockingInfo(const TCHAR *pluginName, int id, int curr, int prev, bool isVis) : _internalID(id), _currContainer(curr), _prevContainer(prev), _isVisible(isVis){
-		lstrcpy(_name, pluginName);
-	};
+	PlugingDlgDockingInfo(const TCHAR *pluginName, int id, int curr, int prev, bool isVis) : _name(pluginName), _internalID(id), _currContainer(curr), _prevContainer(prev), _isVisible(isVis){};
 
 	friend inline const bool operator==(const PlugingDlgDockingInfo & a, const PlugingDlgDockingInfo & b) {
-		if ((lstrcmp(a._name, b._name) == 0) && (a._internalID == b._internalID))
+		if ((a._name == b._name) && (a._internalID == b._internalID))
 			return true;
 		else
 			return false;
@@ -211,27 +209,30 @@ struct PrintSettings {
 
 struct NppGUI
 {
-	NppGUI() : _toolBarStatus(TB_LARGE), _toolbarShow(true), _statusBarShow(true), _menuBarShow(true),\
-		       _tabStatus(TAB_DRAWTOPBAR | TAB_DRAWINACTIVETAB | TAB_DRAGNDROP), _splitterPos(POS_HORIZOTAL),\
-	           _userDefineDlgStatus(UDD_DOCKED), _tabSize(8), _tabReplacedBySpace(false), _fileAutoDetection(cdEnabled), _fileAutoDetectionOriginalValue(_fileAutoDetection),\
-			   _checkHistoryFiles(true) ,_enableSmartHilite(true), _enableTagsMatchHilite(true), _enableTagAttrsHilite(true), _enableHiliteNonHTMLZone(false),\
-			   _isMaximized(false), _isMinimizedToTray(false), _rememberLastSession(true), _enableMouseWheelZoom(true), _backup(bak_none), _useDir(false),\
-			   _doTaskList(true), _maitainIndent(true), _openSaveDir(dir_followCurrent), _styleMRU(true), _styleURL(0),\
-			   _autocStatus(autoc_none), _autocFromLen(1), _funcParams(false), _definedSessionExt(TEXT("")), _neverUpdate(false),\
-			   _doesExistUpdater(false), _caretBlinkRate(250), _caretWidth(1), _shortTitlebar(false), _themeName(TEXT("")), _isLangMenuCompact(false) {
+	NppGUI() :
+		_toolBarStatus(TB_LARGE), _toolbarShow(true), _statusBarShow(true), _menuBarShow(true),
+		_tabStatus(TAB_DRAWTOPBAR | TAB_DRAWINACTIVETAB | TAB_DRAGNDROP), _splitterPos(POS_HORIZOTAL),
+		_userDefineDlgStatus(UDD_DOCKED), _tabSize(8), _tabReplacedBySpace(false), _fileAutoDetection(cdEnabled),
+		_fileAutoDetectionOriginalValue(_fileAutoDetection), _checkHistoryFiles(true), _isMaximized(false), _isMinimizedToTray(false),
+		_rememberLastSession(true), _enableMouseWheelZoom(true),  _doTaskList(true), _maitainIndent(true), _enableSmartHilite(true),
+		_enableTagsMatchHilite(true), _enableTagAttrsHilite(true), _enableHiliteNonHTMLZone(false), _styleMRU(true), _styleURL(0),
+		_isLangMenuCompact(false), _backup(bak_none), _useDir(false), _autocStatus(autoc_none), _autocFromLen(1), _funcParams(false),
+		_neverUpdate(false), _doesExistUpdater(false), _caretBlinkRate(250), _caretWidth(1), _shortTitlebar(false),
+		_openSaveDir(dir_followCurrent)
+	{
 		_appPos.left = 0;
 		_appPos.top = 0;
 		_appPos.right = 700;
 		_appPos.bottom = 500;
 
 		_backupDir[0] = '\0';
-		_defaultDir[0] = 0;
-		_defaultDirExp[0] = 0;
-	};
+		_defaultDir[0] = '\0';
+		_defaultDirExp[0] = '\0';
+	}
 
-	toolBarStatusType _toolBarStatus;		// small, large ou standard
+	toolBarStatusType _toolBarStatus;		// small, large or standard
 	bool _toolbarShow;
-	bool _statusBarShow;		// show ou hide
+	bool _statusBarShow;		// show or hide
 	bool _menuBarShow;
 
 	// 1st bit : draw top bar;
@@ -244,7 +245,7 @@ struct NppGUI
 	// 0:don't draw; 1:draw top bar 2:draw inactive tabs 3:draw both 7:draw both+drag&drop
 	int _tabStatus;
 
-	bool _splitterPos;			// horizontal ou vertical
+	bool _splitterPos;			// horizontal or vertical
 	int _userDefineDlgStatus;	// (hide||show) && (docked||undocked)
 
 	int _tabSize;
@@ -282,7 +283,7 @@ struct NppGUI
 	PrintSettings _printSettings;
 	BackupFeature _backup;
 	bool _useDir;
-	TCHAR _backupDir[MAX_PATH];
+	generic_string _backupDir;
 	DockingManagerData _dockingData;
 	GlobalOverride _globalOverride;
 	enum AutocStatus{autoc_none, autoc_func, autoc_word};
@@ -306,10 +307,14 @@ struct NppGUI
 
 struct ScintillaViewParams
 {
-	ScintillaViewParams() : _lineNumberMarginShow(true), _bookMarkMarginShow(true),\
-		                    _folderStyle(FOLDER_STYLE_BOX), _indentGuideLineShow(true),\
-	                        _currentLineHilitingShow(true), _wrapSymbolShow(false),  _doWrap(false),\
-					_zoom(0), _whiteSpaceShow(false), _eolShow(false){};
+	ScintillaViewParams() :
+		_lineNumberMarginShow(true), _bookMarkMarginShow(true),
+		_folderStyle(FOLDER_STYLE_BOX), _indentGuideLineShow(true),
+	    _currentLineHilitingShow(true), _wrapSymbolShow(false), _doWrap(false),
+	    _edgeMode(EDGE_NONE), _edgeNbColumn(0),
+		_zoom(0), _whiteSpaceShow(false), _eolShow(false)
+	{}
+
 	bool _lineNumberMarginShow;
 	bool _bookMarkMarginShow;
 	//bool _docChangeStateMarginShow;
@@ -340,51 +345,71 @@ struct ScintillaViewParams
 struct Lang
 {
 	LangType _langID;
-	TCHAR _langName[LANG_NAME_LEN];
+	generic_string _langName;
 	const TCHAR *_defaultExtList;
 	const TCHAR *_langKeyWordList[NB_LIST];
 	const TCHAR *_pCommentLineSymbol;
 	const TCHAR *_pCommentStart;
 	const TCHAR *_pCommentEnd;
 
-	Lang() {for (int i = 0 ; i < NB_LIST ; _langKeyWordList[i] = NULL ,i++);};
-	Lang(LangType langID, const TCHAR *name) : _langID(langID){
-		_langName[0] = '\0';
+	Lang():
+		_langID(L_TXT),
+		_defaultExtList(NULL),
+		_pCommentLineSymbol(NULL),
+		_pCommentStart(NULL),
+		_pCommentEnd(NULL)
+	{
+		for (int i = 0 ; i < NB_LIST ; i++)
+		{
+			_langKeyWordList[i] = NULL;
+		}
+	}
+
+	Lang(LangType langID, const TCHAR *name) :
+		_langID(langID),
+		_defaultExtList(NULL),
+		_pCommentLineSymbol(NULL),
+		_pCommentStart(NULL),
+		_pCommentEnd(NULL)
+	{
 		if (name)
-			lstrcpy(_langName, name);
-		for (int i = 0 ; i < NB_LIST ; _langKeyWordList[i] = NULL ,i++);
+			_langName = name;
+		for (int i = 0 ; i < NB_LIST ; i++)
+		{
+			_langKeyWordList[i] = NULL;
+		}
 	};
-	~Lang() {};
+	~Lang() {}
 	void setDefaultExtList(const TCHAR *extLst){
 		_defaultExtList = extLst;
-	};
+	}
 
 	void setCommentLineSymbol(const TCHAR *commentLine){
 		_pCommentLineSymbol = commentLine;
-	};
+	}
 
 	void setCommentStart(const TCHAR *commentStart){
 		_pCommentStart = commentStart;
-	};
+	}
 
 	void setCommentEnd(const TCHAR *commentEnd){
 		_pCommentEnd = commentEnd;
-	};
+	}
 
 	const TCHAR * getDefaultExtList() const {
 		return _defaultExtList;
-	};
+	}
 
 	void setWords(const TCHAR *words, int index) {
 		_langKeyWordList[index] = words;
-	};
+	}
 
 	const TCHAR * getWords(int index) const {
 		return _langKeyWordList[index];
-	};
+	}
 
-	LangType getLangID() const {return _langID;};
-	const TCHAR * getLangName() const {return _langName;};
+	LangType getLangID() const {return _langID;}
+	const TCHAR * getLangName() const {return _langName.c_str();}
 };
 
 class UserLangContainer
@@ -404,7 +429,7 @@ public :
 	UserLangContainer();
 	UserLangContainer(const TCHAR *name, const TCHAR *ext);
 
-	UserLangContainer & operator=(const UserLangContainer & ulc);
+	const UserLangContainer & operator=(const UserLangContainer & ulc);
 
 	int getNbKeywordList() {return nbKeywodList;}
 	const TCHAR * getName() {return _name.c_str();}
@@ -415,6 +440,7 @@ private:
 	std::generic_string _ext;
 
 	StyleArray _styleArray;
+	// JOCE: WHAT!?!  This is a *GIANT* buffer (9 * 30K!) that is allocated for no apparent good reason...
 	TCHAR _keywordLists[nbKeywodList][max_char];
 
 	bool _isCaseIgnored;
@@ -442,14 +468,18 @@ struct FindHistory {
 	enum searchMode{normal, extended, regExpr};
 	enum transparencyMode{none, onLossingFocus, persistant};
 
-	FindHistory() : _nbMaxFindHistoryPath(10), _nbMaxFindHistoryFilter(10), _nbMaxFindHistoryFind(10), _nbMaxFindHistoryReplace(10),\
-					_nbFindHistoryPath(0), _nbFindHistoryFilter(0),_nbFindHistoryFind(0), _nbFindHistoryReplace(0),\
-					_isMatchWord(false), _isMatchCase(false),_isWrap(true),_isDirectionDown(true),\
-					_isFifRecuisive(true), _isFifInHiddenFolder(false), _isDlgAlwaysVisible(false),\
-					_isFilterFollowDoc(false), _isFolderFollowDoc(false),\
-					_searchMode(normal), _transparencyMode(onLossingFocus), _transparency(150)
+	FindHistory() : _nbMaxFindHistoryPath(10), _nbMaxFindHistoryFilter(10), _nbMaxFindHistoryFind(10), _nbMaxFindHistoryReplace(10),
+					_nbFindHistoryPath(0), _nbFindHistoryFilter(0),_nbFindHistoryFind(0), _nbFindHistoryReplace(0),
+					_isMatchWord(false), _isMatchCase(false),_isWrap(true),_isDirectionDown(true),
+					_isFifRecuisive(true), _isFifInHiddenFolder(false), _searchMode(normal), _transparencyMode(onLossingFocus),
+					_transparency(150), _isDlgAlwaysVisible(false), _isFilterFollowDoc(false), _isFolderFollowDoc(false)
+	{
+		memset(_pFindHistoryPath, 0, NB_MAX_FINDHISTORY_PATH * sizeof(std::generic_string*));
+		memset(_pFindHistoryFilter, 0, NB_MAX_FINDHISTORY_FILTER * sizeof(std::generic_string*));
+		memset(_pFindHistoryFind, 0, NB_MAX_FINDHISTORY_FIND * sizeof(std::generic_string*));
+		memset(_pFindHistoryReplace, 0, NB_MAX_FINDHISTORY_REPLACE * sizeof(std::generic_string*));
+	}
 
-	{};
 	int _nbMaxFindHistoryPath;
 	int _nbMaxFindHistoryFilter;
 	int _nbMaxFindHistoryFind;
@@ -460,10 +490,10 @@ struct FindHistory {
 	int _nbFindHistoryFind;
 	int _nbFindHistoryReplace;
 
-	std::generic_string *_pFindHistoryPath[NB_MAX_FINDHISTORY_PATH];
-	std::generic_string *_pFindHistoryFilter[NB_MAX_FINDHISTORY_FILTER];
-	std::generic_string *_pFindHistoryFind[NB_MAX_FINDHISTORY_FIND];
-	std::generic_string *_pFindHistoryReplace[NB_MAX_FINDHISTORY_REPLACE];
+	std::generic_string* _pFindHistoryPath[NB_MAX_FINDHISTORY_PATH];
+	std::generic_string* _pFindHistoryFilter[NB_MAX_FINDHISTORY_FILTER];
+	std::generic_string* _pFindHistoryFind[NB_MAX_FINDHISTORY_FIND];
+	std::generic_string* _pFindHistoryReplace[NB_MAX_FINDHISTORY_REPLACE];
 
 	bool _isMatchWord;
 	bool _isMatchCase;
@@ -571,9 +601,6 @@ private :
 
 #define NB_LANG 80
 
-#define DUP true
-#define FREE false
-
 class NppParameters
 {
 public:
@@ -617,7 +644,7 @@ public:
 	const TCHAR * getLangExtFromName(const TCHAR *langName) const {
 		for (int i = 0 ; i < _nbLang ; i++)
 		{
-			if (!lstrcmp(_langList[i]->_langName, langName))
+			if (_langList[i]->_langName == langName)
 				return _langList[i]->_defaultExtList;
 		}
 		return NULL;
@@ -812,7 +839,7 @@ public:
 	void setScintillaAccelerator(ScintillaAccelerator *pScintAccel) {_pScintAccelerator = pScintAccel;};
 	ScintillaAccelerator * getScintillaAccelerator() {return _pScintAccelerator;};
 
-	const TCHAR * getNppPath() const {return _nppPath;};
+	generic_string getNppPath() const {return _nppPath;};
 	const TCHAR * getAppDataNppDir() const {return _appdataNppDir;};
 	const TCHAR * getWorkingDir() const {return _currentDirectory;};
 	void setWorkingDir(const TCHAR * newPath);
@@ -861,8 +888,14 @@ private:
 
     static NppParameters *_pSelf;
 
-	TiXmlDocument *_pXmlDoc, *_pXmlUserDoc, *_pXmlUserStylerDoc, *_pXmlUserLangDoc,\
-		*_pXmlToolIconsDoc, *_pXmlShortcutDoc, *_pXmlContextMenuDoc, *_pXmlSessionDoc;
+	TiXmlDocument* _pXmlDoc;
+	TiXmlDocument* _pXmlUserDoc;
+	TiXmlDocument* _pXmlUserStylerDoc;
+	TiXmlDocument* _pXmlUserLangDoc;
+	TiXmlDocument* _pXmlToolIconsDoc;
+	TiXmlDocument* _pXmlShortcutDoc;
+	TiXmlDocument* _pXmlContextMenuDoc;
+	TiXmlDocument* _pXmlSessionDoc;
 
 	TiXmlDocumentA *_pXmlNativeLangDocA;
 	//TiXmlDocumentA *_pXmlEnglishDocA;
@@ -871,18 +904,24 @@ private:
 
 	NppGUI _nppGUI;
 	ScintillaViewParams _svp[2];
+
+	// JOCE use a std::vector instead!
 	Lang *_langList[NB_LANG];
 	int _nbLang;
 
+	// JOCE use a std::vector instead!
 	std::generic_string *_LRFileList[NB_MAX_LRF_FILE];
 	int _nbFile;
 	int _nbMaxFile;
 
 	FindHistory _findHistory;
 
+	// JOCE use a std::vector instead!
 	UserLangContainer *_userLangArray[NB_MAX_USER_LANG];
 	int _nbUserLang;
+	// JOCE use a std::string instead
 	TCHAR _userDefineLangPath[MAX_PATH];
+	// JOCE use a std::vector instead!
 	ExternalLangContainer *_externalLangArray[NB_MAX_EXTERNAL_LANG];
 	int _nbExternalLang;
 
@@ -903,7 +942,7 @@ private:
 	WNDPROC _enableThemeDialogTextureFuncAddr;
 
 
-	std::vector<CommandShortcut> _shortcuts;			//main menu shortuts. Static size
+	std::vector<CommandShortcut> _shortcuts;		//main menu shortcuts. Static size
 	std::vector<int> _customizedShortcuts;			//altered main menu shortcuts. Indices static. Needed when saving alterations
 	std::vector<MacroShortcut> _macros;				//macro shortcuts, dynamic size, defined on loading macros and adding/deleting them
 	std::vector<UserCommand> _userCommands;			//run shortcuts, dynamic size, defined on loading run commands and adding/deleting them
@@ -921,10 +960,11 @@ private:
 	std::vector<MenuItemUnit> _contextMenuItems;
 	Session* _session;
 
+	// JOCE: Could / should be repalced by std::strings.
 	TCHAR _shortcutsPath[MAX_PATH];
 	TCHAR _contextMenuPath[MAX_PATH];
 	TCHAR _sessionPath[MAX_PATH];
-	TCHAR _nppPath[MAX_PATH];
+	generic_string _nppPath;
 	TCHAR _userPath[MAX_PATH];
 	TCHAR _stylerPath[MAX_PATH];
 	TCHAR _appdataNppDir[MAX_PATH]; // sentinel of the absence of "doLocalConf.xml" : (_appdataNppDir == TEXT(""))?"doLocalConf.xml present":"doLocalConf.xml absent"
@@ -936,7 +976,8 @@ private:
 	FindDlgTabTitiles _findDlgTabTitiles;
 	bool _asNotepadStyle;
 
-	static int CALLBACK EnumFontFamExProc(ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX * /*lpntme*/, int /*FontType*/, LPARAM lParam) {
+	static int CALLBACK EnumFontFamExProc(ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX * /*lpntme*/, int /*FontType*/, LPARAM lParam)
+	{
 		std::vector<std::generic_string> *pStrVect = (std::vector<std::generic_string> *)lParam;
         size_t vectSize = pStrVect->size();
 
@@ -996,7 +1037,6 @@ private:
 	void insertUserCmd(TiXmlNode *userCmdRoot, const UserCommand & userCmd);
 	void insertScintKey(TiXmlNode *scintKeyRoot, const ScintillaKeyMap & scintKeyMap);
 	void insertPluginCmd(TiXmlNode *pluginCmdRoot, const PluginCmdShortcut & pluginCmd);
-	void stylerStrOp(bool op);
 	TiXmlElement * insertGUIConfigBoolNode(TiXmlNode *r2w, const TCHAR *name, bool bVal);
 	void insertDockingParamNode(TiXmlNode *GUIRoot);
 	void writeExcludedLangList(TiXmlElement *element);

@@ -22,7 +22,7 @@
 #include "npp_winver.h"
 #endif
 
-typedef std::vector<std::generic_string> stringVector;
+typedef std::vector<generic_string> stringVector;
 
 struct OPENFILENAMENPP {
    DWORD        lStructSize;

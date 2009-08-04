@@ -16,13 +16,7 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-
-#include "tinyxml.h"
-
 #include "PluginsManager.h"
-#include "Parameters.h"
-#include "resource.h"
-
 
 const TCHAR * USERMSG = TEXT("This plugin is not compatible with current version of Notepad++.\n\n\
 Do you want to remove this plugin from plugins directory to prevent this message from the next launch time?");
@@ -32,11 +26,11 @@ bool PluginsManager::loadPlugins(const TCHAR *dir)
 	if (_isDisabled)
 		return false;
 
-	std::vector<std::generic_string> dllNames;
-	std::vector<std::generic_string> dll2Remove;
-	const TCHAR *pNppPath = (NppParameters::getInstance())->getNppPath();
+	std::vector<generic_string> dllNames;
+	std::vector<generic_string> dll2Remove;
+	generic_string nppPath = (NppParameters::getInstance())->getNppPath();
 
-	std::generic_string pluginsFullPathFilter = (dir && dir[0])?dir:pNppPath;
+	generic_string pluginsFullPathFilter = (dir && dir[0])?dir:nppPath;
 
 	pluginsFullPathFilter += TEXT("\\plugins\\*.dll");
 
@@ -44,14 +38,14 @@ bool PluginsManager::loadPlugins(const TCHAR *dir)
 	HANDLE hFindFile = ::FindFirstFile(pluginsFullPathFilter.c_str(), &foundData);
 	if (hFindFile != INVALID_HANDLE_VALUE)
 	{
-		std::generic_string plugins1stFullPath = (dir && dir[0])?dir:pNppPath;
+		generic_string plugins1stFullPath = (dir && dir[0])?dir:nppPath;
 		plugins1stFullPath += TEXT("\\plugins\\");
 		plugins1stFullPath += foundData.cFileName;
 		dllNames.push_back(plugins1stFullPath);
 
 		while (::FindNextFile(hFindFile, &foundData))
 		{
-			std::generic_string fullPath = (dir && dir[0])?dir:pNppPath;
+			generic_string fullPath = (dir && dir[0])?dir:nppPath;
 			fullPath += TEXT("\\plugins\\");
 			fullPath += foundData.cFileName;
 			dllNames.push_back(fullPath);
@@ -70,44 +64,44 @@ bool PluginsManager::loadPlugins(const TCHAR *dir)
 
 				pi->_hLib = ::LoadLibrary(dllNames[i].c_str());
 				if (!pi->_hLib)
-					throw std::generic_string(TEXT("Load Library is failed.\nMake \"Runtime Library\" setting of this project as \"Multi-threaded(/MT)\" may cure this problem."));
+					throw generic_string(TEXT("Load Library is failed.\nMake \"Runtime Library\" setting of this project as \"Multi-threaded(/MT)\" may cure this problem."));
 
 				pi->_pFuncIsUnicode = (PFUNCISUNICODE)GetProcAddress(pi->_hLib, "isUnicode");
 #ifdef UNICODE
 				if (!pi->_pFuncIsUnicode || !pi->_pFuncIsUnicode())
-					throw std::generic_string(TEXT("This ANSI plugin is not compatible with your Unicode Notepad++."));
+					throw generic_string(TEXT("This ANSI plugin is not compatible with your Unicode Notepad++."));
 #else
 				if (pi->_pFuncIsUnicode)
-					throw std::generic_string(TEXT("This Unicode plugin is not compatible with your ANSI mode Notepad++."));
+					throw generic_string(TEXT("This Unicode plugin is not compatible with your ANSI mode Notepad++."));
 #endif
 
 				pi->_pFuncSetInfo = (PFUNCSETINFO)GetProcAddress(pi->_hLib, "setInfo");
 
 				if (!pi->_pFuncSetInfo)
-					throw std::generic_string(TEXT("Missing \"setInfo\" function"));
+					throw generic_string(TEXT("Missing \"setInfo\" function"));
 
 				pi->_pFuncGetName = (PFUNCGETNAME)GetProcAddress(pi->_hLib, "getName");
 				if (!pi->_pFuncGetName)
-					throw std::generic_string(TEXT("Missing \"getName\" function"));
+					throw generic_string(TEXT("Missing \"getName\" function"));
 
 				pi->_pBeNotified = (PBENOTIFIED)GetProcAddress(pi->_hLib, "beNotified");
 				if (!pi->_pBeNotified)
-					throw std::generic_string(TEXT("Missing \"beNotified\" function"));
+					throw generic_string(TEXT("Missing \"beNotified\" function"));
 
 				pi->_pMessageProc = (PMESSAGEPROC)GetProcAddress(pi->_hLib, "messageProc");
 				if (!pi->_pMessageProc)
-					throw std::generic_string(TEXT("Missing \"messageProc\" function"));
+					throw generic_string(TEXT("Missing \"messageProc\" function"));
 
 				pi->_pFuncSetInfo(_nppData);
 
 				pi->_pFuncGetFuncsArray = (PFUNCGETFUNCSARRAY)GetProcAddress(pi->_hLib, "getFuncsArray");
 				if (!pi->_pFuncGetFuncsArray)
-					throw std::generic_string(TEXT("Missing \"getFuncsArray\" function"));
+					throw generic_string(TEXT("Missing \"getFuncsArray\" function"));
 
 				pi->_funcItems = pi->_pFuncGetFuncsArray(&pi->_nbFuncItem);
 
 				if ((!pi->_funcItems) || (pi->_nbFuncItem <= 0))
-					throw std::generic_string(TEXT("Missing \"FuncItems\" array, or the nb of Function Item is not set correctly"));
+					throw generic_string(TEXT("Missing \"FuncItems\" array, or the nb of Function Item is not set correctly"));
 
 				pi->_pluginMenu = ::CreateMenu();
 
@@ -117,12 +111,12 @@ bool PluginsManager::loadPlugins(const TCHAR *dir)
 				{
 					GetLexerNameFn GetLexerName = (GetLexerNameFn)::GetProcAddress(pi->_hLib, "GetLexerName");
 					if (!GetLexerName)
-						throw std::generic_string(TEXT("Loading GetLexerName function failed."));
+						throw generic_string(TEXT("Loading GetLexerName function failed."));
 
 					GetLexerStatusTextFn GetLexerStatusText = (GetLexerStatusTextFn)::GetProcAddress(pi->_hLib, "GetLexerStatusText");
 
 					if (!GetLexerStatusText)
-						throw std::generic_string(TEXT("Loading GetLexerStatusText function failed."));
+						throw generic_string(TEXT("Loading GetLexerStatusText function failed."));
 
 					// Assign a buffer for the lexer name.
 					char lexName[MAX_EXTERNAL_LEXER_NAME_LEN];
@@ -171,7 +165,7 @@ bool PluginsManager::loadPlugins(const TCHAR *dir)
 
 						if (! PathFileExists( xmlPath ) )
 						{
-							throw std::generic_string(std::generic_string(xmlPath) + TEXT(" is missing."));
+							throw generic_string(generic_string(xmlPath) + TEXT(" is missing."));
 						}
 					}
 
@@ -181,7 +175,7 @@ bool PluginsManager::loadPlugins(const TCHAR *dir)
 					{
 						delete _pXmlDoc;
 						_pXmlDoc = NULL;
-						throw std::generic_string(std::generic_string(xmlPath) + TEXT(" failed to load."));
+						throw generic_string(generic_string(xmlPath) + TEXT(" failed to load."));
 					}
 
 					for (int x = 0; x < numLexers; x++) // postpone adding in case the xml is missing/corrupt
@@ -199,7 +193,7 @@ bool PluginsManager::loadPlugins(const TCHAR *dir)
 				}
 				_pluginInfos.push_back(pi);
 			}
-			catch(std::generic_string s)
+			catch(generic_string s)
 			{
 				s += TEXT("\n\n");
 				s += USERMSG;
@@ -211,7 +205,7 @@ bool PluginsManager::loadPlugins(const TCHAR *dir)
 			}
 			catch(...)
 			{
-				std::generic_string msg = TEXT("Fail loaded");
+				generic_string msg = TEXT("Fail loaded");
 				msg += TEXT("\n\n");
 				msg += USERMSG;
 				if (::MessageBox(NULL, msg.c_str(), dllNames[i].c_str(), MB_YESNO) == IDYES)
@@ -236,7 +230,7 @@ bool PluginsManager::getShortcutByCmdID(int cmdID, ShortcutKey *sk)
 	if (cmdID == 0 || !sk)
 		return false;
 
-	const std::vector<PluginCmdShortcut> & pluginCmdSCList = (NppParameters::getInstance())->getPluginCommandList();
+	const vector<PluginCmdShortcut> & pluginCmdSCList = (NppParameters::getInstance())->getPluginCommandList();
 
 	for (size_t i = 0 ; i < pluginCmdSCList.size() ; i++)
 	{
@@ -260,7 +254,7 @@ void PluginsManager::setMenu(HMENU hMenu, const TCHAR *menuName)
 {
 	if (hasPlugins())
 	{
-		std::vector<PluginCmdShortcut> & pluginCmdSCList = (NppParameters::getInstance())->getPluginCommandList();
+		vector<PluginCmdShortcut> & pluginCmdSCList = (NppParameters::getInstance())->getPluginCommandList();
 		const TCHAR *nom_menu = (menuName && menuName[0])?menuName:TEXT("Plugins");
 
 		_hPluginsMenu = ::CreateMenu();
@@ -282,7 +276,7 @@ void PluginsManager::setMenu(HMENU hMenu, const TCHAR *menuName)
 
 				int cmdID = ID_PLUGINS_CMD + (_pluginsCommands.size() - 1);
 				_pluginInfos[i]->_funcItems[j]._cmdID = cmdID;
-				std::generic_string itemName = _pluginInfos[i]->_funcItems[j]._itemName;
+				generic_string itemName = _pluginInfos[i]->_funcItems[j]._itemName;
 
 				if (_pluginInfos[i]->_funcItems[j]._pShKey)
 				{
