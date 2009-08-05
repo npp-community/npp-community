@@ -269,8 +269,7 @@ BOOL CALLBACK WindowsDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam
 						{
 							int len = pLvdi->item.cchTextMax;
 							const TCHAR *fileName = buf->getFileName();
-							generic_strncpy(pLvdi->item.pszText, fileName, len-1);
-							pLvdi->item.pszText[len-1] = 0;
+							generic_strncpy(pLvdi->item.pszText, fileName, len);
 							len = lstrlen(pLvdi->item.pszText);
 							if (buf->isDirty())
 							{
@@ -293,13 +292,10 @@ BOOL CALLBACK WindowsDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam
 							const TCHAR *fileName = buf->getFileName();
 							int len = lstrlen(fullName)-lstrlen(fileName);
 							if (!len) {
-								len = 1;
 								fullName = TEXT("");
 							}
-							if (pLvdi->item.cchTextMax < len)
-								len = pLvdi->item.cchTextMax;
-							generic_strncpy(pLvdi->item.pszText, fullName, len-1);
-							pLvdi->item.pszText[len-1] = 0;
+							len = pLvdi->item.cchTextMax;
+							generic_strncpy(pLvdi->item.pszText, fullName, len);
 						}
 						else if (pLvdi->item.iSubItem == 2) // Type
 						{
@@ -308,7 +304,7 @@ BOOL CALLBACK WindowsDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam
 							Lang *lang = pNppParameters->getLangFromID(buf->getLangType());
 							if (NULL != lang)
 							{
-								generic_strncpy(pLvdi->item.pszText, lang->getLangName(), len-1);
+								generic_strncpy(pLvdi->item.pszText, lang->getLangName(), len);
 							}
 						}
 					}
