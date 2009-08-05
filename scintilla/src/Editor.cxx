@@ -1858,7 +1858,11 @@ void Editor::LayoutLine(int line, Surface *surface, ViewStyle &vstyle, LineLayou
 	if (!ll)
 		return;
 
-	PLATFORM_ASSERT(line < pdoc->LinesTotal());
+	// NPPSTART Joce 4/08/09 FixAssertWhenDeletingLastLine
+	// It is totally legal for the line to be equal to the total number of lines and it's
+	// handled properly in pdoc->LineStart(line);
+	PLATFORM_ASSERT(line <= pdoc->LinesTotal());
+	// NPPEND
 	PLATFORM_ASSERT(ll->chars != NULL);
 	int posLineStart = pdoc->LineStart(line);
 	int posLineEnd = pdoc->LineStart(line + 1);
