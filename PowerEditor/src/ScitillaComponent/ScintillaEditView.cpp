@@ -1669,18 +1669,6 @@ char * ScintillaEditView::getSelectedText(char * txt, int size, bool expand)
 		range.cpMax = range.cpMin+size-1;	//keep room for zero terminator
 	}
 
-	// Joce 4/08/09
-	// Sometimes, it seems like GetSelection retrieves erroneous data from Scintilla
-	// (especially when deleting characters from the end of the buffer).
-	// It looks like Scintilla's SCI_GETSELECTIONSTART and SCI_GETSELECTIONEND are not
-	// kept in sync with the buffer size.
-	// Until it's fixed in Scintilla, we're just padding ourselves against such a case.
-	int currentDocumentLen = getCurrentDocLen();
-	if (range.cpMax >= currentDocumentLen )
-	{
-		range.cpMax = currentDocumentLen;
-	}
-
 	getText(txt, range.cpMin, range.cpMax);
 	return txt;
 }
