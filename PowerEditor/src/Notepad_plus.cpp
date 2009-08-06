@@ -1339,7 +1339,7 @@ bool Notepad_plus::fileSave(BufferID id)
 			else if (backup == bak_verbose)
 			{
 				TCHAR path[MAX_PATH];
-				TCHAR *name;
+				std::generic_string name;
 				std::generic_string fn_dateTime_bak;
 
 				lstrcpy(path, fn);
