@@ -76,6 +76,10 @@ void testPathFunctions()
 	strPath = charPath;
 	testPathRemoveFileSpec(charPath, strPath);
 
+	_tcscpy_s(charPath, MAX_PATH, _T("f"));
+	strPath = charPath;
+	testPathRemoveFileSpec(charPath, strPath);
+
 	_tcscpy_s(charPath, MAX_PATH, _T("C://foo//test.exe"));
 	strPath = charPath;
 	testPathRemoveFileSpec(charPath, strPath);
@@ -98,6 +102,10 @@ void testPathFunctions()
 	testPathRemoveFileSpec(charPath, strPath);
 
 	_tcscpy_s(charPath, MAX_PATH, _T("C://"));
+	strPath = charPath;
+	testPathRemoveFileSpec(charPath, strPath);
+
+	_tcscpy_s(charPath, MAX_PATH, _T(""));
 	strPath = charPath;
 	testPathRemoveFileSpec(charPath, strPath);
 

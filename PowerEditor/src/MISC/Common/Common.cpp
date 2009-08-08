@@ -482,16 +482,16 @@ void PathRemoveFileSpec(generic_string & path)
 	generic_string::size_type lastBackslash = path.find_last_of(TEXT('\\'));
 	if (lastBackslash == generic_string::npos)
 	{
-		if (path[1] == TEXT(':') && path[2] != TEXT('\\'))
+		if (path.size() >= 2 && path[1] == TEXT(':'))  // "C:foo.bar" becomes "C:"
 			path.erase(2);
 		else
 			path.erase();
 	}
 	else
 	{
-		if (lastBackslash == 2 && path[1] == TEXT(':'))  // "C:\foo.exe" becomes "C:\"
+		if (lastBackslash == 2 && path[1] == TEXT(':') && path.size() >= 3)  // "C:\foo.exe" becomes "C:\"
 			path.erase(3);
-		else if (lastBackslash == 0 && path.size() >= 1)  //   "\foo.exe" becomes "\"
+		else if (lastBackslash == 0 && path.size() > 1)  //   "\foo.exe" becomes "\"
 			path.erase(1);
 		else
 			path.erase(lastBackslash);
