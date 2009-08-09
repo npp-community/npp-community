@@ -477,8 +477,9 @@ TCHAR *BuildMenuFileName(TCHAR *buffer, int len, int pos, const TCHAR *filename)
 	return buffer;
 }
 
-void PathRemoveFileSpec(generic_string & path)
+BOOL PathRemoveFileSpec(generic_string & path)
 {
+	size_t inLen = path.length();
 	generic_string::size_type lastBackslash = path.find_last_of(TEXT('\\'));
 	if (lastBackslash == generic_string::npos)
 	{
@@ -496,5 +497,7 @@ void PathRemoveFileSpec(generic_string & path)
 		else
 			path.erase(lastBackslash);
 	}
+
+	return inLen != path.length();
 }
 
