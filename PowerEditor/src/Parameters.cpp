@@ -456,7 +456,6 @@ NppParameters::NppParameters() :
 	memset(&_shortcutsPath, 0 , MAX_PATH * sizeof(TCHAR));
 	memset(&_contextMenuPath, 0 , MAX_PATH * sizeof(TCHAR));
 	memset(&_sessionPath, 0 , MAX_PATH * sizeof(TCHAR));
-	memset(&_nppPath, 0 , MAX_PATH * sizeof(TCHAR));
 	memset(&_userPath, 0 , MAX_PATH * sizeof(TCHAR));
 	memset(&_stylerPath, 0 , MAX_PATH * sizeof(TCHAR));
 	memset(&_appdataNppDir, 0 , MAX_PATH * sizeof(TCHAR));

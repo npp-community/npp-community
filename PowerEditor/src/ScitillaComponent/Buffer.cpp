@@ -333,9 +333,6 @@ Buffer::Buffer( FileManager * pManager, BufferID id, Document doc, DocFileStatus
 	_currentStatus(type), _timeStamp(0), _isFileReadOnly(false),
 	_fileName(NULL), _needReloading(false), _recentTag(-1)
 {
-	memset(&_userLangExt, 0, sizeof(_userLangExt));
-	memset(&_fullPathName, 0, sizeof(_fullPathName));
-
 	NppParameters *pNppParamInst = NppParameters::getInstance();
 	const NewDocDefaultSettings & ndds = (pNppParamInst->getNppGUI()).getNewDocDefaultSettings();
 	_unicodeMode = ndds._encoding;

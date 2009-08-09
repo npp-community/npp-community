@@ -162,7 +162,7 @@ bool PluginsManager::loadPlugins(const TCHAR *dir)
 
 					if (!PathFileExists(xmlPath))
 					{
-						lstrcpyn( xmlPath, TEXT("\0"), MAX_PATH );
+						lstrcpyn( xmlPath, TEXT(""), MAX_PATH );
 						lstrcpy( xmlPath, nppParams->getAppDataNppDir() );
 						PathAppend(xmlPath, TEXT("plugins\\Config"));
 						PathAppend( xmlPath, pi->_moduleName );
