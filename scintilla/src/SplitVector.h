@@ -64,7 +64,9 @@ public:
 		Init();
 	}
 
-	~SplitVector() {
+	// NPPSTART Joce 08/09/09 LintCleanup
+	virtual ~SplitVector() {
+	// NPPEND
 		delete []body;
 		body = 0;
 	}

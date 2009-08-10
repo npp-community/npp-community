@@ -39,7 +39,9 @@ public:
 	~LineMarker() {
 		delete pxpm;
 	}
-	LineMarker &operator=(const LineMarker &) {
+	// NPPSTART Joce 08/09/09 LintCleanup
+	const LineMarker &operator=(const LineMarker &) {
+	// NPPEND
 		// Defined to avoid pxpm being blindly copied, not as real assignment operator
 		markType = SC_MARK_CIRCLE;
 		fore = ColourDesired(0,0,0);

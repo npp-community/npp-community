@@ -36,8 +36,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "Scintilla.h"
 #include "SciLexer.h"
 
-#define KEYWORD_BOXHEADER 1
-#define KEYWORD_FOLDCONTRACTED 2
+// NPPSTART Joce 08/09/09 LintCleanup
+//#define KEYWORD_BOXHEADER 1
+//#define KEYWORD_FOLDCONTRACTED 2
+// NPPEND
 /*
 const char EOString = '\0';
 const char EOLine = '\n';

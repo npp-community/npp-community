@@ -28,7 +28,9 @@ using namespace Scintilla;
 #endif
 
 // Internal state, highlighted as number
-#define SCE_B_FILENUMBER SCE_B_DEFAULT+100
+// NPPSTART Joce 08/09/09 LintCleanup
+#define SCE_B_FILENUMBER (SCE_B_DEFAULT+100)
+// NPPEND
 
 
 static bool IsVBComment(Accessor &styler, int pos, int len) {

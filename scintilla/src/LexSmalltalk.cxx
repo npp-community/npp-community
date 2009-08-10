@@ -13,13 +13,17 @@
 //#include <ctype.h>
 // NPPEND
 
-#include "Platform.h"
+// NPPSTART Joce 08/09/09 LintCleanup
+//#include "Platform.h"
+// NPPEND
 
 #include "PropSet.h"
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "KeyWords.h"
-#include "Scintilla.h"
+// NPPSTART Joce 08/09/09 LintCleanup
+//#include "Scintilla.h"
+// NPPEND
 #include "SciLexer.h"
 
 #ifdef SCI_NAMESPACE

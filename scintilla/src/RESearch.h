@@ -19,7 +19,9 @@ namespace Scintilla {
  */
 #define MAXCHR	256
 #define CHRBIT	8
-#define BITBLK	MAXCHR/CHRBIT
+// NPPSTART Joce 08/09/09 LintCleanup
+#define BITBLK	(MAXCHR/CHRBIT)
+// NPPEND
 
 class CharacterIndexer {
 public:

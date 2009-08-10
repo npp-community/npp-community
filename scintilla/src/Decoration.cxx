@@ -14,7 +14,9 @@
 
 #include "Platform.h"
 
-#include "Scintilla.h"
+// NPPSTART Joce 08/09/09 LintCleanup
+//#include "Scintilla.h"
+// NPPEND
 #include "SplitVector.h"
 #include "Partitioning.h"
 #include "RunStyles.h"
