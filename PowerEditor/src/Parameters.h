@@ -51,6 +51,11 @@
 #include "npp_styles.h"
 #endif
 
+// JOCE: this needs to be taken out at some point...
+#ifndef NPP_DATE
+#include "npp_date.h"
+#endif
+
 // Forward declarations
 class TiXmlDocument;
 class TiXmlDocumentA;
@@ -205,121 +210,6 @@ struct PrintSettings {
 	bool isUserMargePresent() const {
 		return ((_marge.left != 0) || (_marge.top != 0) || (_marge.right != 0) || (_marge.bottom != 0));
 	};
-};
-
-class Date {
-public:
-    Date() : _year(2008), _month(4), _day(26){};
-    Date(unsigned long year, unsigned long month, unsigned long day) {
-        assert(year > 0 && year <= 9999); // I don't think Notepad++ will last till AD 10000 :)
-        assert(month > 0 && month <= 12);
-        assert(day > 0 && day <= 31);
-        assert(!(month == 2 && day > 29) &&
-               !(month == 4 && day > 30) &&
-               !(month == 6 && day > 30) &&
-               !(month == 9 && day > 30) &&
-               !(month == 11 && day > 30));
-
-        _year = year;
-        _month = month;
-        _day = day;
-    };
-
-    Date(const TCHAR *dateStr) { // timeStr should be Notepad++ date format : YYYYMMDD
-        assert(dateStr);
-        if (lstrlen(dateStr) == 8)
-        {
-            generic_string ds(dateStr);
-            generic_string yyyy(ds, 0, 4);
-            generic_string mm(ds, 4, 2);
-            generic_string dd(ds, 6, 2);
-
-            int y = generic_atoi(yyyy.c_str());
-            int m = generic_atoi(mm.c_str());
-            int d = generic_atoi(dd.c_str());
-
-            if ((y > 0 && y <= 9999) && (m > 0 && m <= 12) && (d > 0 && d <= 31))
-            {
-                _year = y;
-                _month = m;
-                _day = d;
-                return;
-            }
-        }
-        now();
-    };
-
-    // The constructor which makes the date of number of days from now
-    // nbDaysFromNow could be negative if user want to make a date in the past
-    // if the value of nbDaysFromNow is 0 then the date will be now
-    Date(int nbDaysFromNow)
-    {
-        const time_t oneDay = (60 * 60 * 24);
-
-        time_t rawtime;
-        tm timeinfo;
-
-        time(&rawtime);
-        rawtime += (nbDaysFromNow * oneDay);
-
-        localtime_s(&timeinfo, &rawtime);
-
-        _year = timeinfo.tm_year+1900;
-        _month = timeinfo.tm_mon+1;
-        _day = timeinfo.tm_mday;
-    }
-
-    void now() {
-        time_t rawtime;
-        tm timeinfo;
-
-        time(&rawtime);
-        localtime_s(&timeinfo, &rawtime);
-
-        _year = timeinfo.tm_year+1900;
-        _month = timeinfo.tm_mon+1;
-        _day = timeinfo.tm_mday;
-    }
-
-    generic_string toString() { // Return Notepad++ date format : YYYYMMDD
-        TCHAR dateStr[8+1];
-        wsprintf(dateStr, TEXT("%04d%02d%02d"), _year, _month, _day);
-        return dateStr;
-    };
-
-    bool operator<(const Date & compare) const {
-        if (this->_year != compare._year)
-            return (this->_year < compare._year);
-        if (this->_month != compare._month)
-            return (this->_month < compare._month);
-        return (this->_day < compare._day);
-    };
-    bool operator>(const Date & compare) const {
-        if (this->_year != compare._year)
-            return (this->_year > compare._year);
-        if (this->_month != compare._month)
-            return (this->_month > compare._month);
-        return (this->_day > compare._day);
-    };
-    bool operator==(const Date & compare) const {
-        if (this->_year != compare._year)
-            return false;
-        if (this->_month != compare._month)
-            return false;
-        return (this->_day == compare._day);
-    };
-    bool operator!=(const Date & compare) const {
-        if (this->_year != compare._year)
-            return true;
-        if (this->_month != compare._month)
-            return true;
-        return (this->_day != compare._day);
-    };
-
-private:
-    unsigned long _year;
-    unsigned long _month;
-    unsigned long _day;
 };
 
 struct NppGUI

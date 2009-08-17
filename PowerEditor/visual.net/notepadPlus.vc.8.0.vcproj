@@ -494,22 +494,138 @@
 					RelativePath="..\src\MISC\Exception\Win32Exception.cpp"
 					>
 				</File>
+				<Filter
+					Name="Parameters"
+					>
+					<File
+						RelativePath="..\src\MISC\Common\npp_date.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\MISC\Common\npp_session.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug Unicode|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release Unicode|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\src\MISC\Common\npp_styles.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug Unicode|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release Unicode|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\src\MISC\Common\npp_winver.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug Unicode|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release Unicode|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							/>
+						</FileConfiguration>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="Parameters"
 				>
-				<File
-					RelativePath="..\src\npp_session.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\npp_styles.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\npp_winver.cpp"
-					>
-				</File>
 				<File
 					RelativePath="..\src\Parameters_def.cpp"
 					>
@@ -851,22 +967,30 @@
 					RelativePath="..\src\MISC\Exception\Win32Exception.h"
 					>
 				</File>
+				<Filter
+					Name="Parameters"
+					>
+					<File
+						RelativePath="..\src\MISC\Common\npp_date.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\MISC\Common\npp_session.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\MISC\Common\npp_styles.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\MISC\Common\npp_winver.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="Parameters"
 				>
-				<File
-					RelativePath="..\src\npp_session.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\npp_styles.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\npp_winver.h"
-					>
-				</File>
 				<File
 					RelativePath="..\src\Parameters_def.h"
 					>
