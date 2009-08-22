@@ -90,7 +90,9 @@ TCHAR *BuildMenuFileName(TCHAR *buffer, int len, int pos, const TCHAR *filename)
 
 // MS reimplementations with N++'s generic strings.
 BOOL PathRemoveFileSpec(generic_string & path);
-BOOL PathAppend(generic_string &strDest, const generic_string str2append);
+BOOL PathAppend(generic_string& path, const generic_string& more);
+BOOL PathCanonicalize(generic_string& path);
+BOOL PathCanonicalize(generic_string& path, generic_string& output);
 
 class WcharMbcsConvertor
 {

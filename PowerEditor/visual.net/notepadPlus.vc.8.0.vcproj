@@ -1827,6 +1827,14 @@
 			Name="Tests"
 			>
 			<File
+				RelativePath="..\tests\testPathAppend.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\tests\testPathCanonicalize.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\tests\testPathRemoveFileSpec.cpp"
 				>
 			</File>
