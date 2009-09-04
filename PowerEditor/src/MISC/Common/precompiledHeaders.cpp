@@ -1,5 +1,5 @@
 //this file is part of notepad++
-//Copyright (C)2003 Harry <harrybharry@users.sourceforge.net>
+//Copyright (C)2003 Don HO <don.h@free.fr>
 //
 //This program is free software; you can redistribute it and/or
 //modify it under the terms of the GNU General Public License
@@ -15,21 +15,4 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef SMARTHIGHLIGHTER_H
-#define SMARTHIGHLIGHTER_H
-
-class ScintillaEditView;
-class FindReplaceDlg;
-
-class SmartHighlighter {
-public:
-	SmartHighlighter(FindReplaceDlg * pFRDlg);
-	void highlightView(ScintillaEditView * pHighlightView);
-private:
-	FindReplaceDlg * _pFRDlg;
-
-	bool isQualifiedWord(const char *str) const;
-	bool isWordChar(char ch) const;
-};
-
-#endif //SMARTHIGHLIGHTER_H
+#include "precompiledHeaders.h"
