@@ -2863,7 +2863,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
         LPTOOLTIPTEXT lpttt;
 
         lpttt = (LPTOOLTIPTEXT)notification;
-        lpttt->hinst = _hInst;
+        lpttt->hinst = NULL;
 
 		POINT p;
 		::GetCursorPos(&p);
