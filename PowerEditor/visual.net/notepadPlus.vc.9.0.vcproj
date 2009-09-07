@@ -21,7 +21,7 @@
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops;.\external_apps_locations.vsprops"
 			CharacterSet="2"
 			>
 			<Tool
@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\scintilla\include;..\src;..\src\MISC;..\src\MISC\Common;..\src\MISC\Exception;..\src\MISC\PluginsManager;..\src\MISC\Process;..\src\MISC\RegExt;..\src\ScitillaComponent;..\src\TinyXml;..\src\TinyXml\tinyXmlA;..\src\WinControls;..\src\WinControls\AboutDlg;..\src\WinControls\ColourPicker;..\src\WinControls\ContextMenu;..\src\WinControls\DockingWnd;..\src\WinControls\Grid;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\Preference;..\src\WinControls\shortcut;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\StaticDialog\RunDlg;..\src\WinControls\StatusBar;..\src\WinControls\TabBar;..\src\WinControls\TaskList;..\src\WinControls\ToolBar;..\src\WinControls\ToolTip;..\src\WinControls\TrayIcon;..\src\WinControls\WindowsDlg"
+				AdditionalIncludeDirectories="&quot;$(GoogleMockDir)include&quot;;&quot;$(GoogleTestDir)include&quot;;..\..\scintilla\include;..\src;..\src\MISC;..\src\MISC\Common;..\src\MISC\Exception;..\src\MISC\PluginsManager;..\src\MISC\Process;..\src\MISC\RegExt;..\src\ScitillaComponent;..\src\TinyXml;..\src\TinyXml\tinyXmlA;..\src\WinControls;..\src\WinControls\AboutDlg;..\src\WinControls\ColourPicker;..\src\WinControls\ContextMenu;..\src\WinControls\DockingWnd;..\src\WinControls\Grid;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\Preference;..\src\WinControls\shortcut;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\StaticDialog\RunDlg;..\src\WinControls\StatusBar;..\src\WinControls\TabBar;..\src\WinControls\TaskList;..\src\WinControls\ToolBar;..\src\WinControls\ToolTip;..\src\WinControls\TrayIcon;..\src\WinControls\WindowsDlg"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;TIXML_USE_STL;TIXMLA_USE_STL"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
@@ -112,7 +112,7 @@
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops;.\external_apps_locations.vsprops"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
@@ -137,7 +137,7 @@
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\..\scintilla\include;..\src;..\src\MISC;..\src\MISC\Common;..\src\MISC\Exception;..\src\MISC\PluginsManager;..\src\MISC\Process;..\src\MISC\RegExt;..\src\ScitillaComponent;..\src\TinyXml;..\src\TinyXml\tinyXmlA;..\src\WinControls;..\src\WinControls\AboutDlg;..\src\WinControls\ColourPicker;..\src\WinControls\ContextMenu;..\src\WinControls\DockingWnd;..\src\WinControls\Grid;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\Preference;..\src\WinControls\shortcut;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\StaticDialog\RunDlg;..\src\WinControls\StatusBar;..\src\WinControls\TabBar;..\src\WinControls\TaskList;..\src\WinControls\ToolBar;..\src\WinControls\ToolTip;..\src\WinControls\TrayIcon;..\src\WinControls\WindowsDlg"
+				AdditionalIncludeDirectories="&quot;$(GoogleMockDir)include&quot;;&quot;$(GoogleTestDir)include&quot;;..\..\scintilla\include;..\src;..\src\MISC;..\src\MISC\Common;..\src\MISC\Exception;..\src\MISC\PluginsManager;..\src\MISC\Process;..\src\MISC\RegExt;..\src\ScitillaComponent;..\src\TinyXml;..\src\TinyXml\tinyXmlA;..\src\WinControls;..\src\WinControls\AboutDlg;..\src\WinControls\ColourPicker;..\src\WinControls\ContextMenu;..\src\WinControls\DockingWnd;..\src\WinControls\Grid;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\Preference;..\src\WinControls\shortcut;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\StaticDialog\RunDlg;..\src\WinControls\StatusBar;..\src\WinControls\TabBar;..\src\WinControls\TaskList;..\src\WinControls\ToolBar;..\src\WinControls\ToolTip;..\src\WinControls\TrayIcon;..\src\WinControls\WindowsDlg"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;TIXMLA_USE_STL"
 				StringPooling="true"
 				ExceptionHandling="2"
@@ -207,7 +207,7 @@
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops;.\external_apps_locations.vsprops"
 			CharacterSet="1"
 			>
 			<Tool
@@ -228,7 +228,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\scintilla\include;..\src;..\src\MISC;..\src\MISC\Common;..\src\MISC\Exception;..\src\MISC\PluginsManager;..\src\MISC\Process;..\src\MISC\RegExt;..\src\ScitillaComponent;..\src\TinyXml;..\src\TinyXml\tinyXmlA;..\src\WinControls;..\src\WinControls\AboutDlg;..\src\WinControls\ColourPicker;..\src\WinControls\ContextMenu;..\src\WinControls\DockingWnd;..\src\WinControls\Grid;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\Preference;..\src\WinControls\shortcut;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\StaticDialog\RunDlg;..\src\WinControls\StatusBar;..\src\WinControls\TabBar;..\src\WinControls\TaskList;..\src\WinControls\ToolBar;..\src\WinControls\ToolTip;..\src\WinControls\TrayIcon;..\src\WinControls\WindowsDlg"
+				AdditionalIncludeDirectories="&quot;$(GoogleMockDir)include&quot;;&quot;$(GoogleTestDir)include&quot;;..\..\scintilla\include;..\src;..\src\MISC;..\src\MISC\Common;..\src\MISC\Exception;..\src\MISC\PluginsManager;..\src\MISC\Process;..\src\MISC\RegExt;..\src\ScitillaComponent;..\src\TinyXml;..\src\TinyXml\tinyXmlA;..\src\WinControls;..\src\WinControls\AboutDlg;..\src\WinControls\ColourPicker;..\src\WinControls\ContextMenu;..\src\WinControls\DockingWnd;..\src\WinControls\Grid;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\Preference;..\src\WinControls\shortcut;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\StaticDialog\RunDlg;..\src\WinControls\StatusBar;..\src\WinControls\TabBar;..\src\WinControls\TaskList;..\src\WinControls\ToolBar;..\src\WinControls\ToolTip;..\src\WinControls\TrayIcon;..\src\WinControls\WindowsDlg"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;TIXML_USE_STL;TIXMLA_USE_STL"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
@@ -299,7 +299,7 @@
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops;.\external_apps_locations.vsprops"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -324,7 +324,7 @@
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\..\scintilla\include;..\src;..\src\MISC;..\src\MISC\Common;..\src\MISC\Exception;..\src\MISC\PluginsManager;..\src\MISC\Process;..\src\MISC\RegExt;..\src\ScitillaComponent;..\src\TinyXml;..\src\TinyXml\tinyXmlA;..\src\WinControls;..\src\WinControls\AboutDlg;..\src\WinControls\ColourPicker;..\src\WinControls\ContextMenu;..\src\WinControls\DockingWnd;..\src\WinControls\Grid;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\Preference;..\src\WinControls\shortcut;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\StaticDialog\RunDlg;..\src\WinControls\StatusBar;..\src\WinControls\TabBar;..\src\WinControls\TaskList;..\src\WinControls\ToolBar;..\src\WinControls\ToolTip;..\src\WinControls\TrayIcon;..\src\WinControls\WindowsDlg"
+				AdditionalIncludeDirectories="&quot;$(GoogleMockDir)include&quot;;&quot;$(GoogleTestDir)include&quot;;..\..\scintilla\include;..\src;..\src\MISC;..\src\MISC\Common;..\src\MISC\Exception;..\src\MISC\PluginsManager;..\src\MISC\Process;..\src\MISC\RegExt;..\src\ScitillaComponent;..\src\TinyXml;..\src\TinyXml\tinyXmlA;..\src\WinControls;..\src\WinControls\AboutDlg;..\src\WinControls\ColourPicker;..\src\WinControls\ContextMenu;..\src\WinControls\DockingWnd;..\src\WinControls\Grid;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\Preference;..\src\WinControls\shortcut;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\StaticDialog\RunDlg;..\src\WinControls\StatusBar;..\src\WinControls\TabBar;..\src\WinControls\TaskList;..\src\WinControls\ToolBar;..\src\WinControls\ToolTip;..\src\WinControls\TrayIcon;..\src\WinControls\WindowsDlg"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;TIXMLA_USE_STL"
 				StringPooling="true"
 				ExceptionHandling="2"
@@ -394,7 +394,7 @@
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops;.\external_apps_locations.vsprops"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
@@ -489,7 +489,7 @@
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops;.\external_apps_locations.vsprops"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
