@@ -21,117 +21,141 @@
 
 #include "precompiled_headers.h"
 
-#ifndef NDEBUG
+#ifndef SHIPPING
 
-void testPathRemoveFileSpec(TCHAR* charPath, generic_string strPath)
-{
-	BOOL strRet = PathRemoveFileSpec(strPath);
-	BOOL charRet = PathRemoveFileSpec(charPath);
-
-	assert(strPath == charPath);
-	assert(strRet == charRet);
-}
-
-void testPathFunctions()
+bool testPathRemoveFileSpec(TCHAR* toTest)
 {
 	generic_string strPath;
 	TCHAR charPath[MAX_PATH];
 
-	_tcscpy_s(charPath, MAX_PATH, _T("C:\\foo\\bar.ext"));
+	_tcscpy_s(charPath, MAX_PATH, toTest);
 	strPath = charPath;
-	testPathRemoveFileSpec(charPath, strPath);
 
-	_tcscpy_s(charPath, MAX_PATH, _T("C:\\foo\\bar\\test.php"));
-	strPath = charPath;
-	testPathRemoveFileSpec(charPath, strPath);
+	BOOL strRet = PathRemoveFileSpec(strPath);
+	BOOL charRet = PathRemoveFileSpec(charPath);
 
-	_tcscpy_s(charPath, MAX_PATH, _T("C:\\foo\\"));
-	strPath = charPath;
-	testPathRemoveFileSpec(charPath, strPath);
+	return ((strPath == charPath) &&
+		    (strRet == charRet));
+}
 
+TEST(PathRemoveFileSpecTest, BasicPath)
+{
+	ASSERT_TRUE(testPathRemoveFileSpec(_T("C:\\foo\\bar.ext")));
+}
 
-	_tcscpy_s(charPath, MAX_PATH, _T("C:\\foo"));
-	strPath = charPath;
-	testPathRemoveFileSpec(charPath, strPath);
+TEST(PathRemoveFileSpecTest, BasicTwoDeepPath)
+{
+	ASSERT_TRUE(testPathRemoveFileSpec(_T("C:\\foo\\bar\\test.php")));
+}
 
-	_tcscpy_s(charPath, MAX_PATH, _T("C:\\foo\\\\test"));
-	strPath = charPath;
-	testPathRemoveFileSpec(charPath, strPath);
+TEST(PathRemoveFileSpecTest, BasicPathNoFileWithEndSlash)
+{
+	ASSERT_TRUE(testPathRemoveFileSpec(_T("C:\\foo\\")));
+}
 
-	_tcscpy_s(charPath, MAX_PATH, _T("C:\\"));
-	strPath = charPath;
-	testPathRemoveFileSpec(charPath, strPath);
+TEST(PathRemoveFileSpecTest, BasicPathNoExtensionWithoutEndSlash)
+{
+	ASSERT_TRUE(testPathRemoveFileSpec(_T("C:\\foo")));
+}
 
-	_tcscpy_s(charPath, MAX_PATH, _T("C:bar.ext"));
-	strPath = charPath;
-	testPathRemoveFileSpec(charPath, strPath);
+TEST(PathRemoveFileSpecTest, BasicPathNoFileDoubleMiddleSlashWithoutEndSlash)
+{
+	ASSERT_TRUE(testPathRemoveFileSpec(_T("C:\\foo\\\\test")));
+}
 
+TEST(PathRemoveFileSpecTest, DriveLetterWithRootPath)
+{
+	ASSERT_TRUE(testPathRemoveFileSpec(_T("C:\\")));
+}
 
-	_tcscpy_s(charPath, MAX_PATH, _T("C:"));
-	strPath = charPath;
-	testPathRemoveFileSpec(charPath, strPath);
+TEST(PathRemoveFileSpecTest, DriveLetterAndFileNoSlash)
+{
+	ASSERT_TRUE(testPathRemoveFileSpec(_T("C:bar.ext")));
+}
 
-	_tcscpy_s(charPath, MAX_PATH, _T("\\test\\foo\\bar.ext"));
-	strPath = charPath;
-	testPathRemoveFileSpec(charPath, strPath);
+TEST(PathRemoveFileSpecTest, DriveLetter)
+{
+	ASSERT_TRUE(testPathRemoveFileSpec(_T("C:")));
+}
 
-	_tcscpy_s(charPath, MAX_PATH, _T("\\foo\\bar.ext"));
-	strPath = charPath;
-	testPathRemoveFileSpec(charPath, strPath);
+TEST(PathRemoveFileSpecTest, NoDriveLetterBasicPath)
+{
+	ASSERT_TRUE(testPathRemoveFileSpec(_T("\\foo\\bar.ext")));
+}
 
-	_tcscpy_s(charPath, MAX_PATH, _T("\\foo\\"));
-	strPath = charPath;
-	testPathRemoveFileSpec(charPath, strPath);
+TEST(PathRemoveFileSpecTest, NoDriveLetterBasicPathTwoDeep)
+{
+	ASSERT_TRUE(testPathRemoveFileSpec(_T("\\test\\foo\\bar.ext")));
+}
 
-	_tcscpy_s(charPath, MAX_PATH, _T("\\foo"));
-	strPath = charPath;
-	testPathRemoveFileSpec(charPath, strPath);
+TEST(PathRemoveFileSpecTest, NoDriveLetterBasicPathNoFileWithEndSlash)
+{
+	ASSERT_TRUE(testPathRemoveFileSpec(_T("\\foo\\")));
+}
 
-	_tcscpy_s(charPath, MAX_PATH, _T("foo\\bar.ext"));
-	strPath = charPath;
-	testPathRemoveFileSpec(charPath, strPath);
+TEST(PathRemoveFileSpecTest, NoDriveLetterBasicPathNoFileWithoutEndSlash)
+{
+	ASSERT_TRUE(testPathRemoveFileSpec(_T("\\foo")));
+}
 
-	_tcscpy_s(charPath, MAX_PATH, _T("foo.exe"));
-	strPath = charPath;
-	testPathRemoveFileSpec(charPath, strPath);
+TEST(PathRemoveFileSpecTest, NoDriveLetterNoStartSlashBasicPath)
+{
+	ASSERT_TRUE(testPathRemoveFileSpec(_T("foo\\bar.ext")));
+}
 
-	_tcscpy_s(charPath, MAX_PATH, _T("foo"));
-	strPath = charPath;
-	testPathRemoveFileSpec(charPath, strPath);
+TEST(PathRemoveFileSpecTest, BasicFileName)
+{
+	ASSERT_TRUE(testPathRemoveFileSpec(_T("foo.exe")));
+}
 
-	_tcscpy_s(charPath, MAX_PATH, _T("f"));
-	strPath = charPath;
-	testPathRemoveFileSpec(charPath, strPath);
+TEST(PathRemoveFileSpecTest, BasicFileNameNoExtention)
+{
+	ASSERT_TRUE(testPathRemoveFileSpec(_T("foo")));
+}
 
-	_tcscpy_s(charPath, MAX_PATH, _T("C://foo//test.exe"));
-	strPath = charPath;
-	testPathRemoveFileSpec(charPath, strPath);
+TEST(PathRemoveFileSpecTest, OneLetterFileName)
+{
+	ASSERT_TRUE(testPathRemoveFileSpec(_T("f")));
+}
 
-	_tcscpy_s(charPath, MAX_PATH, _T("//foo//test.exe"));
-	strPath = charPath;
-	testPathRemoveFileSpec(charPath, strPath);
+TEST(PathRemoveFileSpecTest, EmptyString)
+{
+	ASSERT_TRUE(testPathRemoveFileSpec(_T("")));
+}
 
+TEST(PathRemoveFileSpecTest, BasicPathForwardSlash)
+{
+	ASSERT_TRUE(testPathRemoveFileSpec(_T("C:/foo/test.exe")));
+}
 
-	_tcscpy_s(charPath, MAX_PATH, _T("C://foo//test"));
-	strPath = charPath;
-	testPathRemoveFileSpec(charPath, strPath);
+TEST(PathRemoveFileSpecTest, NoDriveForwardSlash)
+{
+	ASSERT_TRUE(testPathRemoveFileSpec(_T("/foo/test.exe")));
+}
 
-	_tcscpy_s(charPath, MAX_PATH, _T("C://foo//"));
-	strPath = charPath;
-	testPathRemoveFileSpec(charPath, strPath);
+TEST(PathRemoveFileSpecTest, NoDriveDoubleForwardSlash)
+{
+	ASSERT_TRUE(testPathRemoveFileSpec(_T("//foo//test.exe")));
+}
 
-	_tcscpy_s(charPath, MAX_PATH, _T("C://foo"));
-	strPath = charPath;
-	testPathRemoveFileSpec(charPath, strPath);
+TEST(PathRemoveFileSpecTest, NoExtensionForwardSlash)
+{
+	ASSERT_TRUE(testPathRemoveFileSpec(_T("C:/foo/test")));
+}
 
-	_tcscpy_s(charPath, MAX_PATH, _T("C://"));
-	strPath = charPath;
-	testPathRemoveFileSpec(charPath, strPath);
+TEST(PathRemoveFileSpecTest, NoFileForwardSlash)
+{
+	ASSERT_TRUE(testPathRemoveFileSpec(_T("C:/foo/")));
+}
 
-	_tcscpy_s(charPath, MAX_PATH, _T(""));
-	strPath = charPath;
-	testPathRemoveFileSpec(charPath, strPath);
+TEST(PathRemoveFileSpecTest, DriveLetterAndFileNoExtensionForwardSlash)
+{
+	ASSERT_TRUE(testPathRemoveFileSpec(_T("C:/foo")));
+}
 
+TEST(PathRemoveFileSpecTest, DriveLetterForwardSlash)
+{
+	ASSERT_TRUE(testPathRemoveFileSpec(_T("C:/")));
 }
 
 #endif
