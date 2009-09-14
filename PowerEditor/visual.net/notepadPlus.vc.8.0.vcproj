@@ -16,198 +16,6 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Debug|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC70.vsprops;.\external_apps_locations.vsprops"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				FavorSizeOrSpeed="0"
-				AdditionalIncludeDirectories="&quot;$(GoogleMockDir)include&quot;;&quot;$(GoogleTestDir)include&quot;;..\..\scintilla\include;..\include;..\src\WinControls;..\src\WinControls\AboutDlg;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\TabBar;..\src\WinControls\ToolBar;..\src\MISC\Process;..\src\ScitillaComponent;..\src\MISC;..\src\MISC\SysMsg;..\src\WinControls\StatusBar;..\src;..\src\WinControls\StaticDialog\RunDlg;..\src\tinyxml;..\src\WinControls\ColourPicker;..\src\Win32Explr;..\src\MISC\RegExt;..\src\WinControls\TrayIcon;..\src\WinControls\shortcut;..\src\WinControls\Grid;..\src\WinControls\ContextMenu;..\src\MISC\PluginsManager;..\src\WinControls\Preference;..\src\WinControls\WindowsDlg;..\src\WinControls\TaskList;..\src\WinControls\DockingWnd;..\src\WinControls\ToolTip;..\src\MISC\Exception;..\src\MISC\Common;..\src\tinyxml\tinyXmlA"
-				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;TIXML_USE_STL;TIXMLA_USE_STL"
-				MinimalRebuild="true"
-				ExceptionHandling="2"
-				BasicRuntimeChecks="0"
-				RuntimeLibrary="1"
-				DefaultCharIsUnsigned="true"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="precompiled_headers.h"
-				PrecompiledHeaderFile="$(IntDir)\$(TargetName).pch"
-				WarningLevel="4"
-				WarnAsError="true"
-				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions="/fixed:no"
-				AdditionalDependencies="comctl32.lib shlwapi.lib shell32.lib Oleacc.lib gtestd.lib"
-				ShowProgress="2"
-				OutputFile="../bin/notepad++DebugA.exe"
-				Version="1.0"
-				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(GoogleMockDir)msvc\Debug&quot;;&quot;$(GoogleTestDir)msvc\Debug&quot;"
-				TypeLibraryFile="/TLBID"
-				TypeLibraryResourceID="5"
-				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/notepadPlus.pdb"
-				SubSystem="2"
-				TargetMachine="1"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine="IF NOT EXIST ..\bin\config.xml COPY ..\src\config.model.xml ..\bin\config.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\config.model.xml COPY ..\src\config.model.xml ..\bin\config.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.xml COPY ..\src\langs.model.xml ..\bin\langs.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.model.xml COPY ..\src\langs.model.xml ..\bin\langs.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.xml COPY ..\src\stylers.model.xml ..\bin\stylers.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.model.xml COPY ..\src\stylers.model.xml ..\bin\stylers.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\LINEDRAW.TTF COPY ..\src\font\LINEDRAW.TTF ..\bin\LINEDRAW.TTF&#x0D;&#x0A;IF NOT EXIST ..\bin\contextMenu.xml COPY ..\src\contextMenu.xml ..\bin\contextMenu.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\shortcuts.xml COPY ..\src\shortcuts.xml ..\bin\shortcuts.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\userDefineLang.xml COPY ..\src\userDefineLang.xml ..\bin\userDefineLang.xml&#x0D;&#x0A;$(TargetPath) -unittests&#x0D;&#x0A;"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC70.vsprops;.\external_apps_locations.vsprops"
-			CharacterSet="2"
-			WholeProgramOptimization="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="2"
-				InlineFunctionExpansion="2"
-				FavorSizeOrSpeed="1"
-				OmitFramePointers="true"
-				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;$(GoogleMockDir)include&quot;;&quot;$(GoogleTestDir)include&quot;;..\..\scintilla\include;..\include;..\src\WinControls;..\src\WinControls\AboutDlg;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\TabBar;..\src\WinControls\ToolBar;..\src\MISC\Process;..\src\ScitillaComponent;..\src\MISC;..\src\MISC\SysMsg;..\src\WinControls\StatusBar;..\src;..\src\WinControls\StaticDialog\RunDlg;..\src\tinyxml;..\src\WinControls\ColourPicker;..\src\Win32Explr;..\src\MISC\RegExt;..\src\WinControls\TrayIcon;..\src\WinControls\shortcut;..\src\WinControls\Grid;..\src\WinControls\ContextMenu;..\src\MISC\PluginsManager;..\src\WinControls\Preference;..\src\WinControls\WindowsDlg;..\src\WinControls\TaskList;..\src\WinControls\DockingWnd;..\src\WinControls\ToolTip;..\src\MISC\Exception;..\src\MISC\Common;..\src\tinyxml\tinyXmlA"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;TIXMLA_USE_STL"
-				StringPooling="true"
-				ExceptionHandling="2"
-				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
-				DefaultCharIsUnsigned="true"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="precompiled_headers.h"
-				PrecompiledHeaderFile="$(IntDir)\$(TargetName).pch"
-				WarningLevel="4"
-				WarnAsError="true"
-				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib shlwapi.lib shell32.lib Oleacc.lib gtest.lib"
-				ShowProgress="2"
-				OutputFile="../bin/notepad++ReleaseA.exe"
-				Version="1.0"
-				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(GoogleMockDir)msvc\Release&quot;;&quot;$(GoogleTestDir)msvc\Release&quot;"
-				TypeLibraryFile=""
-				TypeLibraryResourceID="1"
-				GenerateDebugInformation="true"
-				ProgramDatabaseFile=""
-				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				LinkTimeCodeGeneration="1"
-				TargetMachine="1"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine="IF NOT EXIST ..\bin\config.xml COPY ..\src\config.model.xml ..\bin\config.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\config.model.xml COPY ..\src\config.model.xml ..\bin\config.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.xml COPY ..\src\langs.model.xml ..\bin\langs.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.model.xml COPY ..\src\langs.model.xml ..\bin\langs.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.xml COPY ..\src\stylers.model.xml ..\bin\stylers.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.model.xml COPY ..\src\stylers.model.xml ..\bin\stylers.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\LINEDRAW.TTF COPY ..\src\font\LINEDRAW.TTF ..\bin\LINEDRAW.TTF&#x0D;&#x0A;IF NOT EXIST ..\bin\contextMenu.xml COPY ..\src\contextMenu.xml ..\bin\contextMenu.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\shortcuts.xml COPY ..\src\shortcuts.xml ..\bin\shortcuts.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\userDefineLang.xml COPY ..\src\userDefineLang.xml ..\bin\userDefineLang.xml&#x0D;&#x0A;$(TargetPath) -unittests&#x0D;&#x0A;"
-			/>
-		</Configuration>
-		<Configuration
 			Name="Debug Unicode|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
@@ -400,104 +208,6 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Shipping|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC70.vsprops;.\external_apps_locations.vsprops"
-			CharacterSet="2"
-			WholeProgramOptimization="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="2"
-				InlineFunctionExpansion="2"
-				FavorSizeOrSpeed="1"
-				OmitFramePointers="true"
-				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="..\src\WinControls\AboutDlg;..\..\scintilla\include;..\include;..\src\WinControls;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\TabBar;..\src\WinControls\ToolBar;..\src\MISC\Process;..\src\ScitillaComponent;..\src\MISC;..\src\MISC\SysMsg;..\src\WinControls\StatusBar;..\src;..\src\WinControls\StaticDialog\RunDlg;..\src\tinyxml;..\src\WinControls\ColourPicker;..\src\Win32Explr;..\src\MISC\RegExt;..\src\WinControls\TrayIcon;..\src\WinControls\shortcut;..\src\WinControls\Grid;..\src\WinControls\ContextMenu;..\src\MISC\PluginsManager;..\src\WinControls\Preference;..\src\WinControls\WindowsDlg;..\src\WinControls\TaskList;..\src\WinControls\DockingWnd;..\src\WinControls\ToolTip;..\src\MISC\Exception;..\src\MISC\Common;..\src\tinyxml\tinyXmlA"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;TIXMLA_USE_STL"
-				StringPooling="true"
-				ExceptionHandling="2"
-				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
-				DefaultCharIsUnsigned="true"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="precompiled_headers.h"
-				PrecompiledHeaderFile="$(IntDir)\$(TargetName).pch"
-				WarningLevel="4"
-				WarnAsError="true"
-				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib shlwapi.lib shell32.lib Oleacc.lib"
-				ShowProgress="2"
-				OutputFile="../bin/notepad++A.exe"
-				Version="1.0"
-				LinkIncremental="1"
-				TypeLibraryFile=""
-				TypeLibraryResourceID="1"
-				GenerateDebugInformation="true"
-				ProgramDatabaseFile=""
-				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				LinkTimeCodeGeneration="1"
-				TargetMachine="1"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine="IF NOT EXIST ..\bin\config.xml COPY ..\src\config.model.xml ..\bin\config.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\config.model.xml COPY ..\src\config.model.xml ..\bin\config.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.xml COPY ..\src\langs.model.xml ..\bin\langs.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.model.xml COPY ..\src\langs.model.xml ..\bin\langs.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.xml COPY ..\src\stylers.model.xml ..\bin\stylers.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.model.xml COPY ..\src\stylers.model.xml ..\bin\stylers.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\LINEDRAW.TTF COPY ..\src\font\LINEDRAW.TTF ..\bin\LINEDRAW.TTF&#x0D;&#x0A;IF NOT EXIST ..\bin\contextMenu.xml COPY ..\src\contextMenu.xml ..\bin\contextMenu.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\shortcuts.xml COPY ..\src\shortcuts.xml ..\bin\shortcuts.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\userDefineLang.xml COPY ..\src\userDefineLang.xml ..\bin\userDefineLang.xml&#x0D;&#x0A;"
-			/>
-		</Configuration>
-		<Configuration
 			Name="Shipping Unicode|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
@@ -619,22 +329,6 @@
 				RelativePath="..\src\precompiled_headers.cpp"
 				>
 				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug Unicode|Win32"
 					>
 					<Tool
@@ -644,14 +338,6 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release Unicode|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Shipping|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -721,24 +407,6 @@
 						RelativePath="..\src\MISC\Common\npp_session.cpp"
 						>
 						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\$(InputName)1.obj"
-								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\$(InputName)1.obj"
-								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
 							Name="Debug Unicode|Win32"
 							>
 							<Tool
@@ -749,15 +417,6 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="Release Unicode|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\$(InputName)1.obj"
-								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Shipping|Win32"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -779,24 +438,6 @@
 						RelativePath="..\src\MISC\Common\npp_styles.cpp"
 						>
 						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\$(InputName)1.obj"
-								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\$(InputName)1.obj"
-								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
 							Name="Debug Unicode|Win32"
 							>
 							<Tool
@@ -807,15 +448,6 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="Release Unicode|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\$(InputName)1.obj"
-								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Shipping|Win32"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -837,24 +469,6 @@
 						RelativePath="..\src\MISC\Common\npp_winver.cpp"
 						>
 						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\$(InputName)1.obj"
-								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\$(InputName)1.obj"
-								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
 							Name="Debug Unicode|Win32"
 							>
 							<Tool
@@ -865,15 +479,6 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="Release Unicode|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\$(InputName)1.obj"
-								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Shipping|Win32"
 							>
 							<Tool
 								Name="VCCLCompilerTool"

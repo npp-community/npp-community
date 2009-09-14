@@ -11,37 +11,22 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Unicode|Win32 = Debug Unicode|Win32
-		Debug|Win32 = Debug|Win32
 		Release Unicode|Win32 = Release Unicode|Win32
-		Release|Win32 = Release|Win32
 		Shipping Unicode|Win32 = Shipping Unicode|Win32
-		Shipping|Win32 = Shipping|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{FCF60E65-1B78-4D1D-AB59-4FC00AC8C248}.Debug Unicode|Win32.ActiveCfg = Debug Unicode|Win32
 		{FCF60E65-1B78-4D1D-AB59-4FC00AC8C248}.Debug Unicode|Win32.Build.0 = Debug Unicode|Win32
-		{FCF60E65-1B78-4D1D-AB59-4FC00AC8C248}.Debug|Win32.ActiveCfg = Debug|Win32
-		{FCF60E65-1B78-4D1D-AB59-4FC00AC8C248}.Debug|Win32.Build.0 = Debug|Win32
-		{FCF60E65-1B78-4D1D-AB59-4FC00AC8C248}.Release Unicode|Win32.ActiveCfg = Release Unicode|Win32
-		{FCF60E65-1B78-4D1D-AB59-4FC00AC8C248}.Release Unicode|Win32.Build.0 = Release Unicode|Win32
-		{FCF60E65-1B78-4D1D-AB59-4FC00AC8C248}.Release|Win32.ActiveCfg = Release|Win32
-		{FCF60E65-1B78-4D1D-AB59-4FC00AC8C248}.Release|Win32.Build.0 = Release|Win32
+		{FCF60E65-1B78-4D1D-AB59-4FC00AC8C248}.Release Unicode|Win32.ActiveCfg = Shipping Unicode|Win32
+		{FCF60E65-1B78-4D1D-AB59-4FC00AC8C248}.Release Unicode|Win32.Build.0 = Shipping Unicode|Win32
 		{FCF60E65-1B78-4D1D-AB59-4FC00AC8C248}.Shipping Unicode|Win32.ActiveCfg = Shipping Unicode|Win32
 		{FCF60E65-1B78-4D1D-AB59-4FC00AC8C248}.Shipping Unicode|Win32.Build.0 = Shipping Unicode|Win32
-		{FCF60E65-1B78-4D1D-AB59-4FC00AC8C248}.Shipping|Win32.ActiveCfg = Shipping|Win32
-		{FCF60E65-1B78-4D1D-AB59-4FC00AC8C248}.Shipping|Win32.Build.0 = Shipping|Win32
 		{B1BDB077-3ED7-4C69-9A22-5A65E08C201C}.Debug Unicode|Win32.ActiveCfg = Debug|Win32
 		{B1BDB077-3ED7-4C69-9A22-5A65E08C201C}.Debug Unicode|Win32.Build.0 = Debug|Win32
-		{B1BDB077-3ED7-4C69-9A22-5A65E08C201C}.Debug|Win32.ActiveCfg = Debug|Win32
-		{B1BDB077-3ED7-4C69-9A22-5A65E08C201C}.Debug|Win32.Build.0 = Debug|Win32
 		{B1BDB077-3ED7-4C69-9A22-5A65E08C201C}.Release Unicode|Win32.ActiveCfg = Release|Win32
 		{B1BDB077-3ED7-4C69-9A22-5A65E08C201C}.Release Unicode|Win32.Build.0 = Release|Win32
-		{B1BDB077-3ED7-4C69-9A22-5A65E08C201C}.Release|Win32.ActiveCfg = Release|Win32
-		{B1BDB077-3ED7-4C69-9A22-5A65E08C201C}.Release|Win32.Build.0 = Release|Win32
 		{B1BDB077-3ED7-4C69-9A22-5A65E08C201C}.Shipping Unicode|Win32.ActiveCfg = Release|Win32
 		{B1BDB077-3ED7-4C69-9A22-5A65E08C201C}.Shipping Unicode|Win32.Build.0 = Release|Win32
-		{B1BDB077-3ED7-4C69-9A22-5A65E08C201C}.Shipping|Win32.ActiveCfg = Release|Win32
-		{B1BDB077-3ED7-4C69-9A22-5A65E08C201C}.Shipping|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
