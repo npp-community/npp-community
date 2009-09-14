@@ -69,11 +69,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/fixed:no"
-				AdditionalDependencies="comctl32.lib shlwapi.lib shell32.lib Oleacc.lib"
+				AdditionalDependencies="comctl32.lib shlwapi.lib shell32.lib Oleacc.lib gtestd.lib"
 				ShowProgress="2"
 				OutputFile="../bin/notepad++DebugA.exe"
 				Version="1.0"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;$(GoogleMockDir)msvc\Debug&quot;;&quot;$(GoogleTestDir)msvc\Debug&quot;"
 				TypeLibraryFile="/TLBID"
 				TypeLibraryResourceID="5"
 				GenerateDebugInformation="true"
@@ -104,7 +105,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="IF NOT EXIST ..\bin\config.xml COPY ..\src\config.model.xml ..\bin\config.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\config.model.xml COPY ..\src\config.model.xml ..\bin\config.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.xml COPY ..\src\langs.model.xml ..\bin\langs.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.model.xml COPY ..\src\langs.model.xml ..\bin\langs.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.xml COPY ..\src\stylers.model.xml ..\bin\stylers.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.model.xml COPY ..\src\stylers.model.xml ..\bin\stylers.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\LINEDRAW.TTF COPY ..\src\font\LINEDRAW.TTF ..\bin\LINEDRAW.TTF&#x0D;&#x0A;IF NOT EXIST ..\bin\contextMenu.xml COPY ..\src\contextMenu.xml ..\bin\contextMenu.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\shortcuts.xml COPY ..\src\shortcuts.xml ..\bin\shortcuts.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\userDefineLang.xml COPY ..\src\userDefineLang.xml ..\bin\userDefineLang.xml&#x0D;&#x0A;"
+				CommandLine="IF NOT EXIST ..\bin\config.xml COPY ..\src\config.model.xml ..\bin\config.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\config.model.xml COPY ..\src\config.model.xml ..\bin\config.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.xml COPY ..\src\langs.model.xml ..\bin\langs.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.model.xml COPY ..\src\langs.model.xml ..\bin\langs.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.xml COPY ..\src\stylers.model.xml ..\bin\stylers.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.model.xml COPY ..\src\stylers.model.xml ..\bin\stylers.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\LINEDRAW.TTF COPY ..\src\font\LINEDRAW.TTF ..\bin\LINEDRAW.TTF&#x0D;&#x0A;IF NOT EXIST ..\bin\contextMenu.xml COPY ..\src\contextMenu.xml ..\bin\contextMenu.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\shortcuts.xml COPY ..\src\shortcuts.xml ..\bin\shortcuts.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\userDefineLang.xml COPY ..\src\userDefineLang.xml ..\bin\userDefineLang.xml&#x0D;&#x0A;$(TargetPath) -unittests&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -164,11 +165,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib shlwapi.lib shell32.lib Oleacc.lib"
+				AdditionalDependencies="comctl32.lib shlwapi.lib shell32.lib Oleacc.lib gtest.lib"
 				ShowProgress="2"
-				OutputFile="../bin/notepad++A.exe"
+				OutputFile="../bin/notepad++ReleaseA.exe"
 				Version="1.0"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;$(GoogleMockDir)msvc\Release&quot;;&quot;$(GoogleTestDir)msvc\Release&quot;"
 				TypeLibraryFile=""
 				TypeLibraryResourceID="1"
 				GenerateDebugInformation="true"
@@ -202,7 +204,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="IF NOT EXIST ..\bin\config.xml COPY ..\src\config.model.xml ..\bin\config.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\config.model.xml COPY ..\src\config.model.xml ..\bin\config.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.xml COPY ..\src\langs.model.xml ..\bin\langs.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.model.xml COPY ..\src\langs.model.xml ..\bin\langs.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.xml COPY ..\src\stylers.model.xml ..\bin\stylers.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.model.xml COPY ..\src\stylers.model.xml ..\bin\stylers.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\LINEDRAW.TTF COPY ..\src\font\LINEDRAW.TTF ..\bin\LINEDRAW.TTF&#x0D;&#x0A;IF NOT EXIST ..\bin\contextMenu.xml COPY ..\src\contextMenu.xml ..\bin\contextMenu.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\shortcuts.xml COPY ..\src\shortcuts.xml ..\bin\shortcuts.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\userDefineLang.xml COPY ..\src\userDefineLang.xml ..\bin\userDefineLang.xml&#x0D;&#x0A;"
+				CommandLine="IF NOT EXIST ..\bin\config.xml COPY ..\src\config.model.xml ..\bin\config.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\config.model.xml COPY ..\src\config.model.xml ..\bin\config.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.xml COPY ..\src\langs.model.xml ..\bin\langs.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.model.xml COPY ..\src\langs.model.xml ..\bin\langs.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.xml COPY ..\src\stylers.model.xml ..\bin\stylers.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.model.xml COPY ..\src\stylers.model.xml ..\bin\stylers.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\LINEDRAW.TTF COPY ..\src\font\LINEDRAW.TTF ..\bin\LINEDRAW.TTF&#x0D;&#x0A;IF NOT EXIST ..\bin\contextMenu.xml COPY ..\src\contextMenu.xml ..\bin\contextMenu.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\shortcuts.xml COPY ..\src\shortcuts.xml ..\bin\shortcuts.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\userDefineLang.xml COPY ..\src\userDefineLang.xml ..\bin\userDefineLang.xml&#x0D;&#x0A;$(TargetPath) -unittests&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -259,11 +261,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/fixed:no"
-				AdditionalDependencies="unicows.lib comctl32.lib shlwapi.lib shell32.lib"
+				AdditionalDependencies="unicows.lib comctl32.lib shlwapi.lib shell32.lib gtestd.lib"
 				ShowProgress="2"
 				OutputFile="../bin/notepad++Debug.exe"
 				Version="1.0"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;$(GoogleMockDir)msvc\Debug&quot;;&quot;$(GoogleTestDir)msvc\Debug&quot;"
 				TypeLibraryFile="/TLBID"
 				TypeLibraryResourceID="5"
 				GenerateDebugInformation="true"
@@ -294,7 +297,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="IF NOT EXIST ..\bin\config.xml COPY ..\src\config.model.xml ..\bin\config.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\config.model.xml COPY ..\src\config.model.xml ..\bin\config.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.xml COPY ..\src\langs.model.xml ..\bin\langs.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.model.xml COPY ..\src\langs.model.xml ..\bin\langs.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.xml COPY ..\src\stylers.model.xml ..\bin\stylers.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.model.xml COPY ..\src\stylers.model.xml ..\bin\stylers.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\LINEDRAW.TTF COPY ..\src\font\LINEDRAW.TTF ..\bin\LINEDRAW.TTF&#x0D;&#x0A;IF NOT EXIST ..\bin\contextMenu.xml COPY ..\src\contextMenu.xml ..\bin\contextMenu.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\shortcuts.xml COPY ..\src\shortcuts.xml ..\bin\shortcuts.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\userDefineLang.xml COPY ..\src\userDefineLang.xml ..\bin\userDefineLang.xml&#x0D;&#x0A;"
+				CommandLine="IF NOT EXIST ..\bin\config.xml COPY ..\src\config.model.xml ..\bin\config.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\config.model.xml COPY ..\src\config.model.xml ..\bin\config.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.xml COPY ..\src\langs.model.xml ..\bin\langs.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.model.xml COPY ..\src\langs.model.xml ..\bin\langs.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.xml COPY ..\src\stylers.model.xml ..\bin\stylers.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.model.xml COPY ..\src\stylers.model.xml ..\bin\stylers.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\LINEDRAW.TTF COPY ..\src\font\LINEDRAW.TTF ..\bin\LINEDRAW.TTF&#x0D;&#x0A;IF NOT EXIST ..\bin\contextMenu.xml COPY ..\src\contextMenu.xml ..\bin\contextMenu.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\shortcuts.xml COPY ..\src\shortcuts.xml ..\bin\shortcuts.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\userDefineLang.xml COPY ..\src\userDefineLang.xml ..\bin\userDefineLang.xml&#x0D;&#x0A;$(TargetPath) -unittests&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -354,11 +357,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="unicows.lib comctl32.lib shlwapi.lib shell32.lib Oleacc.lib"
+				AdditionalDependencies="unicows.lib comctl32.lib shlwapi.lib shell32.lib Oleacc.lib gtest.lib"
 				ShowProgress="2"
-				OutputFile="../bin/notepad++.exe"
+				OutputFile="../bin/notepad++Release.exe"
 				Version="1.0"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;$(GoogleMockDir)msvc\Release&quot;;&quot;$(GoogleTestDir)msvc\Release&quot;"
 				TypeLibraryFile=""
 				TypeLibraryResourceID="1"
 				GenerateDebugInformation="true"
@@ -392,7 +396,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="IF NOT EXIST ..\bin\config.xml COPY ..\src\config.model.xml ..\bin\config.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\config.model.xml COPY ..\src\config.model.xml ..\bin\config.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.xml COPY ..\src\langs.model.xml ..\bin\langs.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.model.xml COPY ..\src\langs.model.xml ..\bin\langs.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.xml COPY ..\src\stylers.model.xml ..\bin\stylers.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.model.xml COPY ..\src\stylers.model.xml ..\bin\stylers.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\LINEDRAW.TTF COPY ..\src\font\LINEDRAW.TTF ..\bin\LINEDRAW.TTF&#x0D;&#x0A;IF NOT EXIST ..\bin\contextMenu.xml COPY ..\src\contextMenu.xml ..\bin\contextMenu.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\shortcuts.xml COPY ..\src\shortcuts.xml ..\bin\shortcuts.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\userDefineLang.xml COPY ..\src\userDefineLang.xml ..\bin\userDefineLang.xml&#x0D;&#x0A;"
+				CommandLine="IF NOT EXIST ..\bin\config.xml COPY ..\src\config.model.xml ..\bin\config.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\config.model.xml COPY ..\src\config.model.xml ..\bin\config.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.xml COPY ..\src\langs.model.xml ..\bin\langs.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\langs.model.xml COPY ..\src\langs.model.xml ..\bin\langs.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.xml COPY ..\src\stylers.model.xml ..\bin\stylers.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\stylers.model.xml COPY ..\src\stylers.model.xml ..\bin\stylers.model.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\LINEDRAW.TTF COPY ..\src\font\LINEDRAW.TTF ..\bin\LINEDRAW.TTF&#x0D;&#x0A;IF NOT EXIST ..\bin\contextMenu.xml COPY ..\src\contextMenu.xml ..\bin\contextMenu.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\shortcuts.xml COPY ..\src\shortcuts.xml ..\bin\shortcuts.xml&#x0D;&#x0A;IF NOT EXIST ..\bin\userDefineLang.xml COPY ..\src\userDefineLang.xml ..\bin\userDefineLang.xml&#x0D;&#x0A;$(TargetPath) -unittests&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
