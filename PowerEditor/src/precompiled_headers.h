@@ -20,28 +20,17 @@
 
 #include "targetver.h"
 
-#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
-// Windows Header Files:
-#include <windows.h>
-#include <commctrl.h>
-#include <commdlg.h>
-#include <dlgs.h>
-#include <ShellAPI.h>
-#include <dbghelp.h>
-#include <eh.h>
-#include <exception>		//default C++ exception
-#include <shlobj.h>
-#include <shlwapi.h>
-#include <Oleacc.h>
-#include <uxtheme.h>
+// Allow to track emplacement where leaked memory was allocated.
+#define _CRTDBG_MAP_ALLOC
 
 // C RunTime Header Files
+// The next two files need to stay in that order, and need to be the
+// first system includes of this file.
 #include <stdlib.h>
-#include <malloc.h>
-#include <memory.h>
+#include <crtdbg.h>
+
 #include <tchar.h>
 #include <stdio.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
 #include <ctype.h>
@@ -49,10 +38,6 @@
 #include <assert.h>
 #include <math.h>
 #include <time.h>
-
-#ifdef UNICODE
-#include <wchar.h>
-#endif
 
 // STL Headers
 #include <algorithm>
@@ -67,6 +52,27 @@
 #include <string>
 #include <sstream>
 #endif
+
+// Needed to be able to detect the memory leaks created by calls to 'new'
+#ifdef _DEBUG
+#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
+#define new DEBUG_NEW
+#endif
+
+#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
+// Windows Header Files:
+#include <windows.h>
+#include <commctrl.h>
+#include <commdlg.h>
+#include <dlgs.h>
+#include <ShellAPI.h>
+#include <dbghelp.h>
+#include <eh.h>
+#include <exception>		//default C++ exception
+#include <shlobj.h>
+#include <shlwapi.h>
+#include <Oleacc.h>
+#include <uxtheme.h>
 
 // Google Test
 #ifndef SHIPPING

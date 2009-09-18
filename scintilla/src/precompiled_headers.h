@@ -20,6 +20,41 @@
 
 #include "targetver.h"
 
+// Allow to track emplacement where leaked memory was allocated.
+#define _CRTDBG_MAP_ALLOC
+
+// C RunTime Header Files
+
+// The next two files need to stay in that order, and need to be the
+// first system includes of this file.
+#include <stdlib.h>
+#include <crtdbg.h>
+
+#include <string.h>
+#include <ctype.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include <assert.h>
+#include <limits.h>
+#include <time.h>
+
+#if _MSC_VER >= 1300
+#include <basetsd.h>
+#endif
+
+// STL
+#include <new>
+#include <map>
+#include <string>
+#include <vector>
+#include <algorithm>
+
+// Needed to be able to detect the memory leaks created by calls to 'new'
+#ifdef _DEBUG
+#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
+#define new DEBUG_NEW
+#endif
+
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 // Windows Header Files:
 #include <windows.h>
@@ -32,25 +67,5 @@
 #include <zmouse.h>
 #include <ole2.h>
 
-#if _MSC_VER >= 1300
-#include <basetsd.h>
-#endif
-
-// Standard headers.
-#include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <assert.h>
-#include <limits.h>
-#include <time.h>
-
-// STL
-#include <new>
-#include <map>
-#include <string>
-#include <vector>
-#include <algorithm>
 #endif // PRECOMPILED_HEADERS_H
 

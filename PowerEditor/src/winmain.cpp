@@ -169,6 +169,7 @@ void doException(Notepad_plus & notepad_plus_plus);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*nCmdShow*/)
 {
+	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	LPTSTR cmdLine = ::GetCommandLine();
 	ParamVector params;
 	parseCommandLine(cmdLine, params);
