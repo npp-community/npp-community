@@ -61,14 +61,7 @@ struct PluginInfo {
 class PluginsManager {
 public:
 	PluginsManager() : _hPluginsMenu(NULL), _isDisabled(false) {};
-	~PluginsManager() {
-
-		for (size_t i = 0 ; i < _pluginInfos.size() ; i++)
-			delete _pluginInfos[i];
-
-		if (_hPluginsMenu)
-			DestroyMenu(_hPluginsMenu);
-	};
+	~PluginsManager();
 	void init(const NppData & nppData) {
 		_nppData = nppData;
 	};

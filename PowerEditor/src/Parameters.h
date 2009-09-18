@@ -523,6 +523,7 @@ struct FindHistory {
 	int _nbFindHistoryFind;
 	int _nbFindHistoryReplace;
 
+	// JOCE: Use vectors!
 	generic_string* _pFindHistoryPath[NB_MAX_FINDHISTORY_PATH];
 	generic_string* _pFindHistoryFilter[NB_MAX_FINDHISTORY_FILTER];
 	generic_string* _pFindHistoryFind[NB_MAX_FINDHISTORY_FIND];

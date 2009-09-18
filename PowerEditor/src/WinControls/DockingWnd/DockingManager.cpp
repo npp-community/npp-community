@@ -90,6 +90,7 @@ DockingManager::~DockingManager()
 	for (int i = 0; i < DOCKCONT_MAX; i++)
 	{
 		delete _vSplitter[i];
+		delete _vContainer[i];
 	}
 
 	delete _dockData;

@@ -27,6 +27,15 @@
 const TCHAR * USERMSG = TEXT("This plugin is not compatible with current version of Notepad++.\n\n\
 Do you want to remove this plugin from plugins directory to prevent this message from the next launch time?");
 
+PluginsManager::~PluginsManager() {
+
+	for (size_t i = 0 ; i < _pluginInfos.size() ; i++)
+		delete _pluginInfos[i];
+
+	if (_hPluginsMenu)
+		DestroyMenu(_hPluginsMenu);
+}
+
 bool PluginsManager::unloadPlugin(int index, HWND nppHandle)
 {
     SCNotification scnN;
