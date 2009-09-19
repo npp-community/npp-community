@@ -18,11 +18,7 @@
 #ifndef NPP_WINVER_H
 #define NPP_WINVER_H
 
-
-// JOCE: For the winVer definition... Could probably be moved here at some point
-#ifndef NOTEPAD_PLUS_MSGS_H
-#include "Notepad_plus_msgs.h"
-#endif
+enum winVer{WV_UNKNOWN, WV_WIN32S, WV_95, WV_98, WV_ME, WV_NT, WV_W2K, WV_XP, WV_S2003, WV_XPX64, WV_VISTA, WV_WIN7};
 
 winVer getWinVersion();
 
