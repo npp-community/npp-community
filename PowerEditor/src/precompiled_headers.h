@@ -47,11 +47,8 @@
 #include <vector>
 #include <deque>
 #include <map>
-
-#ifdef TIXMLA_USE_STL
 #include <string>
 #include <sstream>
-#endif
 
 // Needed to be able to detect the memory leaks created by calls to 'new'
 #ifdef _DEBUG

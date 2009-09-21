@@ -49,6 +49,8 @@ inline bool match(TCHAR c1, TCHAR c2) {
 	return false;
 }
 
+
+// JOCE: could generalize to generic_string and move to common.h
 //test string case insensitive ala Scintilla
 //0 if equal, <0 of before, >0 if after (name1 that is)
 int testNameNoCase(const TCHAR * name1, const TCHAR * name2, int len = -1) {
@@ -221,18 +223,13 @@ bool FunctionCallTip::getCursorFunction() {
 		_currentParam = curValue.param;
 
 		bool same = false;
-		if (_funcName) {
-			if(_ignoreCase)
-				same = testNameNoCase(_funcName, funcToken.token, lstrlen(_funcName)) == 0;
-			else
-				same = generic_strncmp(_funcName, funcToken.token, lstrlen(_funcName)) == 0;
-		}
+		if(_ignoreCase)
+			same = testNameNoCase(_funcName.c_str(), funcToken.token, _funcName.length()) == 0;
+		else
+			same = (_funcName == funcToken.token);
+
 		if (!same) {	//check if we need to reload data
-			if (_funcName) {
-				delete [] _funcName;
-			}
-			_funcName = new TCHAR[funcToken.length+1];
-			lstrcpy(_funcName, funcToken.token);
+			_funcName = funcToken.token;
 			res = loadFunction();
 		} else {
 			res = true;
@@ -258,21 +255,20 @@ bool FunctionCallTip::loadFunction() {
 			continue;
 		int compVal = 0;
 		if (_ignoreCase)
-			compVal = testNameNoCase(name, _funcName);	//lstrcmpi doesnt work in this case
+			compVal = testNameNoCase(name, _funcName.c_str());	//lstrcmpi doesnt work in this case
 		else
-			compVal = lstrcmp(name, _funcName);
+			compVal = (_funcName == name);
+
 		if (!compVal) {	//found it?
-			const TCHAR * val = funcNode->Attribute(TEXT("func"));
-			if (val)
-			{
-				if (!lstrcmp(val, TEXT("yes"))) {
-					//what we've been looking for
-					_curFunction = funcNode;
-					break;
-				} else {
-					//name matches, but not a function, abort the entire procedure
-					return false;
-				}
+			const TCHAR* attrib = funcNode->Attribute(TEXT("func"));
+			generic_string val = attrib ? attrib : TEXT("");
+			if (val == TEXT("yes")) {
+				//what we've been looking for
+				_curFunction = funcNode;
+				break;
+			} else {
+				//name matches, but not a function, abort the entire procedure
+				return false;
 			}
 		} else if (compVal > 0) {	//too far, abort
 			return false;
@@ -326,7 +322,7 @@ void FunctionCallTip::showCalltip() {
 		return;
 	}
 
-	//Check if the current overload still holds. If the current param exceeds amounti n overload, see if another one fits better (enough params)
+	//Check if the current overload still holds. If the current param exceeds amount in overload, see if another one fits better (enough params)
 	stringVec & params = _overloads.at(_currentOverload);
 	size_t psize = params.size()+1, osize;
 	if ((size_t)_currentParam >= psize) {
@@ -339,64 +335,45 @@ void FunctionCallTip::showCalltip() {
 			}
 		}
 	}
-	const TCHAR * curRetValText = _retVals.at(_currentOverload);
-	const TCHAR * curDescriptionText = _descriptions.at(_currentOverload);
+	generic_string curRetValText = _retVals.at(_currentOverload);
+	generic_string curDescriptionText = _descriptions.at(_currentOverload);
 	bool hasDescr = true;
 	if (!curDescriptionText[0])
 		hasDescr = false;
 
-	int bytesNeeded = lstrlen(curRetValText) + lstrlen(_funcName) + 5;//'retval funcName (params)\0'
-	if (hasDescr)
-		bytesNeeded += lstrlen(curDescriptionText);
-
 	int nrParams = (int)params.size();
-	for(int i = 0; i < nrParams; i++) {
-		bytesNeeded += lstrlen(params.at(i)) + 2;	//'param, '
-	}
+
+	std::wostringstream stream;
 
 	if (_currentNrOverloads > 1) {
-		bytesNeeded += 24;	//  /\00001 of 00003\/
+		stream << TEXT("\001") << _currentOverload+1 << TEXT(" of ") << _currentNrOverloads << TEXT("\002");
 	}
 
-	const int maxLen = 512;
-	if (bytesNeeded >= maxLen)
-		return;
-
-	TCHAR textBuffer[maxLen];
-	textBuffer[0] = 0;
-
-	if (_currentNrOverloads > 1) {
-		wsprintf(textBuffer, TEXT("\001%u of %u\002"), _currentOverload+1, _currentNrOverloads);
-	}
-
-	lstrcat(textBuffer, curRetValText);
-	lstrcat(textBuffer, TEXT(" "));
-	lstrcat(textBuffer, _funcName);
-	lstrcat(textBuffer, TEXT(" ("));
+	stream << curRetValText << TEXT(" ") << _funcName << TEXT(" (");
 
 	int highlightstart = 0;
 	int highlightend = 0;
 	for(int i = 0; i < nrParams; i++) {
 		if (i == _currentParam) {
-			highlightstart = lstrlen(textBuffer);
-			highlightend = highlightstart + lstrlen(params.at(i));
+			highlightstart = stream.str().length();
+			highlightend = highlightstart + params.at(i).length();
 		}
-		lstrcat(textBuffer, params.at(i));
-		if (i < nrParams-1)
-			lstrcat(textBuffer, TEXT(", "));
+		stream << params.at(i);
+		if (i < nrParams-1) {
+			stream << TEXT(", ");
+		}
 	}
 
-	lstrcat(textBuffer, TEXT(")"));
+	stream << TEXT(")");
 	if (hasDescr) {
-		lstrcat(textBuffer, TEXT("\n"));
-		lstrcat(textBuffer, curDescriptionText);
+		stream << TEXT("\n") << curDescriptionText;
 	}
 
 	if (isVisible())
 		_pEditView->execute(SCI_CALLTIPCANCEL);
 	else
 		_startPos = _curPos;
-	_pEditView->showCallTip(_startPos, textBuffer);
+	_pEditView->showCallTip(_startPos, stream.str().c_str());
 
 	if (highlightstart != highlightend) {
 		_pEditView->execute(SCI_CALLTIPSETHLT, highlightstart, highlightend);
@@ -416,9 +393,6 @@ void FunctionCallTip::reset() {
 
 void FunctionCallTip::cleanup() {
 	reset();
-	if (_funcName)
-		delete [] _funcName;
-	_funcName = 0;
 	_pEditView = NULL;
 }
 
