@@ -56,6 +56,11 @@
 #include "npp_date.h"
 #endif
 
+// JOCE: this needs to be taken out at some point...
+#ifndef USER_DEFINE_DIALOG_H
+#include "UserDefineDialog.h"
+#endif
+
 // Forward declarations
 class TiXmlDocument;
 class TiXmlDocumentA;
@@ -63,7 +68,7 @@ class TiXmlElement;
 
 struct Session;
 
-void cutString(const TCHAR *str2cut, std::vector<generic_string> & patternVect);
+void cutString(const generic_string& str2cut, std::vector<generic_string> & patternVect);
 /*
 struct HeaderLineState {
 	HeaderLineState() : _headerLineNumber(0), _isCollapsed(false){};
@@ -449,40 +454,47 @@ struct Lang
 
 class UserLangContainer
 {
-friend class Notepad_plus;
-friend class ScintillaEditView;
-friend class NppParameters;
-
-friend class SharedParametersDialog;
-friend class FolderStyleDialog;
-friend class KeyWordsStyleDialog;
-friend class CommentStyleDialog;
-friend class SymbolsStyleDialog;
-friend class UserDefineDialog;
-
 public :
 	UserLangContainer();
 	UserLangContainer(const TCHAR *name, const TCHAR *ext);
 
 	const UserLangContainer & operator=(const UserLangContainer & ulc);
 
-	int getNbKeywordList() {return nbKeywodList;}
-	const TCHAR * getName() {return _name.c_str();}
-	const TCHAR * getExtention() {return _ext.c_str();}
+	int getNbKeywordList() const {return KWL_NB_KEYWORD_LISTS;}
+
+	generic_string& getKeywordList(int idx){ assert(idx < KWL_NB_KEYWORD_LISTS); return _keywordLists[idx]; }
+	const generic_string& getName() const { return _name; }
+	const generic_string& getExtension() const { return _ext; }
+	bool isCaseIgnored() const { return _isCaseIgnored; }
+	bool isCommentLineSymbol() const { return _isCommentLineSymbol; }
+	bool isCommentSymbol() const { return _isCommentSymbol; }
+	bool isPrefix(int idx) const { assert(idx < nbPrefixListAllowed); return _isPrefix[idx]; }
+
+	void setKeywordList(int idx, const generic_string& str){ assert(idx < KWL_NB_KEYWORD_LISTS); _keywordLists[idx] = str; }
+	void setName(const generic_string& inName) { _name = inName; }
+	void setExtension(const generic_string& inExt) { _ext = inExt; }
+	void setIsCaseIgnored(bool caseIgnored) { _isCaseIgnored = caseIgnored; }
+	void setIsCommentLineSymbol(bool commentLineSymbol) { _isCommentLineSymbol = commentLineSymbol; }
+	void setIsCommentSymbol(bool commentSymbol) { _isCommentSymbol = commentSymbol; }
+	void setIsPrefix(int idx, bool prefix ) { assert(idx < nbPrefixListAllowed); _isPrefix[idx] = prefix; }
+
+	// JOCE: get rid of this from the public interface.
+	// Right now, it's just a pain in the but to do, but that should be done sooner or later.
+	StyleArray _styleArray;
+
+	// JOCE: Jsut for now.
+	TCHAR _escapeChar[2];
 
 private:
 	generic_string _name;
 	generic_string _ext;
 
-	StyleArray _styleArray;
-	// JOCE: WHAT!?!  This is a *GIANT* buffer (9 * 30K!) that is allocated for no apparent good reason...
-	TCHAR _keywordLists[nbKeywodList][max_char];
+	generic_string _keywordLists[KWL_NB_KEYWORD_LISTS];
 
 	bool _isCaseIgnored;
 	bool _isCommentLineSymbol;
 	bool _isCommentSymbol;
 	bool _isPrefix[nbPrefixListAllowed];
-	TCHAR _escapeChar[2];
 };
 
 #define MAX_EXTERNAL_LEXER_NAME_LEN 16
@@ -746,10 +758,16 @@ public:
 	int getNbUserLang() const {return _nbUserLang;};
 	UserLangContainer & getULCFromIndex(int i) {return *_userLangArray[i];};
 	UserLangContainer * getULCFromName(const TCHAR *userLangName) {
-		for (int i = 0 ; i < _nbUserLang ; i++)
-			if (!lstrcmp(userLangName, _userLangArray[i]->_name.c_str()))
+		int i;
+		for (i = 0 ; i < _nbUserLang ; i++)
+		{
+			if (_userLangArray[i]->getName() == userLangName)
+			{
 				return _userLangArray[i];
-		//qui doit etre jamais passer
+			}
+		}
+		// Should never pass this point.
+		assert(i < _nbUserLang);
 		return NULL;
 	};
 
@@ -777,29 +795,38 @@ public:
 
 	bool isExistingUserLangName(const TCHAR *newName) const {
 		if ((!newName) || (!newName[0]))
+		{
 			return true;
+		}
 
 		for (int i = 0 ; i < _nbUserLang ; i++)
 		{
-			if (!lstrcmp(_userLangArray[i]->_name.c_str(), newName))
+			if (_userLangArray[i]->getName() == newName)
+			{
 				return true;
+			}
 		}
 		return false;
 	};
 
-	const TCHAR * getUserDefinedLangNameFromExt(TCHAR *ext) {
+	bool getUserDefinedLangNameFromExt(TCHAR *ext, generic_string& outLangName) {
 		if ((!ext) || (!ext[0]))
-			return NULL;
+			return false;
 
 		for (int i = 0 ; i < _nbUserLang ; i++)
 		{
 			std::vector<generic_string> extVect;
-			cutString(_userLangArray[i]->_ext.c_str(), extVect);
+			cutString(_userLangArray[i]->getExtension(), extVect);
 			for (size_t j = 0 ; j < extVect.size() ; j++)
+			{
 				if (!generic_stricmp(extVect[j].c_str(), ext))
-					return _userLangArray[i]->_name.c_str();
+				{
+					outLangName = _userLangArray[i]->getName();
+					return true;
+				}
+			}
 		}
-		return NULL;
+		return false;
 	};
 
 	int addUserLangToEnd(const UserLangContainer & userLang, const TCHAR *newName);

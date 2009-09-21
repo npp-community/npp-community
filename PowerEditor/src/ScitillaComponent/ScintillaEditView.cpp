@@ -589,22 +589,19 @@ void ScintillaEditView::setUserLexer(const TCHAR *userLangName)
 	if (!userLangContainer)
 		return;
 
-	execute(SCI_SETPROPERTY, (WPARAM)"userDefine.ignoreCase", (LPARAM)(userLangContainer->_isCaseIgnored?"1":"0"));
-	execute(SCI_SETPROPERTY, (WPARAM)"userDefine.commentLineSymbol", (LPARAM)(userLangContainer->_isCommentLineSymbol?"1":"0"));
-	execute(SCI_SETPROPERTY, (WPARAM)"userDefine.commentSymbol", (LPARAM)(userLangContainer->_isCommentSymbol?"1":"0"));
-	char buf[4];
-	_itoa_s(userLangContainer->_escapeChar[0],buf,10);
-	execute(SCI_SETPROPERTY, (WPARAM)"userDefine.escapeChar", reinterpret_cast<LPARAM>((userLangContainer->_escapeChar[0]) ? buf : "0"));
+	execute(SCI_SETPROPERTY, (WPARAM)"userDefine.ignoreCase", (LPARAM)(userLangContainer->isCaseIgnored()?"1":"0"));
+	execute(SCI_SETPROPERTY, (WPARAM)"userDefine.commentLineSymbol", (LPARAM)(userLangContainer->isCommentLineSymbol()?"1":"0"));
+	execute(SCI_SETPROPERTY, (WPARAM)"userDefine.commentSymbol", (LPARAM)(userLangContainer->isCommentSymbol()?"1":"0"));
 
 	const char strArray[4][20] = {"userDefine.g1Prefix", "userDefine.g2Prefix", "userDefine.g3Prefix", "userDefine.g4Prefix"};
 	for (int i = 0 ; i < 4 ; i++)
-		execute(SCI_SETPROPERTY, (WPARAM)strArray[i], (LPARAM)(userLangContainer->_isPrefix[i]?"1":"0"));
+		execute(SCI_SETPROPERTY, (WPARAM)strArray[i], (LPARAM)(userLangContainer->isPrefix(i)?"1":"0"));
 
 	for (int i = 0 ; i < userLangContainer->getNbKeywordList() ; i++)
 	{
 #ifdef UNICODE
 		WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
-		const char * keyWords_char = wmc->wchar2char(userLangContainer->_keywordLists[i], CP_ACP);
+		const char * keyWords_char = wmc->wchar2char(userLangContainer->getKeywordList(i).c_str(), CP_ACP);
 		execute(SCI_SETKEYWORDS, i, reinterpret_cast<LPARAM>(keyWords_char));
 #else
 		execute(SCI_SETKEYWORDS, i, reinterpret_cast<LPARAM>(userLangContainer->_keywordLists[i]));
