@@ -424,7 +424,7 @@ NppParameters::NppParameters() :
 	_pXmlDoc(NULL), _pXmlUserDoc(NULL), _pXmlUserStylerDoc(NULL),
 	_pXmlUserLangDoc(NULL), _pXmlToolIconsDoc(NULL), _pXmlShortcutDoc(NULL),
 	_pXmlContextMenuDoc(NULL), _pXmlSessionDoc(NULL), _pXmlNativeLangDocA(NULL),
-	_nbLang(0), _nbFile(0), _nbMaxFile(10), _nbUserLang(0), _nbExternalLang(0),
+	_nbFile(0), _nbMaxFile(10), _nbUserLang(0), _nbExternalLang(0),
 	_fileSaveDlgFilterIndex(-1),
 	_hUser32(NULL), _hUXTheme(NULL),
 	_transparentFuncAddr(NULL), _enableThemeDialogTextureFuncAddr(NULL),
@@ -432,7 +432,6 @@ NppParameters::NppParameters() :
 	_pAccelerator(NULL), _pScintAccelerator(NULL),
 	_asNotepadStyle(false)
 {
-	memset(&_langList, 0, NB_LANG * sizeof(Lang *));
 	memset(&_LRFileList, 0, NB_MAX_LRF_FILE * sizeof(generic_string *));
 	memset(&_userLangArray, 0, NB_MAX_USER_LANG * sizeof(UserLangContainer *));
 	memset(&_externalLangArray, 0, NB_MAX_EXTERNAL_LANG * sizeof(ExternalLangContainer *));
@@ -468,8 +467,12 @@ NppParameters::NppParameters() :
 
 NppParameters::~NppParameters()
 {
-	for (int i = 0 ; i < _nbLang ; i++)
-		delete _langList[i];
+	for( std::vector<Lang *>::const_iterator it = _langList.begin(), end = _langList.end();
+		it != end;
+		++it)
+	{
+		delete (*it);
+	}
 	for (int i = 0 ; i < _nbFile ; i++)
 		delete _LRFileList[i];
 	for (int i = 0 ; i < _nbUserLang ; i++)
@@ -611,7 +614,7 @@ bool NppParameters::load()
 {
 	L_END = L_EXTERNAL;
 	bool isAllLaoded = true;
-	for (int i = 0 ; i < NB_LANG ; _langList[i] = NULL, i++);
+	assert(getNbLang() == 0);
 
 	// Make localConf.xml path
 	generic_string localConfPath(_nppPath);
@@ -2339,38 +2342,36 @@ void NppParameters::feedKeyWordsParameters(TiXmlNode *node)
 		langNode ;
 		langNode = langNode->NextSibling(TEXT("Language")) )
 	{
-		if (_nbLang < NB_LANG)
+		TiXmlElement *element = langNode->ToElement();
+		const TCHAR *name = element->Attribute(TEXT("name"));
+		if (name)
 		{
-			TiXmlElement *element = langNode->ToElement();
-			const TCHAR *name = element->Attribute(TEXT("name"));
-			if (name)
+			Lang* newLang = new Lang(getLangIDFromStr(name), name);
+			//_langList[_nbLang] = new Lang(getLangIDFromStr(name), name);
+			newLang->setDefaultExtList(element->Attribute(TEXT("ext")));
+			newLang->setCommentLineSymbol(element->Attribute(TEXT("commentLine")));
+			newLang->setCommentStart(element->Attribute(TEXT("commentStart")));
+			newLang->setCommentEnd(element->Attribute(TEXT("commentEnd")));
+            int i;
+            if (element->Attribute(TEXT("tabSettings"), &i))
+                newLang->setTabInfo(i);
+
+			for (TiXmlNode *kwNode = langNode->FirstChildElement(TEXT("Keywords"));
+				kwNode ;
+				kwNode = kwNode->NextSibling(TEXT("Keywords")) )
 			{
-				_langList[_nbLang] = new Lang(getLangIDFromStr(name), name);
-				_langList[_nbLang]->setDefaultExtList(element->Attribute(TEXT("ext")));
-				_langList[_nbLang]->setCommentLineSymbol(element->Attribute(TEXT("commentLine")));
-				_langList[_nbLang]->setCommentStart(element->Attribute(TEXT("commentStart")));
-				_langList[_nbLang]->setCommentEnd(element->Attribute(TEXT("commentEnd")));
-                int i;
-                if (element->Attribute(TEXT("tabSettings"), &i))
-                    _langList[_nbLang]->setTabInfo(i);
+				const TCHAR *indexName = (kwNode->ToElement())->Attribute(TEXT("name"));
+				TiXmlNode *kwVal = kwNode->FirstChild();
+				const TCHAR *keyWords = TEXT("");
+				if ((indexName) && (kwVal))
+					keyWords = kwVal->Value();
 
-				for (TiXmlNode *kwNode = langNode->FirstChildElement(TEXT("Keywords"));
-					kwNode ;
-					kwNode = kwNode->NextSibling(TEXT("Keywords")) )
-				{
-					const TCHAR *indexName = (kwNode->ToElement())->Attribute(TEXT("name"));
-					TiXmlNode *kwVal = kwNode->FirstChild();
-					const TCHAR *keyWords = TEXT("");
-					if ((indexName) && (kwVal))
-						keyWords = kwVal->Value();
+				int i = getKwClassFromName(indexName);
 
-					int i = getKwClassFromName(indexName);
-
-					if (i >= 0 && i <= KEYWORDSET_MAX)
-						_langList[_nbLang]->setWords(keyWords, i);
-				}
-				_nbLang++;
+				if (i >= 0 && i <= KEYWORDSET_MAX)
+					newLang->setWords(keyWords, i);
 			}
+			_langList.push_back(newLang);
 		}
 	}
 }

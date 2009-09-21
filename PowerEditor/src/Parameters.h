@@ -643,8 +643,6 @@ private :
 	generic_string _stylesXmlPath;
 };
 
-#define NB_LANG 80
-
 class NppParameters
 {
 public:
@@ -670,35 +668,47 @@ public:
     };
 
 	Lang * getLangFromID(LangType langID) const {
-		for (int i = 0 ; i < _nbLang ; i++)
+		for( std::vector<Lang *>::const_iterator it = _langList.begin(), end = _langList.end();
+			 it != end;
+			 ++it)
 		{
-			if ((_langList[i]->_langID == langID) || (!_langList[i]))
-				return _langList[i];
+			if ((*it)->_langID == langID)
+			{
+				return *it;
+			}
 		}
 		return NULL;
-	};
+	}
 
 	Lang * getLangFromIndex(int i) const {
-		if (i >= _nbLang) return NULL;
+		// JOCE check if we can easily make i a site_t
+		if (i >= (int)_langList.size())
+		{
+			return NULL;
+		}
 		return _langList[i];
-	};
+	}
 
-	int getNbLang() const {return _nbLang;};
+	int getNbLang() const {return _langList.size();}
 
 	const TCHAR * getLangExtFromName(const TCHAR *langName) const {
-		for (int i = 0 ; i < _nbLang ; i++)
+		for( std::vector<Lang *>::const_iterator it = _langList.begin(), end = _langList.end();
+			it != end;
+			++it)
 		{
-			if (_langList[i]->_langName == langName)
-				return _langList[i]->_defaultExtList;
+			if ((*it)->_langName == langName)
+				return (*it)->_defaultExtList;
 		}
 		return NULL;
 	};
 
 	const TCHAR * getLangExtFromLangType(LangType langType) const {
-		for (int i = 0 ; i < _nbLang ; i++)
+		for( std::vector<Lang *>::const_iterator it = _langList.begin(), end = _langList.end();
+			it != end;
+			++it)
 		{
-			if (_langList[i]->_langID == langType)
-				return _langList[i]->_defaultExtList;
+			if ((*it)->_langID == langType)
+				return (*it)->_defaultExtList;
 		}
 		return NULL;
 	};
@@ -964,9 +974,7 @@ private:
 	NppGUI _nppGUI;
 	ScintillaViewParams _svp[2];
 
-	// JOCE use a std::vector instead!
-	Lang *_langList[NB_LANG];
-	int _nbLang;
+	std::vector<Lang *> _langList;
 
 	// JOCE use a std::vector instead!
 	generic_string *_LRFileList[NB_MAX_LRF_FILE];
