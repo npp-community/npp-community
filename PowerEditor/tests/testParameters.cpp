@@ -49,3 +49,5 @@ TEST(cutStringSTLStringTest, TwoSpaceSeparatedTokens)
 }
 
 #endif
+// Lint seems flabbergasted with parameters.h because of the #ifndef SHIPPING.
+//lint -e766 Info -- Header file '..\src\parameters.h' not used in module '..\tests\testParameters.cpp'
