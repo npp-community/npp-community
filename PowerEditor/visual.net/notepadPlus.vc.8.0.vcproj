@@ -1726,6 +1726,10 @@
 			Name="Tests"
 			>
 			<File
+				RelativePath="..\tests\testCompareNoCase.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\tests\testParameters.cpp"
 				>
 			</File>

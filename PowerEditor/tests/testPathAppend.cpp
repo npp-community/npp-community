@@ -21,6 +21,7 @@
 
 #include "precompiled_headers.h"
 
+// JOCE: Should move to testCommon.cpp
 #ifndef SHIPPING
 
 bool testPathAppend(TCHAR *path, TCHAR *append)

@@ -23,6 +23,7 @@
 
 #ifndef SHIPPING
 
+// JOCE: Should move to testCommon.cpp
 bool testPathRemoveFileSpec(TCHAR* toTest)
 {
 	generic_string strPath;
