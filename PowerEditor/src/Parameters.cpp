@@ -424,7 +424,7 @@ NppParameters::NppParameters() :
 	_pXmlDoc(NULL), _pXmlUserDoc(NULL), _pXmlUserStylerDoc(NULL),
 	_pXmlUserLangDoc(NULL), _pXmlToolIconsDoc(NULL), _pXmlShortcutDoc(NULL),
 	_pXmlContextMenuDoc(NULL), _pXmlSessionDoc(NULL), _pXmlNativeLangDocA(NULL),
-	_nbFile(0), _nbMaxFile(10), _nbUserLang(0), _nbExternalLang(0),
+	_nbMaxFile(10), _nbUserLang(0), _nbExternalLang(0),
 	_fileSaveDlgFilterIndex(-1),
 	_hUser32(NULL), _hUXTheme(NULL),
 	_transparentFuncAddr(NULL), _enableThemeDialogTextureFuncAddr(NULL),
@@ -432,7 +432,6 @@ NppParameters::NppParameters() :
 	_pAccelerator(NULL), _pScintAccelerator(NULL),
 	_asNotepadStyle(false)
 {
-	memset(&_LRFileList, 0, NB_MAX_LRF_FILE * sizeof(generic_string *));
 	memset(&_userLangArray, 0, NB_MAX_USER_LANG * sizeof(UserLangContainer *));
 	memset(&_externalLangArray, 0, NB_MAX_EXTERNAL_LANG * sizeof(ExternalLangContainer *));
 
@@ -473,8 +472,6 @@ NppParameters::~NppParameters()
 	{
 		delete (*it);
 	}
-	for (int i = 0 ; i < _nbFile ; i++)
-		delete _LRFileList[i];
 	for (int i = 0 ; i < _nbUserLang ; i++)
 		delete _userLangArray[i];
 	if (_hUser32)
@@ -1430,18 +1427,17 @@ void NppParameters::feedFileListParameters(TiXmlNode *node)
 	if (!historyRoot) return;
 
 	(historyRoot->ToElement())->Attribute(TEXT("nbMaxFile"), &_nbMaxFile);
-	if ((_nbMaxFile < 0) || (_nbMaxFile > 30))
+	if ((_nbMaxFile < 0) || (_nbMaxFile > NB_MAX_LRF_FILE))
 		return;
 
 	for (TiXmlNode *childNode = historyRoot->FirstChildElement(TEXT("File"));
-		childNode && (_nbFile < NB_MAX_LRF_FILE);
+		childNode && (getNbLRFile() < NB_MAX_LRF_FILE);
 		childNode = childNode->NextSibling(TEXT("File")) )
 	{
 		const TCHAR *filePath = (childNode->ToElement())->Attribute(TEXT("filename"));
 		if (filePath)
 		{
-			_LRFileList[_nbFile] = new generic_string(filePath);
-			_nbFile++;
+			_LRFileList.push_back(filePath);
 		}
 	}
 }

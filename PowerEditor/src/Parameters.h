@@ -350,6 +350,7 @@ struct ScintillaViewParams
 };
 
 #define NB_LIST 20
+// JOCE: There's no longer a reason to keep NB_MAX_LRF_FILE around now that we use std::vectors.
 #define NB_MAX_LRF_FILE 30
 #define NB_MAX_USER_LANG 30
 #define NB_MAX_EXTERNAL_LANG 30
@@ -713,9 +714,11 @@ public:
 		return NULL;
 	};
 
-	int getNbLRFile() const {return _nbFile;};
+	int getNbLRFile() const {return _LRFileList.size();}
 
-	generic_string *getLRFile(int index) const {
+	const generic_string& getLRFile(int index) const {
+		// JOCE check if we can easily make index a site_t
+		assert(index < (int)_LRFileList.size());
 		return _LRFileList[index];
 	};
 
@@ -975,10 +978,7 @@ private:
 	ScintillaViewParams _svp[2];
 
 	std::vector<Lang *> _langList;
-
-	// JOCE use a std::vector instead!
-	generic_string *_LRFileList[NB_MAX_LRF_FILE];
-	int _nbFile;
+	std::vector<generic_string> _LRFileList;
 	int _nbMaxFile;
 
 	FindHistory _findHistory;
@@ -986,6 +986,7 @@ private:
 	// JOCE use a std::vector instead!
 	UserLangContainer *_userLangArray[NB_MAX_USER_LANG];
 	int _nbUserLang;
+
 	generic_string _userDefineLangPath;
 	ExternalLangContainer *_externalLangArray[NB_MAX_EXTERNAL_LANG];
 	int _nbExternalLang;
