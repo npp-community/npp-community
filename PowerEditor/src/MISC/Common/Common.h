@@ -88,6 +88,10 @@ std::string wstring2string(const std::wstring & rwString, UINT codepage);
 
 TCHAR *BuildMenuFileName(TCHAR *buffer, int len, int pos, const TCHAR *filename);
 
+int strVal(const TCHAR *str, int base);
+int decStrVal(const TCHAR *str);
+int hexStrVal(const TCHAR *str);
+
 // MS reimplementations with N++'s generic strings.
 BOOL PathRemoveFileSpec(generic_string & path);
 BOOL PathAppend(generic_string& path, const generic_string& more);

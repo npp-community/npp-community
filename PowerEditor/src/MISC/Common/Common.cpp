@@ -477,6 +477,28 @@ TCHAR *BuildMenuFileName(TCHAR *buffer, int len, int pos, const TCHAR *filename)
 	return buffer;
 }
 
+int strVal(const TCHAR *str, int base)
+{
+	if (!str) return -1;
+	if (!str[0]) return 0;
+
+	TCHAR *finStr;
+	int result = generic_strtol(str, &finStr, base);
+	if (*finStr != '\0')
+		return -1;
+	return result;
+}
+
+int hexStrVal(const TCHAR *str)
+{
+	return strVal(str, 16);
+}
+
+int decStrVal(const TCHAR *str)
+{
+	return strVal(str, 10);
+}
+
 
 BOOL PathRemoveFileSpec(generic_string & path)
 {
