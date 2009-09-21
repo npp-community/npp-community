@@ -499,6 +499,17 @@ int decStrVal(const TCHAR *str)
 	return strVal(str, 10);
 }
 
+// Not sure if it's safe for all locales.
+// See http://bytes.com/topic/c/answers/60652-tolower-used-transform
+int CompareNoCase(const generic_string& name1, const generic_string& name2)
+{
+	generic_string name1_lower(name1);
+	generic_string name2_lower(name2);
+	std::transform(name1.begin(), name1.end(), name1_lower.begin(), (int(*)(int))tolower);
+	std::transform(name2.begin(), name2.end(), name2_lower.begin(), (int(*)(int))tolower);
+
+	return name1_lower.compare(name2_lower);
+}
 
 BOOL PathRemoveFileSpec(generic_string & path)
 {

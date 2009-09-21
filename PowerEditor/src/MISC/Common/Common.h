@@ -92,6 +92,10 @@ int strVal(const TCHAR *str, int base);
 int decStrVal(const TCHAR *str);
 int hexStrVal(const TCHAR *str);
 
+// test string case insensitive
+// 0 if equal, <0 if name comes before, >0 if it comes after
+int CompareNoCase(const generic_string& name1, const generic_string& name2);
+
 // MS reimplementations with N++'s generic strings.
 BOOL PathRemoveFileSpec(generic_string & path);
 BOOL PathAppend(generic_string& path, const generic_string& more);
