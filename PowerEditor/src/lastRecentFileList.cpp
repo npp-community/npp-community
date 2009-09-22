@@ -42,7 +42,7 @@ LastRecentFileList::~LastRecentFileList()
 int LastRecentFileList::getMaxNbLRF() const
 {
 	return NB_MAX_LRF_FILE;
-};
+}
 
 void LastRecentFileList::initMenu(HMENU hMenu, int idBase, int posBase) {
 	_hMenu = hMenu;

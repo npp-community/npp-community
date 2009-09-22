@@ -139,8 +139,7 @@ public :
 	static void doVertical();
 
 	static void doMultiLine();
-
-	static bool isOwnerDrawTab() {return true;};//(_drawInactiveTab || _drawTopBar || _drawTabCloseButton);};
+	static bool isOwnerDrawTab() {return true;}
 	static bool drawTopBar() {return _drawTopBar;};
 	static bool drawInactiveTab() {return _drawInactiveTab;};
 	static bool drawTabCloseButton() {return _drawTabCloseButton;};

@@ -25,9 +25,9 @@
 #include "RunMacroDlg_rc.h"
 
 
-void RunMacroDlg::init(HINSTANCE hInst, HWND hPere)
+void RunMacroDlg::init(HINSTANCE hInst, HWND hParent)
 {
-	Window::init(hInst, hPere);
+	Window::init(hInst, hParent);
 }
 
 void RunMacroDlg::doDialog(bool isRTL)
@@ -61,9 +61,7 @@ int RunMacroDlg::getMacro2Exec() const
 {
 	bool isCurMacroPresent = ::SendMessage(_hParent, WM_ISCURRENTMACRORECORDED, 0, 0) == TRUE;
 	return isCurMacroPresent?(m_macroIndex - 1):m_macroIndex;
-};
-
-
+}
 
 BOOL CALLBACK RunMacroDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lParam*/)
 {
@@ -163,4 +161,4 @@ void RunMacroDlg::check(int id)
 bool RunMacroDlg::isCheckedOrNot(int checkControlID) const
 {
 	return (BST_CHECKED == ::SendMessage(::GetDlgItem(_hSelf, checkControlID), BM_GETCHECK, 0, 0));
-};
+}

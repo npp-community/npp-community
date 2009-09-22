@@ -307,6 +307,7 @@ struct NppGUI
 	bool _doesExistUpdater;
 	int _caretBlinkRate;
 	int _caretWidth;
+    bool _enableMultiSelection;
 
 	bool _shortTitlebar;
 
@@ -480,6 +481,7 @@ private:
 	bool _isCommentLineSymbol;
 	bool _isCommentSymbol;
 	bool _isPrefix[nbPrefixListAllowed];
+	TCHAR _escapeChar[2];
 };
 
 #define MAX_EXTERNAL_LEXER_NAME_LEN 16

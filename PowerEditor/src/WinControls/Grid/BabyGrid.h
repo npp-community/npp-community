@@ -104,7 +104,5 @@ LRESULT CALLBACK GridProc(HWND, UINT, WPARAM, LPARAM);
 void SetCell(_BGCELL *cell,int row, int col);
 
 
-//global variables
-
-
 #endif // BABYGRID_H
+

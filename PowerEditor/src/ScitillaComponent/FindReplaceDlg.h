@@ -69,7 +69,7 @@ struct FindOption {
 };
 
 enum FindStatus { FSFound, FSNotFound, FSTopReached, FSEndReached};
-//FindReplaceDialog: standard find/replace window
+
 class FindReplaceDlg : public StaticDialog
 {
 friend class FindIncrementDlg;
@@ -79,7 +79,7 @@ public :
 
 	virtual void destroy();
 
-	void init(HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView);
+	void init(HINSTANCE hInst, HWND hParent, ScintillaEditView **ppEditView);
 
 	virtual void create(int dialogID, bool isRTL = false);
 
@@ -90,7 +90,7 @@ public :
 	bool processReplace(const TCHAR *txt2find, const TCHAR *txt2replace, FindOption *options = NULL);
 
 	int markAll(const TCHAR *txt2find, int styleID);
-	int markAll2(const TCHAR *str2find);
+	//int markAll2(const TCHAR *str2find);
 	int markAllInc(const TCHAR *str2find, FindOption *opt);
 
 
@@ -98,7 +98,6 @@ public :
 	int processRange(ProcessOperation op, const TCHAR *txt2find, const TCHAR *txt2replace, int startRange, int endRange, const TCHAR *fileName = NULL, FindOption *opt = NULL, int colourStyleID = -1);
 	void replaceAllInOpenedDocs();
 	void findAllIn(InWhat op);
-
 	void setSearchText(TCHAR * txt2find);
 	void gotoNextFoundResult(int direction = 0);
 
@@ -200,11 +199,12 @@ class FindIncrementDlg : public StaticDialog
 public :
 	FindIncrementDlg() : _pFRDlg(NULL), _pRebar(NULL), _FindStatus(FSFound) {};
 	~FindIncrementDlg();
-	void init(HINSTANCE hInst, HWND hPere, FindReplaceDlg *pFRDlg, bool isRTL = false);
+	void init(HINSTANCE hInst, HWND hParent, FindReplaceDlg *pFRDlg, bool isRTL = false);
 	virtual void destroy();
 	virtual void display(bool toShow = true) const;
 
 	void setSearchText(const TCHAR * txt2find, bool isUTF8 = false);
+
 	void setFindStatus(FindStatus iStatus);
 	FindStatus getFindStatus() {
 		return _FindStatus;

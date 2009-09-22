@@ -50,7 +50,7 @@ public :
 	ToolBar();
 	~ToolBar();
 
-	virtual bool init(HINSTANCE hInst, HWND hPere, toolBarStatusType type,
+	virtual bool init(HINSTANCE hInst, HWND hParent, toolBarStatusType type,
 		ToolBarButtonUnit *buttonUnitArray, int arraySize);
 
 	virtual void destroy();
@@ -115,7 +115,7 @@ public :
 		usedIDs.clear();
 	};
 
-	void init(HINSTANCE hInst, HWND hPere);
+	void init(HINSTANCE hInst, HWND hParent);
 	bool addBand(REBARBANDINFO * rBand, bool useID);	//useID true if ID from info should be used (false for plugins). wID in bandinfo will be set to used ID
 	void reNew(int id, REBARBANDINFO * rBand);					//wID from bandinfo is used for update
 	void removeBand(int id);

@@ -2135,6 +2135,8 @@ void NppParameters::feedUserSettings(TiXmlNode *settingsRoot)
 		boolStr = (globalSettingNode->ToElement())->Attribute(TEXT("caseIgnored"));
 		if (boolStr)
 			_userLangArray[_nbUserLang - 1]->_isCaseIgnored = !lstrcmp(TEXT("yes"), boolStr);
+		boolStr = (globalSettingNode->ToElement())->Attribute(TEXT("escapeChar"));
+		_userLangArray[_nbUserLang - 1]->_escapeChar[0] = (boolStr) ? boolStr[0] : 0;
 	}
 	TiXmlNode *treatAsSymbolNode = settingsRoot->FirstChildElement(TEXT("TreatAsSymbol"));
 	if (treatAsSymbolNode)
@@ -2814,6 +2816,13 @@ void NppParameters::feedGUIParameters(TiXmlNode *node)
 			val = element->Attribute(TEXT("blinkRate"), &i);
 			if (val)
 				_nppGUI._caretBlinkRate = i;
+		}
+
+        else if (!lstrcmp(nm, TEXT("ScintillaGlobalSettings")))
+		{
+			val = element->Attribute(TEXT("enableMultiSelection"));
+			if (val && lstrcmp(val, TEXT("yes")) == 0)
+				_nppGUI._enableMultiSelection = true;
 		}
 
 		else if (!lstrcmp(nm, TEXT("AppPosition")))
@@ -3503,6 +3512,7 @@ bool NppParameters::writeGUIParams()
 	bool tagsMatchHighLightExist = false;
 	bool mouseWheelZoomExist = false;
 	bool caretExist = false;
+    bool ScintillaGlobalSettingsExist = false;
 	bool openSaveDirExist = false;
 	bool titleBarExist = false;
 	bool stylerThemeExist = false;
@@ -3611,6 +3621,11 @@ bool NppParameters::writeGUIParams()
 			caretExist = true;
 			element->SetAttribute(TEXT("width"), _nppGUI._caretWidth);
 			element->SetAttribute(TEXT("blinkRate"), _nppGUI._caretBlinkRate);
+		}
+        else if (!lstrcmp(nm, TEXT("ScintillaGlobalSettings")))
+		{
+			ScintillaGlobalSettingsExist = true;
+            element->SetAttribute(TEXT("enableMultiSelection"), _nppGUI._enableMultiSelection?TEXT("yes"):TEXT("no"));
 		}
 		else if (!lstrcmp(nm, TEXT("Auto-detection")))
 		{
@@ -4031,6 +4046,13 @@ bool NppParameters::writeGUIParams()
 		GUIConfigElement->SetAttribute(TEXT("width"), _nppGUI._caretWidth);
 		GUIConfigElement->SetAttribute(TEXT("blinkRate"), _nppGUI._caretBlinkRate);
 	}
+
+    if (!ScintillaGlobalSettingsExist)
+    {
+        TiXmlElement *GUIConfigElement = (GUIRoot->InsertEndChild(TiXmlElement(TEXT("GUIConfig"))))->ToElement();
+		GUIConfigElement->SetAttribute(TEXT("name"), TEXT("ScintillaGlobalSettings"));
+        GUIConfigElement->SetAttribute(TEXT("enableMultiSelection"), _nppGUI._enableMultiSelection?TEXT("yes"):TEXT("no"));
+    }
 
 	if (!openSaveDirExist)
 	{
@@ -4589,6 +4611,8 @@ void NppParameters::insertUserLang2Tree(TiXmlNode *node, UserLangContainer *user
 	{
 		TiXmlElement *globalElement = (settingsElement->InsertEndChild(TiXmlElement(TEXT("Global"))))->ToElement();
 		globalElement->SetAttribute(TEXT("caseIgnored"), userLang->_isCaseIgnored?TEXT("yes"):TEXT("no"));
+		if (userLang->_escapeChar[0])
+			globalElement->SetAttribute(TEXT("escapeChar"), userLang->_escapeChar);
 
 		TiXmlElement *treatAsSymbolElement = (settingsElement->InsertEndChild(TiXmlElement(TEXT("TreatAsSymbol"))))->ToElement();
 		treatAsSymbolElement->SetAttribute(TEXT("comment"), userLang->_isCommentSymbol?TEXT("yes"):TEXT("no"));
@@ -4815,6 +4839,8 @@ const UserLangContainer & UserLangContainer::operator=( const UserLangContainer 
 	{
 		_name = ulc._name;
 		_ext = ulc._ext;
+		_escapeChar[0] = ulc._escapeChar[0];
+		_escapeChar[1] = '\0';
 		_isCaseIgnored = ulc._isCaseIgnored;
 		_styleArray = ulc._styleArray;
 		int nbStyler = _styleArray.getNbStyler();

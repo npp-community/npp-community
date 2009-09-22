@@ -95,37 +95,7 @@ TabBar::TabBar() :
 TabBar::~TabBar()
 {
 	TabBar::destroy();
-};
-
-void TabBar::destroy()
-{
-	if (_hFont)
-	{
-		DeleteObject(_hFont);
-		_hFont = NULL;
-	}
-
-	if (_hLargeFont)
-	{
-		DeleteObject(_hLargeFont);
-		_hLargeFont = NULL;
-	}
-
-	if (_hVerticalFont)
-	{
-		DeleteObject(_hVerticalFont);
-		_hVerticalFont = NULL;
-	}
-
-	if (_hVerticalLargeFont)
-	{
-		DeleteObject(_hVerticalLargeFont);
-		_hVerticalLargeFont = NULL;
-	}
-
-	Window::destroy();
-};
-
+}
 
 void TabBar::init(HINSTANCE hInst, HWND parent, bool isVertical, bool isTraditional, bool isMultiLine)
 {
@@ -162,6 +132,35 @@ void TabBar::init(HINSTANCE hInst, HWND parent, bool isVertical, bool isTraditio
 	}
 }
 
+void TabBar::destroy()
+{
+	if (_hFont)
+	{
+		DeleteObject(_hFont);
+		_hFont = NULL;
+	}
+
+	if (_hLargeFont)
+	{
+		DeleteObject(_hLargeFont);
+		_hLargeFont = NULL;
+	}
+
+	if (_hVerticalFont)
+	{
+		DeleteObject(_hVerticalFont);
+		_hVerticalFont = NULL;
+	}
+
+	if (_hVerticalLargeFont)
+	{
+		DeleteObject(_hVerticalLargeFont);
+		_hVerticalLargeFont = NULL;
+	}
+
+	Window::destroy();
+}
+
 int TabBar::insertAtEnd(const TCHAR *subTabName)
 {
 	TCITEM tie;
@@ -173,18 +172,6 @@ int TabBar::insertAtEnd(const TCHAR *subTabName)
 	tie.iImage = index;
 	tie.pszText = (TCHAR *)subTabName;
 	return int(::SendMessage(_hSelf, TCM_INSERTITEM, _nbItem++, reinterpret_cast<LPARAM>(&tie)));
-}
-
-void TabBar::activateAt(int index) const
-{
-	if (getCurrentTabIndex() != index) {
-		::SendMessage(_hSelf, TCM_SETCURSEL, index, 0);}
-	TBHDR nmhdr;
-	nmhdr.hdr.hwndFrom = _hSelf;
-	nmhdr.hdr.code = TCN_SELCHANGE;
-	nmhdr.hdr.idFrom = reinterpret_cast<unsigned int>(this);
-	nmhdr.tabOrigin = index;
-
 }
 
 void TabBar::getCurrentTitle(TCHAR *title, int titleLen)
@@ -199,19 +186,7 @@ void TabBar::getCurrentTitle(TCHAR *title, int titleLen)
 int TabBar::getCurrentTabIndex() const
 {
 	return ::SendMessage(_hSelf, TCM_GETCURSEL, 0, 0);
-};
-
-void TabBar::deletAllItem()
-{
-	::SendMessage(_hSelf, TCM_DELETEALLITEMS, 0, 0);
-	_nbItem = 0;
-};
-
-void TabBar::setImageList(HIMAGELIST himl)
-{
-	_hasImgLst = true;
-	::SendMessage(_hSelf, TCM_SETIMAGELIST, 0, (LPARAM)himl);
-};
+}
 
 void TabBar::setFont(TCHAR *fontName, size_t fontSize)
 {
@@ -221,12 +196,12 @@ void TabBar::setFont(TCHAR *fontName, size_t fontSize)
 	}
 
 	_hFont = ::CreateFont( fontSize, 0,
-		(_isVertical) ? 900:0,
-		(_isVertical) ? 900:0,
-		FW_NORMAL,
-		0, 0, 0, 0,
-		0, 0, 0, 0,
-		fontName);
+						  (_isVertical) ? 900:0,
+						  (_isVertical) ? 900:0,
+		                   FW_NORMAL,
+			               0, 0, 0, 0,
+			               0, 0, 0, 0,
+				           fontName);
 	if (_hFont)
 	{
 		::SendMessage(_hSelf, WM_SETFONT, reinterpret_cast<WPARAM>(_hFont), 0);
@@ -257,6 +232,31 @@ void TabBar::deletItemAt(int index)
 	::SendMessage(_hSelf, TCM_DELETEITEM, index, 0);
 	_nbItem--;
 }
+
+void TabBar::activateAt(int index) const
+{
+	if (getCurrentTabIndex() != index)
+	{
+		::SendMessage(_hSelf, TCM_SETCURSEL, index, 0);
+	}
+	TBHDR nmhdr;
+	nmhdr.hdr.hwndFrom = _hSelf;
+	nmhdr.hdr.code = TCN_SELCHANGE;
+	nmhdr.hdr.idFrom = reinterpret_cast<unsigned int>(this);
+	nmhdr.tabOrigin = index;
+}
+
+void TabBar::deletAllItem()
+{
+	::SendMessage(_hSelf, TCM_DELETEALLITEMS, 0, 0);
+	_nbItem = 0;
+};
+
+void TabBar::setImageList(HIMAGELIST himl)
+{
+	_hasImgLst = true;
+	::SendMessage(_hSelf, TCM_SETIMAGELIST, 0, (LPARAM)himl);
+};
 
 void TabBar::reSizeTo(RECT & rc2Ajust)
 {
@@ -412,6 +412,71 @@ void TabBarPlus::init(HINSTANCE hInst, HWND parent, bool isVertical, bool isTrad
 
 		LogFont.lfWeight = 900;
 		_hVerticalLargeFont = CreateFontIndirect(&LogFont);
+	}
+}
+
+void TabBarPlus::doOwnerDrawTab()
+{
+	::SendMessage(_hwndArray[0], TCM_SETPADDING, 0, MAKELPARAM(6, 0));
+	for (int i = 0 ; i < _nbCtrl ; i++)
+	{
+		if (_hwndArray[i])
+		{
+			DWORD style = ::GetWindowLongPtr(_hwndArray[i], GWL_STYLE);
+			if (isOwnerDrawTab())
+				style |= TCS_OWNERDRAWFIXED;
+			else
+				style &= ~TCS_OWNERDRAWFIXED;
+
+			::SetWindowLongPtr(_hwndArray[i], GWL_STYLE, style);
+			::InvalidateRect(_hwndArray[i], NULL, TRUE);
+
+			const int base = 6;
+			::SendMessage(_hwndArray[i], TCM_SETPADDING, 0, MAKELPARAM(_drawTabCloseButton?base+3:base, 0));
+		}
+	}
+}
+
+void TabBarPlus::setColour(COLORREF colour2Set, tabColourIndex i)
+{
+	switch (i)
+	{
+		case activeText:
+			_activeTextColour = colour2Set;
+			break;
+		case activeFocusedTop:
+			_activeTopBarFocusedColour = colour2Set;
+			break;
+		case activeUnfocusedTop:
+			_activeTopBarUnfocusedColour = colour2Set;
+			break;
+		case inactiveText:
+			_inactiveTextColour = colour2Set;
+			break;
+		case inactiveBg :
+			_inactiveBgColour = colour2Set;
+			break;
+		default :
+			return;
+	}
+	doOwnerDrawTab();
+}
+
+void TabBarPlus::doVertical()
+{
+	for (int i = 0 ; i < _nbCtrl ; i++)
+	{
+		if (_hwndArray[i])
+			SendMessage(_hwndArray[i], WM_TABSETSTYLE, isVertical(), TCS_VERTICAL);
+	}
+}
+
+void TabBarPlus::doMultiLine()
+{
+	for (int i = 0 ; i < _nbCtrl ; i++)
+	{
+		if (_hwndArray[i])
+			SendMessage(_hwndArray[i], WM_TABSETSTYLE, isMultiLine(), TCS_MULTILINE);
 	}
 }
 
@@ -967,71 +1032,6 @@ void TabBarPlus::exchangeItemData(POINT point)
 		_isDraggingInside = false;
 	}
 
-}
-
-void TabBarPlus::doOwnerDrawTab()
-{
-	::SendMessage(_hwndArray[0], TCM_SETPADDING, 0, MAKELPARAM(6, 0));
-	for (int i = 0 ; i < _nbCtrl ; i++)
-	{
-		if (_hwndArray[i])
-		{
-			DWORD style = ::GetWindowLongPtr(_hwndArray[i], GWL_STYLE);
-			if (isOwnerDrawTab())
-				style |= TCS_OWNERDRAWFIXED;
-			else
-				style &= ~TCS_OWNERDRAWFIXED;
-
-			::SetWindowLongPtr(_hwndArray[i], GWL_STYLE, style);
-			::InvalidateRect(_hwndArray[i], NULL, TRUE);
-
-			const int base = 6;
-			::SendMessage(_hwndArray[i], TCM_SETPADDING, 0, MAKELPARAM(_drawTabCloseButton?base+3:base, 0));
-		}
-	}
-}
-
-void TabBarPlus::doVertical()
-{
-	for (int i = 0 ; i < _nbCtrl ; i++)
-	{
-		if (_hwndArray[i])
-			SendMessage(_hwndArray[i], WM_TABSETSTYLE, isVertical(), TCS_VERTICAL);
-	}
-}
-
-void TabBarPlus::doMultiLine()
-{
-	for (int i = 0 ; i < _nbCtrl ; i++)
-	{
-		if (_hwndArray[i])
-			SendMessage(_hwndArray[i], WM_TABSETSTYLE, isMultiLine(), TCS_MULTILINE);
-	}
-}
-
-void TabBarPlus::setColour(COLORREF colour2Set, tabColourIndex i)
-{
-	switch (i)
-	{
-		case activeText:
-			_activeTextColour = colour2Set;
-			break;
-		case activeFocusedTop:
-			_activeTopBarFocusedColour = colour2Set;
-			break;
-		case activeUnfocusedTop:
-			_activeTopBarUnfocusedColour = colour2Set;
-			break;
-		case inactiveText:
-			_inactiveTextColour = colour2Set;
-			break;
-		case inactiveBg:
-			_inactiveBgColour = colour2Set;
-			break;
-		default :
-			return;
-	}
-	doOwnerDrawTab();
 }
 
 COLORREF TabBarPlus::getColour(tabColourIndex i)

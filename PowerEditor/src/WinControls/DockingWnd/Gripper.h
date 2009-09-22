@@ -45,16 +45,17 @@ public:
 
 	void startGrip(DockingCont* pCont, DockingManager* pDockMgr, void* pRes);
 
-	~Gripper()
-	{
-		if (_hdc)
-		{::ReleaseDC(0, _hdc);}
-		if (_hbm)
-		{::DeleteObject(_hbm);}
-		if (_hbrush)
-		{::DeleteObject(_hbrush);}
-
-	}
+	~Gripper() {
+		if (_hdc) {
+			::ReleaseDC(0, _hdc);
+		}
+		if (_hbm) {
+			::DeleteObject(_hbm);
+		}
+		if (_hbrush) {
+			::DeleteObject(_hbrush);
+		}
+	};
 
 protected :
 
@@ -70,8 +71,8 @@ protected :
 	void drawRectangle(POINT pt);
 	void getMousePoints(POINT* pt, POINT* ptPrev);
 	void getMovingRect(POINT pt, RECT *rc);
-	DockingCont* contHitTest(POINT pt);
-	DockingCont* workHitTest(POINT pt, RECT *rcCont = NULL);
+	DockingCont * contHitTest(POINT pt);
+	DockingCont * workHitTest(POINT pt, RECT *rcCont = NULL);
 
 	void initTabInformation();
 
@@ -95,40 +96,40 @@ protected :
 	};
 
 private:
-	/* Handle */
-	HINSTANCE		_hInst;
-	HWND			_hParent;
-	HWND			_hSelf;
+	// Handle
+	HINSTANCE _hInst;
+	HWND _hParent;
+	HWND _hSelf;
 
-	/* data of container */
-	tDockMgr		_dockData;
-	DockingManager* _pDockMgr;
-	DockingCont*	_pCont;
+	// data of container
+	tDockMgr _dockData;
+	DockingManager *_pDockMgr;
+	DockingCont *_pCont;
 
-	/* mouse offset in moving rectangle */
-	POINT			_ptOffset;
+	// mouse offset in moving rectangle
+	POINT _ptOffset;
 
-	/* remembers old mouse point */
-	POINT			_ptOld;
-	BOOL			_bPtOldValid;
+	// remembers old mouse point
+	POINT _ptOld;
+	BOOL _bPtOldValid;
 
-	/* for sorting tabs */
-	HWND			_hTab;
-	HWND			_hTabSource;
-	BOOL			_startMovingFromTab;
-	int				_iItem;
-	RECT			_rcItem;
-	TCITEM			_tcItem;
+	// for sorting tabs
+	HWND _hTab;
+	HWND _hTabSource;
+	BOOL _startMovingFromTab;
+	int	_iItem;
+	RECT _rcItem;
+	TCITEM _tcItem;
 
-	/* resource pointer of THIS class */
-	void*			_pRes;
+	// resource pointer of THIS class
+	void *_pRes;
 
-	HDC				_hdc;
-	HBITMAP			_hbm;
-	HBRUSH			_hbrush;
+	HDC _hdc;
+	HBITMAP _hbm;
+	HBRUSH _hbrush;
 
-	/* is class registered */
-	static BOOL		_isRegistered;
+	// is class registered
+	static BOOL _isRegistered;
 };
 
 #endif // GRIPPER_H

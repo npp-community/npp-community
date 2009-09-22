@@ -484,6 +484,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\ScitillaComponent\ScintillaCtrls.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\ScitillaComponent\ScintillaEditView.h"
 					>
 				</File>
@@ -1432,6 +1436,10 @@
 				</File>
 				<File
 					RelativePath="..\src\ScitillaComponent\Printer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\ScitillaComponent\ScintillaCtrls.cpp"
 					>
 				</File>
 				<File

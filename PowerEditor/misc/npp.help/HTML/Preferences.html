@@ -10,10 +10,10 @@ relevant to some aspect of Notepad++ (for instance, the interface or
 backup options).
 <p><img style="width: 599px; height: 397px;" alt="" src="Images/Screenshots/preferences.png" usemap="#preferences">
 <p>
-<h2><a name="Global">Global</a>
+<h2><a name="General">General</a>
 </h2>
 <p>The
-global settings control the look of the main interface. You can
+general settings control the look of the main interface. You can
 control the Tab Bar, the Tool Bar, the Status Bar and the menu from
 here, as well as the current ...
 <p>
@@ -81,7 +81,7 @@ click to close document</span> - If checked, doubleclicking on a tab will
 close it.
 </li></ul></span></dl>
 
-<h2><a name="Edit_Components"></a>Edit Components</h2>
+<h2><a name="Editing"></a>Editing</h2>
 <p>These
 settings affect the behaviour and look of Scintilla, the edit
 component of Notepad++.
@@ -97,13 +97,9 @@ the size of the space character).
 rate</span> - Change from fast (F) to slow (S). Moving all the way to slow
 will stop the blinking.</font><br>You can change the caret color with the <a href="Styler%20Configurator.html#Caret_colour">Styler Configurator</a>.
 </li></ul>
-<dt>Tab settings
-<span style="font-weight:normal;">
-<ul><li><span class="label">Tab size</span> - Size in space characters of a tab character in the document.
-</li><li><span class="checkbox">Replace
-by space</span> - Checking this will cause any tabs added to be in the
-form of spaces, up to the amount as determined by the Tab size
-setting.</li></ul></span></dl>
+<dt>Multi-Editing
+<dd>You can enable or disable this feature through the checkbox. This both controls the ability to select multiple areas (see <a href="Selecting.html">Selecting text</a>) and to get typed text mirrored in all the areas in the selection.
+</dl>
 <p>
 The
 following options are changed per view (See <a href="Multi%20View.html">Multi View</a>). Select the
@@ -197,25 +193,28 @@ To remove the association, select the extension to dissociate and
 press the arrow next to the garbage can.
 <p>
 
-<h2><a name="Language_Menu"></a>Language
-Menu
+<h2><a name="Language_Menu"></a>Language Menu/Tab settings
 </h2>You
 can select the languages that are available from the <span class="menu_item">Language</span> menu. In
 the <span class="label">Available Items</span> list are the languages that are currently
 visible. To hide a language form the menu, select it and press the
 <span class="button">-&gt;</span> button to put it in the <span class="label">Disabled Items</span> list. Add the
-language again by selecting it from the <span class="label">Disabled Item</span></font><font face="Times New Roman, serif"> list and
+language again by selecting it from the <span class="label">Disabled Items</span></font><font face="Times New Roman, serif"> list and
 pressing the <span class="button">&lt;-</span> button.</font>
 <br>
 The appearance of the Language menu can be further controlled by the <span class="checkbox">Make Language menu Compact</span> checkbox. When checked, languages whose names start by the same letter are grouped into a submenu, rather than being all lumped in the menu proper.
 <p>
-
-<h2><a name="Print_-_Colour_and_Margin"></a>Print
-- Colour and Margin
-</h2>
+Tab settings can be adjusted on a per language basis. The right hand list has all built-in languages, as well as a topmost (Default) entry. The latter applies to all languages which don't have a custom setting, as well as to all user defined languages. The frame below allows adjusting tab settings for the selected language:
+<ul><li><span class="label">Tab size</span> - Size in space characters of a tab character in the document.
+</li><li><span class="checkbox">Replace
+by space</span> - Checking this will cause any tabs added to be in the
+form of spaces, up to the amount as determined by the Tab size
+setting.</li></ul>
+<p>
+<h2><a name="Print"></a>Print</h2>
 <p>Use
 these settings to adjust the layout and colors used when printing a
-document.
+document, as well as the page header and footer text. This can be any regular string or a variable that will change depending on the printed document.
 <p><ul><li>
 <span class="checkbox">Print
 line number</span> - If selected, linenumbers will be printed aswell.</li><li>
@@ -233,16 +232,7 @@ on white</span> - All text will be printed black and a white background.
 background color</span> - This will print all the text colored, but any
 background colors (including the default color) will be printed
 white.</li></ul>
-</li></ul><p>
-
-<h2><a name="Print_-_Header_and_Footer"></a>Print
-- Header and Footer</font>
-</h2>
-<p>Use
-these settings to control special text to appear at the documents
-edges. This can be any regular string or an variable that will change
-depending on the printed document.
-<p>
+</li></ul>
 <dl>
 <dt>Variables
 <dd>
@@ -387,6 +377,8 @@ other method of opening a file to load a session into Notepad++.
 <dt>Other options
 <span style="font-weight:normal;">
 <ul><li>
+<span class="checkbox">Enable Notepad++ auto-updater</span>: If checked, Notepad++ will attempt to find about an update at startup. You have the option of postponing the upgrade if one is found.
+</li><li>
 <span class="checkbox">Auto-indent</span> -
 If checked, adding a new line will automatically indent that line
 if any line with text before it has indentation as well. The
@@ -407,5 +399,5 @@ the active file only the filename will be displayed.
 </li></ul></span>
 </dl>
 
-<map id="preferences" name="preferences"><area shape="rect" alt="" coords="7,39,63,55" href="#Global" title=""><area shape="rect" alt="" coords="71,41,173,55" href="#Edit_Components" title=""><area shape="rect" alt="" coords="183,42,379,55" href="#New_Document_Open_Save_directory" title=""><area shape="rect" alt="" coords="390,42,484,55" href="#File_Association" title=""><area shape="rect" alt="" coords="492,42,588,55" href="#Language_Menu" title=""><area shape="rect" alt="" coords="9,24,169,36" href="#Print_-_Colour_and_Margin" title=""><area shape="rect" alt="" coords="179,24,342,37" href="#Print_-_Header_and_Footer" title=""><area shape="rect" alt="" coords="350,24,509,37" href="#Backup_Auto-Completion" title=""><area shape="rect" alt="" coords="518,24,590,38" href="#MISC" title=""></map>
+<map id="preferences" name="preferences"><area shape="rect" alt="" coords="11,45,84,61" href="#General" title=""><area shape="rect" alt="" coords="88,45,152,61" href="#Editing" title=""><area shape="rect" alt="" coords="156,45,325,61" href="#New_Document_Open_Save_directory" title=""><area shape="rect" alt="" coords="329,45,428,61" href="#File_Association" title=""><area shape="rect" alt="" coords="432,45,585,61" href="#Language_Menu" title=""><area shape="rect" alt="" coords="14,30,178,43" href="#Print" title=""><area shape="rect" alt="" coords="182,30,417,43" href="#Backup_Auto-Completion" title=""><area shape="rect" alt="" coords="421,30,584,43" href="#MISC" title=""></map>
 </body></html>

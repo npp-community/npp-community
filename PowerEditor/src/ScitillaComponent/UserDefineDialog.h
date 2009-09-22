@@ -128,6 +128,8 @@ public :
 	static const bool REMOVE;
 	SymbolsStyleDialog();
 	void updateDlg();
+	void undeleteChar();
+
 protected :
 	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
     void setKeywords2List(int /*ctrlID*/) {}
@@ -139,6 +141,7 @@ private :
 	// 2 static const TCHAR * to have the compatibility with the old xml
 	static const TCHAR *_delimTag1;
 	static const TCHAR *_delimTag2;
+	TCHAR _lastEscapeChar;
 
 	void symbolAction(bool action);
 	void listboxsRemoveAll();
@@ -156,10 +159,10 @@ public :
 	UserDefineDialog();
 	~UserDefineDialog();
 
-	void init(HINSTANCE hInst, HWND hPere, ScintillaEditView *pSev) {
+	void init(HINSTANCE hInst, HWND hParent, ScintillaEditView *pSev) {
 		if (!_pScintilla)
 		{
-			Window::init(hInst, hPere);
+			Window::init(hInst, hParent);
 			_pScintilla = pSev;
 		}
 	};

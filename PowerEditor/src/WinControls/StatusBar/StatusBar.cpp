@@ -22,9 +22,9 @@
 
 const int defaultPartWidth = 5;
 
-void StatusBar::init(HINSTANCE hInst, HWND hPere, int nbParts)
+void StatusBar::init(HINSTANCE hInst, HWND hParent, int nbParts)
 {
-	Window::init(hInst, hPere);
+	Window::init(hInst, hParent);
     InitCommonControls();
 
 	_hSelf = //CreateStatusWindow(WS_CHILD | WS_CLIPSIBLINGS, NULL, _hParent, IDC_STATUSBAR);

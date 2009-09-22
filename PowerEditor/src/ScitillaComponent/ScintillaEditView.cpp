@@ -141,7 +141,7 @@ int getNbDigits(int aNum, int base)
 	return nbDigits;
 };
 
-void ScintillaEditView::init(HINSTANCE hInst, HWND hPere)
+void ScintillaEditView::init(HINSTANCE hInst, HWND hParent)
 {
 	if (!_hLib)
 	{
@@ -149,7 +149,7 @@ void ScintillaEditView::init(HINSTANCE hInst, HWND hPere)
 		throw int(106901);
 	}
 
-	Window::init(hInst, hPere);
+	Window::init(hInst, hParent);
    _hSelf = ::CreateWindowEx(
 					WS_EX_CLIENTEDGE,\
 					TEXT("Scintilla"),\
@@ -592,6 +592,9 @@ void ScintillaEditView::setUserLexer(const TCHAR *userLangName)
 	execute(SCI_SETPROPERTY, (WPARAM)"userDefine.ignoreCase", (LPARAM)(userLangContainer->_isCaseIgnored?"1":"0"));
 	execute(SCI_SETPROPERTY, (WPARAM)"userDefine.commentLineSymbol", (LPARAM)(userLangContainer->_isCommentLineSymbol?"1":"0"));
 	execute(SCI_SETPROPERTY, (WPARAM)"userDefine.commentSymbol", (LPARAM)(userLangContainer->_isCommentSymbol?"1":"0"));
+	char buf[4];
+	_itoa_s(userLangContainer->_escapeChar[0],buf,10);
+	execute(SCI_SETPROPERTY, (WPARAM)"userDefine.escapeChar", reinterpret_cast<LPARAM>((userLangContainer->_escapeChar[0]) ? buf : "0"));
 
 	const char strArray[4][20] = {"userDefine.g1Prefix", "userDefine.g2Prefix", "userDefine.g3Prefix", "userDefine.g4Prefix"};
 	for (int i = 0 ; i < 4 ; i++)
@@ -663,12 +666,14 @@ void ScintillaEditView::setCppLexer(LangType langType)
 	const TCHAR *lexerName = ScintillaEditView::langNames[langType].lexerName;
 
     execute(SCI_SETLEXER, SCLEX_CPP);
+	/*
 	if (isCJK())
 	{
 		int charSet = codepage2CharSet();
 		if (charSet)
 			execute(SCI_STYLESETCHARACTERSET, SCE_C_STRING, charSet);
 	}
+	*/
 
 	if ((langType != L_RC) && (langType != L_JS))
     {
@@ -1356,9 +1361,6 @@ void ScintillaEditView::restoreCurrentPos()
 }
 
 void ScintillaEditView::restyleBuffer() {
-	//int end = execute(SCI_GETENDSTYLED);	//style up to the last styled byte.
-	//if (end == 0)
-	//	return;
 	execute(SCI_CLEARDOCUMENTSTYLE);
 	execute(SCI_COLOURISE, 0, -1);
 	_currentBuffer->setNeedsLexing(false);
@@ -1442,6 +1444,7 @@ void ScintillaEditView::activateBuffer(BufferID buffer)
 	runMarkers(true, 0, true, false);
     return;	//all done
 }
+
 void ScintillaEditView::bufferUpdated(Buffer * buffer, int mask) {
 	//actually only care about language and lexing etc
 	if (buffer == _currentBuffer)
@@ -1624,6 +1627,50 @@ void ScintillaEditView::replaceSelWith(const char * replaceText)
 	execute(SCI_REPLACESEL, 0, (WPARAM)replaceText);
 }
 
+char * ScintillaEditView::getWordFromRange(char * txt, int size, int pos1, int pos2)
+{
+    if (!size)
+		return NULL;
+    if (pos1 > pos2)
+    {
+        int tmp = pos1;
+        pos1 = pos2;
+        pos2 = tmp;
+    }
+
+    if (size < pos2-pos1)
+        return NULL;
+
+    getText(txt, pos1, pos2);
+	return txt;
+}
+
+char * ScintillaEditView::getWordOnCaretPos(char * txt, int size)
+{
+    if (!size)
+		return NULL;
+
+    std::pair<int,int> range = getWordRange();
+    return getWordFromRange(txt, size, range.first, range.second);
+}
+
+TCHAR * ScintillaEditView::getGenericWordOnCaretPos(TCHAR * txt, int size)
+{
+#ifdef UNICODE
+	WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
+	unsigned int cp = execute(SCI_GETCODEPAGE);
+	char *txtA = new char[size + 1];
+	getWordOnCaretPos(txtA, size);
+
+	const TCHAR * txtW = wmc->char2wchar(txtA, cp);
+	lstrcpy(txt, txtW);
+	delete [] txtA;
+	return txt;
+#else
+	return getWordOnCaretPos(txt, size);
+#endif
+}
+
 char * ScintillaEditView::getSelectedText(char * txt, int size, bool expand)
 {
 	if (!size)
@@ -1639,9 +1686,8 @@ char * ScintillaEditView::getSelectedText(char * txt, int size, bool expand)
 	{
 		range.cpMax = range.cpMin+size-1;	//keep room for zero terminator
 	}
-
-	getText(txt, range.cpMin, range.cpMax);
-	return txt;
+	//getText(txt, range.cpMin, range.cpMax);
+	return getWordFromRange(txt, size, range.cpMin, range.cpMax);
 }
 
 TCHAR * ScintillaEditView::getGenericSelectedText(TCHAR * txt, int size, bool expand)
@@ -2060,6 +2106,106 @@ void ScintillaEditView::setMultiSelections(const ColumnModeInfos & cmi)
 	}
 }
 
+void ScintillaEditView::currentLineUp() const
+{
+	int currentLine = getCurrentLineNumber();
+	if (currentLine != 0)
+	{
+		execute(SCI_BEGINUNDOACTION);
+		currentLine--;
+		execute(SCI_LINETRANSPOSE);
+		execute(SCI_GOTOLINE, currentLine);
+		execute(SCI_ENDUNDOACTION);
+	}
+}
+
+void ScintillaEditView::currentLineDown() const
+{
+	int currentLine = getCurrentLineNumber();
+	if (currentLine != (execute(SCI_GETLINECOUNT) - 1))
+	{
+		execute(SCI_BEGINUNDOACTION);
+		currentLine++;
+		execute(SCI_GOTOLINE, currentLine);
+		execute(SCI_LINETRANSPOSE);
+		execute(SCI_ENDUNDOACTION);
+	}
+}
+
+
+std::pair<int, int> ScintillaEditView::getSelectionLinesRange() const
+{
+    std::pair<int, int> range(-1, -1);
+    if (execute(SCI_GETSELECTIONS) > 1)
+        return range;
+    int start = execute(SCI_GETSELECTIONSTART);
+    int end = execute(SCI_GETSELECTIONEND);
+
+    range.first = execute(SCI_LINEFROMPOSITION, start);
+    range.second = execute(SCI_LINEFROMPOSITION, end);
+    if (range.first > range.second)
+        range.swap(range);
+    return range;
+}
+
+void ScintillaEditView::currentLinesUp() const
+{
+	std::pair<int, int> lineRange = getSelectionLinesRange();
+    if ((lineRange.first == -1 || lineRange.first == 0))
+        return;
+
+	bool noSel = lineRange.first == lineRange.second;
+    int nbSelLines = lineRange.second - lineRange.first + 1;
+
+    int line2swap = lineRange.first - 1;
+    int nbChar = execute(SCI_LINELENGTH, line2swap);
+
+    int posStart = execute(SCI_POSITIONFROMLINE, lineRange.first);
+    int posEnd = execute(SCI_GETLINEENDPOSITION, lineRange.second);
+
+    execute(SCI_BEGINUNDOACTION);
+    execute(SCI_GOTOLINE, line2swap);
+
+    for (int i = 0 ; i < nbSelLines ; i++)
+    {
+        currentLineDown();
+    }
+	execute(SCI_ENDUNDOACTION);
+
+    execute(SCI_SETSELECTIONSTART, posStart - nbChar);
+	execute(SCI_SETSELECTIONEND, noSel?posStart - nbChar:posEnd - nbChar);
+}
+
+void ScintillaEditView::currentLinesDown() const
+{
+	std::pair<int, int> lineRange = getSelectionLinesRange();
+
+	if ((lineRange.first == -1 || lineRange.second >= execute(SCI_LINEFROMPOSITION, getCurrentDocLen())))
+        return;
+
+	bool noSel = lineRange.first == lineRange.second;
+    int nbSelLines = lineRange.second - lineRange.first + 1;
+
+	int line2swap = lineRange.second + 1;
+    int nbChar = execute(SCI_LINELENGTH, line2swap);
+
+	int posStart = execute(SCI_POSITIONFROMLINE, lineRange.first);
+    int posEnd = execute(SCI_GETLINEENDPOSITION, lineRange.second);
+
+    execute(SCI_BEGINUNDOACTION);
+    execute(SCI_GOTOLINE, line2swap);
+
+    for (int i = 0 ; i < nbSelLines ; i++)
+    {
+        currentLineUp();
+    }
+	execute(SCI_ENDUNDOACTION);
+
+	execute(SCI_SETSELECTIONSTART, posStart + nbChar);
+	execute(SCI_SETSELECTIONEND, noSel?posStart + nbChar:posEnd + nbChar);
+
+}
+
 void ScintillaEditView::convertSelectedTextTo(bool Case)
 {
 	unsigned int codepage = _codepage;
@@ -2145,14 +2291,21 @@ void ScintillaEditView::convertSelectedTextTo(bool Case)
 }
 
 
-bool ScintillaEditView::expandWordSelection()
+
+std::pair<int, int> ScintillaEditView::getWordRange()
 {
-	int caretPos = execute(SCI_GETCURRENTPOS, 0, 0);
+    int caretPos = execute(SCI_GETCURRENTPOS, 0, 0);
 	int startPos = static_cast<int>(execute(SCI_WORDSTARTPOSITION, caretPos, true));
 	int endPos = static_cast<int>(execute(SCI_WORDENDPOSITION, caretPos, true));
-	if (startPos != endPos) {
-		execute(SCI_SETSELECTIONSTART, startPos);
-		execute(SCI_SETSELECTIONEND, endPos);
+    return std::pair<int, int>(startPos, endPos);
+}
+
+bool ScintillaEditView::expandWordSelection()
+{
+    std::pair<int, int> wordRange = 	getWordRange();
+    if (wordRange.first != wordRange.second) {
+        execute(SCI_SETSELECTIONSTART, wordRange.first);
+        execute(SCI_SETSELECTIONEND, wordRange.second);
 		return true;
 	}
 	return false;
@@ -2201,8 +2354,10 @@ TCHAR * int2str(TCHAR *str, int strLen, int number, int base, int nbDigits, bool
 		}
 		else
 		{
-			wsprintf(f, TEXT("%%%s"), fStr);
-			wsprintf(str, f, number);
+			// use sprintf or swprintf instead of wsprintf
+			// to make octal format work
+			generic_sprintf(f, 64, TEXT("%%%s"), fStr);
+			generic_sprintf(str, strLen, f, number);
 		}
 		int i = lstrlen(str);
 		for ( ; i < nbDigits ; i++)
@@ -2213,8 +2368,10 @@ TCHAR * int2str(TCHAR *str, int strLen, int number, int base, int nbDigits, bool
 	{
 		if (base != 2)
 		{
-			wsprintf(f, TEXT("%%.%d%s"), nbDigits, fStr);
-			wsprintf(str, f, number);
+			// use sprintf or swprintf instead of wsprintf
+			// to make octal format work
+			generic_sprintf(f, 64, TEXT("%%.%d%s"), nbDigits, fStr);
+			generic_sprintf(str, strLen, f, number);
 		}
 		// else already done.
 	}
@@ -3000,32 +3157,6 @@ void ScintillaEditView::setCurrentLineHiLiting( bool isHiliting, COLORREF bgColo
 bool ScintillaEditView::isCurrentLineHiLiting() const
 {
 	return (execute(SCI_GETCARETLINEVISIBLE) != 0);
-}
-
-void ScintillaEditView::currentLineUp() const
-{
-	int currentLine = getCurrentLineNumber();
-	if (currentLine != 0)
-	{
-		execute(SCI_BEGINUNDOACTION);
-		currentLine--;
-		execute(SCI_LINETRANSPOSE);
-		execute(SCI_GOTOLINE, currentLine);
-		execute(SCI_ENDUNDOACTION);
-	}
-}
-
-void ScintillaEditView::currentLineDown() const
-{
-	int currentLine = getCurrentLineNumber();
-	if (currentLine != (execute(SCI_GETLINECOUNT) - 1))
-	{
-		execute(SCI_BEGINUNDOACTION);
-		currentLine++;
-		execute(SCI_GOTOLINE, currentLine);
-		execute(SCI_LINETRANSPOSE);
-		execute(SCI_ENDUNDOACTION);
-	}
 }
 
 void ScintillaEditView::convertSelectedTextToLowerCase()

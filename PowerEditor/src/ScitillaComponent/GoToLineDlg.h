@@ -29,7 +29,7 @@ class GoToLineDlg : public StaticDialog
 public :
 	GoToLineDlg() : StaticDialog(), _mode(go2line) {};
 
-	void init(HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView);
+	void init(HINSTANCE hInst, HWND hParent, ScintillaEditView **ppEditView);
 
 	virtual void create(int dialogID, bool isRTL = false);
 
@@ -51,7 +51,6 @@ private :
     void cleanLineEdit() const;
 
     int getLine() const;
-
 };
 
 #endif //GOTILINE_DLG_H

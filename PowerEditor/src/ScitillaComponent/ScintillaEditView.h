@@ -145,11 +145,25 @@ struct ColumnModeInfo {
 	bool isValid() const {
 		return (_order >= 0 && _selLpos >= 0 && _selRpos >= 0 && _selLpos <= _selRpos);
 	};
-/*
-	bool hasVirtualSpace() const {
-		return (_nbVirtualCaretSpc >= 0 && _nbVirtualAnchorSpc >= 0);
-	};
-	*/
+};
+
+// JOCE: Can move the two following functors in the cpp file.
+//
+// SortClass for vector<ColumnModeInfo>
+// sort in _order : increased order
+struct SortInSelectOrder {
+	bool operator() (ColumnModeInfo & l, ColumnModeInfo & r) {
+		return (l._order < r._order);
+	}
+};
+
+//
+// SortClass for vector<ColumnModeInfo>
+// sort in _selLpos : increased order
+struct SortInPositionOrder {
+	bool operator() (ColumnModeInfo & l, ColumnModeInfo & r) {
+		return (l._selLpos < r._selLpos);
+	}
 };
 
 typedef std::vector<ColumnModeInfo> ColumnModeInfos;
@@ -170,7 +184,7 @@ public:
 	ScintillaEditView();
 
 	virtual ~ScintillaEditView();
-	virtual void init(HINSTANCE hInst, HWND hPere);
+	virtual void init(HINSTANCE hInst, HWND hParent);
 
 	LRESULT execute(UINT Msg, WPARAM wParam=0, LPARAM lParam=0) const {
 		return _pScintillaFunc(_pScintillaPtr, static_cast<int>(Msg), static_cast<int>(wParam), static_cast<int>(lParam));
@@ -186,7 +200,10 @@ public:
 
 	int getSelectedTextCount();
 
+	char * getWordFromRange(char * txt, int size, int pos1, int pos2);
 	char * getSelectedText(char * txt, int size, bool expand = true);
+	char * getWordOnCaretPos(char * txt, int size);
+	TCHAR * getGenericWordOnCaretPos(TCHAR * txt, int size);
 	TCHAR * getGenericSelectedText(TCHAR * txt, int size, bool expand = true);
 	int searchInTarget(const TCHAR * Text2Find, int fromPos, int toPos) const;
 	void appandGenericText(const TCHAR * text2Append) const;
@@ -280,6 +297,10 @@ public:
 
 	void currentLineUp() const;
 	void currentLineDown() const;
+
+	std::pair<int, int> getSelectionLinesRange() const;
+	void currentLinesUp() const;
+	void currentLinesDown() const;
 
 	void convertSelectedTextTo(bool Case);
 	void setMultiSelections(const ColumnModeInfos & cmi);
@@ -428,6 +449,7 @@ protected:
 	int codepage2CharSet() const;
 
 	void setTabSettings(Lang *lang);
+	std::pair<int, int> getWordRange();
 	bool expandWordSelection();
 
 private:

@@ -102,12 +102,31 @@ BOOL CALLBACK GoToLineDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lPa
 	}
 }
 
-void GoToLineDlg::init( HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView )
+void GoToLineDlg::init( HINSTANCE hInst, HWND hParent, ScintillaEditView **ppEditView )
 {
-	Window::init(hInst, hPere);
+	Window::init(hInst, hParent);
 	if (!ppEditView)
 		throw int(9900);
 	_ppEditView = ppEditView;
+}
+
+void GoToLineDlg::updateLinesNumbers() const
+{
+	unsigned int current = 0;
+	unsigned int limit = 0;
+
+	if (_mode == go2line)
+	{
+		current = (unsigned int)((*_ppEditView)->getCurrentLineNumber() + 1);
+		limit = (unsigned int)((*_ppEditView)->execute(SCI_GETLINECOUNT));
+	}
+	else
+	{
+		current = (unsigned int)(*_ppEditView)->execute(SCI_GETCURRENTPOS);
+		limit = (unsigned int)((*_ppEditView)->getCurrentDocLen() - 1);
+	}
+    ::SetDlgItemInt(_hSelf, ID_CURRLINE, current, FALSE);
+    ::SetDlgItemInt(_hSelf, ID_LASTLINE, limit, FALSE);
 }
 
 void GoToLineDlg::create( int dialogID, bool isRTL)
@@ -127,25 +146,6 @@ void GoToLineDlg::display( bool toShow /*= true*/ ) const
 	Window::display(toShow);
 	if (toShow)
 		::SetFocus(::GetDlgItem(_hSelf, ID_GOLINE_EDIT));
-}
-
-void GoToLineDlg::updateLinesNumbers() const
-{
-	unsigned int current = 0;
-	unsigned int limit = 0;
-
-	if (_mode == go2line)
-	{
-		current = (unsigned int)((*_ppEditView)->getCurrentLineNumber() + 1);
-		limit = (unsigned int)((*_ppEditView)->execute(SCI_GETLINECOUNT));
-	}
-	else
-	{
-		current = (unsigned int)(*_ppEditView)->execute(SCI_GETCURRENTPOS);
-		limit = (unsigned int)((*_ppEditView)->getCurrentDocLen() - 1);
-	}
-	::SetDlgItemInt(_hSelf, ID_CURRLINE, current, FALSE);
-	::SetDlgItemInt(_hSelf, ID_LASTLINE, limit, FALSE);
 }
 
 void GoToLineDlg::cleanLineEdit() const

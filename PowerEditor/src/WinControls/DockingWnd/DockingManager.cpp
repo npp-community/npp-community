@@ -74,10 +74,10 @@ DockingManager::DockingManager()
 	/* create four containers with splitters */
 	for (int i = 0; i < DOCKCONT_MAX; i++)
 	{
-		DockingCont*		_pDockCont = new DockingCont;
+		DockingCont *_pDockCont = new DockingCont;
 		_vContainer.push_back(_pDockCont);
 
-		DockingSplitter*	_pSplitter = new DockingSplitter;
+		DockingSplitter *_pSplitter = new DockingSplitter;
 		_vSplitter.push_back(_pSplitter);
 	}
 
@@ -94,8 +94,7 @@ DockingManager::~DockingManager()
 	}
 
 	delete _dockData;
-};
-
+}
 
 void DockingManager::init(HINSTANCE hInst, HWND hWnd, Window ** ppWin)
 {
@@ -172,6 +171,11 @@ void DockingManager::init(HINSTANCE hInst, HWND hWnd, Window ** ppWin)
 	_dockData->hWnd = _hSelf;
 
 	_isInitialized = TRUE;
+}
+
+void DockingManager::destroy()
+{
+	::DestroyWindow(_hSelf);
 }
 
 LRESULT CALLBACK DockingManager::staticWinProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -658,8 +662,9 @@ void DockingManager::createDockableDlg(tTbData* data, int iCont, bool isVisible)
 		}
 	}
 
-	/* attach toolbar */
-	_vContainer[iCont]->createToolbar(data);
+	// attach toolbar
+	if (_vContainer.size() > (size_t)iCont && _vContainer[iCont] != NULL)
+		_vContainer[iCont]->createToolbar(data);
 
 	/* notify client app */
 	if (iCont < DOCKCONT_MAX)
@@ -678,8 +683,7 @@ void DockingManager::setActiveTab(int iCont, int iItem)
 
 void DockingManager::showDockableDlg(HWND hDlg, BOOL view)
 {
-	tTbData*	pTbData =	NULL;
-
+	tTbData *pTbData = NULL;
 	for (size_t i = 0; i < _vContainer.size(); i++)
 	{
 		pTbData = _vContainer[i]->findToolbarByWnd(hDlg);
@@ -693,8 +697,7 @@ void DockingManager::showDockableDlg(HWND hDlg, BOOL view)
 
 void DockingManager::showDockableDlg(TCHAR* pszName, BOOL view)
 {
-	tTbData*	pTbData =	NULL;
-
+	tTbData *pTbData = NULL;
 	for (size_t i = 0; i < _vContainer.size(); i++)
 	{
 		pTbData = _vContainer[i]->findToolbarByName(pszName);
@@ -704,8 +707,38 @@ void DockingManager::showDockableDlg(TCHAR* pszName, BOOL view)
 			return;
 		}
 	}
-};
+}
 
+LRESULT DockingManager::SendNotify(HWND hWnd, UINT message)
+{
+	NMHDR	nmhdr;
+	nmhdr.code		= message;
+	nmhdr.hwndFrom	= _hParent;
+	nmhdr.idFrom	= ::GetDlgCtrlID(_hParent);
+	::SendMessage(hWnd, WM_NOTIFY, nmhdr.idFrom, (LPARAM)&nmhdr);
+	return ::GetWindowLongPtr(hWnd, DWL_MSGRESULT);
+}
+
+void DockingManager::setDockedContSize(int iCont, int iSize)
+{
+	if ((iCont == CONT_TOP) || (iCont == CONT_BOTTOM))
+		_dockData->rcRegion[iCont].bottom = iSize;
+	else if ((iCont == CONT_LEFT) || (iCont == CONT_RIGHT))
+		_dockData->rcRegion[iCont].right = iSize;
+	else
+		return;
+	onSize();
+}
+
+int DockingManager::getDockedContSize(int iCont)
+{
+	if ((iCont == CONT_TOP) || (iCont == CONT_BOTTOM))
+		return _dockData->rcRegion[iCont].bottom;
+	else if ((iCont == CONT_LEFT) || (iCont == CONT_RIGHT))
+		return _dockData->rcRegion[iCont].right;
+	else
+		return -1;
+}
 
 DockingCont* DockingManager::toggleActiveTb(DockingCont* pContSrc, UINT message, BOOL bNew, LPRECT prcFloat)
 {
@@ -911,45 +944,12 @@ int DockingManager::GetContainer(DockingCont* pCont)
 
 void DockingManager::getDockInfo(tDockMgr *pDockData) {
 	*pDockData	= *_dockData;
-};
+}
 
 void DockingManager::setStyleCaption(BOOL captionOnTop)
 {
 	_vContainer[CONT_TOP]->setCaptionTop(captionOnTop);
 	_vContainer[CONT_BOTTOM]->setCaptionTop(captionOnTop);
-};
-
-int DockingManager::getDockedContSize(int iCont)
-{
-	if ((iCont == CONT_TOP) || (iCont == CONT_BOTTOM))
-	{
-		return _dockData->rcRegion[iCont].bottom;
-	}
-	else if ((iCont == CONT_LEFT) || (iCont == CONT_RIGHT))
-	{
-		return _dockData->rcRegion[iCont].right;
-	}
-	else
-	{
-		return -1;
-	}
-}
-
-void DockingManager::setDockedContSize(int iCont, int iSize)
-{
-	if ((iCont == CONT_TOP) || (iCont == CONT_BOTTOM))
-	{
-		_dockData->rcRegion[iCont].bottom = iSize;
-	}
-	else if ((iCont == CONT_LEFT) || (iCont == CONT_RIGHT))
-	{
-		_dockData->rcRegion[iCont].right = iSize;
-	}
-	else
-	{
-		return;
-	}
-	onSize();
 }
 
 int DockingManager::FindEmptyContainer()
@@ -994,15 +994,3 @@ int DockingManager::FindEmptyContainer()
     /* search for empty arrays */
     return iRetCont;
 }
-
-LRESULT DockingManager::SendNotify(HWND hWnd, UINT message)
-{
-	NMHDR	nmhdr;
-
-	nmhdr.code		= message;
-	nmhdr.hwndFrom	= _hParent;
-	nmhdr.idFrom	= ::GetDlgCtrlID(_hParent);
-	::SendMessage(hWnd, WM_NOTIFY, nmhdr.idFrom, (LPARAM)&nmhdr);
-	return ::GetWindowLongPtr(hWnd, DWL_MSGRESULT);
-}
-

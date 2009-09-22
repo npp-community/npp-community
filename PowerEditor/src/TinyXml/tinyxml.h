@@ -40,8 +40,6 @@ distribution.
 
 #ifdef TIXML_USE_STL
 	#define TIXML_STRING	generic_string
-	//#define TIXML_ISTREAM	std::istream
-	//#define TIXML_OSTREAM	std::ostream
 	#define TIXML_ISTREAM	std::basic_istream<TCHAR>
 	#define TIXML_OSTREAM	std::basic_ostream<TCHAR>
 

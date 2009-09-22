@@ -33,7 +33,7 @@ class RunMacroDlg : public StaticDialog
 public :
 	RunMacroDlg() : StaticDialog(), m_Mode(RM_RUN_MULTI), m_Times(1) {};
 
-	void init(HINSTANCE hInst, HWND hPere);
+	void init(HINSTANCE hInst, HWND hParent);
 	void doDialog(bool isRTL = false);
 	void initMacroList();
 

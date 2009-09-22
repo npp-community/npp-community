@@ -40,7 +40,7 @@
 	#define generic_fopen(pFile, filename, mode) if(_wfopen_s(&pFile, filename, mode) != 0){pFile = NULL;}
 	#define generic_fgets fgetws
 	#define generic_stat _wstat
-	//#define generic_string std::wstring
+	#define generic_sprintf swprintf
 	#define COPYDATA_FILENAMES COPYDATA_FILENAMESW
 #else
 	#define NppMainEntry WinMain
@@ -61,7 +61,7 @@
 	#define generic_fopen(pFile, filename, mode) if(fopen_s(&pFile, filename, mode) != 0){pFile = NULL;}
 	#define generic_fgets fgets
 	#define generic_stat _stat
-	//#define generic_string std::string
+	#define generic_sprintf sprintf
 	#define COPYDATA_FILENAMES COPYDATA_FILENAMESA
 #endif
 
