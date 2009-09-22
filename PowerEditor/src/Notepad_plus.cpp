@@ -128,6 +128,7 @@ Notepad_plus::Notepad_plus():
 	_pluginsManager(new PluginsManager()),
 	_isRTL(false),
 	_isFileOpening(false),
+	_rememberThisSession(true),
 	_mainWindowStatus(0),
 	_activeView(MAIN_VIEW)
 {
@@ -232,7 +233,9 @@ Notepad_plus::Notepad_plus():
 		}
 	}
 	else
+	{
 		_toolIcons = NULL;
+	}
 }
 
 // ATTENTION : the order of the destruction is very important
@@ -10435,11 +10438,7 @@ bool Notepad_plus::str2Cliboard(const TCHAR *str2cpy)
 
 	int len2Allocate = lstrlen(str2cpy) + 1;
 	len2Allocate *= sizeof(TCHAR);
-	unsigned int cilpboardFormat = CF_TEXT;
-
-#ifdef UNICODE
-	cilpboardFormat = CF_UNICODETEXT;
-#endif
+	unsigned int cilpboardFormat = CF_UNICODETEXT;
 
 	HGLOBAL hglbCopy = ::GlobalAlloc(GMEM_MOVEABLE, len2Allocate);
 	if (hglbCopy == NULL)

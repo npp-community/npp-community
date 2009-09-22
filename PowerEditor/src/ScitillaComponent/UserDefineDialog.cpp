@@ -927,7 +927,7 @@ int fontNameCombo4[] = {IDC_SYMBOL_FONT_COMBO, IDC_SYMBOL_FONT2_COMBO, IDC_SYMBO
 const TCHAR *SymbolsStyleDialog::_delimTag1 = TEXT("DELIMINER1");
 const TCHAR *SymbolsStyleDialog::_delimTag2 = TEXT("DELIMINER2");
 
-SymbolsStyleDialog::SymbolsStyleDialog() : SharedParametersDialog(3)
+SymbolsStyleDialog::SymbolsStyleDialog() : SharedParametersDialog(3), _lastEscapeChar(TEXT('\0'))
 {
     memcpy(_fgStatic, fgStatic4, sizeof(fgStatic4));
 	memcpy(_bgStatic, bgStatic4, sizeof(bgStatic4));

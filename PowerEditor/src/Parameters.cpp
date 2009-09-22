@@ -4811,6 +4811,9 @@ UserLangContainer::UserLangContainer():
 	{
 		_isPrefix[i] = false;
 	}
+
+	_escapeChar[0] = TEXT('\0');
+	_escapeChar[1] = TEXT('\0');
 }
 
 UserLangContainer::UserLangContainer( const TCHAR *name, const TCHAR *ext ) :
@@ -4831,6 +4834,9 @@ UserLangContainer::UserLangContainer( const TCHAR *name, const TCHAR *ext ) :
 	{
 		_isPrefix[i] = false;
 	}
+
+	_escapeChar[0] = TEXT('\0');
+	_escapeChar[1] = TEXT('\0');
 }
 
 const UserLangContainer & UserLangContainer::operator=( const UserLangContainer & ulc )

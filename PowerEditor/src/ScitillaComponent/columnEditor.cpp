@@ -103,10 +103,13 @@ BOOL CALLBACK ColumnEditorDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM)
 						if ((*_ppEditView)->execute(SCI_SELECTIONISRECTANGLE) || (*_ppEditView)->execute(SCI_GETSELECTIONS) > 1)
 						{
 							ColumnModeInfos colInfos = (*_ppEditView)->getColumnModeSelectInfo();
+							// It's all right here. It's used as intended.
+							//lint -e864 (Info -- Expression involving variable 'colInfos' possibly depends on order of evaluation)
 							std::sort(colInfos.begin(), colInfos.end(), SortInPositionOrder());
 							(*_ppEditView)->columnReplace(colInfos, str);
 							std::sort(colInfos.begin(), colInfos.end(), SortInSelectOrder());
 							(*_ppEditView)->setMultiSelections(colInfos);
+							//lint +e864
 						}
 						else
 						{
@@ -161,11 +164,14 @@ BOOL CALLBACK ColumnEditorDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM)
 
 						if ((*_ppEditView)->execute(SCI_SELECTIONISRECTANGLE) || (*_ppEditView)->execute(SCI_GETSELECTIONS) > 1)
 						{
+							// It's all right here. It's used as intended.
+							//lint -e864 (Info -- Expression involving variable 'colInfos' possibly depends on order of evaluation)
 							ColumnModeInfos colInfos = (*_ppEditView)->getColumnModeSelectInfo();
 							std::sort(colInfos.begin(), colInfos.end(), SortInPositionOrder());
 							(*_ppEditView)->columnReplace(colInfos, initialNumber, increaseNumber, format);
 							std::sort(colInfos.begin(), colInfos.end(), SortInSelectOrder());
 							(*_ppEditView)->setMultiSelections(colInfos);
+							//lint +e864
 						}
 						else
 						{

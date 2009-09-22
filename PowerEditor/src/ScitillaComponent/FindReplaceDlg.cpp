@@ -30,7 +30,6 @@
 #include "Toolbar.h"
 
 #include "Parameters.h"
-#include "npp_winver.h"
 
 LONG FindReplaceDlg::originalFinderProc = NULL;
 
@@ -434,21 +433,19 @@ void FindReplaceDlg::destroy()
 {
 	if (_tab)
 	{
+		_tab->destroy();
 		delete _tab;
 		_tab = NULL;
 	}
 	StaticDialog::destroy();
 }
 
-#ifdef UNICODE
 void FindReplaceDlg::addText2Combo(const TCHAR * txt2add, HWND hCombo, bool /*isUTF8*/)
 {
 	if (!hCombo) return;
 	if (!lstrcmp(txt2add, TEXT(""))) return;
 
-	int i = 0;
-
-	i = ::SendMessage(hCombo, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)txt2add);
+	int i = ::SendMessage(hCombo, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)txt2add);
 	if (i != CB_ERR) // found
 	{
 		::SendMessage(hCombo, CB_DELETESTRING, i, 0);
@@ -458,110 +455,17 @@ void FindReplaceDlg::addText2Combo(const TCHAR * txt2add, HWND hCombo, bool /*is
 
 	::SendMessage(hCombo, CB_SETCURSEL, i, 0);
 }
-#else
-void FindReplaceDlg::addText2Combo(const TCHAR * txt2add, HWND hCombo, bool isUTF8)
-{
-	if (!hCombo) return;
-	if (!lstrcmp(txt2add, TEXT(""))) return;
-
-	int i = 0;
-
-	TCHAR text[FINDREPLACE_MAXLENGTH];
-	bool isWin9x = getWinVersion() <= WV_ME;
-	wchar_t wchars2Add[FINDREPLACE_MAXLENGTH];
-	wchar_t textW[FINDREPLACE_MAXLENGTH];
-	int count = ::SendMessage(hCombo, CB_GETCOUNT, 0, 0);
-
-	if (isUTF8)
-		::MultiByteToWideChar(CP_UTF8, 0, txt2add, -1, wchars2Add, FINDREPLACE_MAXLENGTH - 1);
-
-	for ( ; i < count ; i++)
-	{
-		if (isUTF8)
-		{
-			if (!isWin9x)
-				::SendMessageW(hCombo, CB_GETLBTEXT, i, (LPARAM)textW);
-
-			else
-			{
-				::SendMessageA(hCombo, CB_GETLBTEXT, i, (LPARAM)text);
-				::MultiByteToWideChar(CP_ACP, 0, text, -1, textW, FINDREPLACE_MAXLENGTH - 1);
-			}
-
-			if (!wcscmp(wchars2Add, textW))
-			{
-				::SendMessage(hCombo, CB_DELETESTRING, i, 0);
-				break;
-			}
-		}
-		else
-		{
-			::SendMessage(hCombo, CB_GETLBTEXT, i, (LPARAM)text);
-			if (!strcmp(txt2add, text))
-			{
-				::SendMessage(hCombo, CB_DELETESTRING, i, 0);
-				break;
-			}
-		}
-	}
-
-	if (!isUTF8)
-		i = ::SendMessage(hCombo, CB_INSERTSTRING, 0, (LPARAM)txt2add);
-
-	else
-	{
-		if (!isWin9x)
-			i = ::SendMessageW(hCombo, CB_INSERTSTRING, 0, (LPARAM)wchars2Add);
-		else
-		{
-			::WideCharToMultiByte(CP_ACP, 0, wchars2Add, -1, text, FINDREPLACE_MAXLENGTH - 1, NULL, NULL);
-			i = ::SendMessageA(hCombo, CB_INSERTSTRING, 0, (LPARAM)text);
-		}
-	}
-	::SendMessage(hCombo, CB_SETCURSEL, i, 0);
-}
-#endif
 
 
-#ifdef UNICODE
 generic_string FindReplaceDlg::getTextFromCombo(HWND hCombo, bool /*isUnicode*/) const
 {
 	TCHAR str[FINDREPLACE_MAXLENGTH];
 	::SendMessage(hCombo, WM_GETTEXT, FINDREPLACE_MAXLENGTH - 1, (LPARAM)str);
 	return generic_string(str);
 }
-#else
-generic_string FindReplaceDlg::getTextFromCombo(HWND hCombo, bool isUnicode) const
-{
-	TCHAR str[FINDREPLACE_MAXLENGTH];
-	bool isWin9x = getWinVersion() <= WV_ME;
-	if (isUnicode)
-	{
-		wchar_t wchars[FINDREPLACE_MAXLENGTH];
-		if ( !isWin9x )
-		{
-			::SendMessageW(hCombo, WM_GETTEXT, FINDREPLACE_MAXLENGTH - 1, (LPARAM)wchars);
-		}
-		else
-		{
-			char achars[FINDREPLACE_MAXLENGTH];
-			::SendMessageA(hCombo, WM_GETTEXT, FINDREPLACE_MAXLENGTH - 1, (LPARAM)achars);
-			::MultiByteToWideChar(CP_ACP, 0, achars, -1, wchars, FINDREPLACE_MAXLENGTH - 1);
-		}
-		::WideCharToMultiByte(CP_UTF8, 0, wchars, -1, str, FINDREPLACE_MAXLENGTH - 1, NULL, NULL);
-	}
-	else
-	{
-		::SendMessage(hCombo, WM_GETTEXT, FINDREPLACE_MAXLENGTH - 1, (LPARAM)str);
-	}
-
-	return generic_string(str);
-}
-#endif
 
 FindReplaceDlg::~FindReplaceDlg()
 {
-	_tab->destroy();
 	if (_pFinder)
 		delete _pFinder;
 	delete [] _uniFileName;
@@ -2416,29 +2320,9 @@ BOOL CALLBACK Finder::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-void FindIncrementDlg::setSearchText(const TCHAR * txt2find, bool isUTF8 ) {
-#ifdef UNICODE
+void FindIncrementDlg::setSearchText(const TCHAR * txt2find, bool /*isUTF8*/)
+{
 	::SendDlgItemMessage(_hSelf, IDC_INCFINDTEXT, WM_SETTEXT, 0, (LPARAM)txt2find);
-	isUTF8 = isUTF8;
-#else
-	if (!isUTF8)
-	{
-		::SendDlgItemMessage(_hSelf, IDC_INCFINDTEXT, WM_SETTEXT, 0, (LPARAM)txt2find);
-		return;
-	}
-	const int wideBufferSize = 256;
-	WCHAR wchars[wideBufferSize];
-	::MultiByteToWideChar(CP_UTF8, 0, txt2find, -1, wchars, wideBufferSize);
-	winVer winVersion = getWinVersion();
-	if (winVersion <= WV_ME) {
-		//Cannot simply take txt2find since its UTF8
-		char ansiBuffer[wideBufferSize];	//Assuming no more than 2 bytes for each wchar (SBCS or DBCS, no UTF8 and sorts)
-		::WideCharToMultiByte(CP_ACP, 0, wchars, -1, ansiBuffer, wideBufferSize, NULL, NULL);
-		::SendDlgItemMessageA(_hSelf, IDC_INCFINDTEXT, WM_SETTEXT, 0, (LPARAM)ansiBuffer);
-	} else {
-		::SendDlgItemMessageW(_hSelf, IDC_INCFINDTEXT, WM_SETTEXT, 0, (LPARAM)wchars);
-	}
-#endif
 }
 
 void FindIncrementDlg::init(HINSTANCE hInst, HWND hParent, FindReplaceDlg *pFRDlg, bool isRTL)
