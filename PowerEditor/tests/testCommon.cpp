@@ -15,10 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-/* This file was originally hacked into winmain.cpp to run the tests
-Hopefully it'll be converted to whatever unit testing framework is in place, at some point
-*/
-
 #include "precompiled_headers.h"
 
 #ifndef SHIPPING
@@ -386,7 +382,7 @@ TEST(PathRemoveFileSpecTest, DriveLetterForwardSlash)
 //
 //////////////////////////////////////////////////////////////////////////
 
-void assertPathCanonicalize(TCHAR *path)
+bool testPathCanonicalize(TCHAR *path)
 {
 	generic_string strPath(path);
 
@@ -394,126 +390,340 @@ void assertPathCanonicalize(TCHAR *path)
 	BOOL charRet = PathCanonicalize(output, path);
 	BOOL strRet = PathCanonicalize(strPath);
 
-	assert(charRet == strRet);
-	assert(strPath == output);
+	return ((charRet == strRet)
+		   && (strPath == output));
 }
 
-// TODO: Needs to be ported to Google Test framework
-void testPathCanonicalize()
+TEST(PathCanonicalizeTest, Normal)
 {
-	generic_string strPath;
+	EXPECT_TRUE(testPathCanonicalize(_T("abc\\def")));
+	EXPECT_TRUE(testPathCanonicalize(_T("abc\\def\\ghi")));
+}
 
-	assertPathCanonicalize(TEXT("abc\\def"));
-	assertPathCanonicalize(TEXT("abc\\def\\.."));
-	assertPathCanonicalize(TEXT("abc\\def\\..\\ghi"));
-	assertPathCanonicalize(TEXT("abc\\..\\def\\ghi"));
-	assertPathCanonicalize(TEXT("abc\\def\\ghi\\.."));
-	assertPathCanonicalize(TEXT("abc\\def\\ghi\\..\\"));
-	assertPathCanonicalize(TEXT("abc\\..\\..\\def\\ghi"));
-	assertPathCanonicalize(TEXT("abc\\.\\def\\ghi"));
-	assertPathCanonicalize(TEXT("abc\\.\\.\\def\\ghi"));
-	assertPathCanonicalize(TEXT("abc\\def\\ghi"));
-	assertPathCanonicalize(TEXT("..\\abc\\def"));
-	assertPathCanonicalize(TEXT("..\\..\\abc\\def"));
-	assertPathCanonicalize(TEXT(".\\..\\abc\\def"));
-	assertPathCanonicalize(TEXT(".\\abc\\def"));
-	assertPathCanonicalize(TEXT(".\\.\\abc\\def"));
-	assertPathCanonicalize(TEXT(".\\..\\..\\abc\\def"));
-	assertPathCanonicalize(TEXT("..\\.\\abc\\def"));
-	assertPathCanonicalize(TEXT("..\\.\\..\\abc\\def"));
-	assertPathCanonicalize(TEXT("..\\..\\.\\abc\\def"));
-	assertPathCanonicalize(TEXT("abc\\def\\ghi\\..\\..\\jkl"));
-	assertPathCanonicalize(TEXT("abc\\def\\ghi\\..\\..\\.\\jkl"));
-	assertPathCanonicalize(TEXT("abc\\def\\ghi\\..\\.\\..\\jkl"));
-	assertPathCanonicalize(TEXT("abc\\def\\ghi\\.\\..\\..\\jkl"));
-	assertPathCanonicalize(TEXT("abc\\def\\.\\ghi\\..\\..\\jkl"));
+TEST(PathCanonicalizeTest, EndParent)
+{
+	EXPECT_TRUE(testPathCanonicalize(_T("abc\\def\\..")));
+	EXPECT_TRUE(testPathCanonicalize(_T("abc\\def\\ghi\\..")));
+}
 
+TEST(PathCanonicalizeTest, ParentMiddle)
+{
+	EXPECT_TRUE(testPathCanonicalize(_T("abc\\def\\..\\ghi")));
+	EXPECT_TRUE(testPathCanonicalize(_T("abc\\..\\def\\ghi")));
+}
 
-	// Single check for double backslashes
-	assertPathCanonicalize(TEXT("abc\\def\\\\ghi"));
+TEST(PathCanonicalizeTest, ParentEndBS)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("abc\\def\\ghi\\..\\")));
+}
 
+TEST(PathCanonicalizeTest, ParentParentMiddleOverflow)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("abc\\..\\..\\def\\ghi")));
+}
 
+TEST(PathCanonicalizeTest, ParentParentMiddle)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("abc\\def\\ghi\\..\\..\\jkl")));
+}
 
-	// Same tests but starting with a "\\"
-	assertPathCanonicalize(TEXT("\\abc\\def"));
-	assertPathCanonicalize(TEXT("\\abc\\def\\.."));
-	assertPathCanonicalize(TEXT("\\abc\\def\\..\\ghi"));
-	assertPathCanonicalize(TEXT("\\abc\\..\\def\\ghi"));
-	assertPathCanonicalize(TEXT("\\abc\\def\\ghi\\.."));
-	assertPathCanonicalize(TEXT("\\abc\\def\\ghi\\..\\"));
-	assertPathCanonicalize(TEXT("\\abc\\..\\..\\def\\ghi"));
-	assertPathCanonicalize(TEXT("\\abc\\.\\def\\ghi"));
-	assertPathCanonicalize(TEXT("\\abc\\.\\.\\def\\ghi"));
-	assertPathCanonicalize(TEXT("\\abc\\def\\ghi"));
-	assertPathCanonicalize(TEXT("\\..\\abc\\def"));
-	assertPathCanonicalize(TEXT("\\..\\..\\abc\\def"));
-	assertPathCanonicalize(TEXT("\\.\\..\\abc\\def"));
-	assertPathCanonicalize(TEXT("\\.\\abc\\def"));
-	assertPathCanonicalize(TEXT("\\.\\.\\abc\\def"));
-	assertPathCanonicalize(TEXT("\\.\\..\\..\\abc\\def"));
-	assertPathCanonicalize(TEXT("\\..\\.\\abc\\def"));
-	assertPathCanonicalize(TEXT("\\..\\.\\..\\abc\\def"));
-	assertPathCanonicalize(TEXT("\\..\\..\\.\\abc\\def"));
-	assertPathCanonicalize(TEXT("\\abc\\def\\ghi\\..\\..\\jkl"));
-	assertPathCanonicalize(TEXT("\\abc\\def\\ghi\\..\\..\\.\\jkl"));
-	assertPathCanonicalize(TEXT("\\abc\\def\\ghi\\..\\.\\..\\jkl"));
-	assertPathCanonicalize(TEXT("\\abc\\def\\ghi\\.\\..\\..\\jkl"));
-	assertPathCanonicalize(TEXT("\\abc\\def\\.\\ghi\\..\\..\\jkl"));
+TEST(PathCanonicalizeTest, SameMiddle)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("abc\\.\\def\\ghi")));
+}
 
-	// And now with a drive letter
-	assertPathCanonicalize(TEXT("C:\\abc\\def"));
-	assertPathCanonicalize(TEXT("C:\\abc\\def\\.."));
-	assertPathCanonicalize(TEXT("C:\\abc\\def\\..\\ghi"));
-	assertPathCanonicalize(TEXT("C:\\abc\\..\\def\\ghi"));
-	assertPathCanonicalize(TEXT("C:\\abc\\def\\ghi\\.."));
-	assertPathCanonicalize(TEXT("C:\\abc\\def\\ghi\\..\\"));
-	assertPathCanonicalize(TEXT("C:\\abc\\..\\..\\def\\ghi"));
-	assertPathCanonicalize(TEXT("C:\\abc\\.\\def\\ghi"));
-	assertPathCanonicalize(TEXT("C:\\abc\\.\\.\\def\\ghi"));
-	assertPathCanonicalize(TEXT("C:\\abc\\def\\ghi"));
-	assertPathCanonicalize(TEXT("C:\\..\\abc\\def"));
-	assertPathCanonicalize(TEXT("C:\\..\\..\\abc\\def"));
-	assertPathCanonicalize(TEXT("C:\\.\\..\\abc\\def"));
-	assertPathCanonicalize(TEXT("C:\\.\\abc\\def"));
-	assertPathCanonicalize(TEXT("C:\\.\\.\\abc\\def"));
-	assertPathCanonicalize(TEXT("C:\\.\\..\\..\\abc\\def"));
-	assertPathCanonicalize(TEXT("C:\\..\\.\\abc\\def"));
-	assertPathCanonicalize(TEXT("C:\\..\\.\\..\\abc\\def"));
-	assertPathCanonicalize(TEXT("C:\\..\\..\\.\\abc\\def"));
-	assertPathCanonicalize(TEXT("C:\\abc\\def\\ghi\\..\\..\\jkl"));
-	assertPathCanonicalize(TEXT("C:\\abc\\def\\ghi\\..\\..\\.\\jkl"));
-	assertPathCanonicalize(TEXT("C:\\abc\\def\\ghi\\..\\.\\..\\jkl"));
-	assertPathCanonicalize(TEXT("C:\\abc\\def\\ghi\\.\\..\\..\\jkl"));
-	assertPathCanonicalize(TEXT("C:\\abc\\def\\.\\ghi\\..\\..\\jkl"));
+TEST(PathCanonicalizeTest, SameSameMiddle)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("abc\\.\\.\\def\\ghi")));
+}
 
+TEST(PathCanonicalizeTest, ParentOverflow)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("..\\abc\\def")));
+}
 
-	// And the really ugly one, drive letter relative path
-	// (win32 version gets this wrong, so we have to too, "C:..\\abc\\def" becomes "\abc\def")
-	assertPathCanonicalize(TEXT("C:abc\\def"));
-	assertPathCanonicalize(TEXT("C:abc\\def\\.."));
-	assertPathCanonicalize(TEXT("C:abc\\def\\..\\ghi"));
-	assertPathCanonicalize(TEXT("C:abc\\..\\def\\ghi"));
-	assertPathCanonicalize(TEXT("C:abc\\def\\ghi\\.."));
-	assertPathCanonicalize(TEXT("C:abc\\def\\ghi\\..\\"));
-	assertPathCanonicalize(TEXT("C:abc\\..\\..\\def\\ghi"));
-	assertPathCanonicalize(TEXT("C:abc\\.\\def\\ghi"));
-	assertPathCanonicalize(TEXT("C:abc\\.\\.\\def\\ghi"));
-	assertPathCanonicalize(TEXT("C:abc\\def\\ghi"));
-	assertPathCanonicalize(TEXT("C:..\\abc\\def"));
-	assertPathCanonicalize(TEXT("C:..\\..\\abc\\def"));
-	assertPathCanonicalize(TEXT("C:.\\..\\abc\\def"));
-	assertPathCanonicalize(TEXT("C:.\\abc\\def"));
-	assertPathCanonicalize(TEXT("C:.\\.\\abc\\def"));
-	assertPathCanonicalize(TEXT("C:.\\..\\..\\abc\\def"));
-	assertPathCanonicalize(TEXT("C:..\\.\\abc\\def"));
-	assertPathCanonicalize(TEXT("C:..\\.\\..\\abc\\def"));
-	assertPathCanonicalize(TEXT("C:..\\..\\.\\abc\\def"));
-	assertPathCanonicalize(TEXT("C:abc\\def\\ghi\\..\\..\\jkl"));
-	assertPathCanonicalize(TEXT("C:abc\\def\\ghi\\..\\..\\.\\jkl"));
-	assertPathCanonicalize(TEXT("C:abc\\def\\ghi\\..\\.\\..\\jkl"));
-	assertPathCanonicalize(TEXT("C:abc\\def\\ghi\\.\\..\\..\\jkl"));
-	assertPathCanonicalize(TEXT("C:abc\\def\\.\\ghi\\..\\..\\jkl"));
+TEST(PathCanonicalizeTest, ParentParentOverflow)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("..\\..\\abc\\def")));
+}
 
+TEST(PathCanonicalizeTest, SameParentOverflow)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T(".\\..\\abc\\def")));
+}
+
+TEST(PathCanonicalizeTest, SameDir)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T(".\\abc\\def")));
+}
+
+TEST(PathCanonicalizeTest, SameSameDir)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T(".\\.\\abc\\def")));
+}
+
+TEST(PathCanonicalizeTest, SameParentParentOverflow)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T(".\\..\\..\\abc\\def")));
+}
+
+TEST(PathCanonicalizeTest, ParentSameOverflow)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("..\\.\\abc\\def")));
+}
+
+TEST(PathCanonicalizeTest, ParentSameParentOverflow)
+{
+	EXPECT_TRUE(testPathCanonicalize(_T("..\\.\\..\\abc\\def")));
+	EXPECT_TRUE(testPathCanonicalize(_T("..\\..\\.\\abc\\def")));
+}
+
+TEST(PathCanonicalizeTest, ParentParentSameMiddle)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("abc\\def\\ghi\\..\\..\\.\\jkl")));
+}
+
+TEST(PathCanonicalizeTest, ParentSameParentMiddle)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("abc\\def\\ghi\\..\\.\\..\\jkl")));
+}
+
+TEST(PathCanonicalizeTest, SameParentParentMiddle)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("abc\\def\\ghi\\.\\..\\..\\jkl")));
+}
+
+TEST(PathCanonicalizeTest, SameDirParentParentMiddle)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("abc\\def\\.\\ghi\\..\\..\\jkl")));
+}
+
+// Single check for double backslashes
+TEST(PathCanonicalizeTest, DoubleBackSlashes)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("abc\\def\\\\ghi")));
+}
+
+// Same tests but starting with a "\\"
+TEST(PathCanonicalizeTest, BSNormalDirs)
+{
+	EXPECT_TRUE(testPathCanonicalize(_T("\\abc\\def")));
+	EXPECT_TRUE(testPathCanonicalize(_T("\\abc\\def\\ghi")));
+}
+
+TEST(PathCanonicalizeTest, BSEndParent)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("\\abc\\def\\..")));
+}
+
+TEST(PathCanonicalizeTest, BSParentMiddle)
+{
+	EXPECT_TRUE(testPathCanonicalize(_T("\\abc\\def\\..\\ghi")));
+	EXPECT_TRUE(testPathCanonicalize(_T("\\abc\\..\\def\\ghi")));
+}
+
+TEST(PathCanonicalizeTest, BSParentEnd)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("\\abc\\def\\ghi\\..")));
+}
+
+TEST(PathCanonicalizeTest, BSParentEndBS)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("\\abc\\def\\ghi\\..\\")));
+}
+
+TEST(PathCanonicalizeTest, BSParentParentMiddleOverflow)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("\\abc\\..\\..\\def\\ghi")));
+
+}
+
+TEST(PathCanonicalizeTest, BSSameMiddle)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("\\abc\\.\\def\\ghi")));
+}
+
+TEST(PathCanonicalizeTest, BSSameDirSameDirMiddle)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("\\abc\\.\\.\\def\\ghi")));
+}
+
+TEST(PathCanonicalizeTest, BSParentDir)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("\\..\\abc\\def")));
+}
+
+TEST(PathCanonicalizeTest, BSParentParent)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("\\..\\..\\abc\\def")));
+}
+
+TEST(PathCanonicalizeTest, BSSameParentDir)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("\\.\\..\\abc\\def")));
+}
+
+TEST(PathCanonicalizeTest, BSSameDir)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("\\.\\abc\\def")));
+}
+
+TEST(PathCanonicalizeTest, BSSameSameDir)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("\\.\\.\\abc\\def")));
+}
+
+TEST(PathCanonicalizeTest, BSSameParentParent)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("\\.\\..\\..\\abc\\def")));
+}
+
+TEST(PathCanonicalizeTest, BSParentSame)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("\\..\\.\\abc\\def")));
+}
+
+TEST(PathCanonicalizeTest, BSParentSameParent)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("\\..\\.\\..\\abc\\def")));
+}
+
+TEST(PathCanonicalizeTest, BSParentParentSame)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("\\..\\..\\.\\abc\\def")));
+}
+
+TEST(PathCanonicalizeTest, BSParentParentMiddleNoOverflow)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("\\abc\\def\\ghi\\..\\..\\jkl")));
+}
+
+TEST(PathCanonicalizeTest, BSParentParentSameMiddle)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("\\abc\\def\\ghi\\..\\..\\.\\jkl")));
+}
+
+TEST(PathCanonicalizeTest, BSParentSameParentMiddle)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("\\abc\\def\\ghi\\..\\.\\..\\jkl")));
+}
+
+TEST(PathCanonicalizeTest, BSSameParentParentMiddle)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("\\abc\\def\\ghi\\.\\..\\..\\jkl")));
+}
+
+TEST(PathCanonicalizeTest, BSSameDirParentParentMiddle)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("\\abc\\def\\.\\ghi\\..\\..\\jkl")));
+}
+
+TEST(PathCanonicalizeTest, DriveNormal)
+{
+	EXPECT_TRUE(testPathCanonicalize(_T("C:\\abc\\def")));
+	EXPECT_TRUE(testPathCanonicalize(_T("C:\\abc\\def\\ghi")));
+}
+
+TEST(PathCanonicalizeTest, DriveParentEnd)
+{
+	EXPECT_TRUE(testPathCanonicalize(_T("C:\\abc\\def\\..")));
+	EXPECT_TRUE(testPathCanonicalize(_T("C:\\abc\\def\\ghi\\..")));
+}
+
+TEST(PathCanonicalizeTest, DriveParentMiddle)
+{
+	EXPECT_TRUE(testPathCanonicalize(_T("C:\\abc\\def\\..\\ghi")));
+	EXPECT_TRUE(testPathCanonicalize(_T("C:\\abc\\..\\def\\ghi")));
+}
+
+TEST(PathCanonicalizeTest, DriveParentEndBS)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("C:\\abc\\def\\ghi\\..\\")));
+}
+
+TEST(PathCanonicalizeTest, DriveParentParentMiddleOverflow)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("C:\\abc\\..\\..\\def\\ghi")));
+}
+
+TEST(PathCanonicalizeTest, DriveSameMiddle)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("C:\\abc\\.\\def\\ghi")));
+}
+
+TEST(PathCanonicalizeTest, DriveSameSameMiddle)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("C:\\abc\\.\\.\\def\\ghi")));
+}
+
+TEST(PathCanonicalizeTest, DriveParentOverflow)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("C:\\..\\abc\\def")));
+}
+
+TEST(PathCanonicalizeTest, DriveParentParentOverflow)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("C:\\..\\..\\abc\\def")));
+}
+
+TEST(PathCanonicalizeTest, DriveSameParentOverflow)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("C:\\.\\..\\abc\\def")));
+}
+
+TEST(PathCanonicalizeTest, DriveSame)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("C:\\.\\abc\\def")));
+}
+
+TEST(PathCanonicalizeTest, DriveSameSame)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("C:\\.\\.\\abc\\def")));
+}
+
+TEST(PathCanonicalizeTest, DriveSameParentParentOverflow)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("C:\\.\\..\\..\\abc\\def")));
+}
+
+TEST(PathCanonicalizeTest, DriveParentSameOverflow)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("C:\\..\\.\\abc\\def")));
+}
+
+TEST(PathCanonicalizeTest, DriveParentSameParentOverflow)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("C:\\..\\.\\..\\abc\\def")));
+}
+
+TEST(PathCanonicalizeTest, DriveParentParentSameOverflow)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("C:\\..\\..\\.\\abc\\def")));
+}
+
+TEST(PathCanonicalizeTest, DriveParentParentMiddle)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("C:\\abc\\def\\ghi\\..\\..\\jkl")));
+}
+
+TEST(PathCanonicalizeTest, DriveParentParentSameMiddle)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("C:\\abc\\def\\ghi\\..\\..\\.\\jkl")));
+}
+
+TEST(PathCanonicalizeTest, DriveParentSameParentMiddle)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("C:\\abc\\def\\ghi\\..\\.\\..\\jkl")));
+}
+
+TEST(PathCanonicalizeTest, DriveSameParentParentMiddle)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("C:\\abc\\def\\ghi\\.\\..\\..\\jkl")));
+}
+
+TEST(PathCanonicalizeTest, DriveSameDirParentParentMiddle)
+{
+	ASSERT_TRUE(testPathCanonicalize(_T("C:\\abc\\def\\.\\ghi\\..\\..\\jkl")));
 }
 
 
@@ -541,13 +751,19 @@ TEST(CompareNoCaseTest, CompareTwoEqualStringsDifferentCases)
 	ASSERT_EQ(0, res);
 }
 
+TEST(CompareNoCaseTest, CompareTwoEqualStringsDifferentCasesMixedCase)
+{
+	int res = CompareNoCase(TEXT("blah"), TEXT("BlAh"));
+	ASSERT_EQ(0, res);
+}
+
 TEST(CompareNoCaseTest, CompareTwoDifferentStringsFisrtSmaller)
 {
 	int res = CompareNoCase(TEXT("blah"), TEXT("clah"));
 	ASSERT_EQ(-1, res);
 }
 
-TEST(CompareNoCaseTest, CompareTwoDifferentStringsFisrtBigger)
+TEST(CompareNoCaseTest, CompareTwoDifferentStringsFirstBigger)
 {
 	int res = CompareNoCase(TEXT("blah"), TEXT("alah"));
 	ASSERT_EQ(1, res);
