@@ -618,7 +618,7 @@ protected:
 	void updateHotspotMaps();
 	bool IsHotspotStyleID(int styleID) const;
 	bool getHotSpotFromStyle(Style& out_hotspot, int idStyleFrom) const;
-	void createHotSpotFromStyle(Style& out_hotspot, int idStyleFrom) const;
+	void createHotSpotFromStyle(Style& out_hotspot, int idStyleFrom, int nativeLangEncoding = -1) const;
 	void setHotspotStyle(Style& styleToSet, int originalStyleId);
 	void setStyle(Style styleToSet);			//NOT by reference	(style edited)
 	void setSpecialStyle(const Style& styleToSet);	//by reference

@@ -2582,10 +2582,31 @@ bool ScintillaEditView::getHotSpotFromStyle(Style& out_hotspot, int idStyleFrom)
 	return false;
 }
 
-void ScintillaEditView::createHotSpotFromStyle(Style& out_hotspot, int idStyleFrom) const
+void ScintillaEditView::createHotSpotFromStyle(Style& out_hotspot, int idStyleFrom, int nativeLangEncoding) const
 {
-	//TCHAR fontName[256];
-	//_pEditView->execute(SCI_STYLEGETFONT, idStyle, (LPARAM)fontName);
+	// TODO
+	// Joce: HACK HACK HACK HACK HACK :-/
+	// nativeLangEncoding should be made part of WcharMbcsConvertor
+	static int nativeLangEncodingCopy = -1;
+	if (nativeLangEncodingCopy >= 0 && nativeLangEncodingCopy != nativeLangEncoding)
+	{
+		nativeLangEncodingCopy = nativeLangEncoding;
+	}
+	// End HACK
+
+	char fontNameA[128];
+
+	execute(SCI_STYLEGETFONT, idStyleFrom, (LPARAM)fontNameA);
+	TCHAR *generic_fontname = new TCHAR[128];
+#ifdef UNICODE
+	WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
+	const wchar_t * fontNameW = wmc->char2wchar(fontNameA, nativeLangEncodingCopy);
+	lstrcpy(generic_fontname, fontNameW);
+#else
+	lstrcpy(generic_fontname, fontNameA);
+#endif
+	out_hotspot._fontName = generic_fontname;
+
 	out_hotspot._fgColor = execute(SCI_STYLEGETFORE, idStyleFrom);
 	out_hotspot._bgColor = execute(SCI_STYLEGETBACK, idStyleFrom);
 	out_hotspot._fontSize = execute(SCI_STYLEGETSIZE, idStyleFrom);
