@@ -2860,7 +2860,6 @@ void Notepad_plus::addHotSpot(bool docIsModifing)
 			ch = (UCHAR)_pEditView->execute(SCI_GETCHARAT, posBegin2style--);
 		}
 	}
-	int style_hotspot = 30;
 
 	int startPos = 0;
 	int endPos = _pEditView->execute(SCI_GETTEXTLENGTH);
@@ -2872,6 +2871,7 @@ void Notepad_plus::addHotSpot(bool docIsModifing)
 
 	vector<pair<int, int> > hotspotStylers;
 
+	int style_hotspot = 30;
 	int posFound = _pEditView->execute(SCI_SEARCHINTARGET, strlen(urlHttpRegExpr), (LPARAM)urlHttpRegExpr);
 
 	while (posFound != -1)
@@ -2894,9 +2894,9 @@ void Notepad_plus::addHotSpot(bool docIsModifing)
 				if (hotspotStylers[i].second == idStyle)
 				{
 					fs = hotspotStylers[i].first;
-					break;
+						break;
+					}
 				}
-			}
 
 			if (fs != -1)
 			{
@@ -2928,10 +2928,11 @@ void Notepad_plus::addHotSpot(bool docIsModifing)
 				if (urlAction == 2)
 					hotspotStyle._fontStyle |= FONTSTYLE_UNDERLINE;
 
-				_pEditView->setStyle(hotspotStyle);
+				_pEditView->setHotspotStyle(hotspotStyle);
 
 				_pEditView->execute(SCI_STYLESETHOTSPOT, style_hotspot, TRUE);
 				_pEditView->execute(SCI_SETHOTSPOTACTIVEFORE, TRUE, activeFG);
+				//_pEditView->execute(SCI_SETHOTSPOTACTIVEBACK, TRUE, activeBG);
 				_pEditView->execute(SCI_SETHOTSPOTSINGLELINE, style_hotspot, 0);
 				_pEditView->execute(SCI_STARTSTYLING, start, 0x1F);
 				_pEditView->execute(SCI_SETSTYLING, foundTextLen, style_hotspot);
@@ -2946,7 +2947,6 @@ void Notepad_plus::addHotSpot(bool docIsModifing)
 
 		posFound = _pEditView->execute(SCI_SEARCHINTARGET, strlen(urlHttpRegExpr), (LPARAM)urlHttpRegExpr);
 	}
-
 
 	_pEditView->execute(SCI_STARTSTYLING, endStyle, 0xFF);
 	_pEditView->execute(SCI_SETSTYLING, 0, 0);

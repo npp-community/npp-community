@@ -140,6 +140,11 @@ public:
 		{
 			::FreeLibrary(_hLib);
 		}
+
+		for (BufferStyleMap::iterator it(_hotspotStyles.begin()); it != _hotspotStyles.end(); ++it )
+		{
+			delete it->second;
+		}
 	};
 	virtual void destroy()
 	{
@@ -588,6 +593,10 @@ protected:
 
 	bool _wrapRestoreNeeded;
 
+	typedef std::map<int, Style> StyleMap;
+	typedef std::map<BufferID, StyleMap*> BufferStyleMap;
+	BufferStyleMap _hotspotStyles;
+
 //Lexers and Styling
 	void defineDocType(LangType typeDoc);	//setup stylers for active document
 	void restyleBuffer();
@@ -595,9 +604,10 @@ protected:
 	void setKeywords(LangType langType, const char *keywords, int index);
 	void setLexer(int lexerID, LangType langType, int whichList);
 	inline void makeStyle(LangType langType, const TCHAR **keywordArray = NULL);
+	void setHotspotStyle(Style& styleToSet);
 	void setStyle(Style styleToSet);			//NOT by reference	(style edited)
-	void setSpecialStyle(Style & styleToSet);	//by reference
-	void setSpecialIndicator(Style & styleToSet) {
+	void setSpecialStyle(const Style& styleToSet);	//by reference
+	void setSpecialIndicator(const Style& styleToSet) {
 		execute(SCI_INDICSETFORE, styleToSet._styleID, styleToSet._bgColor);
 	};
 
