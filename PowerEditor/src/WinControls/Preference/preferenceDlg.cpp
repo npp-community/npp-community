@@ -631,6 +631,7 @@ BOOL CALLBACK SettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPara
 
 			::SendDlgItemMessage(_hSelf, IDC_CHECK_MIN2SYSTRAY, BM_SETCHECK, nppGUI._isMinimizedToTray, 0);
 			::SendDlgItemMessage(_hSelf, IDC_CHECK_REMEMBERSESSION, BM_SETCHECK, nppGUI._rememberLastSession, 0);
+			::SendDlgItemMessage(_hSelf, IDC_CHECK_ENABLEWHEELZOOM, BM_SETCHECK, nppGUI._enableMouseWheelZoom, 0);
 			::SendDlgItemMessage(_hSelf, IDC_CHECK_AUTOUPDATE, BM_SETCHECK, !nppGUI._neverUpdate, 0);
 
 			::ShowWindow(::GetDlgItem(_hSelf, IDC_CHECK_AUTOUPDATE), nppGUI._doesExistUpdater?SW_SHOW:SW_HIDE);
@@ -766,6 +767,13 @@ BOOL CALLBACK SettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPara
 					//::SendMessage(_hParent, WM_COMMAND, IDM_SETTING_REMEMBER_LAST_SESSION, 0);
 					nppGUI._rememberLastSession = isCheckedOrNot(wParam);
 					return TRUE;
+
+				case IDC_CHECK_ENABLEWHEELZOOM:
+				{
+					nppGUI._enableMouseWheelZoom = isCheckedOrNot(wParam);
+					::SendMessage(_hParent, WM_COMMAND, IDM_SETTING_MENU_WHEEL, 0);
+					return TRUE;
+				}
 
 				case IDM_SETTING_HISTORY_SIZE:
 				{

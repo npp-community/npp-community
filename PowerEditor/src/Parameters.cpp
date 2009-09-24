@@ -2719,6 +2719,22 @@ void NppParameters::feedGUIParameters(TiXmlNode *node)
 			}
 		}
 
+		else if (!lstrcmp(nm, TEXT("EnableWheelZoom")))
+		{
+			TiXmlNode *n = childNode->FirstChild();
+			if (n)
+			{
+				val = n->Value();
+				if (val)
+				{
+					if (!lstrcmp(val, TEXT("yes")))
+						_nppGUI._enableMouseWheelZoom = true;
+					else
+						_nppGUI._enableMouseWheelZoom = false;
+				}
+			}
+		}
+
 		else if (!lstrcmp(nm, TEXT("TagsMatchHighLight")))
 		{
 			TiXmlNode *n = childNode->FirstChild();
@@ -3542,6 +3558,7 @@ bool NppParameters::writeGUIParams()
 	bool menuBarExist = false;
 	bool smartHighLightExist = false;
 	bool tagsMatchHighLightExist = false;
+	bool mouseWheelZoomExist = false;
 	bool caretExist = false;
 	bool openSaveDirExist = false;
 	bool titleBarExist = false;
@@ -3718,7 +3735,16 @@ bool NppParameters::writeGUIParams()
 			else
 				childNode->InsertEndChild(TiXmlText(pStr));
 		}
-
+		else if (!lstrcmp(nm, TEXT("EnableWheelZoom")))
+		{
+			mouseWheelZoomExist = true;
+			const TCHAR *pStr = _nppGUI._enableMouseWheelZoom?TEXT("yes"):TEXT("no");
+			TiXmlNode *n = childNode->FirstChild();
+			if (n)
+				n->SetValue(pStr);
+			else
+				childNode->InsertEndChild(TiXmlText(pStr));
+		}
 		else if (!lstrcmp(nm, TEXT("TagsMatchHighLight")))
 		{
 			tagsMatchHighLightExist = true;
@@ -3937,6 +3963,10 @@ bool NppParameters::writeGUIParams()
 	if (!smartHighLightExist)
 	{
 		insertGUIConfigBoolNode(GUIRoot, TEXT("SmartHighLight"), _nppGUI._enableSmartHilite);
+	}
+	if (!mouseWheelZoomExist)
+	{
+		insertGUIConfigBoolNode(GUIRoot, TEXT("EnableWheelZoom"), _nppGUI._enableMouseWheelZoom);
 	}
 	if (!tagsMatchHighLightExist)
 	{

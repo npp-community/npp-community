@@ -303,6 +303,14 @@ public:
 		return (execute(SCI_GETINDENTATIONGUIDES) != 0);
 	};
 
+	bool isMouseWheelZoomEnable() const {
+		return (execute(SCI_GETWHEELZOOMING) != 0);
+	};
+
+	bool enableMouseWheelZoom(bool enable) {
+		execute(SCI_SETWHEELZOOMING, WPARAM(enable));
+	};
+
     void wrap(bool willBeWrapped = true) {
         execute(SCI_SETWRAPMODE, (WPARAM)willBeWrapped);
     };
