@@ -430,19 +430,6 @@ void ScintillaEditView::setSpecialStyle(const Style & styleToSet)
 		execute(SCI_STYLESETSIZE, styleID, styleToSet._fontSize);
 }
 
-void ScintillaEditView::setHotspotStyle(Style& styleToSet)
-{
-	StyleMap* styleMap;
-	if( _hotspotStyles.find(_currentBuffer) == _hotspotStyles.end() )
-	{
-		_hotspotStyles[_currentBuffer] = new StyleMap;
-	}
-
-	styleMap = _hotspotStyles[_currentBuffer];
-	(*styleMap)[styleToSet._styleID] = styleToSet;
-	setStyle(styleToSet);
-}
-
 void ScintillaEditView::setStyle(Style styleToSet)
 {
 	GlobalOverride & go = _pParameter->getGlobalOverrideStyle();
@@ -1323,15 +1310,7 @@ void ScintillaEditView::defineDocType(LangType typeDoc)
 	int bitsNeeded = execute(SCI_GETSTYLEBITSNEEDED);
 	execute(SCI_SETSTYLEBITS, bitsNeeded);
 
-	// Reapply the hotspot styles.
-	if (_hotspotStyles.find(_currentBuffer) != _hotspotStyles.end())
-	{
-		StyleMap* currentStyleMap = _hotspotStyles[_currentBuffer];
-		for (StyleMap::iterator it(currentStyleMap->begin()); it != currentStyleMap->end(); ++it)
-		{
-			setStyle(it->second);
-		}
-	}
+	reapplyHotspotStyles();
 }
 
 BufferID ScintillaEditView::attachDefaultDoc()
@@ -1443,6 +1422,8 @@ void ScintillaEditView::activateBuffer(BufferID buffer)
 	// the ref count of old current doc and increase the one of the new doc. FileManager should manage the rest
 	// Note that the actual reference in the Buffer itself is NOT decreased, Notepad_plus does that if neccessary
 	execute(SCI_SETDOCPOINTER, 0, _currentBuffer->getDocument());
+
+	updateHotspotMaps();
 
 	// Due to execute(SCI_CLEARDOCUMENTSTYLE); in defineDocType() function
 	// defineDocType() function should be called here, but not be after the fold info loop
@@ -2571,6 +2552,90 @@ void ScintillaEditView::runMarkers(bool doHide, int searchStart, bool endOfDoc, 
 					startShowing = execute(SCI_GETLASTCHILD, i, (levelLine & SC_FOLDLEVELNUMBERMASK));
 				}
 			}
+		}
+	}
+}
+
+bool ScintillaEditView::IsHotspotStyleID(int styleID) const
+{
+	if (_currentHotspotOriginMap)
+	{
+		return _currentHotspotOriginMap->find(styleID) != _currentHotspotOriginMap->end();
+	}
+	return false;
+}
+
+void ScintillaEditView::setHotspotStyle(Style& styleToSet, int originalStyleId)
+{
+	(*_currentHotspotStyleMap)[originalStyleId] = styleToSet;
+	(*_currentHotspotOriginMap)[styleToSet._styleID] = originalStyleId;
+	setStyle(styleToSet);
+}
+
+bool ScintillaEditView::getHotSpotFromStyle(Style& out_hotspot, int idStyleFrom) const
+{
+	if (_currentHotspotStyleMap->find(idStyleFrom) != _currentHotspotStyleMap->end())
+	{
+		out_hotspot = (*_currentHotspotStyleMap)[idStyleFrom];
+		return true;
+	}
+	return false;
+}
+
+void ScintillaEditView::createHotSpotFromStyle(Style& out_hotspot, int idStyleFrom) const
+{
+	//TCHAR fontName[256];
+	//_pEditView->execute(SCI_STYLEGETFONT, idStyle, (LPARAM)fontName);
+	out_hotspot._fgColor = execute(SCI_STYLEGETFORE, idStyleFrom);
+	out_hotspot._bgColor = execute(SCI_STYLEGETBACK, idStyleFrom);
+	out_hotspot._fontSize = execute(SCI_STYLEGETSIZE, idStyleFrom);
+
+	int isBold = execute(SCI_STYLEGETBOLD, idStyleFrom);
+	int isItalic = execute(SCI_STYLEGETITALIC, idStyleFrom);
+	int isUnderline = execute(SCI_STYLEGETUNDERLINE, idStyleFrom);
+	out_hotspot._fontStyle = (isBold?FONTSTYLE_BOLD:0) | (isItalic?FONTSTYLE_ITALIC:0) | (isUnderline?FONTSTYLE_UNDERLINE:0);
+
+	int urlAction = (NppParameters::getInstance())->getNppGUI()._styleURL;
+	if (urlAction == 2)
+		out_hotspot._fontStyle |= FONTSTYLE_UNDERLINE;
+
+	int style_hotspot = out_hotspot._styleID;
+	int activeFG = 0xFF0000;
+
+	execute(SCI_STYLESETHOTSPOT, style_hotspot, TRUE);
+	execute(SCI_SETHOTSPOTACTIVEFORE, TRUE, activeFG);
+	//execute(SCI_SETHOTSPOTACTIVEBACK, TRUE, activeBG);
+	execute(SCI_SETHOTSPOTSINGLELINE, style_hotspot, 0);
+
+}
+
+void ScintillaEditView::updateHotspotMaps()
+{
+	if( _hotspotStyles.find(_currentBufferID) == _hotspotStyles.end() )
+	{
+		_hotspotStyles[_currentBufferID] = new StyleMap;
+	}
+	_currentHotspotStyleMap = _hotspotStyles[_currentBufferID];
+
+	if( _hotspotOrigins.find(_currentBufferID) == _hotspotOrigins.end() )
+	{
+		_hotspotOrigins[_currentBufferID] = new HotspotOriginMap;
+	}
+	_currentHotspotOriginMap = _hotspotOrigins[_currentBufferID];
+
+}
+
+void ScintillaEditView::reapplyHotspotStyles()
+{
+	if (_currentHotspotStyleMap && _currentHotspotOriginMap)
+	{
+		for (StyleMap::iterator it(_currentHotspotStyleMap->begin()); it != _currentHotspotStyleMap->end(); ++it)
+		{
+			Style& hotspotStyle = it->second;
+			int originalStyleId = (*_currentHotspotOriginMap)[hotspotStyle._styleID];
+
+			createHotSpotFromStyle(hotspotStyle, originalStyleId);
+			setStyle(hotspotStyle);
 		}
 	}
 }

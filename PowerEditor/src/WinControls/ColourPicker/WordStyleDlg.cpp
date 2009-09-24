@@ -809,6 +809,11 @@ void WordStyleDlg::create(int dialogID, bool isRTL)
 
 void WordStyleDlg::apply()
 {
+	LexerStylerArray & lsa = (NppParameters::getInstance())->getLStylerArray();
+	StyleArray & globalStyles = (NppParameters::getInstance())->getGlobalStylers();
+	lsa = _lsArray;
+	globalStyles = _globalStyles;
+
 	::EnableWindow(::GetDlgItem(_hSelf, IDOK), FALSE);
 	::SendMessage(_hParent, WM_UPDATESCINTILLAS, 0, 0);
 }
