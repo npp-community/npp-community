@@ -20,10 +20,16 @@ Thumbs.db
 *.ilk
 *.log
 [Bb]in
-[Db]ebug*/
+[Dd]ebug*/
 *.lib
 *.sbr
 obj/
 [Rr]elease*/
 _ReSharper*/
 [Tt]est[Rr]esult*
+# Joce's ignore list
+UpgradeLog*.XML
+UpgradeReport*.*
+*.lnt
+*.old
+
