@@ -2932,7 +2932,7 @@ void Notepad_plus::addHotSpot(bool docIsModifing)
 				if (_pEditView->getHotSpotFromStyle(hotspotStyle, idStyle) == false)
 				{
 					hotspotStyle._styleID = style_hotspot;
-					_pEditView->createHotSpotFromStyle(hotspotStyle, idStyle);
+					_pEditView->createHotSpotFromStyle(hotspotStyle, idStyle, _nativeLangEncoding);
 					_pEditView->setHotspotStyle(hotspotStyle, idStyle);
 				}
 
