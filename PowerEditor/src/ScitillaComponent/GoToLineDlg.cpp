@@ -15,10 +15,11 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+#include "precompiled_headers.h"
 #include "GoToLineDlg.h"
 
 
-BOOL CALLBACK GoToLineDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK GoToLineDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	switch (message)
 	{
@@ -98,7 +99,6 @@ BOOL CALLBACK GoToLineDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lPara
 		default :
 			return FALSE;
 	}
-	return FALSE;
 }
 
 

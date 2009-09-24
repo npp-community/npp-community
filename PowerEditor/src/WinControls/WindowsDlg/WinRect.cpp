@@ -6,14 +6,13 @@
 // Set tabsize = 3 in your editor.
 //
 //#include "StdAfx.h"
-#include "windows.h"
-#include <assert.h>
+#include "precompiled_headers.h"
 #include "WinMgr.h"
 
 //////////////////
 // Construct from args
 //
-WINRECT::WINRECT(WORD f, UINT id, LONG p)
+WINRECT::WINRECT(WORD f, INT id, LONG p)
 {
 	memset(this, 0, sizeof(WINRECT));
 	flags = f;

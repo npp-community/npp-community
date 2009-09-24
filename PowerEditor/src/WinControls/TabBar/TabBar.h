@@ -20,9 +20,6 @@
 
 #include "Window.h"
 
-#ifndef _WIN32_IE
-#define _WIN32_IE	0x0600
-#endif //_WIN32_IE
 
 //Notification message
 #define TCN_TABDROPPED (TCN_FIRST - 10)
@@ -34,7 +31,6 @@
 const int marge = 8;
 const int nbCtrlMax = 10;
 
-#include <commctrl.h>
 #include "menuCmdID.h"
 #include "resource.h"
 
@@ -134,7 +130,7 @@ public:
 
 
 protected:
-	size_t _nbItem;
+	int  _nbItem;
 	bool _hasImgLst;
 	HFONT _hFont;
 	HFONT _hLargeFont;

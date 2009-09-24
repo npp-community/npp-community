@@ -20,8 +20,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include <stdio.h>
-#include <assert.h>
 #include "Parameters.h"
 
 #ifdef _MSC_VER

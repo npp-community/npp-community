@@ -4,7 +4,6 @@
 	Version="9.00"
 	Name="SciLexer"
 	ProjectGUID="{55121E73-EAE3-438B-A537-BABBCA29B084}"
-	RootNamespace="SciLexer"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -95,7 +94,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /Y $(TargetPath) ..\..\PowerEditor\bin"
 			/>
 		</Configuration>
 		<Configuration
@@ -175,7 +173,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /Y $(TargetPath) ..\..\PowerEditor\bin"
 			/>
 		</Configuration>
 	</Configurations>

@@ -22,14 +22,10 @@ must not be misrepresented as being the original software.
 distribution.
 */
 
+#include "precompiled_headers.h"
 #include "tinyxml.h"
 
 #ifndef TIXML_USE_STL
-
-
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
 
 #include "tinystr.h"
 

@@ -22,7 +22,6 @@
 #include "Window.h"
 #include "Notepad_plus_msgs.h"
 
-#include <uxtheme.h>
 
 typedef HRESULT (WINAPI * ETDTProc) (HWND, DWORD);
 

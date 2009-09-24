@@ -1,4 +1,4 @@
-#include <windows.h>
+#include "precompiled_headers.h"
 #include "WindowsDlg.h"
 #include "WindowsDlgRc.h"
 
@@ -16,7 +16,7 @@ BOOL SizeableDlg::onInitDialog()
 	return TRUE;
 }
 
-void SizeableDlg::onSize(UINT nType, int cx, int cy)
+void SizeableDlg::onSize(UINT /*nType*/, int cx, int cy)
 {
 	_winMgr.CalcLayout(cx,cy,_hSelf);
 	_winMgr.SetWindowPositions(_hSelf);
@@ -27,7 +27,7 @@ void SizeableDlg::onGetMinMaxInfo(MINMAXINFO* lpMMI)
 	_winMgr.GetMinMaxInfo(_hSelf, lpMMI);
 }
 
-LRESULT SizeableDlg::onWinMgr(WPARAM wp, LPARAM lp)
+LRESULT SizeableDlg::onWinMgr(WPARAM /*wp*/, LPARAM /*lp*/)
 {
 	return 0;
 }

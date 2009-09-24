@@ -1,9 +1,6 @@
 #ifndef LASTRECENTFILELIST_H
 #define LASTRECENTFILELIST_H
 
-#include <deque>
-#include <string>
-#include "windows.h"
 #include "Parameters.h"
 
 struct RecentItem {

@@ -40,7 +40,7 @@
 	#define	IDM_FILE_DELETE		     	(IDM_FILE + 16)
 	#define	IDM_FILE_RENAME		     	(IDM_FILE + 17)
 
- // A mettre à jour si on ajoute nouveau menu item dans le menu "File"
+ // To update if we add a new menu item in the "File" menu
 	#define	IDM_FILEMENU_LASTONE	IDM_FILE_RENAME
 
 #define	IDM_EDIT       (IDM + 2000)
@@ -294,6 +294,7 @@
 	#define	IDM_SETTING_PREFERECE     (IDM_SETTING + 11)
 
 	#define	IDM_SETTING_AUTOCNBCHAR        (IDM_SETTING + 15)
+	#define	IDM_SETTING_MENU_WHEEL         (IDM_SETTING + 16)
 
 // Menu macro
 	#define	IDM_MACRO_STARTRECORDINGMACRO    (IDM_EDIT + 18)

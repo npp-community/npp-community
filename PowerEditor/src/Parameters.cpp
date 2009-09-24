@@ -15,16 +15,16 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+#include "precompiled_headers.h"
 #include "Parameters.h"
 #include "FileDialog.h"
 #include "ScintillaEditView.h"
-#include <shlobj.h>
 
 #include "keys.h"
 
 struct WinMenuKeyDefinition {	//more or less matches accelerator table definition, easy copy/paste
 	//const TCHAR * name;	//name retrieved from menu?
-	int vKey;
+	UCHAR vKey;
 	int functionId;
 	bool isCtrl;
 	bool isAlt;
@@ -39,7 +39,7 @@ struct ScintillaKeyDefinition {
 	bool isCtrl;
 	bool isAlt;
 	bool isShift;
-	int vKey;
+	UCHAR vKey;
 	int redirFunctionId;	//this gets set  when a function is being redirected through Notepad++ if Scintilla doesnt do it properly :)
 };
 
@@ -328,6 +328,41 @@ ScintillaKeyDefinition scintKeyDefs[] = {	//array of accelerator keys for all po
 	//{TEXT("SCI_STYLECLEARALL"),			SCI_STYLECLEARALL,			false, false, false, 0,			0},
 	//
 };
+
+static int strVal(const TCHAR *str, int base) {
+	if (!str) return -1;
+	if (!str[0]) return 0;
+
+	TCHAR *finStr;
+	int result = generic_strtol(str, &finStr, base);
+	if (*finStr != '\0')
+		return -1;
+	return result;
+};
+
+static int decStrVal(const TCHAR *str) {
+	return strVal(str, 10);
+};
+
+static int hexStrVal(const TCHAR *str) {
+	return strVal(str, 16);
+};
+
+static int getKwClassFromName(const TCHAR *str) {
+	if (!lstrcmp(TEXT("instre1"), str)) return LANG_INDEX_INSTR;
+	if (!lstrcmp(TEXT("instre2"), str)) return LANG_INDEX_INSTR2;
+	if (!lstrcmp(TEXT("type1"), str)) return LANG_INDEX_TYPE;
+	if (!lstrcmp(TEXT("type2"), str)) return LANG_INDEX_TYPE2;
+	if (!lstrcmp(TEXT("type3"), str)) return LANG_INDEX_TYPE3;
+	if (!lstrcmp(TEXT("type4"), str)) return LANG_INDEX_TYPE4;
+	if (!lstrcmp(TEXT("type5"), str)) return LANG_INDEX_TYPE5;
+
+	if ((str[1] == '\0') && (str[0] >= '0') && (str[0] <= '8')) // up to KEYWORDSET_MAX
+		return str[0] - '0';
+
+	return -1;
+};
+
 #ifdef UNICODE
 #include "localizationString.h"
 
@@ -336,7 +371,7 @@ wstring LocalizationSwitcher::getLangFromXmlFileName(wchar_t *fn) const
 	size_t nbItem = sizeof(localizationDefs)/sizeof(LocalizationSwitcher::LocalizationDefinition);
 	for (size_t i = 0 ; i < nbItem ; i++)
 	{
-		if (wcsicmp(fn, localizationDefs[i]._xmlFileName) == 0)
+		if (_wcsicmp(fn, localizationDefs[i]._xmlFileName) == 0)
 			return localizationDefs[i]._langName;
 	}
 	return TEXT("");
@@ -346,7 +381,7 @@ wstring LocalizationSwitcher::getXmlFilePathFromLangName(wchar_t *langName) cons
 {
 	for (size_t i = 0 ; i < _localizationList.size() ; i++)
 	{
-		if (wcsicmp(langName, _localizationList[i].first.c_str()) == 0)
+		if (_wcsicmp(langName, _localizationList[i].first.c_str()) == 0)
 			return _localizationList[i].second;
 	}
 	return TEXT("");
@@ -378,7 +413,10 @@ bool LocalizationSwitcher::switchToLang(wchar_t *lang2switch) const
 
 generic_string ThemeSwitcher::getThemeFromXmlFileName(const TCHAR *xmlFullPath) const
 {
-	if (xmlFullPath == TEXT("")) return xmlFullPath;
+	if ( 0 == _tcscmp(xmlFullPath, TEXT("")))
+	{
+		return xmlFullPath;
+	}
 	TCHAR fn[MAX_PATH];
 	lstrcpy(fn, ::PathFindFileName(xmlFullPath));
 	PathRemoveExtension(fn);
@@ -400,7 +438,8 @@ winVer getWindowsVersion()
 
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 
-	if( !(bOsVersionInfoEx = GetVersionEx ((OSVERSIONINFO *) &osvi)) )
+	bOsVersionInfoEx = GetVersionEx ((OSVERSIONINFO *) &osvi);
+	if( !bOsVersionInfoEx )
 	{
 		osvi.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
 		if (! GetVersionEx ( (OSVERSIONINFO *) &osvi) )
@@ -1134,7 +1173,7 @@ void NppParameters::initScintillaKeys() {
 
 	//Warning! Matching function have to be consecutive
 	ScintillaKeyDefinition skd;
-	size_t prevIndex = -1;
+	int prevIndex = -1;
 	int prevID = -1;
 	for(int i = 0; i < nrCommands; i++) {
 		skd = scintKeyDefs[i];
@@ -1634,13 +1673,13 @@ void NppParameters::getActions(TiXmlNode *node, Macro & macro)
 			continue;
 
 		int msg = 0;
-		const TCHAR *msgStr = (childNode->ToElement())->Attribute(TEXT("message"), &msg);
+		(childNode->ToElement())->Attribute(TEXT("message"), &msg);
 
 		int wParam = 0;
-		const TCHAR *wParamStr = (childNode->ToElement())->Attribute(TEXT("wParam"), &wParam);
+		(childNode->ToElement())->Attribute(TEXT("wParam"), &wParam);
 
 		int lParam = 0;
-		const TCHAR *lParamStr = (childNode->ToElement())->Attribute(TEXT("lParam"), &lParam);
+		(childNode->ToElement())->Attribute(TEXT("lParam"), &lParam);
 
 		const TCHAR *sParam = (childNode->ToElement())->Attribute(TEXT("sParam"));
 		if (!sParam)
@@ -1739,7 +1778,7 @@ void NppParameters::feedScintKeys(TiXmlNode *node)
 		for(size_t i = 0; i < len; i++)
 		{
 			ScintillaKeyMap & skmOrig = _scintillaKeyCommands[i];
-			if (skmOrig.getScintillaKeyID() == scintKey &&skmOrig.getMenuCmdID() == menuID)
+			if (skmOrig.getScintillaKeyID() == scintKey && skmOrig.getMenuCmdID() == menuID)
 			{
 				//Found matching command
 				_scintillaKeyCommands[i].clearDups();
@@ -1770,7 +1809,8 @@ void NppParameters::feedScintKeys(TiXmlNode *node)
 					str = (nextNode->ToElement())->Attribute(TEXT("Key"), &key);
 					if (!str)
 						continue;
-					kc._key = key;
+					assert(key >= 0 && key < 256);
+					kc._key = (UCHAR)key; // safe, since => assert(key >= 0 && key < 256)
 					_scintillaKeyCommands[i].addKeyCombo(kc);
 				}
 				break;
@@ -1807,7 +1847,8 @@ bool NppParameters::getShortcuts(TiXmlNode *node, Shortcut & sc)
 	if (!keyStr)
 		return false;
 
-	sc = Shortcut(name, isCtrl, isAlt, isShift, key);
+	assert(key >= 0 && key < 256);
+	sc = Shortcut(name, isCtrl, isAlt, isShift, (UCHAR)key);
 	return true;
 }
 
@@ -2297,9 +2338,9 @@ void StyleArray::addStyler(int styleID, TiXmlNode *styleNode)
 	{
 		TiXmlElement *element = styleNode->ToElement();
 
-		// Pour _fgColor, _bgColor :
-		// RGB() | (result & 0xFF000000) c'est pour le cas de -1 (0xFFFFFFFF)
-		// retourné par hexStrVal(str)
+		// For _fgColor, _bgColor :
+		// RGB() | (result & 0xFF000000) It's the case for -1 (0xFFFFFFFF)
+		// returned by hexStrVal(str)
 		const TCHAR *str = element->Attribute(TEXT("name"));
 		if (str)
 		{
@@ -2719,6 +2760,22 @@ void NppParameters::feedGUIParameters(TiXmlNode *node)
 			}
 		}
 
+		else if (!lstrcmp(nm, TEXT("EnableWheelZoom")))
+		{
+			TiXmlNode *n = childNode->FirstChild();
+			if (n)
+			{
+				val = n->Value();
+				if (val)
+				{
+					if (!lstrcmp(val, TEXT("yes")))
+						_nppGUI._enableMouseWheelZoom = true;
+					else
+						_nppGUI._enableMouseWheelZoom = false;
+				}
+			}
+		}
+
 		else if (!lstrcmp(nm, TEXT("TagsMatchHighLight")))
 		{
 			TiXmlNode *n = childNode->FirstChild();
@@ -2899,8 +2956,8 @@ void NppParameters::feedGUIParameters(TiXmlNode *node)
 			if (fuckUp)
 				_nppGUI._appPos = oldRect;
 
-
-			if (val = element->Attribute(TEXT("isMaximized")))
+			val = element->Attribute(TEXT("isMaximized"));
+			if (val)
 			{
 				_nppGUI._isMaximized = (lstrcmp(val, TEXT("yes")) == 0);
 			}
@@ -2917,7 +2974,8 @@ void NppParameters::feedGUIParameters(TiXmlNode *node)
 			if (element->Attribute(TEXT("lang"), &i))
 				_nppGUI._newDocDefaultSettings._lang = (LangType)i;
 
-			if (val = element->Attribute(TEXT("openAnsiAsUTF8")))
+			val = element->Attribute(TEXT("openAnsiAsUTF8"));
+			if (val)
 				_nppGUI._newDocDefaultSettings._openAnsiAsUtf8 = (lstrcmp(val, TEXT("yes")) == 0);
 
 		}
@@ -3244,7 +3302,7 @@ void NppParameters::feedGUIParameters(TiXmlNode *node)
 		else if (!lstrcmp(nm, TEXT("stylerTheme")))
 		{
 			const TCHAR *themePath = element->Attribute(TEXT("path"));
-			if (themePath != NULL && themePath != TEXT(""))
+			if (themePath != NULL && (_tcscmp(themePath, TEXT("")) != 0))
 				_nppGUI._themeName.assign(themePath);
 		}
 	}
@@ -3445,8 +3503,8 @@ void NppParameters::feedDockingManager(TiXmlNode *node)
 			dlgElement->Attribute(TEXT("prev"), &prev);
 
 			bool isVisible = false;
-			const TCHAR *val = NULL;
-			if (val = dlgElement->Attribute(TEXT("isVisible")))
+			const TCHAR *val = dlgElement->Attribute(TEXT("isVisible"));
+			if (val)
 			{
 				isVisible = (lstrcmp(val, TEXT("yes")) == 0);
 			}
@@ -3533,7 +3591,6 @@ bool NppParameters::writeGUIParams()
 	bool maitainIndentExist = false;
 	bool MRUExist = false;
 	bool backExist = false;
-	bool saveOpenFileInSameDirExist = false;
 	bool URLExist = false;
 	bool globalOverrideExist = false;
 	bool autocExist = false;
@@ -3542,6 +3599,7 @@ bool NppParameters::writeGUIParams()
 	bool menuBarExist = false;
 	bool smartHighLightExist = false;
 	bool tagsMatchHighLightExist = false;
+	bool mouseWheelZoomExist = false;
 	bool caretExist = false;
 	bool openSaveDirExist = false;
 	bool titleBarExist = false;
@@ -3718,7 +3776,16 @@ bool NppParameters::writeGUIParams()
 			else
 				childNode->InsertEndChild(TiXmlText(pStr));
 		}
-
+		else if (!lstrcmp(nm, TEXT("EnableWheelZoom")))
+		{
+			mouseWheelZoomExist = true;
+			const TCHAR *pStr = _nppGUI._enableMouseWheelZoom?TEXT("yes"):TEXT("no");
+			TiXmlNode *n = childNode->FirstChild();
+			if (n)
+				n->SetValue(pStr);
+			else
+				childNode->InsertEndChild(TiXmlText(pStr));
+		}
 		else if (!lstrcmp(nm, TEXT("TagsMatchHighLight")))
 		{
 			tagsMatchHighLightExist = true;
@@ -3937,6 +4004,10 @@ bool NppParameters::writeGUIParams()
 	if (!smartHighLightExist)
 	{
 		insertGUIConfigBoolNode(GUIRoot, TEXT("SmartHighLight"), _nppGUI._enableSmartHilite);
+	}
+	if (!mouseWheelZoomExist)
+	{
+		insertGUIConfigBoolNode(GUIRoot, TEXT("EnableWheelZoom"), _nppGUI._enableMouseWheelZoom);
 	}
 	if (!tagsMatchHighLightExist)
 	{
@@ -4524,8 +4595,6 @@ void NppParameters::writeStyles(LexerStylerArray & lexersStylers, StyleArray & g
 
 void NppParameters::writeStyle2Element(Style & style2Wite, Style & style2Sync, TiXmlElement *element)
 {
-    const TCHAR *styleName = element->Attribute(TEXT("name"));
-
     if (HIBYTE(HIWORD(style2Wite._fgColor)) != 0xFF)
     {
         int rgbVal = RGB2int(style2Wite._fgColor);

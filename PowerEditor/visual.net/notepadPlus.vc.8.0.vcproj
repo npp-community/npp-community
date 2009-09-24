@@ -49,14 +49,12 @@
 				ExceptionHandling="0"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="precompiled_headers.h"
-				PrecompiledHeaderFile="$(IntDir)\$(TargetName).pch"
-				WarningLevel="4"
-				WarnAsError="true"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile=""
+				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
-				ForcedIncludeFiles=""
+				ForcedIncludeFiles="Common.h"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -71,7 +69,7 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="/fixed:no"
 				AdditionalDependencies="comctl32.lib shlwapi.lib shell32.lib Oleacc.lib"
-				ShowProgress="0"
+				ShowProgress="2"
 				OutputFile="../bin/notepad++DebugA.exe"
 				Version="1.0"
 				LinkIncremental="1"
@@ -135,8 +133,8 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/EHa"
 				Optimization="2"
-				InlineFunctionExpansion="2"
-				FavorSizeOrSpeed="1"
+				InlineFunctionExpansion="1"
+				FavorSizeOrSpeed="2"
 				OmitFramePointers="true"
 				AdditionalIncludeDirectories="..\..\scintilla\include;..\src;..\src\MISC;..\src\MISC\Common;..\src\MISC\Exception;..\src\MISC\PluginsManager;..\src\MISC\Process;..\src\MISC\RegExt;..\src\ScitillaComponent;..\src\TinyXml;..\src\TinyXml\tinyXmlA;..\src\WinControls;..\src\WinControls\AboutDlg;..\src\WinControls\ColourPicker;..\src\WinControls\ContextMenu;..\src\WinControls\DockingWnd;..\src\WinControls\Grid;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\Preference;..\src\WinControls\shortcut;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\StaticDialog\RunDlg;..\src\WinControls\StatusBar;..\src\WinControls\TabBar;..\src\WinControls\TaskList;..\src\WinControls\ToolBar;..\src\WinControls\ToolTip;..\src\WinControls\TrayIcon;..\src\WinControls\WindowsDlg"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;TIXMLA_USE_STL"
@@ -144,14 +142,11 @@
 				ExceptionHandling="0"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="precompiled_headers.h"
-				PrecompiledHeaderFile="$(IntDir)\$(TargetName).pch"
-				WarningLevel="4"
-				WarnAsError="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
-				ForcedIncludeFiles=""
+				ForcedIncludeFiles="Common.h"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -164,8 +159,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="/OPT:WIN98"
 				AdditionalDependencies="comctl32.lib shlwapi.lib shell32.lib Oleacc.lib"
-				ShowProgress="0"
+				ShowProgress="2"
 				OutputFile="../bin/notepad++A.exe"
 				Version="1.0"
 				LinkIncremental="1"
@@ -235,14 +231,12 @@
 				ExceptionHandling="0"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="precompiled_headers.h"
-				PrecompiledHeaderFile="$(IntDir)\$(TargetName).pch"
-				WarningLevel="4"
-				WarnAsError="true"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile=""
+				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
-				ForcedIncludeFiles=""
+				ForcedIncludeFiles="Common.h"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -256,7 +250,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="unicows.lib comctl32.lib shlwapi.lib shell32.lib"
-				ShowProgress="0"
+				ShowProgress="2"
 				OutputFile="../bin/notepad++Debug.exe"
 				Version="1.0"
 				LinkIncremental="1"
@@ -322,8 +316,8 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/EHa"
 				Optimization="2"
-				InlineFunctionExpansion="2"
-				FavorSizeOrSpeed="1"
+				InlineFunctionExpansion="1"
+				FavorSizeOrSpeed="2"
 				OmitFramePointers="true"
 				AdditionalIncludeDirectories="..\..\scintilla\include;..\src;..\src\MISC;..\src\MISC\Common;..\src\MISC\Exception;..\src\MISC\PluginsManager;..\src\MISC\Process;..\src\MISC\RegExt;..\src\ScitillaComponent;..\src\TinyXml;..\src\TinyXml\tinyXmlA;..\src\WinControls;..\src\WinControls\AboutDlg;..\src\WinControls\ColourPicker;..\src\WinControls\ContextMenu;..\src\WinControls\DockingWnd;..\src\WinControls\Grid;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\Preference;..\src\WinControls\shortcut;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\StaticDialog\RunDlg;..\src\WinControls\StatusBar;..\src\WinControls\TabBar;..\src\WinControls\TaskList;..\src\WinControls\ToolBar;..\src\WinControls\ToolTip;..\src\WinControls\TrayIcon;..\src\WinControls\WindowsDlg"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;TIXMLA_USE_STL"
@@ -331,14 +325,11 @@
 				ExceptionHandling="0"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="precompiled_headers.h"
-				PrecompiledHeaderFile="$(IntDir)\$(TargetName).pch"
-				WarningLevel="4"
-				WarnAsError="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
-				ForcedIncludeFiles=""
+				ForcedIncludeFiles="Common.h"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -351,8 +342,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="/OPT:WIN98"
 				AdditionalDependencies="unicows.lib comctl32.lib shlwapi.lib shell32.lib Oleacc.lib"
-				ShowProgress="0"
+				ShowProgress="2"
 				OutputFile="../bin/notepad++.exe"
 				Version="1.0"
 				LinkIncremental="1"
@@ -408,42 +400,6 @@
 			<File
 				RelativePath="..\src\Parameters.cpp"
 				>
-			</File>
-			<File
-				RelativePath="..\src\precompiled_headers.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug Unicode|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Unicode|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\src\UniConversion.cpp"
@@ -577,10 +533,6 @@
 					</File>
 					<File
 						RelativePath="..\src\TinyXml\tinyXmlA\tinyxmlerrorA.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\TinyXml\tinyXmlA\tinyxmlparserA.cpp"
 						>
 					</File>
 				</Filter>
@@ -723,6 +675,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc"
 			>
 			<File
+				RelativePath="..\src\constant.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\keys.h"
 				>
 			</File>
@@ -747,15 +703,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\precompiled_headers.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\resource.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\targetver.h"
 				>
 			</File>
 			<File
@@ -896,6 +844,10 @@
 						RelativePath="..\src\TinyXml\tinyXmlA\tinyxmlA.h"
 						>
 					</File>
+					<File
+						RelativePath="..\src\TinyXml\tinyXmlA\tinyxmlparserA.cpp"
+						>
+					</File>
 				</Filter>
 			</Filter>
 			<Filter
@@ -919,6 +871,10 @@
 				</File>
 				<File
 					RelativePath="..\src\WinControls\ColourPicker\ColourPopup.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\WinControls\DockingWnd\common_func.h"
 					>
 				</File>
 				<File

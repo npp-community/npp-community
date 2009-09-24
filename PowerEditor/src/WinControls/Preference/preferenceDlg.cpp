@@ -15,7 +15,7 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#include <windows.h>
+#include "precompiled_headers.h"
 #include "preferenceDlg.h"
 
 const int BLINKRATE_FASTEST = 50;
@@ -125,7 +125,7 @@ BOOL CALLBACK PreferenceDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPa
 	return FALSE;
 }
 
-BOOL CALLBACK BarsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK BarsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	NppParameters *pNppParam = NppParameters::getInstance();
 	switch (Message)
@@ -392,7 +392,7 @@ void MarginsDlg::changePanelTo(int index)
 
 }
 
-BOOL CALLBACK MarginsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK MarginsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	NppParameters *pNppParam = NppParameters::getInstance();
 	NppGUI & nppGUI = (NppGUI &)pNppParam->getNppGUI();
@@ -586,7 +586,7 @@ BOOL CALLBACK MarginsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam
 	return FALSE;
 }
 
-BOOL CALLBACK SettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK SettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	NppParameters *pNppParam = NppParameters::getInstance();
 	NppGUI & nppGUI = (NppGUI &)pNppParam->getNppGUI();
@@ -631,6 +631,7 @@ BOOL CALLBACK SettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPara
 
 			::SendDlgItemMessage(_hSelf, IDC_CHECK_MIN2SYSTRAY, BM_SETCHECK, nppGUI._isMinimizedToTray, 0);
 			::SendDlgItemMessage(_hSelf, IDC_CHECK_REMEMBERSESSION, BM_SETCHECK, nppGUI._rememberLastSession, 0);
+			::SendDlgItemMessage(_hSelf, IDC_CHECK_ENABLEWHEELZOOM, BM_SETCHECK, nppGUI._enableMouseWheelZoom, 0);
 			::SendDlgItemMessage(_hSelf, IDC_CHECK_AUTOUPDATE, BM_SETCHECK, !nppGUI._neverUpdate, 0);
 
 			::ShowWindow(::GetDlgItem(_hSelf, IDC_CHECK_AUTOUPDATE), nppGUI._doesExistUpdater?SW_SHOW:SW_HIDE);
@@ -767,6 +768,13 @@ BOOL CALLBACK SettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPara
 					nppGUI._rememberLastSession = isCheckedOrNot(wParam);
 					return TRUE;
 
+				case IDC_CHECK_ENABLEWHEELZOOM:
+				{
+					nppGUI._enableMouseWheelZoom = isCheckedOrNot(wParam);
+					::SendMessage(_hParent, WM_COMMAND, IDM_SETTING_MENU_WHEEL, 0);
+					return TRUE;
+				}
+
 				case IDM_SETTING_HISTORY_SIZE:
 				{
 					::SendMessage(_hParent, WM_COMMAND, IDM_SETTING_HISTORY_SIZE, 0);
@@ -856,7 +864,7 @@ BOOL CALLBACK SettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPara
 	return FALSE;
 }
 
-BOOL CALLBACK DefaultNewDocDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK DefaultNewDocDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	NppParameters *pNppParam = NppParameters::getInstance();
 	NppGUI & nppGUI = (NppGUI & )pNppParam->getNppGUI();
@@ -1182,7 +1190,7 @@ BOOL CALLBACK LangMenuDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPara
 					pDestLst->push_back(lmi);
 
 					::SendDlgItemMessage(_hSelf, list2Add, LB_SETCURSEL, iAdd, 0);
-					::SendDlgItemMessage(_hSelf, list2Remove, LB_SETCURSEL, -1, 0);
+					::SendDlgItemMessage(_hSelf, list2Remove, LB_SETCURSEL, (WPARAM)-1, 0);
 					::EnableWindow(::GetDlgItem(_hSelf, idButton2Enable), TRUE);
 					::EnableWindow(::GetDlgItem(_hSelf, idButton2Disable), FALSE);
 
@@ -1228,7 +1236,7 @@ BOOL CALLBACK LangMenuDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPara
 	return FALSE;
 }
 
-BOOL CALLBACK PrintSettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK PrintSettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	NppParameters *pNppParam = NppParameters::getInstance();
 	NppGUI & nppGUI = (NppGUI & )pNppParam->getNppGUI();
@@ -1348,7 +1356,7 @@ void trim(generic_string & str)
 	else str.erase(str.begin(), str.end());
 };
 
-BOOL CALLBACK PrintSettings2Dlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK PrintSettings2Dlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	NppParameters *pNppParam = NppParameters::getInstance();
 	NppGUI & nppGUI = (NppGUI & )pNppParam->getNppGUI();
@@ -1391,9 +1399,9 @@ BOOL CALLBACK PrintSettings2Dlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM
 			::SendDlgItemMessage(_hSelf, IDC_COMBO_FFONTNAME, CB_SETCURSEL, index, 0);
 
 			wsprintf(intStr, TEXT("%d"), nppGUI._printSettings._headerFontSize);
-			::SendDlgItemMessage(_hSelf, IDC_COMBO_HFONTSIZE, CB_SELECTSTRING, -1, (LPARAM)intStr);
+			::SendDlgItemMessage(_hSelf, IDC_COMBO_HFONTSIZE, CB_SELECTSTRING, (WPARAM)-1, (LPARAM)intStr);
 			wsprintf(intStr, TEXT("%d"), nppGUI._printSettings._footerFontSize);
-			::SendDlgItemMessage(_hSelf, IDC_COMBO_FFONTSIZE, CB_SELECTSTRING, -1, (LPARAM)intStr);
+			::SendDlgItemMessage(_hSelf, IDC_COMBO_FFONTSIZE, CB_SELECTSTRING, (WPARAM)-1, (LPARAM)intStr);
 
 			::SendDlgItemMessage(_hSelf, IDC_CHECK_HBOLD, BM_SETCHECK, nppGUI._printSettings._headerFontStyle & FONTSTYLE_BOLD?TRUE:FALSE, 0);
 			::SendDlgItemMessage(_hSelf, IDC_CHECK_HITALIC, BM_SETCHECK, nppGUI._printSettings._headerFontStyle & FONTSTYLE_ITALIC?TRUE:FALSE, 0);
@@ -1478,8 +1486,8 @@ BOOL CALLBACK PrintSettings2Dlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM
 				//_colourHooker.setColour(RGB(0, 0, 0xFF));
 				::SendDlgItemMessage(_hSelf, IDC_VIEWPANEL_STATIC, WM_SETTEXT, 0, (LPARAM)str);
 
-				int focusedEditStatic;
-				int groupStatic;
+				int focusedEditStatic = -1;
+				int groupStatic = -1;
 				switch (_focusedEditCtrl)
 				{
 					case IDC_EDIT_HLEFT : focusedEditStatic = IDC_HL_STATIC; groupStatic = IDC_HGB_STATIC; break;
@@ -1593,7 +1601,7 @@ BOOL CALLBACK PrintSettings2Dlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM
 	return FALSE;
 }
 
-BOOL CALLBACK BackupDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK BackupDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	NppParameters *pNppParam = NppParameters::getInstance();
 	NppGUI & nppGUI = (NppGUI &)pNppParam->getNppGUI();

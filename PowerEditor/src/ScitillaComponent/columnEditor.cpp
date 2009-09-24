@@ -16,10 +16,11 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+#include "precompiled_headers.h"
 
 #include "columnEditor.h"
 
-BOOL CALLBACK ColumnEditorDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK ColumnEditorDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	switch (message)
 	{
@@ -152,8 +153,8 @@ BOOL CALLBACK ColumnEditorDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM l
 
 							int nbLine = endLine - cursorLine + 1;
 							int endNumber = initialNumber + increaseNumber * (nbLine - 1);
-							int nbEnd = getNbChiffre(endNumber, base);
-							int nbInit = getNbChiffre(initialNumber, base);
+							int nbEnd = getNbDigits(endNumber, base);
+							int nbInit = getNbDigits(initialNumber, base);
 							int nb = max(nbInit, nbEnd);
 
 
@@ -227,7 +228,6 @@ BOOL CALLBACK ColumnEditorDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM l
 		default :
 			return FALSE;
 	}
-	return FALSE;
 }
 
 void ColumnEditorDlg::switchTo(bool toText)

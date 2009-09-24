@@ -653,12 +653,15 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 				wheelDelta = - (-wheelDelta % WHEEL_DELTA);
 
 			if (wParam & MK_CONTROL) {
-				// Zoom! We play with the font sizes in the styles.
-				// Number of steps/line is ignored, we just care if sizing up or down
-				if (linesToScroll < 0) {
-					KeyCommand(SCI_ZOOMIN);
-				} else {
-					KeyCommand(SCI_ZOOMOUT);
+				if (enableWheelZooming)
+				{
+					// Zoom! We play with the font sizes in the styles.
+					// Number of steps/line is ignored, we just care if sizing up or down
+					if (linesToScroll < 0) {
+						KeyCommand(SCI_ZOOMIN);
+					} else {
+						KeyCommand(SCI_ZOOMOUT);
+					}
 				}
 			} else {
 				// Scroll

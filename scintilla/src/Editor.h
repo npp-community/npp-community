@@ -144,6 +144,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	bool verticalScrollBarVisible;
 	bool endAtLastLine;
 	bool caretSticky;
+	bool enableWheelZooming;
 
 	Surface *pixmapLine;
 	Surface *pixmapSelMargin;

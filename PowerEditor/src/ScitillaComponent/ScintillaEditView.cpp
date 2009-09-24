@@ -16,8 +16,7 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-#include <windows.h>
-#include <ShellAPI.h>
+#include "precompiled_headers.h"
 #include "ScintillaEditView.h"
 #include "Parameters.h"
 
@@ -106,6 +105,29 @@ LanguageName ScintillaEditView::langNames[L_EXTERNAL+1] = {
 {TEXT("cmake"),		TEXT("CMAKEFILE"),				TEXT("CMAKEFILE"),											L_CMAKE,		SCLEX_CMAKE},
 {TEXT("yaml"),		TEXT("YAML"),						TEXT("YAML Ain't Markup Language"),							L_YAML,			SCLEX_YAML},
 {TEXT("ext"),			TEXT("External"),					TEXT("External"),												L_EXTERNAL,		SCLEX_NULL}
+};
+
+
+int getNbDigits(int aNum, int base)
+{
+	int nbChiffre = 1;
+	int diviseur = base;
+
+	for (;;)
+	{
+		int result = aNum / diviseur;
+		if (!result)
+			break;
+		else
+		{
+			diviseur *= base;
+			nbChiffre++;
+		}
+	}
+	if ((base == 16) && (nbChiffre % 2 != 0))
+		nbChiffre += 1;
+
+	return nbChiffre;
 };
 
 //const int MASK_RED   = 0xFF0000;
@@ -974,7 +996,7 @@ void ScintillaEditView::defineDocType(LangType typeDoc)
     }
 
     execute(SCI_STYLECLEARALL);
-	int oldBits = execute(SCI_GETSTYLEBITSNEEDED);
+	execute(SCI_GETSTYLEBITSNEEDED);
 
 	Style *pStyle;
 	Style defaultIndicatorStyle;
@@ -1079,10 +1101,9 @@ void ScintillaEditView::defineDocType(LangType typeDoc)
         pStyle = &(stylers.getStyler(iFind));
     }
 	setSpecialIndicator(*pStyle);
-    int caretWidth = 1;
 
-    // Il faut surtout faire un test ici avant d'exécuter SCI_SETCODEPAGE
-    // Sinon y'aura un soucis de performance!
+	// You must not do a test here before we execute SCI_SETCODEPAGE
+	// Or else, there might be a performance problem!
 	if (isCJK())
 	{
 		if (getCurrentBuffer()->getUnicodeMode() == uni8Bit)
@@ -1141,8 +1162,6 @@ void ScintillaEditView::defineDocType(LangType typeDoc)
         case L_NFO :
 		{
 			LexerStyler *pStyler = (_pParameter->getLStylerArray()).getLexerStylerByName(TEXT("nfo"));
-			COLORREF bg = black;
-			COLORREF fg = liteGrey;
 			Style nfoStyle;
 			nfoStyle._styleID = STYLE_DEFAULT;
 			nfoStyle._fontName = TEXT("MS LineDraw");
@@ -1430,8 +1449,7 @@ void ScintillaEditView::activateBuffer(BufferID buffer)
 	int numLines = execute(SCI_GETLINECOUNT);
 
 	char numLineStr[32];
-	itoa(numLines, numLineStr, 10);
-	int nbDigit = strlen(numLineStr);
+	_itoa_s(numLines, numLineStr, 32, 10);
 
 	runMarkers(true, 0, true, false);
     return;	//all done
@@ -1582,9 +1600,9 @@ void ScintillaEditView::getGenericText(TCHAR *dest, int start, int end) const
 
 // "mstart" and "mend" are pointers to indexes in the read string,
 // which are converted to the corresponding indexes in the returned TCHAR string.
+#ifdef UNICODE
 void ScintillaEditView::getGenericText(TCHAR *dest, int start, int end, int *mstart, int *mend) const
 {
-#ifdef UNICODE
 	WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
 	char *destA = new char[end - start + 1];
 	getText(destA, start, end);
@@ -1592,10 +1610,13 @@ void ScintillaEditView::getGenericText(TCHAR *dest, int start, int end, int *mst
 	const TCHAR *destW = wmc->char2wchar(destA, cp, mstart, mend);
 	lstrcpy(dest, destW);
 	delete [] destA;
-#else
-	getText(dest, start, end);
-#endif
 }
+#else
+void ScintillaEditView::getGenericText(TCHAR *dest, int start, int end, int* /*mstart*/, int* /*mend*/) const
+{
+	getText(dest, start, end);
+}
+#endif
 
 void ScintillaEditView::insertGenericTextFrom(int position, const TCHAR *text2insert) const
 {
@@ -1634,9 +1655,9 @@ char * ScintillaEditView::getSelectedText(char * txt, int size, bool expand)
 
 TCHAR * ScintillaEditView::getGenericSelectedText(TCHAR * txt, int size, bool expand)
 {
+#ifdef UNICODE
 	WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
 	unsigned int cp = execute(SCI_GETCODEPAGE);
-#ifdef UNICODE
 	char *txtA = new char[size + 1];
 	getSelectedText(txtA, size, expand);
 
@@ -1688,17 +1709,20 @@ void ScintillaEditView::addGenericText(const TCHAR * text2Append) const
 #endif
 }
 
+#ifdef UNICODE
 void ScintillaEditView::addGenericText(const TCHAR * text2Append, long *mstart, long *mend) const
 {
-#ifdef UNICODE
 	WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
 	unsigned int cp = execute(SCI_GETCODEPAGE);
 	const char *text2AppendA =wmc->wchar2char(text2Append, cp, mstart, mend);
 	execute(SCI_ADDTEXT, strlen(text2AppendA), (LPARAM)text2AppendA);
-#else
-	execute(SCI_ADDTEXT, strlen(text2Append), (LPARAM)text2Append);
-#endif
 }
+#else
+void ScintillaEditView::addGenericText(const TCHAR * text2Append, long* /*mstart*/, long* /*mend*/) const
+{
+	execute(SCI_ADDTEXT, strlen(text2Append), (LPARAM)text2Append);
+}
+#endif
 
 int ScintillaEditView::replaceTarget(const TCHAR * str2replace, int fromTargetPos, int toTargetPos) const
 {
@@ -1711,9 +1735,9 @@ int ScintillaEditView::replaceTarget(const TCHAR * str2replace, int fromTargetPo
 	WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
 	unsigned int cp = execute(SCI_GETCODEPAGE);
 	const char *str2replaceA = wmc->wchar2char(str2replace, cp);
-	return execute(SCI_REPLACETARGET, -1, (LPARAM)str2replaceA);
+	return execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)str2replaceA);
 #else
-	return execute(SCI_REPLACETARGET, -1, (LPARAM)str2replace);
+	return execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)str2replace);
 #endif
 }
 
@@ -1728,9 +1752,9 @@ int ScintillaEditView::replaceTargetRegExMode(const TCHAR * re, int fromTargetPo
 	WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
 	unsigned int cp = execute(SCI_GETCODEPAGE);
 	const char *reA = wmc->wchar2char(re, cp);
-	return execute(SCI_REPLACETARGETRE, -1, (LPARAM)reA);
+	return execute(SCI_REPLACETARGETRE, (WPARAM)-1, (LPARAM)reA);
 #else
-	return execute(SCI_REPLACETARGETRE, -1, (LPARAM)re);
+	return execute(SCI_REPLACETARGETRE, (WPARAM)-1, (LPARAM)re);
 #endif
 }
 
@@ -1759,9 +1783,9 @@ void ScintillaEditView::showCallTip(int startPos, const TCHAR * def)
 }
 
 
+#ifdef UNICODE
 void ScintillaEditView::getLine(int lineNumber, TCHAR * line, int lineBufferLen)
 {
-#ifdef UNICODE
 	WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
 	unsigned int cp = execute(SCI_GETCODEPAGE);
 	char *lineA = new char[lineBufferLen];
@@ -1769,11 +1793,13 @@ void ScintillaEditView::getLine(int lineNumber, TCHAR * line, int lineBufferLen)
 	const TCHAR *lineW = wmc->char2wchar(lineA, cp);
 	lstrcpy(line, lineW);
 	delete [] lineA;
-#else
-	execute(SCI_GETLINE, lineNumber, (LPARAM)line);
-#endif
 }
-
+#else
+void ScintillaEditView::getLine(int lineNumber, TCHAR * line, int /*lineBufferLen*/)
+{
+	execute(SCI_GETLINE, lineNumber, (LPARAM)line);
+}
+#endif
 
 void ScintillaEditView::addText(int length, const char *buf)
 {
@@ -2059,7 +2085,7 @@ void ScintillaEditView::convertSelectedTextTo(bool Case)
 
            execute(SCI_SETTARGETSTART, start);
            execute(SCI_SETTARGETEND, end);
-           execute(SCI_REPLACETARGET, -1, (LPARAM)srcStr);
+           execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)srcStr);
        }
 
        delete [] srcStr;
@@ -2240,9 +2266,9 @@ void ScintillaEditView::columnReplace(ColumnModeInfo & cmi, const TCHAR *str)
 		WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
 		unsigned int cp = execute(SCI_GETCODEPAGE);
 		const char *strA = wmc->wchar2char(str, cp);
-		execute(SCI_REPLACETARGET, -1, (LPARAM)strA);
+		execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)strA);
 #else
-		execute(SCI_REPLACETARGET, -1, (LPARAM)str);
+		execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)str);
 #endif
 		totalDiff += diff;
 		cmi[i].second += diff;
@@ -2275,8 +2301,8 @@ void ScintillaEditView::columnReplace(ColumnModeInfo & cmi, int initial, int inc
 		base = 2;
 
 	int endNumber = initial + incr * (cmi.size() - 1);
-	int nbEnd = getNbChiffre(endNumber, base);
-	int nbInit = getNbChiffre(initial, base);
+	int nbEnd = getNbDigits(endNumber, base);
+	int nbInit = getNbDigits(initial, base);
 	int nb = max(nbInit, nbEnd);
 
 	const int stringSize = 512;
@@ -2299,9 +2325,9 @@ void ScintillaEditView::columnReplace(ColumnModeInfo & cmi, int initial, int inc
 		WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
 		unsigned int cp = execute(SCI_GETCODEPAGE);
 		const char *strA = wmc->wchar2char(str, cp);
-		execute(SCI_REPLACETARGET, -1, (LPARAM)strA);
+		execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)strA);
 #else
-		execute(SCI_REPLACETARGET, -1, (LPARAM)str);
+		execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)str);
 #endif
 		initial += incr;
 		totalDiff += diff;

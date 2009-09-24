@@ -18,7 +18,6 @@
 #ifndef SPLITTER_H
 #define SPLITTER_H
 
-#include <windows.h>
 #include "Window.h"
 #include "resource.h"
 

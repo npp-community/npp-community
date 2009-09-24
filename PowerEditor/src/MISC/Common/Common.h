@@ -18,36 +18,26 @@
 #ifndef M30_IDE_COMMUN_H
 #define M30_IDE_COMMUN_H
 
-#include <windows.h>
-#include <string>
-#include <vector>
-#include <time.h>
-#include <Shlobj.h>
-
-#ifdef UNICODE
-#include <wchar.h>
-#endif
-
 #define CP_ANSI_LATIN_1 1252
 #define CP_BIG5 950
 
 #ifdef UNICODE
 	#define NppMainEntry wWinMain
 	#define generic_strtol wcstol
-	#define generic_strncpy wcsncpy
-	#define generic_stricmp wcsicmp
+	#define generic_strncpy(dest, src, size_d) wcsncpy_s(dest, size_d, src, _TRUNCATE)
+	#define generic_stricmp _wcsicmp
 	#define generic_strncmp wcsncmp
-	#define generic_strnicmp wcsnicmp
+	#define generic_strnicmp _wcsnicmp
 	#define generic_strncat wcsncat
 	#define generic_strchr wcschr
 	#define generic_atoi _wtoi
-	#define generic_itoa _itow
+	#define generic_itoa _itow_s
 	#define generic_atof _wtof
-	#define generic_strtok wcstok
+	#define generic_strtok wcstok_s
 	#define generic_strftime wcsftime
 	#define generic_fprintf fwprintf
-	#define generic_sscanf swscanf
-	#define generic_fopen _wfopen
+	#define generic_sscanf swscanf_s
+	#define generic_fopen(pFile, filename, mode) if(_wfopen_s(&pFile, filename, mode) != 0){pFile = NULL;}
 	#define generic_fgets fgetws
 	#define generic_stat _wstat
 	#define generic_string wstring
@@ -55,20 +45,20 @@
 #else
 	#define NppMainEntry WinMain
 	#define generic_strtol strtol
-	#define generic_strncpy strncpy
-	#define generic_stricmp stricmp
+	#define generic_strncpy(dest, src, size_d) strncpy_s(dest, size_d, src, _TRUNCATE)
+	#define generic_stricmp _stricmp
 	#define generic_strncmp strncmp
-	#define generic_strnicmp strnicmp
+	#define generic_strnicmp _strnicmp
 	#define generic_strncat strncat
 	#define generic_strchr strchr
 	#define generic_atoi atoi
-	#define generic_itoa itoa
+	#define generic_itoa _itoa_s
 	#define generic_atof atof
-	#define generic_strtok strtok
+	#define generic_strtok strtok_s
 	#define generic_strftime strftime
 	#define generic_fprintf fprintf
-	#define generic_sscanf sscanf
-	#define generic_fopen fopen
+	#define generic_sscanf sscanf_s
+	#define generic_fopen(pFile, filename, mode) if(fopen_s(&pFile, filename, mode) != 0){pFile = NULL;}
 	#define generic_fgets fgets
 	#define generic_stat _stat
 	#define generic_string string
@@ -77,22 +67,13 @@
 
 void folderBrowser(HWND parent, int outputCtrlID, const TCHAR *defaultStr = NULL);
 
-// Set a call back with the handle after init to set the path.
-// http://msdn.microsoft.com/library/default.asp?url=/library/en-us/shellcc/platform/shell/reference/callbackfunctions/browsecallbackproc.asp
-static int __stdcall BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM, LPARAM pData)
-{
-	if (uMsg == BFFM_INITIALIZED)
-		::SendMessage(hwnd, BFFM_SETSELECTION, TRUE, pData);
-	return 0;
-};
-
 void systemMessage(const TCHAR *title);
 //DWORD ShortToLongPathName(LPCTSTR lpszShortPath, LPTSTR lpszLongPath, DWORD cchBuffer);
 void printInt(int int2print);
 void printStr(const TCHAR *str2print);
 
 void writeLog(const TCHAR *logFileName, const char *log2write);
-int filter(unsigned int code, struct _EXCEPTION_POINTERS *ep);
+int filter(unsigned int code);
 int getCpFromStringValue(const char * encodingStr);
 std::generic_string purgeMenuItemString(const TCHAR * menuItemStr, bool keepAmpersand = false);
 std::vector<std::generic_string> tokenizeString(const std::generic_string & tokenString, const char delim);
@@ -124,6 +105,7 @@ protected:
 		if (_wideCharStr)
 			delete [] _wideCharStr;
 	};
+
 	static WcharMbcsConvertor * _pSelf;
 
 	const int initSize;
@@ -131,6 +113,10 @@ protected:
 	size_t _multiByteAllocLen;
 	wchar_t *_wideCharStr;
 	size_t _wideCharAllocLen;
+
+private:
+	// Since there's no public ctor, we need to void the default assignment operator.
+	WcharMbcsConvertor& operator= (const WcharMbcsConvertor&);
 
 };
 

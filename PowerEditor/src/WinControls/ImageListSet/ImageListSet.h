@@ -18,10 +18,6 @@
 #ifndef IMAGE_LIST_H
 #define IMAGE_LIST_H
 
-#include <windows.h>
-#include <commctrl.h>
-#include <vector>
-
 const int nbMax = 45;
 #define	IDI_SEPARATOR_ICON -1
 

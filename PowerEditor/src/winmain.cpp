@@ -15,11 +15,12 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+#include "precompiled_headers.h"
+
 #include "Common.h"
 #include "Notepad_plus.h"
 #include "Process.h"
 
-#include <exception>		//default C++ exception
 #include "Win32Exception.h"	//Win32 exception
 #include "MiniDumper.h"			//Write dump files
 
@@ -40,7 +41,6 @@ void parseCommandLine(TCHAR * commandLine, ParamVector & paramVector) {
 	//params.erase(params.begin());
 	//remove the first element, since thats the path the the executable (GetCommandLine does that)
 	TCHAR stopChar = TEXT(' ');
-	int i = 0;
 	if (commandLine[0] == TEXT('\"')) {
 		stopChar = TEXT('\"');
 		commandLine++;
@@ -161,7 +161,7 @@ const TCHAR FLAG_NOTABBAR[] = TEXT("-notabbar");
 
 void doException(Notepad_plus & notepad_plus_plus);
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR cmdLineAnsi, int nCmdShow)
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*nCmdShow*/)
 {
 	LPTSTR cmdLine = ::GetCommandLine();
 	ParamVector params;
@@ -227,45 +227,48 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR cmdLineAnsi, int nCmdSh
 	if ((!isMultiInst) && (!TheFirstOne))
 	{
 		HWND hNotepad_plus = ::FindWindow(Notepad_plus::getClassName(), NULL);
-		for (int i = 0 ;!(hNotepad_plus = ::FindWindow(Notepad_plus::getClassName(), NULL)) && i < 5 ; i++)
+		for (int i = 0 ;!hNotepad_plus && i < 5 ; i++)
+		{
 			Sleep(100);
+			hNotepad_plus = ::FindWindow(Notepad_plus::getClassName(), NULL);
+		}
 
         if (hNotepad_plus)
         {
-		// First of all, destroy static object NppParameters
-		pNppParameters->destroyInstance();
-		MainFileManager->destroyInstance();
+			// First of all, destroy static object NppParameters
+			pNppParameters->destroyInstance();
+			MainFileManager->destroyInstance();
 
-		int sw;
+			int sw;
 
-		if (::IsZoomed(hNotepad_plus))
-			sw = SW_MAXIMIZE;
-		else if (::IsIconic(hNotepad_plus))
-			sw = SW_RESTORE;
-		else
-			sw = SW_SHOW;
+			if (::IsZoomed(hNotepad_plus))
+				sw = SW_MAXIMIZE;
+			else if (::IsIconic(hNotepad_plus))
+				sw = SW_RESTORE;
+			else
+				sw = SW_SHOW;
 
-		// IMPORTANT !!!
-		::ShowWindow(hNotepad_plus, sw);
+			// IMPORTANT !!!
+			::ShowWindow(hNotepad_plus, sw);
 
-		::SetForegroundWindow(hNotepad_plus);
+			::SetForegroundWindow(hNotepad_plus);
 
-		if (params.size() > 0)	//if there are files to open, use the WM_COPYDATA system
-		{
-			COPYDATASTRUCT paramData;
-			paramData.dwData = COPYDATA_PARAMS;
-			paramData.lpData = &cmdLineParams;
-			paramData.cbData = sizeof(cmdLineParams);
+			if (params.size() > 0)	//if there are files to open, use the WM_COPYDATA system
+			{
+				COPYDATASTRUCT paramData;
+				paramData.dwData = COPYDATA_PARAMS;
+				paramData.lpData = &cmdLineParams;
+				paramData.cbData = sizeof(cmdLineParams);
 
-			COPYDATASTRUCT fileNamesData;
-			fileNamesData.dwData = COPYDATA_FILENAMES;
-			fileNamesData.lpData = (void *)quotFileName.c_str();
-			fileNamesData.cbData = long(quotFileName.length() + 1)*(sizeof(TCHAR));
+				COPYDATASTRUCT fileNamesData;
+				fileNamesData.dwData = COPYDATA_FILENAMES;
+				fileNamesData.lpData = (void *)quotFileName.c_str();
+				fileNamesData.cbData = long(quotFileName.length() + 1)*(sizeof(TCHAR));
 
-			::SendMessage(hNotepad_plus, WM_COPYDATA, (WPARAM)hInstance, (LPARAM)&paramData);
-			::SendMessage(hNotepad_plus, WM_COPYDATA, (WPARAM)hInstance, (LPARAM)&fileNamesData);
-		}
-		return 0;
+				::SendMessage(hNotepad_plus, WM_COPYDATA, (WPARAM)hInstance, (LPARAM)&paramData);
+				::SendMessage(hNotepad_plus, WM_COPYDATA, (WPARAM)hInstance, (LPARAM)&fileNamesData);
+			}
+			return 0;
         }
 	}
 

@@ -15,7 +15,7 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-//#include "..\..\resource.h"
+#include "precompiled_headers.h"
 #include "ToolBar.h"
 #include "Shortcut.h"
 
@@ -43,7 +43,8 @@ bool ToolBar::init( HINSTANCE hInst, HWND hPere, toolBarStatusType type,
 	_pTBB = new TBBUTTON[_nrTotalButtons];	//add one for the extra separator
 
 	int cmd = 0;
-	int bmpIndex = -1, style;
+	int bmpIndex = -1;
+	BYTE style;
 	size_t i = 0;
 	for (; i < _nrButtons ; i++)
 	{

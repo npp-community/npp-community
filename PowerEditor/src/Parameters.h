@@ -18,8 +18,6 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
-#include <string>
-#include <shlwapi.h>
 #include "tinyxmlA.h"
 #include "tinyxml.h"
 
@@ -213,41 +211,6 @@ struct DockingManagerData {
 		}
 		return NULL;
 	}
-};
-
-static int strVal(const TCHAR *str, int base) {
-	if (!str) return -1;
-	if (!str[0]) return 0;
-
-    TCHAR *finStr;
-    int result = generic_strtol(str, &finStr, base);
-    if (*finStr != '\0')
-        return -1;
-    return result;
-};
-
-static int decStrVal(const TCHAR *str) {
-    return strVal(str, 10);
-};
-
-static int hexStrVal(const TCHAR *str) {
-    return strVal(str, 16);
-};
-
-
-static int getKwClassFromName(const TCHAR *str) {
-	if (!lstrcmp(TEXT("instre1"), str)) return LANG_INDEX_INSTR;
-	if (!lstrcmp(TEXT("instre2"), str)) return LANG_INDEX_INSTR2;
-	if (!lstrcmp(TEXT("type1"), str)) return LANG_INDEX_TYPE;
-	if (!lstrcmp(TEXT("type2"), str)) return LANG_INDEX_TYPE2;
-	if (!lstrcmp(TEXT("type3"), str)) return LANG_INDEX_TYPE3;
-	if (!lstrcmp(TEXT("type4"), str)) return LANG_INDEX_TYPE4;
-	if (!lstrcmp(TEXT("type5"), str)) return LANG_INDEX_TYPE5;
-
-	if ((str[1] == '\0') && (str[0] >= '0') && (str[0] <= '8')) // up to KEYWORDSET_MAX
-		return str[0] - '0';
-
-	return -1;
 };
 
 const int FONTSTYLE_BOLD = 1;
@@ -549,7 +512,7 @@ struct NppGUI
 		       _tabStatus(TAB_DRAWTOPBAR | TAB_DRAWINACTIVETAB | TAB_DRAGNDROP), _splitterPos(POS_HORIZOTAL),\
 	           _userDefineDlgStatus(UDD_DOCKED), _tabSize(8), _tabReplacedBySpace(false), _fileAutoDetection(cdEnabled), _fileAutoDetectionOriginalValue(_fileAutoDetection),\
 			   _checkHistoryFiles(true) ,_enableSmartHilite(true), _enableTagsMatchHilite(true), _enableTagAttrsHilite(true), _enableHiliteNonHTMLZone(false),\
-			   _isMaximized(false), _isMinimizedToTray(false), _rememberLastSession(true), _backup(bak_none), _useDir(false),\
+			   _isMaximized(false), _isMinimizedToTray(false), _rememberLastSession(true), _enableMouseWheelZoom(true), _backup(bak_none), _useDir(false),\
 			   _doTaskList(true), _maitainIndent(true), _openSaveDir(dir_followCurrent), _styleMRU(true), _styleURL(0),\
 			   _autocStatus(autoc_none), _autocFromLen(1), _funcParams(false), _definedSessionExt(TEXT("")), _neverUpdate(false),\
 			   _doesExistUpdater(false), _caretBlinkRate(250), _caretWidth(1), _shortTitlebar(false), _themeName(TEXT("")), _isLangMenuCompact(false) {
@@ -592,6 +555,7 @@ struct NppGUI
 	bool _isMaximized;
 	bool _isMinimizedToTray;
 	bool _rememberLastSession;
+	bool _enableMouseWheelZoom;
 	bool _doTaskList;
 	bool _maitainIndent;
 	bool _enableSmartHilite;
@@ -1346,7 +1310,7 @@ private:
 
 	winVer _winVersion;
 
-	static int CALLBACK EnumFontFamExProc(ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX *lpntme, int FontType, LPARAM lParam) {
+	static int CALLBACK EnumFontFamExProc(ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX * /*lpntme*/, int /*FontType*/, LPARAM lParam) {
 		vector<generic_string> *pStrVect = (vector<generic_string> *)lParam;
         size_t vectSize = pStrVect->size();
 

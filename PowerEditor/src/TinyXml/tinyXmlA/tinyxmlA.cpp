@@ -22,7 +22,7 @@ must not be misrepresented as being the original software.
 distribution.
 */
 
-#include <ctype.h>
+#include "precompiled_headers.h"
 #include "tinyxmlA.h"
 
 #ifdef TIXMLA_USE_STL
@@ -92,7 +92,7 @@ void TiXmlBaseA::PutString( const TIXMLA_STRING& str, TIXMLA_STRING* outString )
 			// Easy pass at non-alpha/numeric/symbol
 			// 127 is the delete key. Below 32 is symbolic.
 			char buf[ 32 ];
-			sprintf( buf, "&#x%02X;", (unsigned) ( c & 0xff ) );
+			sprintf_s( buf, 32, "&#x%02X;", (unsigned) ( c & 0xff ) );
 			outString->append( buf, strlen( buf ) );
 			++i;
 		}
@@ -112,7 +112,7 @@ TiXmlBaseA::StringToBuffer::StringToBuffer( const TIXMLA_STRING& str )
 	buffer = new char[ str.length()+1 ];
 	if ( buffer )
 	{
-		strcpy( buffer, str.c_str() );
+		strcpy_s( buffer, str.length()+1, str.c_str() );
 	}
 }
 
@@ -528,7 +528,7 @@ int TiXmlElementA::QueryDoubleAttribute( const char* name, double* dval ) const
 void TiXmlElementA::SetAttribute( const char * name, int val )
 {
 	char buf[64];
-	sprintf( buf, "%d", val );
+	sprintf_s( buf, 64, "%d", val );
 	SetAttribute( name, buf );
 }
 
@@ -713,9 +713,9 @@ bool TiXmlDocumentA::LoadFile( const char* filename )
 	// Fixed with the StringToBuffer class.
 	value = filename;
 
-	FILE* file = fopen( value.c_str (), "r" );
+	FILE* file = NULL;
 
-	if ( file )
+	if ( fopen_s( &file, value.c_str (), "r" ) == 0 )
 	{
 		// Get the file size, so we can pre-allocate the string. HUGE speed impact.
 		long length = 0;
@@ -771,7 +771,8 @@ bool TiXmlDocumentA::LoadUnicodeFilePath( const TCHAR* filename )
 	// See STL_STRING_BUG above.
 	// Fixed with the StringToBuffer class.
 
-	FILE* file = generic_fopen(filename, TEXT("r"));
+	FILE* file = NULL;
+	generic_fopen(file, filename, TEXT("r"));
 
 	if ( file )
 	{
@@ -816,8 +817,8 @@ bool TiXmlDocumentA::LoadUnicodeFilePath( const TCHAR* filename )
 bool TiXmlDocumentA::SaveFile( const char * filename ) const
 {
 	// The old c stuff lives on...
-	FILE* fp = fopen( filename, "w" );
-	if ( fp )
+	FILE* fp = NULL;
+	if ( fopen_s( &fp, filename, "w" ) == 0 )
 	{
 		Print( fp, 0 );
 		fclose( fp );
@@ -926,14 +927,14 @@ void TiXmlAttributeA::StreamOut( TIXMLA_OSTREAM * stream ) const
 
 int TiXmlAttributeA::QueryIntValue( int* ival ) const
 {
-	if ( sscanf( value.c_str(), "%d", ival ) == 1 )
+	if ( sscanf_s( value.c_str(), "%d", ival ) == 1 )
 		return TIXMLA_SUCCESS;
 	return TIXMLA_WRONG_TYPE;
 }
 
 int TiXmlAttributeA::QueryDoubleValue( double* dval ) const
 {
-	if ( sscanf( value.c_str(), "%lf", dval ) == 1 )
+	if ( sscanf_s( value.c_str(), "%lf", dval ) == 1 )
 		return TIXMLA_SUCCESS;
 	return TIXMLA_WRONG_TYPE;
 }
@@ -941,14 +942,14 @@ int TiXmlAttributeA::QueryDoubleValue( double* dval ) const
 void TiXmlAttributeA::SetIntValue( int _value )
 {
 	char buf [64];
-	sprintf (buf, "%d", _value);
+	sprintf_s(buf, 64, "%d", _value);
 	SetValue (buf);
 }
 
 void TiXmlAttributeA::SetDoubleValue( double _value )
 {
 	char buf [64];
-	sprintf (buf, "%lf", _value);
+	sprintf_s(buf, 64, "%lf", _value);
 	SetValue (buf);
 }
 
