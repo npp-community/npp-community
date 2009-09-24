@@ -26,11 +26,6 @@ distribution.
 #ifndef TINYXML_INCLUDED
 #define TINYXML_INCLUDED
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4530 )
-#pragma warning( disable : 4786 )
-#endif
-
 #include "Common.h"
 
 // Help out windows:
@@ -46,9 +41,6 @@ distribution.
 #endif
 
 #ifdef TIXML_USE_STL
-	#include <string>
-	#include <iostream>
-    //#include <ostream>
 	#define TIXML_STRING	std::generic_string
 	//#define TIXML_ISTREAM	std::istream
 	//#define TIXML_OSTREAM	std::ostream

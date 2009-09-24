@@ -46,3 +46,8 @@
 #include <vector>
 #include <deque>
 #include <map>
+
+#ifdef TIXMLA_USE_STL
+#include <string>
+#include <sstream>
+#endif

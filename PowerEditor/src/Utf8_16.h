@@ -22,10 +22,6 @@
 
 #include "Parameters.h"
 
-#ifdef _MSC_VER
-#pragma warning(disable: 4514) // nreferenced inline function has been removed
-#endif
-
 class Utf8_16 {
 public:
 	typedef unsigned short utf16; // 16 bits
