@@ -408,7 +408,7 @@ void ScintillaEditView::setSpecialStyle(const Style & styleToSet)
     if ( styleToSet._colorStyle & COLORSTYLE_BACKGROUND )
 	    execute(SCI_STYLESETBACK, styleID, styleToSet._bgColor);
 
-	if ((!styleToSet._fontName)||(lstrcmp(styleToSet._fontName, TEXT(""))))
+    if (styleToSet._fontName && lstrcmp(styleToSet._fontName, TEXT("")) != 0)
 	{
 #ifdef UNICODE
 		WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
@@ -1121,10 +1121,10 @@ void ScintillaEditView::defineDocType(LangType typeDoc)
 	{
 		if (getCurrentBuffer()->getUnicodeMode() == uni8Bit)
 		{
-			if (typeDoc != L_CSS || typeDoc != L_CAML || typeDoc != L_ASM || typeDoc != L_MATLAB)
-				execute(SCI_SETCODEPAGE, _codepage);
-			else
+			if (typeDoc == L_CSS || typeDoc == L_CAML || typeDoc == L_ASM || typeDoc == L_MATLAB)
 				execute(SCI_SETCODEPAGE, CP_ACP);
+			else
+				execute(SCI_SETCODEPAGE, _codepage);
 		}
 	}
 
