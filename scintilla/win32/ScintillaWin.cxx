@@ -5,18 +5,21 @@
 // Copyright 1998-2003 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <assert.h>
-#include <limits.h>
+// NPPSTART Joce 06/09/09 Scintilla_precomp_headers
+#include "precompiled_headers.h"
+//#include <stdlib.h>
+//#include <string.h>
+//#include <stdio.h>
+//#include <ctype.h>
+//#include <assert.h>
+//#include <limits.h>
 
-#define _WIN32_WINNT  0x0500
-#include <windows.h>
-#include <commctrl.h>
-#include <richedit.h>
-#include <windowsx.h>
+//#define _WIN32_WINNT  0x0500
+//#include <windows.h>
+//#include <commctrl.h>
+//#include <richedit.h>
+//#include <windowsx.h>
+// NPPEND
 
 #include "Platform.h"
 
@@ -65,17 +68,19 @@
 #define UNICODE_NOCHAR                  0xFFFF
 #endif
 
-#ifndef WM_IME_STARTCOMPOSITION
-#include <imm.h>
-#endif
-
-#include <commctrl.h>
-#ifndef __BORLANDC__
-#ifndef __DMC__
-#include <zmouse.h>
-#endif
-#endif
-#include <ole2.h>
+// NPPSTART Joce 06/09/09 Scintilla_precomp_headers
+//#ifndef WM_IME_STARTCOMPOSITION
+//#include <imm.h>
+//#endif
+//
+//#include <commctrl.h>
+//#ifndef __BORLANDC__
+//#ifndef __DMC__
+//#include <zmouse.h>
+//#endif
+//#endif
+//#include <ole2.h>
+// NPPEND
 
 #ifndef MK_ALT
 #define MK_ALT 32
@@ -776,7 +781,9 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 	case WM_CHAR:
 		if (((wParam >= 128) || !iscntrl(wParam)) || !lastKeyDownConsumed) {
 			if (::IsWindowUnicode(MainHWND()) || keysAlwaysUnicode) {
-				wchar_t wcs[2] = {wParam, 0};
+				// NPPSTART Joce 06/16/09 Scintilla_clean_precomp
+				wchar_t wcs[2] = {(wchar_t)wParam, 0};
+				// NPPEND
 				if (IsUnicodeMode()) {
 					// For a wide character version of the window:
 					char utfval[4];

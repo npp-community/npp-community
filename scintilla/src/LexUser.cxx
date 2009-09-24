@@ -16,12 +16,16 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ----------------------------------------------------------------------------------------*/
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <windows.h>
+
+// NPPSTART Joce 06/09/09 Scintilla_precomp_headers
+#include "precompiled_headers.h"
+//#include <stdlib.h>
+//#include <string.h>
+//#include <ctype.h>
+//#include <stdio.h>
+//#include <stdarg.h>
+//#include <windows.h>
+// NPPEND
 
 #include "Platform.h"
 
@@ -39,8 +43,13 @@ const char EOString = '\0';
 const char EOLine = '\n';
 const char EOWord = ' ';
 */
-static bool isInOpList(WordList & opList, char op)
+// NPPSTART Joce 06/16/09 Scintilla_clean_precomp
+// Changed the type to int (as it was always what was passed anyway)
+// and cast the value in the function.
+static bool isInOpList(WordList & opList, int in_op)
 {
+	char op = (char)in_op;
+// NPPEND
 	for (int i = 0 ; i < opList.len ; i++)
 		if (op == *(opList.words[i]))
 			return true;
@@ -52,11 +61,13 @@ static int cmpString(const void *a1, const void *a2) {
 	return strcmp(*(char**)(a1), *(char**)(a2));
 }
 
-static int cmpStringNoCase(const void *a1, const void *a2) {
-	// Can't work out the correct incantation to use modern casts here
-	return CompareCaseInsensitive(*(char**)(a1), *(char**)(a2));
-}
-
+// NPPSTART Joce 06/16/09 Scintilla_clean_precomp
+// Unused function
+//static int cmpStringNoCase(const void *a1, const void *a2) {
+//	// Can't work out the correct incantation to use modern casts here
+//	return CompareCaseInsensitive(*(char**)(a1), *(char**)(a2));
+//}
+// NPPEND
 
 static bool isInList(WordList & list, const char *s, bool specialMode, bool ignoreCase)
 {
@@ -134,7 +145,9 @@ static bool isInList(WordList & list, const char *s, bool specialMode, bool igno
 		if (!isalpha(s[0]))
 			return false;
 
-		firstChar = isupper(s[0])?tolower(s[0]):toupper(s[0]);
+		// NPPSTART Joce 06/16/09 Scintilla_clean_precomp
+		firstChar = (unsigned char)(isupper(s[0])?tolower(s[0]):toupper(s[0]));
+		// NPPEND
 		j = list.starts[firstChar];
 		if (j >= 0)
 		{

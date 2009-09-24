@@ -6,11 +6,14 @@
  ** The License.txt file describes the conditions under which this software may be distributed.
  **/
 
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdarg.h>
-#include <stdio.h>
+// NPPSTART Joce 06/09/09 Scintilla_precomp_headers
+#include "precompiled_headers.h"
+//#include <stdlib.h>
+//#include <string.h>
+//#include <ctype.h>
+//#include <stdarg.h>
+//#include <stdio.h>
+// NPPEND
 
 #include "Platform.h"
 
@@ -82,7 +85,9 @@ static void ColourisePSDoc(
 
     // Clear out existing tokenization
     if (tokenizing && length > 0) {
-        styler.StartAt(startPos, static_cast<char>(INDIC2_MASK));
+		// NPPSTART Joce 06/16/09 Scintilla_clean_precomp
+        styler.StartAt(startPos, INDIC2_MASK);
+        // NPPEND
         styler.ColourTo(startPos + length-1, 0);
         styler.Flush();
         styler.StartAt(startPos);
@@ -264,7 +269,9 @@ static void ColourisePSDoc(
             if (tokenizing && sc.state != SCE_C_DEFAULT && sc.state != SCE_PS_COMMENT &&
                 sc.state != SCE_PS_DSC_COMMENT && sc.state != SCE_PS_DSC_VALUE) {
                 styler.Flush();
-                styler.StartAt(tokenpos, static_cast<char>(INDIC2_MASK));
+				// NPPSTART Joce 06/16/09 Scintilla_clean_precomp
+                styler.StartAt(tokenpos, INDIC2_MASK);
+                // NPPEND
                 styler.ColourTo(tokenpos, INDIC2_MASK);
                 styler.Flush();
                 styler.StartAt(tokenpos);

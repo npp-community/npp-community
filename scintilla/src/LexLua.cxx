@@ -7,11 +7,14 @@
  ** Modified by Marcos E. Wurzius & Philippe Lhoste
  **/
 
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdarg.h>
-#include <stdio.h>
+// NPPSTART Joce 06/09/09 Scintilla_precomp_headers
+#include "precompiled_headers.h"
+//#include <stdlib.h>
+//#include <string.h>
+//#include <ctype.h>
+//#include <stdarg.h>
+//#include <stdio.h>
+// NPPEND
 
 #include "Platform.h"
 

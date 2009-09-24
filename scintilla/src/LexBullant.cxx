@@ -1,11 +1,14 @@
 // SciTE - Scintilla based Text Editor
 // LexBullant.cxx - lexer for Bullant
 
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <stdarg.h>
+// NPPSTART Joce 06/09/09 Scintilla_precomp_headers
+#include "precompiled_headers.h"
+//#include <stdlib.h>
+//#include <string.h>
+//#include <ctype.h>
+//#include <stdio.h>
+//#include <stdarg.h>
+// NPPEND
 
 #include "Platform.h"
 
