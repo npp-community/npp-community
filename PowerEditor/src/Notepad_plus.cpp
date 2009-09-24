@@ -2749,7 +2749,17 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 		}
 		//Else forward notification to window of rebarband
 		REBARBANDINFO rbBand;
-		rbBand.cbSize = sizeof(rbBand);
+		winVer winVersion = (NppParameters::getInstance())->getWinVersion();
+		if (winVersion <= WV_ME)
+		{
+			ZeroMemory(&rbBand, sizeof(REBARBANDINFO));
+			rbBand.cbSize  = sizeof(REBARBANDINFO);
+		}
+		else
+		{
+			ZeroMemory(&rbBand, REBARBANDINFO_V3_SIZE);
+			rbBand.cbSize  = REBARBANDINFO_V3_SIZE;
+		}
 		rbBand.fMask = RBBIM_CHILD;
 		::SendMessage(notifRebar->getHSelf(), RB_GETBANDINFO, lpnm->uBand, (LPARAM)&rbBand);
 		::SendMessage(rbBand.hwndChild, WM_NOTIFY, 0, (LPARAM)lpnm);
@@ -9775,22 +9785,6 @@ void Notepad_plus::notifyBufferChanged(Buffer * buffer, int mask) {
 		setUniModeText(buffer->getUnicodeMode());
 		setDisplayFormat(buffer->getFormat());
 		enableConvertMenuItems(buffer->getFormat());
-	}
-
-	if (mask & (BufferChangeReadonly))
-	{
-		checkDocState();
-
-		Buffer * curBuf = _pEditView->getCurrentBuffer();
-		bool isSysReadOnly = curBuf->getFileReadOnly();
-		bool isUserReadOnly = curBuf->getUserReadOnly();
-
-		// To notify plugins ro status is changed
-		SCNotification scnN;
-		scnN.nmhdr.code = NPPN_READONLYCHANGED;
-		scnN.nmhdr.hwndFrom = buffer;
-		scnN.nmhdr.idFrom = int(isSysReadOnly || isUserReadOnly);
-		_pluginsManager.notify(&scnN);
 	}
 }
 

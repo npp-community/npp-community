@@ -2014,15 +2014,26 @@ void FindIncrementDlg::markSelectedTextInc(bool enable, FindOption *opt)
 	_pFRDlg->markAllInc(text2Find, opt);
 }
 
-void FindIncrementDlg::addToRebar(ReBar * rebar) {
+void FindIncrementDlg::addToRebar(ReBar * rebar)
+{
 	if(_pRebar)
 		return;
 	_pRebar = rebar;
 	RECT client;
 	getClientRect(client);
 
-	ZeroMemory(&_rbBand, sizeof(REBARBANDINFO));
-	_rbBand.cbSize  = sizeof(REBARBANDINFO);
+	winVer winVersion = (NppParameters::getInstance())->getWinVersion();
+	if (winVersion <= WV_ME)
+	{
+		ZeroMemory(&_rbBand, sizeof(REBARBANDINFO));
+		_rbBand.cbSize  = sizeof(REBARBANDINFO);
+	}
+	else
+	{
+		ZeroMemory(&_rbBand, REBARBANDINFO_V3_SIZE);
+		_rbBand.cbSize  = REBARBANDINFO_V3_SIZE;
+	}
+
 	_rbBand.fMask   = RBBIM_STYLE | RBBIM_CHILD | RBBIM_CHILDSIZE |
 					  RBBIM_SIZE | RBBIM_ID;
 
