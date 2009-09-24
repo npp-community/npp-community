@@ -127,7 +127,8 @@ class ScintillaEditView : public Window
 public:
 	ScintillaEditView()
 		: Window(), _pScintillaFunc(NULL),_pScintillaPtr(NULL),
-		  _folderStyle(FOLDER_STYLE_BOX), _lineNumbersShown(false), _wrapRestoreNeeded(false)
+		  _folderStyle(FOLDER_STYLE_BOX), _lineNumbersShown(false), _wrapRestoreNeeded(false),
+		  _currentHotspotStyleMap(NULL), _currentHotspotOriginMap(NULL)
 	{
 		++_refCount;
 	};
