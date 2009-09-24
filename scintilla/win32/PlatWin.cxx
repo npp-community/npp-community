@@ -5,18 +5,21 @@
 // Copyright 1998-2003 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <time.h>
+// NPPSTART Joce 06/09/09 Scintilla_precomp_headers
+#include "precompiled_headers.h"
+//#include <stdlib.h>
+//#include <string.h>
+//#include <ctype.h>
+//#include <stdarg.h>
+//#include <stdio.h>
+//#include <time.h>
 
-#define _WIN32_WINNT  0x0400
-#include <windows.h>
-#include <commctrl.h>
-#include <richedit.h>
-#include <windowsx.h>
+//#define _WIN32_WINNT  0x0400
+//#include <windows.h>
+//#include <commctrl.h>
+//#include <richedit.h>
+//#include <windowsx.h>
+// NPPEND
 
 #include "Platform.h"
 #include "PlatformRes.h"
@@ -2056,7 +2059,9 @@ double ElapsedTime::Duration(bool reset) {
 		LARGE_INTEGER lBegin;
 		lBegin.HighPart = bigBit;
 		lBegin.LowPart = littleBit;
-		double elapsed = lEnd.QuadPart - lBegin.QuadPart;
+		// NPPSTART Joce 06/16/09 Scintilla_clean_precomp
+		double elapsed = (double)(lEnd.QuadPart - lBegin.QuadPart);
+		// NPPEND
 		result = elapsed / static_cast<double>(frequency.QuadPart);
 	} else {
 		endBigBit = clock();

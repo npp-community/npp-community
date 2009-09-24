@@ -95,10 +95,13 @@ inline bool IsAlphabetic(unsigned int ch) {
 }
 #endif
 
-#ifdef _MSC_VER
-// Visual C++ doesn't like the private copy idiom for disabling
-// the default copy constructor and operator=, but it's fine.
-#pragma warning(disable: 4511 4512)
-#endif
+// NPPSTART Joce 06/16/09 Scintilla_clean_precomp
+// All warnings are now enabled.
+//#ifdef _MSC_VER
+//// Visual C++ doesn't like the private copy idiom for disabling
+//// the default copy constructor and operator=, but it's fine.
+//#pragma warning(disable: 4511 4512)
+//#endif
+// NPPEND
 
 #endif

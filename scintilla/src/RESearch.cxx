@@ -198,13 +198,19 @@
  *  matches:    foo-foo fo-fo fob-fob foobar-foobar ...
  */
 
+// NPPSTART Joce 06/09/09 Scintilla_precomp_headers
+#include "precompiled_headers.h"
+// NPPEND
+
 #include "CharClassify.h"
 #include "RESearch.h"
 
-// Shut up annoying Visual C++ warnings:
-#ifdef _MSC_VER
-#pragma warning(disable: 4514)
-#endif
+// NPPSTART Joce 06/16/09 Scintilla_clean_precomp
+//// Shut up annoying Visual C++ warnings:
+//#ifdef _MSC_VER
+//#pragma warning(disable: 4514)
+//#endif
+// NPPEND
 
 #ifdef SCI_NAMESPACE
 using namespace Scintilla;

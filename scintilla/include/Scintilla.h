@@ -22,12 +22,14 @@ bool Scintilla_ReleaseResources();
 #endif
 int Scintilla_LinkLexers();
 
-// Here should be placed typedefs for uptr_t, an unsigned integer type large enough to
-// hold a pointer and sptr_t, a signed integer large enough to hold a pointer.
-// May need to be changed for 64 bit platforms.
-#if _MSC_VER >= 1300
-#include <BaseTsd.h>
-#endif
+// NPPSTART Joce 06/09/09 Scintilla_precomp_headers
+//// Here should be placed typedefs for uptr_t, an unsigned integer type large enough to
+//// hold a pointer and sptr_t, a signed integer large enough to hold a pointer.
+//// May need to be changed for 64 bit platforms.
+//#if _MSC_VER >= 1300
+//#include <BaseTsd.h>
+//#endif
+// NPPEND
 #ifdef MAXULONG_PTR
 typedef ULONG_PTR uptr_t;
 typedef LONG_PTR sptr_t;

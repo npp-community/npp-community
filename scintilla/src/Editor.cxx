@@ -5,10 +5,13 @@
 // Copyright 1998-2004 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <ctype.h>
+// NPPSTART Joce 06/09/09 Scintilla_precomp_headers
+#include "precompiled_headers.h"
+//#include <stdlib.h>
+//#include <string.h>
+//#include <stdio.h>
+//#include <ctype.h>
+// NPPEND
 
 #include "Platform.h"
 
@@ -5864,7 +5867,9 @@ void Editor::AddStyledText(char *buffer, int appendLength) {
 		for (i = 0;i < textLength;i++) {
 			text[i] = buffer[i*2+1];
 		}
-		pdoc->StartStyling(CurrentPosition(), static_cast<char>(0xff));
+		// NPPSTART Joce 06/16/09 Scintilla_clean_precomp
+		pdoc->StartStyling(CurrentPosition(), STYLE_MAX);
+		// NPPEND
 		pdoc->SetStyles(textLength, text);
 		delete []text;
 	}

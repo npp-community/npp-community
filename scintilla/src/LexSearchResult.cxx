@@ -19,12 +19,15 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <vector>
+// NPPSTART Joce 06/09/09 Scintilla_precomp_headers
+#include "precompiled_headers.h"
+//#include <stdlib.h>
+//#include <string.h>
+//#include <ctype.h>
+//#include <stdio.h>
+//#include <stdarg.h>
+//#include <vector>
+// NPPEND
 
 #include "Platform.h"
 
@@ -65,6 +68,10 @@ static void ColouriseSearchResultLine(SearchResultMarkings* pMarkings, char *lin
 		unsigned int currentPos;
 
 		PLATFORM_ASSERT(lengthLine >= firstTokenLen + 2);
+		// NPPSTART Joce 06/16/09 Scintilla_clean_precomp
+		// Avoid compiler warning in release
+		lengthLine = lengthLine;
+		// NPPEND
 
 		styler.ColourTo(startLine + firstTokenLen, SCE_SEARCHRESULT_DEFAULT);
 
