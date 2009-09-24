@@ -17,6 +17,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "precompiled_headers.h"
 #include "ShortcutMapper.h"
 #include "Notepad_plus.h"
 
@@ -286,12 +287,12 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 					{
 						const int row = _babygrid.getSelectedRow();
 						int shortcutIndex = row-1;
-						DWORD cmdID;// = _pAccel->_pAccelArray[row-1].cmd;
+						int cmdID = -1;// = _pAccel->_pAccelArray[row-1].cmd;
 
 						// Menu data
-						size_t posBase;
-						size_t nbElem;
-						HMENU hMenu;
+						size_t posBase = 0;
+						size_t nbElem = 0;
+						HMENU hMenu = NULL;
 
 						switch(_currentState) {
 							case STATE_MENU:

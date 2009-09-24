@@ -22,7 +22,7 @@ must not be misrepresented as being the original software.
 distribution.
 */
 
-#include <ctype.h>
+#include "precompiled_headers.h"
 #include "tinyxml.h"
 
 #ifdef TIXML_USE_STL
@@ -713,7 +713,8 @@ bool TiXmlDocument::LoadFile( const TCHAR* filename )
 	// Fixed with the StringToBuffer class.
 	value = filename;
 
-	FILE* file = generic_fopen( value.c_str (), TEXT("r") );
+	FILE* file = NULL;
+	generic_fopen( file, value.c_str (), TEXT("r") );
 
 	if ( file )
 	{
@@ -758,7 +759,8 @@ bool TiXmlDocument::LoadFile( const TCHAR* filename )
 bool TiXmlDocument::SaveFile( const TCHAR * filename ) const
 {
 	// The old c stuff lives on...
-	FILE* fp = generic_fopen( filename, TEXT("w") );
+	FILE* fp = NULL;
+	generic_fopen( fp, filename, TEXT("w") );
 	if ( fp )
 	{
 		Print( fp, 0 );

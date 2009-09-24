@@ -15,14 +15,20 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-//#include "Common.h"	//use force include
-#include <shlwapi.h>
-#include <memory>
-#include <algorithm>
+#include "precompiled_headers.h"
 #include "Common.h"
 
 
 WcharMbcsConvertor * WcharMbcsConvertor::_pSelf = new WcharMbcsConvertor;
+
+// Set a call back with the handle after init to set the path.
+// http://msdn.microsoft.com/library/default.asp?url=/library/en-us/shellcc/platform/shell/reference/callbackfunctions/browsecallbackproc.asp
+static int __stdcall BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM, LPARAM pData)
+{
+	if (uMsg == BFFM_INITIALIZED)
+		::SendMessage(hwnd, BFFM_SETSELECTION, TRUE, pData);
+	return 0;
+};
 
 void systemMessage(const TCHAR *title)
 {
@@ -52,7 +58,8 @@ void printStr(const TCHAR *str2print)
 
 void writeLog(const TCHAR *logFileName, const char *log2write)
 {
-	FILE *f = generic_fopen(logFileName, TEXT("a+"));
+	FILE *f = NULL;
+	generic_fopen(f, logFileName, TEXT("a+"));
 	fwrite(log2write, sizeof(log2write[0]), strlen(log2write), f);
 	fputc('\n', f);
 	fflush(f);
@@ -163,7 +170,7 @@ void ScreenRectToClientRect(HWND hWnd, RECT* rect)
 	rect->bottom = pt.y;
 };
 
-int filter(unsigned int code, struct _EXCEPTION_POINTERS *ep)
+int filter(unsigned int code)
 {
    if (code == EXCEPTION_ACCESS_VIOLATION)
       return EXCEPTION_EXECUTE_HANDLER;
@@ -176,40 +183,40 @@ int getCpFromStringValue(const char * encodingStr)
 	if (!encodingStr)
 		return CP_ACP;
 
-	if (stricmp("windows-1250", encodingStr) == 0)
+	if (_stricmp("windows-1250", encodingStr) == 0)
 		return 1250;
-	if (stricmp("windows-1251", encodingStr) == 0)
+	if (_stricmp("windows-1251", encodingStr) == 0)
 		return 1251;
-	if (stricmp("windows-1252", encodingStr) == 0)
+	if (_stricmp("windows-1252", encodingStr) == 0)
 		return 1252;
-	if (stricmp("windows-1253", encodingStr) == 0)
+	if (_stricmp("windows-1253", encodingStr) == 0)
 		return 1253;
-	if (stricmp("windows-1254", encodingStr) == 0)
+	if (_stricmp("windows-1254", encodingStr) == 0)
 		return 1254;
-	if (stricmp("windows-1255", encodingStr) == 0)
+	if (_stricmp("windows-1255", encodingStr) == 0)
 		return 1255;
-	if (stricmp("windows-1256", encodingStr) == 0)
+	if (_stricmp("windows-1256", encodingStr) == 0)
 		return 1256;
-	if (stricmp("windows-1257", encodingStr) == 0)
+	if (_stricmp("windows-1257", encodingStr) == 0)
 		return 1257;
-	if (stricmp("windows-1258", encodingStr) == 0)
+	if (_stricmp("windows-1258", encodingStr) == 0)
 		return 1258;
 
-	if (stricmp("big5", encodingStr) == 0)
+	if (_stricmp("big5", encodingStr) == 0)
 		return 950;
-	if (stricmp("gb2312", encodingStr) == 0)
+	if (_stricmp("gb2312", encodingStr) == 0)
 		return 936;
-	if (stricmp("shift_jis", encodingStr) == 0)
+	if (_stricmp("shift_jis", encodingStr) == 0)
 		return 932;
-	if (stricmp("euc-kr", encodingStr) == 0)
+	if (_stricmp("euc-kr", encodingStr) == 0)
 		return 51949;
-	if (stricmp("tis-620", encodingStr) == 0)
+	if (_stricmp("tis-620", encodingStr) == 0)
 		return 874;
 
-	if (stricmp("iso-8859-8", encodingStr) == 0)
+	if (_stricmp("iso-8859-8", encodingStr) == 0)
 		return 28598;
 
-	if (stricmp("utf-8", encodingStr) == 0)
+	if (_stricmp("utf-8", encodingStr) == 0)
 		return 65001;
 
 	return CP_ACP;
@@ -412,7 +419,7 @@ TCHAR *BuildMenuFileName(TCHAR *buffer, int len, int pos, const TCHAR *filename)
 	if (pos < 9)
 	{
 		*itr++ = '&';
-		*itr++ = '1' + pos;
+		*itr++ = '1' + (TCHAR)pos;
 	}
 	else if (pos == 9)
 	{
@@ -448,7 +455,7 @@ TCHAR *BuildMenuFileName(TCHAR *buffer, int len, int pos, const TCHAR *filename)
 	else
 	{
 		TCHAR cnvName[MAX_PATH*2];
-		const TCHAR *s1 = convertFileName(cnvName, filename);
+		convertFileName(cnvName, filename);
 		PathCompactPathEx(itr, filename, len - (itr-buffer), 0);
 	}
 	return buffer;

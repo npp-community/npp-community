@@ -15,15 +15,14 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+#include "precompiled_headers.h"
 #include "dockingResource.h"
-#include "math.h"
 #include "Docking.h"
 #include "DockingCont.h"
 #include "DropData.h"
 #include "SplitterContainer.h"
 #include "WindowInterface.h"
 #include "ToolTip.h"
-#include <Commctrl.h>
 #include "Parameters.h"
 #include "Common.h"
 
@@ -116,7 +115,7 @@ void DockingCont::doDialog(bool willBeShown, bool isFloating)
 }
 
 
-tTbData* DockingCont::createToolbar(tTbData data, Window **ppWin)
+tTbData* DockingCont::createToolbar(tTbData data)
 {
 	tTbData *pTbData = new tTbData;
 
@@ -147,8 +146,6 @@ tTbData* DockingCont::createToolbar(tTbData data, Window **ppWin)
 
 void DockingCont::removeToolbar(tTbData TbData)
 {
-	INT			iItemCnt	= 0;
-
 	// remove from list
 	for (size_t iTb = 0; iTb < _vTbData.size(); iTb++)
 	{
@@ -479,7 +476,7 @@ void DockingCont::drawCaptionItem(DRAWITEMSTRUCT *pDrawItemStruct)
 			::FillRect(hDc, &rc, bgbrush);
 
 			// draw grid lines
-			HPEN	hOldPen = (HPEN)::SelectObject(hDc, hPen);
+			::SelectObject(hDc, hPen);
 
 			MoveToEx(hDc, rc.left , rc.top , NULL);
 			LineTo  (hDc, rc.right, rc.top );
@@ -522,7 +519,7 @@ void DockingCont::drawCaptionItem(DRAWITEMSTRUCT *pDrawItemStruct)
 			::FillRect(hDc, &rc, bgbrush);
 
 			// draw grid lines
-			HPEN	hOldPen = (HPEN)::SelectObject(hDc, hPen);
+			::SelectObject(hDc, hPen);
 
 			MoveToEx(hDc, rc.left , rc.top , NULL);
 			LineTo  (hDc, rc.right, rc.top );
@@ -1154,7 +1151,7 @@ INT DockingCont::hideToolbar(tTbData *pTbData, BOOL hideClient)
 	// delete item
 	if (TRUE == ::SendMessage(_hContTab, TCM_DELETEITEM, iItem, 0))
 	{
-		UINT	iItemCnt = ::SendMessage(_hContTab, TCM_GETITEMCOUNT, 0, 0);
+		LRESULT	iItemCnt = ::SendMessage(_hContTab, TCM_GETITEMCOUNT, 0, 0);
 
 		if (iItemCnt != 0)
 		{

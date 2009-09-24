@@ -22,6 +22,7 @@ must not be misrepresented as being the original software.
 distribution.
 */
 
+#include "precompiled_headers.h"
 #include "tinyxml.h"
 //#include "tchar.h"
 

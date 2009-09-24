@@ -1,5 +1,5 @@
+#include "precompiled_headers.h"
 #include "trayIconControler.h"
-#include <iostream>
 trayIconControler::trayIconControler(HWND hwnd, UINT uID, UINT uCBMsg, HICON hicon, TCHAR *tip)
 {
   _nid.cbSize = sizeof(_nid);

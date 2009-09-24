@@ -31,12 +31,6 @@ distribution.
 #pragma warning( disable : 4786 )
 #endif
 
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-#include <windows.h>
 #include "Common.h"
 
 // Help out windows:
@@ -182,13 +176,13 @@ protected:
 	};
 
 	static const TCHAR*	SkipWhiteSpace( const TCHAR* );
-	inline static bool	IsWhiteSpace( int c )		{ return ( isspace( c ) || c == '\n' || c == '\r' ); }
+	inline static bool	IsWhiteSpace( TCHAR c )		{ return ( isspace( c ) || c == '\n' || c == '\r' ); }
 
 	virtual void StreamOut (TIXML_OSTREAM *) const = 0;
 
 	#ifdef TIXML_USE_STL
 	    static bool	StreamWhiteSpace( TIXML_ISTREAM * in, TIXML_STRING * tag );
-	    static bool StreamTo( TIXML_ISTREAM * in, int character, TIXML_STRING * tag );
+	    static bool StreamTo( TIXML_ISTREAM * in, TCHAR character, TIXML_STRING * tag );
 	#endif
 
 	/*	Reads an XML name into the generic_string provided. Returns

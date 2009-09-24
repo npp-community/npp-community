@@ -1,12 +1,11 @@
 #ifndef TRAY_ICON_CONTROLER_H
 #define TRAY_ICON_CONTROLER_H
 
-#include <windows.h>
 
 #define ADD     NIM_ADD
 #define REMOVE  NIM_DELETE
 
-// code d'erreur
+// Error codes
 #define INCORRECT_OPERATION     1
 #define OPERATION_INCOHERENT    2
 

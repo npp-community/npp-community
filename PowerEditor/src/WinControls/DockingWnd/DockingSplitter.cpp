@@ -16,6 +16,7 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
+#include "precompiled_headers.h"
 #include "DockingSplitter.h"
 #include "Common.h"
 #include "Notepad_plus_msgs.h"

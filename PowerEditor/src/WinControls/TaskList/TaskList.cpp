@@ -15,6 +15,7 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+#include "precompiled_headers.h"
 #include "TaskList.h"
 #include "TaskListDlg_rc.h"
 #include "colors.h"
@@ -240,6 +241,5 @@ LRESULT TaskList::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 		default :
 			return ::CallWindowProc(_defaultProc, hwnd, Message, wParam, lParam);
 	}
-	return FALSE;
 }
 

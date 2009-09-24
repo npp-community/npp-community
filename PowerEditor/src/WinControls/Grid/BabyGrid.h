@@ -6,7 +6,6 @@
 //email: mudcat@mis.net for more information.
 
 
-#include <windows.h>
 #include "resource.h"
 
 #ifndef WM_MOUSEWHEEL

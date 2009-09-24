@@ -17,6 +17,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "precompiled_headers.h"
 #include "ColourPicker.h"
 #include "Common.h"
 
@@ -67,7 +68,7 @@ void ColourPicker::drawBackground(HDC hDC)
 void ColourPicker::drawForeground(HDC hDC)
 {
     RECT rc;
-	HBRUSH hbrush;
+	HBRUSH hbrush = NULL;
 
 	if(!hDC || _isEnabled)
 		return;

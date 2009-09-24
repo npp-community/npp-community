@@ -17,7 +17,6 @@
 
 #ifndef NOTEPAD_PLUS_H
 #define NOTEPAD_PLUS_H
-#include <window.h>
 #include "Window.h"
 #include "ScintillaEditView.h"
 #include "ToolBar.h"
@@ -36,7 +35,6 @@
 #include "GoToLineDlg.h"
 #include "columnEditor.h"
 #include "WordStyleDlg.h"
-//#include "constant.h"
 #include "trayIconControler.h"
 #include "ContextMenu.h"
 #include "PluginsManager.h"
@@ -156,8 +154,8 @@ public:
 	bool fileSave(BufferID id = BUFFER_INVALID);
 	bool fileSaveAll();
 	bool fileSaveAs(BufferID id = BUFFER_INVALID, bool isSaveCopy = false);
-	bool fileDelete(BufferID id = BUFFER_INVALID, int curView = -1);
-	bool fileRename(BufferID id = BUFFER_INVALID, int curView = -1);
+	bool fileDelete(BufferID id = BUFFER_INVALID);
+	bool fileRename(BufferID id = BUFFER_INVALID);
 
 	bool addBufferToView(BufferID id, int whichOne);
 	bool moveBuffer(BufferID id, int whereTo);	//assumes whereFrom is otherView(whereTo)
@@ -186,7 +184,7 @@ public:
 	const TCHAR * fileSaveSession(size_t nbFile, TCHAR ** fileNames, const TCHAR *sessionFile2save);
 	const TCHAR * fileSaveSession(size_t nbFile = 0, TCHAR ** fileNames = NULL);
 
-	bool changeDlgLang(HWND hDlg, const char *dlgTagName, char *title = NULL);
+	bool changeDlgLang(HWND hDlg, const char *dlgTagName, char *title = NULL, int titleBufLen = 0);
 	void changeFindReplaceDlgLang();
 	void changeConfigLang();
 	void changeUserDefineLang();
@@ -535,7 +533,7 @@ private:
 
 	void checkLangsMenu(int id) const ;
 
-    void setLanguage(int id, LangType langType);
+    void setLanguage(LangType langType);
 
 	enum LangType menuID2LangType(int cmdID);
 
@@ -671,7 +669,6 @@ private:
 
 		::OpenClipboard(_hSelf);
 		HANDLE clipboardData = ::GetClipboardData(clipFormat);
-		int len = ::GlobalSize(clipboardData);
 		LPVOID clipboardDataPtr = ::GlobalLock(clipboardData);
 
 		generic_string clipboardStr = (const TCHAR *)clipboardDataPtr;

@@ -1,8 +1,6 @@
+#include "precompiled_headers.h"
 #include "Buffer.h"
 
-#include <shlwapi.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include "Scintilla.h"
 #include "Parameters.h"
 
@@ -110,8 +108,8 @@ void Buffer::setFileName(const TCHAR *fn, LangType defaultLang)
 		ext += 1;
 
 		// Define User Lang firstly
-		const TCHAR *langName = NULL;
-		if ((langName = pNppParamInst->getUserDefinedLangNameFromExt(ext)))
+		const TCHAR *langName = pNppParamInst->getUserDefinedLangNameFromExt(ext);
+		if (langName)
 		{
 			newLang = L_USER;
 			lstrcpy(_userLangExt, langName);
@@ -399,7 +397,6 @@ void FileManager::closeBuffer(BufferID id, ScintillaEditView * identifier) {
 	int index = getBufferIndexByID(id);
 	Buffer * buf = getBufferByIndex(index);
 
-	int oldRefs = buf->_references;
 	int refs = buf->removeReference(identifier);
 
 	if (!refs) {	//buffer can be deallocated
@@ -459,7 +456,7 @@ BufferID FileManager::loadFile(const TCHAR * filename, Document doc) {
 		buf->setUnicodeMode(encoding);
 
 		//determine buffer properties
-		BufferID retval = _nextBufferID++;
+		_nextBufferID++;
 		return id;
 	} else {	//failed loading, release document
 		if (ownDoc)
@@ -520,7 +517,7 @@ bool FileManager::saveBuffer(BufferID id, const TCHAR * filename, bool isCopy) {
 	Buffer * buffer = getBufferByID(id);
 	bool isHidden = false;
 	bool isSys = false;
-	DWORD attrib;
+	DWORD attrib = 0;
 
 	TCHAR fullpath[MAX_PATH];
 	::GetFullPathName(filename, MAX_PATH, fullpath, NULL);
@@ -602,7 +599,7 @@ BufferID FileManager::newEmptyDocument()
 	newBuf->_id = id;
 	_buffers.push_back(newBuf);
 	_nrBufs++;
-	BufferID retval = _nextBufferID++;
+	_nextBufferID++;
 	return id;
 }
 
@@ -618,7 +615,7 @@ BufferID FileManager::bufferFromDocument(Document doc, bool dontIncrease, bool d
 	newBuf->_id = id;
 	_buffers.push_back(newBuf);
 	_nrBufs++;
-	BufferID retval = _nextBufferID;
+	_nextBufferID;
 	if (!dontIncrease)
 		_nextBufferID++;
 	return id;
@@ -628,7 +625,8 @@ bool FileManager::loadFileData(Document doc, const TCHAR * filename, Utf8_16_Rea
 {
 	const int blockSize = 128 * 1024;	//128 kB
 	char data[blockSize];
-	FILE *fp = generic_fopen(filename, TEXT("rb"));
+	FILE *fp = NULL;
+	generic_fopen(fp, filename, TEXT("rb"));
 	if (!fp)
 		return false;
 
@@ -662,7 +660,7 @@ bool FileManager::loadFileData(Document doc, const TCHAR * filename, Utf8_16_Rea
 			lenConvert = UnicodeConvertor->convert(data, lenFile);
 			_pscratchTilla->execute(SCI_APPENDTEXT, lenConvert, (LPARAM)(UnicodeConvertor->getNewBuf()));
 		} while (lenFile > 0);
-	} __except(filter(GetExceptionCode(), GetExceptionInformation())) {
+	} __except(filter(GetExceptionCode())) {
 		printStr(TEXT("File is too big to be opened by Notepad++"));
 		success = false;
 	}
@@ -698,7 +696,8 @@ BufferID FileManager::getBufferFromDocument(Document doc) {
 }
 
 bool FileManager::createEmptyFile(const TCHAR * path) {
-	FILE * file = generic_fopen(path, TEXT("wb"));
+	FILE * file = NULL;
+	generic_fopen(file, path, TEXT("wb"));
 	if (!file)
 		return false;
 	fclose(file);

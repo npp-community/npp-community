@@ -15,14 +15,10 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+#include "precompiled_headers.h"
 #include "DocTabView.h"
 
-#ifndef _WIN32_IE
-#define _WIN32_IE	0x0600
-#endif //_WIN32_IE
 
-#include <commctrl.h>
-#include <shlwapi.h>
 
 bool DocTabView::_hideTabBarStatus = false;
 
@@ -71,7 +67,7 @@ BufferID DocTabView::findBufferByName(const TCHAR * fullfilename) {	//-1 if not 
 	TCITEM tie;
 	tie.lParam = -1;
 	tie.mask = TCIF_PARAM;
-	for(size_t i = 0; i < _nbItem; i++) {
+	for(int i = 0; i < _nbItem; i++) {
 		::SendMessage(_hSelf, TCM_GETITEM, i, reinterpret_cast<LPARAM>(&tie));
 		BufferID id = (BufferID)tie.lParam;
 		Buffer * buf = MainFileManager->getBufferByID(id);
@@ -86,7 +82,7 @@ int DocTabView::getIndexByBuffer(BufferID id) {
 	TCITEM tie;
 	tie.lParam = -1;
 	tie.mask = TCIF_PARAM;
-	for(int i = 0; i < (int)_nbItem; i++) {
+	for(int i = 0; i < _nbItem; i++) {
 		::SendMessage(_hSelf, TCM_GETITEM, i, reinterpret_cast<LPARAM>(&tie));
 		if ((BufferID)tie.lParam == id)
 			return i;

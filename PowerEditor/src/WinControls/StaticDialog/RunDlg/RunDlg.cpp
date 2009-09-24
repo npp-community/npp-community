@@ -15,6 +15,7 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+#include "precompiled_headers.h"
 #include "RunDlg.h"
 #include "FileDialog.h"
 //#include "resource.h"
@@ -196,7 +197,7 @@ HINSTANCE Command::run(HWND hWnd)
 	return res;
 }
 
-BOOL CALLBACK RunDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK RunDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	switch (message)
 	{
