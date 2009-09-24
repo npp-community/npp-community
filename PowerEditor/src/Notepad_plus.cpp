@@ -4641,6 +4641,8 @@ void Notepad_plus::setLanguage(LangType langType) {
 		_pEditView->getCurrentBuffer()->setLangType(langType);
 	}
 
+	addHotSpot(false);
+
 	if (reset) {
 		_subEditView.execute(SCI_SETDOCPOINTER, 0, prev);
 		_subEditView.restoreCurrentPos();

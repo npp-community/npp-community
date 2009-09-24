@@ -143,7 +143,9 @@ Editor::Editor() {
 	endAtLastLine = true;
 	caretSticky = false;
 
+	// NPPSTART Joce 06/10/09 DisableMouseWheelZoom
 	enableWheelZooming = true;
+	// NPPEND
 
 	pixmapLine = Surface::Allocate();
 	pixmapSelMargin = Surface::Allocate();
@@ -7400,12 +7402,14 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	case SCI_GETZOOM:
 		return vs.zoomLevel;
 
+	// NPPSTART Joce 06/10/09 DisableMouseWheelZoom
 	case SCI_GETWHEELZOOMING:
 		return enableWheelZooming;
 
 	case SCI_SETWHEELZOOMING:
 		enableWheelZooming = (wParam != 0);
 		break;
+	// NPPEND
 
 	case SCI_GETEDGECOLUMN:
 		return theEdge;
