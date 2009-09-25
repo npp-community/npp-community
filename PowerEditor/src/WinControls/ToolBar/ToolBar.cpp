@@ -262,7 +262,7 @@ void ToolBar::addToRebar(ReBar * rebar) {
 	_pRebar = rebar;
 
 	winVer winVersion = (NppParameters::getInstance())->getWinVersion();
-	if (winVersion <= WV_ME)
+	if (winVersion <= WV_W2K)
 	{
 		ZeroMemory(&_rbBand, sizeof(REBARBANDINFO));
 		_rbBand.cbSize  = sizeof(REBARBANDINFO);
@@ -348,7 +348,7 @@ void ReBar::setIDVisible(int id, bool show)
 
 	REBARBANDINFO rbBand;
 	winVer winVersion = (NppParameters::getInstance())->getWinVersion();
-	if (winVersion <= WV_ME)
+	if (winVersion <= WV_W2K)
 	{
 		ZeroMemory(&rbBand, sizeof(REBARBANDINFO));
 		rbBand.cbSize  = sizeof(REBARBANDINFO);
@@ -375,7 +375,7 @@ bool ReBar::getIDVisible(int id)
 		return false;	//error
 	REBARBANDINFO rbBand;
 	winVer winVersion = (NppParameters::getInstance())->getWinVersion();
-	if (winVersion <= WV_ME)
+	if (winVersion <= WV_W2K)
 	{
 		ZeroMemory(&rbBand, sizeof(REBARBANDINFO));
 		rbBand.cbSize  = sizeof(REBARBANDINFO);

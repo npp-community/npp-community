@@ -37,7 +37,7 @@
 
 const TCHAR Notepad_plus::_className[32] = TEXT("Notepad++");
 HWND Notepad_plus::gNppHWND = NULL;
-const char *urlHttpRegExpr = "http://[a-z0-9_\\-\\+.:?&@=/%#]*";
+const char *urlHttpRegExpr = "http://[a-z0-9_\\-\\+~.:?&@=/%#]*";
 
 int docTabIconIDs[] = {IDI_SAVED_ICON, IDI_UNSAVED_ICON, IDI_READONLY_ICON};
 enum tb_stat {tb_saved, tb_unsaved, tb_ro};
@@ -2750,7 +2750,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 		//Else forward notification to window of rebarband
 		REBARBANDINFO rbBand;
 		winVer winVersion = (NppParameters::getInstance())->getWinVersion();
-		if (winVersion <= WV_ME)
+		if (winVersion <= WV_W2K)
 		{
 			ZeroMemory(&rbBand, sizeof(REBARBANDINFO));
 			rbBand.cbSize  = sizeof(REBARBANDINFO);
@@ -4305,16 +4305,16 @@ void Notepad_plus::command(int id)
 
 		case IDM_ONLINEHELP:
 		{
-			::ShellExecute(NULL, TEXT("open"), TEXT("http://notepad-plus.sourceforge.net/uk/generalFAQ.php"), NULL, NULL, SW_SHOWNORMAL);
+			::ShellExecute(NULL, TEXT("open"), TEXT("http://sourceforge.net/apps/mediawiki/notepad-plus/index.php?title=Main_Page"), NULL, NULL, SW_SHOWNORMAL);
 			break;
 		}
-
+/*
 		case IDM_WIKIFAQ:
 		{
 			::ShellExecute(NULL, TEXT("open"), TEXT("http://notepad-plus.wiki.sourceforge.net/FAQ"), NULL, NULL, SW_SHOWNORMAL);
 			break;
 		}
-
+*/
 		case IDM_FORUM:
 		{
 			::ShellExecute(NULL, TEXT("open"), TEXT("http://sourceforge.net/forum/?group_id=95717"), NULL, NULL, SW_SHOWNORMAL);
@@ -4842,7 +4842,7 @@ void Notepad_plus::updateStatusBar()
     _statusBar.setText(strLnCol, STATUSBAR_CUR_POS);
 
 	TCHAR strDonLen[64];
-	wsprintf(strDonLen, TEXT("nb char : %d"), _pEditView->getCurrentDocLen());
+    wsprintf(strDonLen, TEXT("nb char : %d    nb line : %d"), _pEditView->getCurrentDocLen(), _pEditView->execute(SCI_GETLINECOUNT));
 	_statusBar.setText(strDonLen, STATUSBAR_DOC_SIZE);
     _statusBar.setText(_pEditView->execute(SCI_GETOVERTYPE) ? TEXT("OVR") : TEXT("INS"), STATUSBAR_TYPING_MODE);
 }
@@ -7134,7 +7134,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
             //--Status Bar Section--//
 			bool willBeShown = nppGUI._statusBarShow;
             _statusBar.init(_hInst, hwnd, 6);
-			_statusBar.setPartWidth(STATUSBAR_DOC_SIZE, 180);
+			_statusBar.setPartWidth(STATUSBAR_DOC_SIZE, 250);
 			_statusBar.setPartWidth(STATUSBAR_CUR_POS, 250);
 			_statusBar.setPartWidth(STATUSBAR_EOF_FORMAT, 80);
 			_statusBar.setPartWidth(STATUSBAR_UNICODE_TYPE, 100);
