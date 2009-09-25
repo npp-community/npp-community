@@ -25,6 +25,7 @@
 
 //*******************************************************//
 
+
 #define PLAT_GTK 0
 #define PLAT_GTK_WIN32 0
 #define PLAT_MACOSX 0
