@@ -2668,7 +2668,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 		NppParameters *nppParam = NppParameters::getInstance();
 
 		// if it's searching/replacing, then do nothing
-		if (_linkTriggered && !nppParam->_isFindReplacing)
+		if (/*_linkTriggered &&*/ !nppParam->_isFindReplacing)
 		{
 			int urlAction = (NppParameters::getInstance())->getNppGUI()._styleURL;
 			if ((urlAction == 1) || (urlAction == 2))
@@ -2872,8 +2872,12 @@ void Notepad_plus::addHotSpot(bool docIsModifing)
 		}
 	}
 
+	int endStyled = _pEditView->execute(SCI_GETENDSTYLED, 0, 0);
+	int lineEndStyled = _pEditView->execute(SCI_LINEFROMPOSITION, endStyled, 0);
+	endStyled = _pEditView->execute(SCI_POSITIONFROMLINE, lineEndStyled, 0);
+
 	int startPos = 0;
-	int endPos = _pEditView->execute(SCI_GETTEXTLENGTH);
+	int endPos = endStyled;
 
 	_pEditView->execute(SCI_SETSEARCHFLAGS, SCFIND_REGEXP|SCFIND_POSIX);
 
@@ -2882,7 +2886,10 @@ void Notepad_plus::addHotSpot(bool docIsModifing)
 
 	vector<pair<int, int> > hotspotStylers;
 
-	int style_hotspot = 30;
+	int bitsNeeded = _pEditView->execute(SCI_GETSTYLEBITSNEEDED);
+	int styleMask = (1<<bitsNeeded)-1;
+
+	int style_hotspot = styleMask-1;
 	int posFound = _pEditView->execute(SCI_SEARCHINTARGET, strlen(urlHttpRegExpr), (LPARAM)urlHttpRegExpr);
 
 	while (posFound != -1)
@@ -2936,7 +2943,7 @@ void Notepad_plus::addHotSpot(bool docIsModifing)
 					_pEditView->setHotspotStyle(hotspotStyle, idStyle);
 				}
 
-				_pEditView->execute(SCI_STARTSTYLING, start, 0x1F);
+				_pEditView->execute(SCI_STARTSTYLING, start, styleMask);
 				_pEditView->execute(SCI_SETSTYLING, foundTextLen, style_hotspot);
 				if (style_hotspot > 1)
 					style_hotspot--;
