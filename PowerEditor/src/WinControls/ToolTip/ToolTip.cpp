@@ -69,7 +69,7 @@ void ToolTip::Show(RECT rectTitle, const TCHAR * pszTitle, int iXOff, int iWidth
 	::SendMessage(_hSelf, WM_SETFONT, reinterpret_cast<WPARAM>(_hFont), TRUE);
 
 	// Bleuargh...  const_cast.  Will have to do for now.
-	_ti.lpszText	= const_cast<TCHAR *>(pszTitle);
+	_ti.lpszText  = const_cast<TCHAR *>(pszTitle);
 	::SendMessage(_hSelf, TTM_ADDTOOL, 0, (LPARAM) (LPTOOLINFO) &_ti);
 	::SendMessage(_hSelf, TTM_TRACKPOSITION, 0, (LPARAM)(DWORD) MAKELONG(_ti.rect.left + iXOff, _ti.rect.top + iWidthOff));
 	::SendMessage(_hSelf, TTM_TRACKACTIVATE, true, (LPARAM)(LPTOOLINFO) &_ti);

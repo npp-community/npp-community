@@ -310,30 +310,6 @@ BOOL CALLBACK BarsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*
 #endif
 								}
 								return TRUE;
-/*
-								case IDC_COMBO_THEME :
-								{
-									LocalizationSwitcher & localizationSwitcher = pNppParam->getLocalizationSwitcher();
-									int index = ::SendDlgItemMessage(_hSelf, IDC_COMBO_LOCALIZATION, CB_GETCURSEL, 0, 0);
-									TCHAR themeName[MAX_PATH];
-									::SendDlgItemMessage(_hSelf, IDC_COMBO_LOCALIZATION, CB_GETLBTEXT, index, (LPARAM)themeName);
-									if (langName[0])
-									{
-										// Make English as basic language
-										if (localizationSwitcher.switchToLang(TEXT("English")))
-										{
-											::SendMessage(::GetParent(_hParent), NPPM_INTERNAL_RELOADNATIVELANG, 0, 0);
-										}
-										// Change the language
-										if (localizationSwitcher.switchToLang(langName))
-										{
-											::SendMessage(::GetParent(_hParent), NPPM_INTERNAL_RELOADNATIVELANG, 0, 0);
-											::InvalidateRect(_hParent, NULL, TRUE);
-										}
-									}
-								}
-								return TRUE;
-								*/
 								default:
 									break;
 							}
@@ -633,6 +609,13 @@ BOOL CALLBACK SettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPa
 			::SendDlgItemMessage(_hSelf, IDC_CHECK_REMEMBERSESSION, BM_SETCHECK, nppGUI._rememberLastSession, 0);
 			::SendDlgItemMessage(_hSelf, IDC_CHECK_ENABLEWHEELZOOM, BM_SETCHECK, nppGUI._enableMouseWheelZoom, 0);
 			::SendDlgItemMessage(_hSelf, IDC_CHECK_AUTOUPDATE, BM_SETCHECK, !nppGUI._neverUpdate, 0);
+
+			bool isVistaAndAfter = (pNppParam->getWinVersion() >= WV_VISTA);
+			if (isVistaAndAfter)
+			{
+				::SendDlgItemMessage(_hSelf, IDC_CHECK_AUTOUPDATE, BM_SETCHECK, FALSE, 0);
+				::EnableWindow(::GetDlgItem(_hSelf, IDC_CHECK_AUTOUPDATE), FALSE);
+			}
 
 			::ShowWindow(::GetDlgItem(_hSelf, IDC_CHECK_AUTOUPDATE), nppGUI._doesExistUpdater?SW_SHOW:SW_HIDE);
 

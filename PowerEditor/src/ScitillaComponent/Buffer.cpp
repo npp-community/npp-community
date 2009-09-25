@@ -192,10 +192,8 @@ bool Buffer::checkFileState() {	//returns true if the status has been changed (i
 			doNotify(mask);
 			return true;
 		}
-
 		return false;
 	}
-
 	return false;
 }
 
@@ -368,7 +366,7 @@ void FileManager::init(Notepad_plus * pNotepadPlus, ScintillaEditView * pscratch
 
 void FileManager::checkFilesystemChanges() {
 	for(size_t i = 0; i < _nrBufs; i++) {
-		if (_buffers[i]->checkFileState()){}	//something has changed. Triggers update automatically
+		_buffers[i]->checkFileState();	//something has changed. Triggers update automatically
 	}
 }
 

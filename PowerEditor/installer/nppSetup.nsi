@@ -17,18 +17,18 @@
 
 ; Define the application name
 !define APPNAME "Notepad++"
-!define APPVERSION "5.4.3"
-!define APPNAMEANDVERSION "Notepad++ v5.4.3"
+!define APPVERSION "5.4.5"
+!define APPNAMEANDVERSION "Notepad++ v5.4.5"
 !define APPWEBSITE "http://notepad-plus.sourceforge.net/"
 
 !define VERSION_MAJOR 5
-!define VERSION_MINOR 43
+!define VERSION_MINOR 45
 
 ; Main Install settings
 Name "${APPNAMEANDVERSION}"
 InstallDir "$PROGRAMFILES\Notepad++"
 InstallDirRegKey HKLM "Software\${APPNAME}" ""
-OutFile "..\bin\npp.5.4.3.Installer.exe"
+OutFile "..\bin\npp.5.4.5.Installer.exe"
 
 ; GetWindowsVersion
  ;
@@ -441,11 +441,11 @@ GLOBAL_INST:
 	IfFileExists "$INSTDIR\plugins\NppAutoIndent.dll" 0 +3
 		MessageBox MB_OK "Due to the stabilty issue,$\nNppAutoIndent.dll is about to be deleted.$\nYou can download it via menu $\"?->Get more plugins$\" if you really need it."
 		Delete "$INSTDIR\plugins\NppAutoIndent.dll"
-
+/*
 	IfFileExists "$INSTDIR\plugins\ComparePlugin.dll" 0 +3
 		MessageBox MB_OK "Due to the problem of compability with this version,$\nComparePlugin.dll is about to be deleted.$\nYou can download it via menu $\"?->Get more plugins$\" if you really need it."
 		Delete "$INSTDIR\plugins\ComparePlugin.dll"
-
+*/
 	; detect the right of
 	UserInfo::GetAccountType
 	Pop $1
@@ -573,10 +573,6 @@ SubSection "Auto-completion Files" autoCompletionComponent
 		File "..\bin\plugins\APIs\nsis.xml"
 	SectionEnd
 
-	Section AWK
-		SetOutPath "$INSTDIR\plugins\APIs"
-		File "..\bin\plugins\APIs\awk.xml"
-	SectionEnd
 SubSectionEnd
 
 SubSection "Plugins" Plugins
@@ -676,6 +672,13 @@ SubSection "Plugins" Plugins
 		SetOutPath "$INSTDIR\plugins"
 		File "..\bin\plugins\NppPlugin_ChangeMarker.dll"
 	SectionEnd
+
+	Section "Compare Plugin" ComparePlugin
+		Delete "$INSTDIR\plugins\ComparePlugin.dll"
+		SetOutPath "$INSTDIR\plugins"
+		File "..\bin\plugins\ComparePlugin.dll"
+	SectionEnd
+
 SubSectionEnd
 
 SubSection "Themes" Themes
@@ -740,6 +743,10 @@ SubSection "Themes" Themes
 		File "..\bin\themes\vim Dark Blue.xml"
 	SectionEnd
 
+	Section "Bespin" Bespin
+		SetOutPath "$INSTDIR\themes"
+		File "..\bin\themes\Bespin.xml"
+	SectionEnd
 SubSectionEnd
 
 Section /o "As default html viewer" htmlViewer
@@ -1057,6 +1064,11 @@ SubSection un.Themes
 
 	Section un.vimDarkBlue
 		Delete "$INSTDIR\themes\vim Dark Blue.xml"
+		RMDir "$INSTDIR\themes\"
+	SectionEnd
+
+	Section un.Bespin
+		Delete "$INSTDIR\themes\Bespin.xml"
 		RMDir "$INSTDIR\themes\"
 	SectionEnd
 SubSectionEnd

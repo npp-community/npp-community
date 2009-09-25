@@ -191,7 +191,7 @@ private:
 
 	// caption params
 	BOOL					_isTopCaption;
-	std::generic_string		_pszCaption;
+	std::generic_string			_pszCaption;
 	BOOL					_isMouseDown;
 	BOOL					_isMouseClose;
 	BOOL					_isMouseOver;
