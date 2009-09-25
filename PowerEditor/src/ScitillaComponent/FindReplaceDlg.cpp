@@ -690,7 +690,6 @@ BOOL CALLBACK FindReplaceDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 						_isInSelection = true;
 					}
 				}
-
 				// Searching/replacing in column selection is not allowed
 				if ((*_ppEditView)->execute(SCI_GETSELECTIONMODE) == SC_SEL_RECTANGLE)
 				{
@@ -1112,8 +1111,11 @@ BOOL CALLBACK FindReplaceDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 // return value :
 // true  : the text2find is found
 // false : the text2find is not found
-bool FindReplaceDlg::processFindNext(const TCHAR *txt2find, FindOption *options)
+bool FindReplaceDlg::processFindNext(const TCHAR *txt2find, FindOption *options, FindStatus *oFindStatus)
 {
+	if (oFindStatus)
+		*oFindStatus = FSFound;
+
 	if (!txt2find || !txt2find[0])
 		return false;
 
@@ -1141,10 +1143,23 @@ bool FindReplaceDlg::processFindNext(const TCHAR *txt2find, FindOption *options)
 		endPosition = 0;
 	}
 
-	if (pOptions->_isIncremental)
+	if (FirstIncremental==pOptions->_incrementalType)
 	{
-		startPosition = 0;
+		// the text to find is modified so use the current position
+		startPosition = cr.cpMin;
 		endPosition = docLength;
+	}
+	else if (NextIncremental==pOptions->_incrementalType)
+	{
+		// text to find is not modified, so use current position +1
+		startPosition = cr.cpMin +1;
+		endPosition = docLength;
+		if (pOptions->_whichDirection == DIR_UP)
+		{
+			//When searching upwards, start is the lower part, end the upper, for backwards search
+			startPosition = cr.cpMax - 1;
+			endPosition = 0;
+		}
 	}
 
 	int flags = Searching::buildSearchFlags(pOptions);
@@ -1161,11 +1176,15 @@ bool FindReplaceDlg::processFindNext(const TCHAR *txt2find, FindOption *options)
 			{
 				startPosition = 0;
 				endPosition = docLength;
+				if (oFindStatus)
+					*oFindStatus = FSEndReached;
 			}
 			else
 			{
 				startPosition = docLength;
 				endPosition = 0;
+				if (oFindStatus)
+					*oFindStatus = FSTopReached;
 			}
 
 			//new target, search again
@@ -1173,8 +1192,10 @@ bool FindReplaceDlg::processFindNext(const TCHAR *txt2find, FindOption *options)
 		}
 		if (posFind == -1)
 		{
+			if (oFindStatus)
+				*oFindStatus = FSNotFound;
 			//failed, or failed twice with wrap
-			if (!pOptions->_isIncremental) //incremental search doesnt trigger messages
+			if (NotIncremental==pOptions->_incrementalType) //incremental search doesnt trigger messages
 			{
 				generic_string msg = TEXT("Can't find the text:\r\n\"");
 				msg += pText;
@@ -1917,34 +1938,30 @@ BOOL CALLBACK Finder::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
+void FindIncrementDlg::setSearchText(const TCHAR * txt2find, bool isUTF8 ) {
 #ifdef UNICODE
-	void FindIncrementDlg::setSearchText(const TCHAR * txt2find, bool /*isUTF8*/)
+	::SendDlgItemMessage(_hSelf, IDC_INCFINDTEXT, WM_SETTEXT, 0, (LPARAM)txt2find);
+	isUTF8 = isUTF8;
+#else
+	if (!isUTF8)
 	{
 		::SendDlgItemMessage(_hSelf, IDC_INCFINDTEXT, WM_SETTEXT, 0, (LPARAM)txt2find);
+		return;
 	}
-#else
-	void FindIncrementDlg::setSearchText(const TCHAR * txt2find, bool isUTF8)
-	{
-		if (!isUTF8)
-		{
-			::SendDlgItemMessage(_hSelf, IDC_INCFINDTEXT, WM_SETTEXT, 0, (LPARAM)txt2find);
-			return;
-		}
-		const int wideBufferSize = 256;
-		WCHAR wchars[wideBufferSize];
-		::MultiByteToWideChar(CP_UTF8, 0, txt2find, -1, wchars, wideBufferSize);
-		winVer winVersion = NppParameters::getInstance()->getWinVersion();
-		if (winVersion <= WV_ME) {
-			//Cannot simply take txt2find since its UTF8
-			char ansiBuffer[wideBufferSize];	//Assuming no more than 2 bytes for each wchar (SBCS or DBCS, no UTF8 and sorts)
-			::WideCharToMultiByte(CP_ACP, 0, wchars, -1, ansiBuffer, wideBufferSize, NULL, NULL);
-			::SendDlgItemMessageA(_hSelf, IDC_INCFINDTEXT, WM_SETTEXT, 0, (LPARAM)ansiBuffer);
-		} else {
-			::SendDlgItemMessageW(_hSelf, IDC_INCFINDTEXT, WM_SETTEXT, 0, (LPARAM)wchars);
-		}
-
+	const int wideBufferSize = 256;
+	WCHAR wchars[wideBufferSize];
+	::MultiByteToWideChar(CP_UTF8, 0, txt2find, -1, wchars, wideBufferSize);
+	winVer winVersion = NppParameters::getInstance()->getWinVersion();
+	if (winVersion <= WV_ME) {
+		//Cannot simply take txt2find since its UTF8
+		char ansiBuffer[wideBufferSize];	//Assuming no more than 2 bytes for each wchar (SBCS or DBCS, no UTF8 and sorts)
+		::WideCharToMultiByte(CP_ACP, 0, wchars, -1, ansiBuffer, wideBufferSize, NULL, NULL);
+		::SendDlgItemMessageA(_hSelf, IDC_INCFINDTEXT, WM_SETTEXT, 0, (LPARAM)ansiBuffer);
+	} else {
+		::SendDlgItemMessageW(_hSelf, IDC_INCFINDTEXT, WM_SETTEXT, 0, (LPARAM)wchars);
 	}
 #endif
+}
 
 void FindIncrementDlg::destroy()
 {
@@ -1963,10 +1980,15 @@ void FindIncrementDlg::display(bool toShow) const
 		return;
 	}
 	if (toShow)
+	{
 		::SetFocus(::GetDlgItem(_hSelf, IDC_INCFINDTEXT));
+		// select the whole find editor text
+		::SendDlgItemMessage(_hSelf, IDC_INCFINDTEXT, EM_SETSEL, 0, -1);
+	}
 	_pRebar->setIDVisible(_rbBand.wID, toShow);
 }
 
+#define SHIFTED 0x8000
 BOOL CALLBACK FindIncrementDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	switch (message)
@@ -1974,6 +1996,7 @@ BOOL CALLBACK FindIncrementDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM 
 		case WM_COMMAND :
 		{
 			bool isUnicode = (*(_pFRDlg->_ppEditView))->getCurrentBuffer()->getUnicodeMode() != uni8Bit;
+			FindStatus findStatus = FSFound;
 			switch (LOWORD(wParam))
 			{
 				case IDCANCEL :
@@ -1985,45 +2008,79 @@ BOOL CALLBACK FindIncrementDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM 
 
 				case IDC_INCFINDPREVOK :
 				case IDC_INCFINDNXTOK :
+				case IDOK :
 				{
 					FindOption fo;
 					fo._isWholeWord = false;
+					fo._incrementalType = NextIncremental;
 					fo._isMatchCase = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_INCFINDMATCHCASE, BM_GETCHECK, 0, 0));
 					if (LOWORD(wParam) == IDC_INCFINDPREVOK)
 						fo._whichDirection = DIR_UP;
+					else if (LOWORD(wParam) == IDOK)
+					{
+						SHORT nVirtKey = GetKeyState(VK_SHIFT);
+						if (nVirtKey & SHIFTED)
+							fo._whichDirection = DIR_UP;
+					}
 
 					generic_string str2Search = _pFRDlg->getTextFromCombo(::GetDlgItem(_hSelf, IDC_INCFINDTEXT), isUnicode);
-					_pFRDlg->processFindNext(str2Search.c_str(), &fo);
+					_pFRDlg->processFindNext(str2Search.c_str(), &fo, &findStatus);
+					setFindStatus(findStatus);
+				}
+				return TRUE;
+
+				case IDC_INCFINDTEXT :
+				{
+					switch(HIWORD(wParam))
+					{
+						case EN_CHANGE :
+						{
+							FindOption fo;
+							fo._isWholeWord = false;
+							fo._isMatchCase = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_INCFINDMATCHCASE, BM_GETCHECK, 0, 0));
+							fo._incrementalType = FirstIncremental;
+
+							generic_string str2Search = _pFRDlg->getTextFromCombo(::GetDlgItem(_hSelf, IDC_INCFINDTEXT), isUnicode);
+							_pFRDlg->processFindNext(str2Search.c_str(), &fo, &findStatus);
+							setFindStatus(findStatus);
+						}
+					return TRUE;
+					case EN_KILLFOCUS :
+					case EN_SETFOCUS :
+						break;
+					}
 				}
 				return TRUE;
 
 				case IDC_INCFINDMATCHCASE:
-				case IDC_INCFINDTEXT :
+				{
+					FindOption fo;
+					fo._isWholeWord = false;
+					fo._incrementalType = FirstIncremental;
+					fo._isMatchCase = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_INCFINDMATCHCASE, BM_GETCHECK, 0, 0));
+
+					generic_string str2Search = _pFRDlg->getTextFromCombo(::GetDlgItem(_hSelf, IDC_INCFINDTEXT), isUnicode);
+					bool isFound = _pFRDlg->processFindNext(str2Search.c_str(), &fo, &findStatus);
+					setFindStatus(findStatus);
+					if (!isFound)
+					{
+						CharacterRange range = (*(_pFRDlg->_ppEditView))->getSelection();
+						(*(_pFRDlg->_ppEditView))->execute(SCI_SETSEL, (WPARAM)-1, range.cpMin);
+					}
+				}
+
 				case IDC_INCFINDHILITEALL :
 				{
-					if (_doSearchFromBegin)
-					{
-						FindOption fo;
-						fo._isWholeWord = false;
-						fo._isIncremental = true;
-						fo._isMatchCase = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_INCFINDMATCHCASE, BM_GETCHECK, 0, 0));
+					FindOption fo;
+					fo._isWholeWord = false;
+					fo._incrementalType = FirstIncremental;
+					fo._isMatchCase = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_INCFINDMATCHCASE, BM_GETCHECK, 0, 0));
 
-						generic_string str2Search = _pFRDlg->getTextFromCombo(::GetDlgItem(_hSelf, IDC_INCFINDTEXT), isUnicode);
-						bool isFound = _pFRDlg->processFindNext(str2Search.c_str(), &fo);
-						if (!isFound)
-						{
-							CharacterRange range = (*(_pFRDlg->_ppEditView))->getSelection();
-							(*(_pFRDlg->_ppEditView))->execute(SCI_SETSEL, (WPARAM)-1, range.cpMin);
-						}
-
-						bool isHiLieAll = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_INCFINDHILITEALL, BM_GETCHECK, 0, 0));
-						if (str2Search == TEXT(""))
-							isHiLieAll = false;
-
-						markSelectedTextInc(isHiLieAll, &fo);
-					}
-					else
-						_doSearchFromBegin = true;
+					generic_string str2Search = _pFRDlg->getTextFromCombo(::GetDlgItem(_hSelf, IDC_INCFINDTEXT), isUnicode);
+					bool isHiLieAll = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_INCFINDHILITEALL, BM_GETCHECK, 0, 0));
+					if (str2Search == TEXT(""))
+						isHiLieAll = false;
+					markSelectedTextInc(isHiLieAll, &fo);
 				}
 				return TRUE;
 
