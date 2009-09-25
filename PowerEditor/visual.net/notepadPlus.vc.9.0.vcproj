@@ -826,11 +826,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\ScitillaComponent\columnEditor_rc.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\ScitillaComponent\DocTabView.h"
 					>
 				</File>
 				<File
 					RelativePath="..\src\ScitillaComponent\FindReplaceDlg.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\ScitillaComponent\FindReplaceDlg_rc.h"
 					>
 				</File>
 				<File
@@ -970,6 +978,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\WinControls\StaticDialog\RunDlg\RunDlg_rc.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\WinControls\shortcut\RunMacroDlg.h"
 					>
 				</File>
@@ -987,6 +999,10 @@
 				</File>
 				<File
 					RelativePath="..\src\WinControls\Grid\ShortcutMapper_rc.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\WinControls\shortcut\shortcutRc.h"
 					>
 				</File>
 				<File
