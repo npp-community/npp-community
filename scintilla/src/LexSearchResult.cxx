@@ -70,7 +70,9 @@ static void ColouriseSearchResultLine(SearchResultMarkings* pMarkings, char *lin
 		PLATFORM_ASSERT(lengthLine >= firstTokenLen + 2);
 		// NPPSTART Joce 06/16/09 Scintilla_clean_precomp
 		// Avoid compiler warning in release
+		#ifdef NDEBUG
 		lengthLine = lengthLine;
+		#endif
 		// NPPEND
 
 		styler.ColourTo(startLine + firstTokenLen, SCE_SEARCHRESULT_DEFAULT);

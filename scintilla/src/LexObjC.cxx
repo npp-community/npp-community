@@ -21,6 +21,8 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "KeyWords.h"
+
+#define INCLUDE_DEPRECATED_FEATURES
 #include "Scintilla.h"
 #include "SciLexer.h"
 
