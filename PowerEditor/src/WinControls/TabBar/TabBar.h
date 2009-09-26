@@ -177,6 +177,7 @@ public :
 	};
 
 	static void setColour(COLORREF colour2Set, tabColourIndex i);
+	static COLORREF getColour(tabColourIndex i);
 
 protected:
     // it's the boss to decide if we do the drag N drop

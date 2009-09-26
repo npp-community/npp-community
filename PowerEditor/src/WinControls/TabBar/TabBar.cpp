@@ -984,25 +984,45 @@ void TabBarPlus::setColour(COLORREF colour2Set, tabColourIndex i)
 {
 	switch (i)
 	{
-	case activeText:
-		_activeTextColour = colour2Set;
-		break;
-	case activeFocusedTop:
-		_activeTopBarFocusedColour = colour2Set;
-		break;
-	case activeUnfocusedTop:
-		_activeTopBarUnfocusedColour = colour2Set;
-		break;
-	case inactiveText:
-		_inactiveTextColour = colour2Set;
-		break;
-	case inactiveBg :
-		_inactiveBgColour = colour2Set;
-		break;
-	default :
-		return;
+		case activeText:
+			_activeTextColour = colour2Set;
+			break;
+		case activeFocusedTop:
+			_activeTopBarFocusedColour = colour2Set;
+			break;
+		case activeUnfocusedTop:
+			_activeTopBarUnfocusedColour = colour2Set;
+			break;
+		case inactiveText:
+			_inactiveTextColour = colour2Set;
+			break;
+		case inactiveBg:
+			_inactiveBgColour = colour2Set;
+			break;
+		default :
+			return;
 	}
 	doOwnerDrawTab();
+}
+
+COLORREF TabBarPlus::getColour(tabColourIndex i)
+{
+	switch (i)
+	{
+		case activeText:
+			return _activeTextColour;
+		case activeFocusedTop:
+			return _activeTopBarFocusedColour;
+		case activeUnfocusedTop:
+			return _activeTopBarUnfocusedColour;
+		case inactiveText:
+			return _inactiveTextColour;
+		case inactiveBg:
+			return _inactiveBgColour;
+		default :
+			assert(0);
+			return black;
+	}
 }
 
 int TabBarPlus::getTabIndexAt(int x, int y)

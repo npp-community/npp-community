@@ -916,14 +916,6 @@ void DockingManager::setStyleCaption(BOOL captionOnTop)
 	_vContainer[CONT_BOTTOM]->setCaptionTop(captionOnTop);
 };
 
-void DockingManager::setTabStyle(BOOL orangeLine)
-{
-	for (size_t i = 0; i < _vContainer.size(); i++)
-	{
-		_vContainer[i]->setTabStyle(orangeLine);
-	}
-}
-
 int DockingManager::getDockedContSize(int iCont)
 {
 	if ((iCont == CONT_TOP) || (iCont == CONT_BOTTOM))

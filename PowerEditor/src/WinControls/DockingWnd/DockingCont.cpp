@@ -20,6 +20,7 @@
 #include "dockingResource.h"
 #include "Docking.h"
 #include "ToolTip.h"
+#include "Tabbar.h"
 #include "npp_winver.h"
 
 #ifndef WH_MOUSE_LL
@@ -72,7 +73,6 @@ DockingCont::DockingCont()
 	_bCaptionTT			= FALSE;
 	_bCapTTHover		= FALSE;
 	_hoverMPos			= posClose;
-	_bDrawOgLine		= TRUE;
 	_vTbData.clear();
 }
 
@@ -823,21 +823,30 @@ void DockingCont::drawTabItem(DRAWITEMSTRUCT *pDrawItemStruct)
 	rc.top += ::GetSystemMetrics(SM_CYEDGE);
 
 	::SetBkMode(hDc, TRANSPARENT);
-	HBRUSH hBrush = ::CreateSolidBrush(::GetSysColor(COLOR_BTNFACE));
+
+	COLORREF backgroundColor = TabBarPlus::getColour(TabBarPlus::inactiveBg);
+	if (isSelected)
+	{
+		backgroundColor = ::GetSysColor(COLOR_BTNFACE);
+	}
+
+	HBRUSH hBrush = ::CreateSolidBrush(backgroundColor);
 	::FillRect(hDc, &rc, hBrush);
 	::DeleteObject((HGDIOBJ)hBrush);
 
-	// draw orange bar
-	if ((_bDrawOgLine == TRUE) && (isSelected))
+	// draw top / bottom bar
+	RECT barRect  = rc;
+	barRect.top  += rc.bottom - 4;
+
+	COLORREF colorBarColor = TabBarPlus::getColour(TabBarPlus::activeUnfocusedTop);
+	if (isSelected)
 	{
-		RECT barRect  = rc;
-		barRect.top  += rc.bottom - 4;
-
-		hBrush = ::CreateSolidBrush(RGB(250, 170, 60));
-		::FillRect(hDc, &barRect, hBrush);
-		::DeleteObject((HGDIOBJ)hBrush);
-
+		colorBarColor = TabBarPlus::getColour(TabBarPlus::activeFocusedTop);
 	}
+
+	hBrush = ::CreateSolidBrush(colorBarColor);
+	::FillRect(hDc, &barRect, hBrush);
+	::DeleteObject((HGDIOBJ)hBrush);
 
 	// draw icon if enabled
 	if (((tTbData*)tcItem.lParam)->uMask & DWS_ICONTAB)
@@ -854,23 +863,22 @@ void DockingCont::drawTabItem(DRAWITEMSTRUCT *pDrawItemStruct)
 			ImageList_GetImageInfo(hImageList, iPosImage, &info);
 			ImageList_Draw(hImageList, iPosImage, hDc, rc.left + 3, 2, ILD_NORMAL);
 
-			if (isSelected == true)
-			{
-				rc.left += imageRect.right - imageRect.left + 5;
-			}
+			rc.left += imageRect.right - imageRect.left + 5;
 		}
 	}
 
-	if (isSelected == true)
+	COLORREF textColor = TabBarPlus::getColour(TabBarPlus::inactiveText);
+	if (isSelected)
 	{
-		COLORREF _unselectedColor = RGB(0, 0, 0);
-		::SetTextColor(hDc, _unselectedColor);
-
-		// draw text
-		rc.top -= ::GetSystemMetrics(SM_CYEDGE);
-		::SelectObject(hDc, _hFont);
-		::DrawText(hDc, text, length, &rc, DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX);
+		textColor = TabBarPlus::getColour(TabBarPlus::activeText);
 	}
+
+	::SetTextColor(hDc, textColor);
+
+	// draw text
+	rc.top -= ::GetSystemMetrics(SM_CYEDGE);
+	::SelectObject(hDc, _hFont);
+	::DrawText(hDc, text, length, &rc, DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX);
 
 	::RestoreDC(hDc, nSavedDC);
 }
@@ -1312,22 +1320,13 @@ void DockingCont::SelectTab(INT iTab)
 		tcItem.mask	= TCIF_TEXT;
 		for (INT iItem = 0; iItem < iItemCnt; iItem++)
 		{
-			if (iItem == iTab)
-			{
-				// fake here an icon before text ...
-				TCHAR	szText[64];
+			// fake here an icon before text ...
+			TCHAR	szText[64];
 
-				lstrcpy(szText, TEXT("    "));
-				lstrcat(szText, pszMaxTxt);
-				tcItem.pszText		= szText;
-				tcItem.cchTextMax	= lstrlen(szText);
-			}
-			else
-			{
-				// ... and resize old and new item
-				tcItem.pszText		= TEXT("");
-				tcItem.cchTextMax	= lstrlen(TEXT(""));
-			}
+			lstrcpy(szText, TEXT("      "));
+			lstrcat(szText, pszMaxTxt);
+			tcItem.pszText		= szText;
+			tcItem.cchTextMax	= lstrlen(szText);
 			::SendMessage(_hContTab, TCM_SETITEM, iItem, (LPARAM)&tcItem);
 		}
 
