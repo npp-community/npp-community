@@ -48,6 +48,7 @@
 				ExceptionHandling="2"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="1"
+				DefaultCharIsUnsigned="true"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="precompiled_headers.h"
 				PrecompiledHeaderFile="$(IntDir)\$(TargetName).pch"
@@ -142,6 +143,7 @@
 				ExceptionHandling="2"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
+				DefaultCharIsUnsigned="true"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="precompiled_headers.h"
 				PrecompiledHeaderFile="$(IntDir)\$(TargetName).pch"
@@ -232,6 +234,7 @@
 				ExceptionHandling="2"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="1"
+				DefaultCharIsUnsigned="true"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="precompiled_headers.h"
 				PrecompiledHeaderFile="$(IntDir)\$(TargetName).pch"
@@ -327,6 +330,7 @@
 				ExceptionHandling="2"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
+				DefaultCharIsUnsigned="true"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="precompiled_headers.h"
 				PrecompiledHeaderFile="$(IntDir)\$(TargetName).pch"
@@ -1204,15 +1208,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\default_close.ico"
-					>
-				</File>
-				<File
-					RelativePath="..\src\default_new.ico"
-					>
-				</File>
-				<File
-					RelativePath="..\src\default_open.ico"
+					RelativePath="..\src\icons\delete.ico"
 					>
 				</File>
 				<File
@@ -1241,26 +1237,6 @@
 				</File>
 				<File
 					RelativePath="..\src\icons\findrep_on.ico"
-					>
-				</File>
-				<File
-					RelativePath="..\src\hot_close.ico"
-					>
-				</File>
-				<File
-					RelativePath="..\src\hot_new.ico"
-					>
-				</File>
-				<File
-					RelativePath="..\src\hot_open.ico"
-					>
-				</File>
-				<File
-					RelativePath="..\src\icons\icon10.ico"
-					>
-				</File>
-				<File
-					RelativePath="..\src\icons\imp_off.ico"
 					>
 				</File>
 				<File
@@ -1312,6 +1288,30 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\icons\playrecord_dis.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\playrecord_m_dis.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\playrecord_m_off.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\playrecord_m_on.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\playrecord_off.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\playrecord_on.ico"
+					>
+				</File>
+				<File
 					RelativePath="..\src\icons\readonly.ico"
 					>
 				</File>
@@ -1356,6 +1356,42 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\icons\saverecord_dis.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\saverecord_off.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\saverecord_on.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\startrecord_dis.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\startrecord_off.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\startrecord_on.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\stoprecord_dis.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\stoprecord_off.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\stoprecord_on.ico"
+					>
+				</File>
+				<File
 					RelativePath="..\src\icons\supp_off.ico"
 					>
 				</File>
@@ -1369,6 +1405,30 @@
 				</File>
 				<File
 					RelativePath="..\src\icons\suppall_on.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\syncH_dis.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\syncH_off.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\syncH_on.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\syncV_dis.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\syncV_off.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\syncV_on.ico"
 					>
 				</File>
 				<File
@@ -1496,11 +1556,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\cursors\drag_plus.cur"
+					RelativePath="..\src\cursors\drag_out.cur"
 					>
 				</File>
 				<File
-					RelativePath="..\src\cursors\up.cur"
+					RelativePath="..\src\cursors\drag_plus.cur"
 					>
 				</File>
 			</Filter>
@@ -1513,6 +1573,30 @@
 				</File>
 				<File
 					RelativePath="..\src\icons\closefile.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\closeTabButton.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\closeTabButton_hover.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\closeTabButton_inact.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\closeTabButton_push.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\copy.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\cut.bmp"
 					>
 				</File>
 				<File
@@ -1532,11 +1616,67 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\icons\newFile.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\openFile.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\paste.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\playRecord.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\playRecord_m.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\print.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\redo.bmp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\icons\saveAll.bmp"
 					>
 				</File>
 				<File
+					RelativePath="..\src\icons\saveFile.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\saveRecord.bmp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\icons\showPannel.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\startRecord.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\stopRecord.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\syncH.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\syncV.bmp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\undo.bmp"
 					>
 				</File>
 				<File

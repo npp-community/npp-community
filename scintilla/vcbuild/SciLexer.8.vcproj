@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
-	Name="SciLexer"
-	ProjectGUID="{55121E73-EAE3-438B-A537-BABBCA29B084}"
-	Keyword="Win32Proj"
-	TargetFrameworkVersion="131072"
+	Version="8.00"
+	Name="SciLexer.vc.8"
+	ProjectGUID="{B1BDB077-3ED7-4C69-9A22-5A65E08C201C}"
+	RootNamespace="SciLexer"
 	>
 	<Platforms>
 		<Platform
@@ -17,10 +16,12 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\bin"
+			OutputDirectory=".\..\bin"
 			IntermediateDirectory="Debug"
 			ConfigurationType="2"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="2"
 			>
 			<Tool
@@ -37,18 +38,32 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
+				PreprocessorDefinitions="_DEBUG"
+				MkTypLibCompatible="true"
+				SuppressStartupBanner="true"
+				TargetEnvironment="1"
+				TypeLibraryName=".\../bin/SciLexer.tlb"
+				HeaderFileName=""
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\src"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;SCILEXER7_EXPORTS;SCI_LEXER"
+				AdditionalIncludeDirectories="..\include,..\src"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;SCILEXER7_EXPORTS;SCI_LEXER;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				DefaultCharIsUnsigned="true"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="precompiled_headers.h"
+				PrecompiledHeaderFile="$(IntDir)\$(TargetName).pch"
+				AssemblerListingLocation=""
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc80.pdb"
+				BrowseInformation="0"
+				WarningLevel="4"
+				WarnAsError="true"
+				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -56,22 +71,23 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="0"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Imm32.lib"
+				AdditionalDependencies="imm32.lib"
 				OutputFile="$(OutDir)/SciLexer.dll"
 				LinkIncremental="2"
+				SuppressStartupBanner="true"
 				ModuleDefinitionFile="..\win32\Scintilla.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/SciLexer.7.pdb"
+				ProgramDatabaseFile="$(OutDir)/SciLexer.8.pdb"
 				SubSystem="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-				ImportLibrary="$(OutDir)/SciLexer.7.lib"
+				ImportLibrary="$(OutDir)/SciLexer.8.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -85,6 +101,8 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
+				SuppressStartupBanner="true"
+				OutputFile="$(OutDir)/$(ProjectName).bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -93,7 +111,11 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="xcopy /Y $(TargetPath) ..\..\PowerEditor\bin"
 			/>
 		</Configuration>
 		<Configuration
@@ -101,7 +123,9 @@
 			OutputDirectory="..\bin"
 			IntermediateDirectory="Release"
 			ConfigurationType="2"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="2"
 			>
 			<Tool
@@ -118,39 +142,61 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
+				PreprocessorDefinitions="NDEBUG"
+				MkTypLibCompatible="true"
+				SuppressStartupBanner="true"
+				TargetEnvironment="1"
+				TypeLibraryName=".\../bin/SciLexer.tlb"
+				HeaderFileName=""
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\include;..\src"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SCILEXER7_EXPORTS;SCI_LEXER"
+				Optimization="2"
+				InlineFunctionExpansion="2"
+				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="..\include,..\src"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SCILEXER7_EXPORTS;SCI_LEXER;_CRT_SECURE_NO_WARNINGS"
+				StringPooling="true"
 				RuntimeLibrary="0"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
+				EnableFunctionLevelLinking="true"
+				DefaultCharIsUnsigned="true"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="precompiled_headers.h"
+				PrecompiledHeaderFile="$(IntDir)\$(TargetName).pch"
+				AssemblerListingLocation=""
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc80.pdb"
+				BrowseInformation="0"
+				BrowseInformationFile=""
+				WarningLevel="4"
+				WarnAsError="true"
+				SuppressStartupBanner="true"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="0"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Imm32.lib"
+				AdditionalDependencies="imm32.lib"
 				OutputFile="$(OutDir)/SciLexer.dll"
 				LinkIncremental="1"
+				SuppressStartupBanner="true"
 				ModuleDefinitionFile="..\win32\Scintilla.def"
-				GenerateDebugInformation="true"
+				GenerateMapFile="false"
+				MapFileName=""
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-				ImportLibrary="$(OutDir)/SciLexer.7.lib"
+				OptimizeForWindows98="0"
+				ImportLibrary="$(OutDir)/SciLexer.8.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -164,6 +210,8 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
+				SuppressStartupBanner="true"
+				OutputFile="$(OutDir)/$(ProjectName).bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -172,7 +220,11 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="xcopy /Y $(TargetPath) ..\..\PowerEditor\bin"
 			/>
 		</Configuration>
 	</Configurations>
@@ -181,8 +233,7 @@
 	<Files>
 		<Filter
 			Name="Source Files"
-			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
 				RelativePath="..\src\AutoComplete.cxx"
@@ -241,8 +292,32 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\PerLine.cxx"
+				>
+			</File>
+			<File
 				RelativePath="..\src\PositionCache.cxx"
 				>
+			</File>
+			<File
+				RelativePath="..\src\precompiled_headers.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\src\PropSet.cxx"
@@ -284,18 +359,6 @@
 				RelativePath="..\src\XPM.cxx"
 				>
 			</File>
-			<Filter
-				Name="win32"
-				>
-				<File
-					RelativePath="..\win32\PlatWin.cxx"
-					>
-				</File>
-				<File
-					RelativePath="..\win32\ScintillaWin.cxx"
-					>
-				</File>
-			</Filter>
 			<Filter
 				Name="Lexer"
 				>
@@ -357,6 +420,10 @@
 				</File>
 				<File
 					RelativePath="..\src\LexCmake.cxx"
+					>
+				</File>
+				<File
+					RelativePath="..\src\LexCOBOL.cxx"
 					>
 				</File>
 				<File
@@ -472,6 +539,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\LexNimrod.cxx"
+					>
+				</File>
+				<File
 					RelativePath="..\src\LexNsis.cxx"
 					>
 				</File>
@@ -505,6 +576,10 @@
 				</File>
 				<File
 					RelativePath="..\src\LexPOV.cxx"
+					>
+				</File>
+				<File
+					RelativePath="..\src\LexPowerPro.cxx"
 					>
 				</File>
 				<File
@@ -548,6 +623,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\LexSML.cxx"
+					>
+				</File>
+				<File
+					RelativePath="..\src\LexSorcus.cxx"
+					>
+				</File>
+				<File
 					RelativePath="..\src\LexSpecman.cxx"
 					>
 				</File>
@@ -560,7 +643,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\LexTACL.cxx"
+					>
+				</File>
+				<File
 					RelativePath="..\src\LexTADS3.cxx"
+					>
+				</File>
+				<File
+					RelativePath="..\src\LexTAL.cxx"
 					>
 				</File>
 				<File
@@ -592,11 +683,76 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="win32"
+				>
+				<File
+					RelativePath="..\win32\PlatWin.cxx"
+					>
+				</File>
+				<File
+					RelativePath="..\win32\ScintillaWin.cxx"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Resource Files"
+			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+			>
+			<File
+				RelativePath="..\include\Face.py"
+				>
+			</File>
+			<File
+				RelativePath="..\include\HFacer.py"
+				>
+			</File>
+			<File
+				RelativePath="..\src\LexGen.py"
+				>
+			</File>
+			<File
+				RelativePath="..\win32\Margin.cur"
+				>
+			</File>
+			<File
+				RelativePath="..\win32\Scintilla.def"
+				>
+			</File>
+			<File
+				RelativePath="..\include\Scintilla.iface"
+				>
+			</File>
+			<File
+				RelativePath="..\win32\ScintRes.rc"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+						PreprocessorDefinitions=""
+						AdditionalIncludeDirectories="\source\scintilla.178\win32"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+						PreprocessorDefinitions=""
+						AdditionalIncludeDirectories="\source\scintilla.178\win32"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\src\SciTE.properties"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
 				RelativePath="..\src\AutoComplete.h"
@@ -659,7 +815,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\PerLine.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\PositionCache.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\precompiled_headers.h"
 				>
 			</File>
 			<File
@@ -688,6 +852,10 @@
 			</File>
 			<File
 				RelativePath="..\src\SVector.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\targetver.h"
 				>
 			</File>
 			<File
@@ -743,51 +911,13 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="win32"
+				Name="Win32"
 				>
 				<File
 					RelativePath="..\win32\PlatformRes.h"
 					>
 				</File>
 			</Filter>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
-			<File
-				RelativePath="..\include\Face.py"
-				>
-			</File>
-			<File
-				RelativePath="..\include\HFacer.py"
-				>
-			</File>
-			<File
-				RelativePath="..\src\LexGen.py"
-				>
-			</File>
-			<File
-				RelativePath="..\win32\Margin.cur"
-				>
-			</File>
-			<File
-				RelativePath="..\win32\Scintilla.def"
-				>
-			</File>
-			<File
-				RelativePath="..\include\Scintilla.iface"
-				>
-			</File>
-			<File
-				RelativePath="..\win32\ScintRes.rc"
-				>
-			</File>
-			<File
-				RelativePath="..\src\SciTE.properties"
-				>
-			</File>
 		</Filter>
 	</Files>
 	<Globals>
