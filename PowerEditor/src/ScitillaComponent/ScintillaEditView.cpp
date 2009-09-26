@@ -1668,6 +1668,7 @@ char * ScintillaEditView::getSelectedText(char * txt, int size, bool expand)
 	{
 		range.cpMax = range.cpMin+size-1;	//keep room for zero terminator
 	}
+
 	getText(txt, range.cpMin, range.cpMax);
 	return txt;
 }

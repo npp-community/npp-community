@@ -2201,8 +2201,11 @@ bool Platform::ShowAssertionPopUps(bool assertionPopUps_) {
 }
 
 void Platform::Assert(const char *c, const char *file, int line) {
-	char buffer[2000];
-	sprintf(buffer, "Assertion [%s] failed at %s %d", c, file, line);
+	// NPPSTART Joce 5/08/09 VSAssertMessages
+	// Made the assert message clickable when displayed in the debug output.
+	char buffer[2048];
+	sprintf(buffer, "%s(%d): Assertion [%s] failed", file, line, c);
+	// NPPEND
 	if (assertionPopUps) {
 		int idButton = ::MessageBoxA(0, buffer, "Assertion failure",
 			MB_ABORTRETRYIGNORE|MB_ICONHAND|MB_SETFOREGROUND|MB_TASKMODAL);

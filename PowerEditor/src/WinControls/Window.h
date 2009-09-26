@@ -64,7 +64,6 @@ public:
 
 	virtual void redraw() const {
 		::InvalidateRect(_hSelf, NULL, TRUE);
-		::UpdateWindow(_hSelf);
 	};
 
     virtual void getClientRect(RECT & rc) const {
