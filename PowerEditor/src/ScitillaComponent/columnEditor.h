@@ -20,10 +20,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef COLUMNEDITOR_H
 #define COLUMNEDITOR_H
 
+#ifndef STATIC_DIALOG_H
 #include "StaticDialog.h"
-
-const bool activeText = true;
-const bool activeNumeric = false;
+#endif
 
 // Forward declarations
 class ScintillaEditView;

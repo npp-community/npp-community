@@ -28,6 +28,7 @@ const TCHAR *nppDoc = TEXT("Notepad++ Document");
 const int nbSupportedLang = 9;
 const int nbExtMax = 10;
 const int extNameMax = 18;
+const int extNameLen = 32;
 
 TCHAR defExtArray[nbSupportedLang][nbExtMax][extNameMax] = {
 	{TEXT("Notepad"),        			TEXT(".txt"), TEXT(".log"), TEXT(".ini")},

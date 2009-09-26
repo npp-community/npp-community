@@ -17,8 +17,10 @@
 
 #ifndef STATUS_BAR_H
 #define STATUS_BAR_H
-#include "Window.h"
 
+#ifndef WINDOW_CONTROL_H
+#include "Window.h"
+#endif
 
 class StatusBar : public Window
 {

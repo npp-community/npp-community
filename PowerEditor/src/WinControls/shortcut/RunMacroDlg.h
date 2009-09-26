@@ -20,7 +20,9 @@
 #ifndef RUN_MACRO_DLG_H
 #define RUN_MACRO_DLG_H
 
+#ifndef STATIC_DIALOG_H
 #include "StaticDialog.h"
+#endif
 
 #define RM_CANCEL -1
 #define RM_RUN_MULTI 1

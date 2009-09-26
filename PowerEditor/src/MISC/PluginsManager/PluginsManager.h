@@ -18,7 +18,9 @@
 #ifndef PLUGINSMANAGER_H
 #define PLUGINSMANAGER_H
 
+#ifndef PLUGININTERFACE_H
 #include "PluginInterface.h"
+#endif
 
 typedef BOOL (__cdecl * PFUNCISUNICODE)();
 

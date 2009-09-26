@@ -18,8 +18,12 @@
 #ifndef VALUE_DLG_H
 #define VALUE_DLG_H
 
+#ifndef WINDOW_CONTROL_H
 #include "StaticDialog.h"
-const int DEFAULT_NB_NUMBER = 2;
+#endif
+
+#define DEFAULT_NB_NUMBER 2
+
 class ValueDlg : public StaticDialog
 {
 public :

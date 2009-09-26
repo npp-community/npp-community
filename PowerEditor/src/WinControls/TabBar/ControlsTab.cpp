@@ -18,6 +18,9 @@
 
 #include "precompiled_headers.h"
 #include "ControlsTab.h"
+
+const int margin = 8;
+
 /*
 void ControlsTab::init(HINSTANCE hInst, HWND hwnd, bool isVertical, WindowVector & winVector)
 {
@@ -48,8 +51,8 @@ void ControlsTab::createTabs(WindowVector & winVector)
 void ControlsTab::reSizeTo(RECT & rc)
 {
 	TabBar::reSizeTo(rc);
-	rc.left += marge;
-	rc.top += marge;
+	rc.left += margin;
+	rc.top += margin;
 
 	//-- We do those dirty things
 	//-- because it's a "vertical" tab control

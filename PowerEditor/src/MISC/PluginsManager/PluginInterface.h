@@ -18,7 +18,9 @@
 #ifndef PLUGININTERFACE_H
 #define PLUGININTERFACE_H
 
+#ifndef NOTEPAD_PLUS_MSGS_H
 #include "Notepad_plus_msgs.h"
+#endif
 
 const int nbChar = 64;
 

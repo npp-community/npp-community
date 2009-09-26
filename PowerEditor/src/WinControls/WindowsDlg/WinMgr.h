@@ -19,8 +19,8 @@
 //change to DEFINE for GCC
 #define INFINITY 0x7fff // max short
 
-const SIZE SIZEZERO = {0, 0};
-const SIZE SIZEMAX = {INFINITY,INFINITY};
+extern const SIZE SIZEZERO;
+extern const SIZE SIZEMAX;
 
 inline SIZE GetSize(LONG w, LONG h) {
 	SIZE sz = {w, h}; return sz;

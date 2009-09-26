@@ -18,14 +18,19 @@
 #ifndef SPLITTER_CONTAINER_H
 #define SPLITTER_CONTAINER_H
 
+#ifndef WINDOW_CONTROL_H
 #include "Window.h"
+#endif
+
+#ifndef SPLITTER_H
 #include "Splitter.h"
+#endif
 
 #define SPC_CLASS_NAME TEXT("splitterContainer")
 
 typedef bool DIRECTION;
-const bool LEFT = true;
-const bool RIGHT = false;
+#define LEFT true
+#define RIGHT false
 
 class SplitterContainer : public Window
 {

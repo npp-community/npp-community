@@ -18,8 +18,13 @@
 #ifndef SPLITTER_H
 #define SPLITTER_H
 
+#ifndef WINDOW_CONTROL_H
 #include "Window.h"
+#endif
+
+#ifndef RESOURCE_H
 #include "resource.h"
+#endif
 
 #define SV_HORIZONTAL		0x00000001
 #define SV_VERTICAL			0x00000002
@@ -34,17 +39,17 @@
 #define WM_DOPOPUPMENU			(SPLITTER_USER + 3)
 #define WM_RESIZE_CONTAINER		(SPLITTER_USER + 4)
 
-const int HIEGHT_MINIMAL = 15;
+#define HIEGHT_MINIMAL 15
 
 enum Arrow {ARROW_LEFT, ARROW_UP, ARROW_RIGHT, ARROW_DOWN};
 
 typedef bool WH;
-const bool WIDTH = true;
-const bool HEIGHT = false;
+#define WIDTH true
+#define HEIGHT false
 
 typedef bool ZONE_TYPE;
-const bool TOP_LEFT = true;
-const bool BOTTOM_RIGHT = false;
+#define TOP_LEFT true
+#define BOTTOM_RIGHT false
 
 enum SplitterMode {
     DYNAMIC, LEFT_FIX, RIGHT_FIX

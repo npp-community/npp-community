@@ -20,7 +20,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef CONTROLS_TAB_H
 #define CONTROLS_TAB_H
 
+#ifndef TAB_BAR_H
 #include "TabBar.h"
+#endif
 
 struct DlgInfo {
     Window *_dlg;

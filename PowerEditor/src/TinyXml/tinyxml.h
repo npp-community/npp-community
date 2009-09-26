@@ -47,7 +47,9 @@ distribution.
 
 
 #else
-	#include "tinystr.h"
+	#ifndef TIXML_STRING_INCLUDED
+		#include "tinystr.h"
+	#endif
 	#define TIXML_STRING	TiXmlString
 	#define TIXML_OSTREAM	TiXmlOutStream
 #endif

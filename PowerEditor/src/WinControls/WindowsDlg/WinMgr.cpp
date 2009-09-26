@@ -11,6 +11,9 @@
 #include "precompiled_headers.h"
 #include "WinMgr.h"
 
+const SIZE SIZEZERO = {0, 0};
+const SIZE SIZEMAX = {INFINITY,INFINITY};
+
 // Theo - Style Helpers
 inline static DWORD GetStyle(HWND hWnd) {
 	return (DWORD)GetWindowLongPtr(hWnd, GWL_STYLE);

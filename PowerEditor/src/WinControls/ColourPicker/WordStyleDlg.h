@@ -20,16 +20,24 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef WORD_STYLE_H
 #define WORD_STYLE_H
 
+#ifndef STATIC_DIALOG_H
 #include "StaticDialog.h"
+#endif
+
+#ifndef NPP_STYLES
 #include "npp_styles.h"
+#endif
+
+#ifndef RESOURCE_H
 #include "resource.h"
+#endif
 
 #define WM_UPDATESCINTILLAS			(WORDSTYLE_USER + 1) //GlobalStyleDlg's msg 2 send 2 its parent
 
 enum fontStyleType {BOLD_STATUS, ITALIC_STATUS, UNDERLINE_STATUS};
 
-const bool C_FOREGROUND = false;
-const bool C_BACKGROUND = true;
+#define C_FOREGROUND false
+#define C_BACKGROUND true
 
 // Forward declarations
 class ColourStaticTextHooker;

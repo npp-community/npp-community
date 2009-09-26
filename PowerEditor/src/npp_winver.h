@@ -18,8 +18,11 @@
 #ifndef NPP_WINVER_H
 #define NPP_WINVER_H
 
+
 // JOCE: For the winVer definition... Could probably be moved here at some point
+#ifndef NOTEPAD_PLUS_MSGS_H
 #include "Notepad_plus_msgs.h"
+#endif
 
 winVer getWinVersion();
 

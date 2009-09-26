@@ -18,7 +18,9 @@
 #ifndef RUN_DLG_H
 #define RUN_DLG_H
 
+#ifndef STATIC_DIALOG_H
 #include "StaticDialog.h"
+#endif
 
 #define CURRENTWORD_MAXLENGTH 2048
 

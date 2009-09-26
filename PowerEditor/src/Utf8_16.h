@@ -18,9 +18,13 @@
 // - Removing UCS-Bug in Utf8_Iter
 // - Add convert function in Utf8_16_Write
 ////////////////////////////////////////////////////////////////////////////////
-#pragma once
 
+#ifndef UTF_8_16_H
+#define UTF_8_16_H
+
+#ifndef PARAMETERS_DEF_H
 #include "Parameters_def.h"
+#endif
 
 class Utf8_16 {
 public:
@@ -145,3 +149,5 @@ protected:
 	size_t m_nBufSize;
 	bool m_bFirstWrite;
 };
+
+#endif // UTF_8_16_H

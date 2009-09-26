@@ -18,12 +18,17 @@
 #ifndef DOCTABVIEW_H
 #define DOCTABVIEW_H
 
+#ifndef TAB_BAR_H
 #include "TabBar.h"
-#include "BufferID.h"
+#endif
 
-const int SAVED_IMG_INDEX = 0;
-const int UNSAVED_IMG_INDEX = 1;
-const int REDONLY_IMG_INDEX = 2;
+#ifndef BUFFERID_H
+#include "BufferID.h"
+#endif
+
+#define SAVED_IMG_INDEX 0
+#define UNSAVED_IMG_INDEX 1
+#define REDONLY_IMG_INDEX 2
 
 class ScintillaEditView;
 class IconList;

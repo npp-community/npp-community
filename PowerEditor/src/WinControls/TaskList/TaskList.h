@@ -18,7 +18,9 @@
 #ifndef TASKLIST_H
 #define TASKLIST_H
 
+#ifndef WINDOW_CONTROL_H
 #include "Window.h"
+#endif
 
 #ifndef WM_MOUSEWHEEL
 #define WM_MOUSEWHEEL 0x020A

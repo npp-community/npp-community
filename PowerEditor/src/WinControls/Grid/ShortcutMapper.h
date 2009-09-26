@@ -20,7 +20,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef SHORTCUTMAPPER
 #define SHORTCUTMAPPER
 
+#ifndef STATIC_DIALOG_H
 #include "StaticDialog.h"
+#endif
 
 enum GridState {STATE_MENU, STATE_MACRO, STATE_USER, STATE_PLUGIN, STATE_SCINTILLA};
 

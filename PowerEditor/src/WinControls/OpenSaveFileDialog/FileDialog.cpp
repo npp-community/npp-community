@@ -76,8 +76,6 @@ FileDialog::FileDialog(HWND hwnd, HINSTANCE hInst)
 	: _nbCharFileExt(0), _nbExt(0), _fileExt(NULL)
 {
 	staticThis = this;
-    //for (int i = 0 ; i < nbExtMax ; i++)
-    //    _extArray[i][0] = '\0';
 
 	_fileName[0] = '\0';
 
@@ -126,10 +124,6 @@ FileDialog::~FileDialog()
 // FileDialog.setExtFilter(TEXT("Makefile"), TEXT("makefile"), TEXT("GNUmakefile"), NULL);
 void FileDialog::setExtFilter(const TCHAR *extText, const TCHAR *ext, ...)
 {
-    // fill out the ext array for save as file dialog
-    //if (_nbExt < nbExtMax)
-    //    lstrcpy(_extArray[_nbExt++], ext);
-    //
 	std::generic_string exts;
 
     va_list pArg;
@@ -156,10 +150,6 @@ void FileDialog::setExtFilter(const TCHAR *extText, const TCHAR *ext, ...)
 
 int FileDialog::setExtsFilter(const TCHAR *extText, const TCHAR *exts)
 {
-    // fill out the ext array for save as file dialog
-    //if (_nbExt < nbExtMax)
-    //    lstrcpy(_extArray[_nbExt++], exts);
-    //
     std::generic_string extFilter = extText;
 	TCHAR *oldFilter = NULL;
 

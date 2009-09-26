@@ -18,7 +18,6 @@
 #ifndef PARAMETERS_DEF_H
 #define PARAMETERS_DEF_H
 
-
 #define POS_HORIZOTAL false
 #define POS_VERTICAL true
 

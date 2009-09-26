@@ -18,8 +18,13 @@
 #ifndef FIND_REPLACE_DLG_H
 #define FIND_REPLACE_DLG_H
 
+#ifndef STATIC_DIALOG_H
 #include "StaticDialog.h"
+#endif
+
+#ifndef BUFFERID_H
 #include "BufferID.h"
+#endif
 
 // Forward declarations
 class Finder;

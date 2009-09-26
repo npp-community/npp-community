@@ -18,16 +18,11 @@
 #ifndef FILE_DIALOG_H
 #define FILE_DIALOG_H
 
-//#define _WIN32_WINNT  0x0600
-
+#ifndef NPP_WINVER_H
 #include "npp_winver.h"
-
-const int nbExtMax = 256;
-const int extLenMax = 64;
+#endif
 
 typedef std::vector<std::generic_string> stringVector;
-//const bool styleOpen = true;
-//const bool styleSave = false;
 
 struct OPENFILENAMENPP {
    DWORD        lStructSize;
@@ -87,8 +82,6 @@ private:
 	OPENFILENAMENPP _ofn;
 	winVer _winVersion;
 
-
-    //TCHAR _extArray[nbExtMax][extLenMax];
     int _nbExt;
 
     static FileDialog *staticThis;

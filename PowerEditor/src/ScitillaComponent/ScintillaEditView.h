@@ -18,10 +18,21 @@
 #ifndef SCINTILLA_EDIT_VIEW_H
 #define SCINTILLA_EDIT_VIEW_H
 
+#ifndef WINDOW_CONTROL_H
 #include "Window.h"
+#endif
+
+#ifndef BUFFERID_H
 #include "BufferID.h"
+#endif
+
+#ifndef NOTEPAD_PLUS_MSGS_H
 #include "Notepad_plus_msgs.h"
+#endif
+
+#ifndef SCINTILLA_REF_H
 #include "ScintillaRef.h"
+#endif
 
 // Forward declarations
 class NppParameters;
@@ -64,14 +75,14 @@ typedef void * SCINTILLA_PTR;
 #define WM_REPLACEINFILES		  	(SCINTILLA_USER + 10)
 #define WM_FINDALL_INCURRENTDOC	  	(SCINTILLA_USER + 11)
 
-const int NB_FOLDER_STATE = 7;
+#define NB_FOLDER_STATE 7
 
 // Codepage
-const int CP_CHINESE_TRADITIONAL = 950;
-const int CP_CHINESE_SIMPLIFIED = 936;
-const int CP_JAPANESE = 932;
-const int CP_KOREAN = 949;
-const int CP_GREEK = 1253;
+#define CP_CHINESE_TRADITIONAL 950
+#define CP_CHINESE_SIMPLIFIED 936
+#define CP_JAPANESE 932
+#define CP_KOREAN 949
+#define CP_GREEK 1253
 
 //wordList
 #define LIST_NONE 0
@@ -83,24 +94,25 @@ const int CP_GREEK = 1253;
 #define LIST_5 32
 #define LIST_6 64
 
-const bool fold_uncollapse = true;
-const bool fold_collapse = false;
+#define fold_uncollapse true
+#define fold_collapse false
 
-const bool UPPERCASE = true;
-const bool LOWERCASE = false;
+#define UPPERCASE true
+#define LOWERCASE false
 
 typedef std::vector<std::pair<int, int> > ColumnModeInfo;
-const UCHAR MASK_FORMAT = 0x03;
-const UCHAR MASK_ZERO_LEADING = 0x04;
-const UCHAR BASE_10 = 0x00; // Dec
-const UCHAR BASE_16 = 0x01; // Hex
-const UCHAR BASE_08 = 0x02; // Oct
-const UCHAR BASE_02 = 0x03; // Bin
+#define MASK_FORMAT 0x03
+#define MASK_ZERO_LEADING 0x04
+
+#define BASE_10 0x00 // Dec
+#define BASE_16 0x01 // Hex
+#define BASE_08 0x02 // Oct
+#define BASE_02 0x03 // Bin
 
 
-const int MARK_BOOKMARK = 24;
-const int MARK_HIDELINESBEGIN = 23;
-const int MARK_HIDELINESEND = 22;
+#define MARK_BOOKMARK 24
+#define MARK_HIDELINESBEGIN 23
+#define MARK_HIDELINESEND 22
 //const int MARK_LINEMODIFIEDUNSAVED = 21;
 //const int MARK_LINEMODIFIEDSAVED = 20;
 // 24 - 16 reserved for Notepad++ internal used
