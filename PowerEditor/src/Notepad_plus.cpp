@@ -10121,15 +10121,8 @@ bool Notepad_plus::str2Cliboard(const TCHAR *str2cpy)
 //This function is destructive
 bool Notepad_plus::emergency(std::generic_string emergencySavedDir)
 {
-	bool filestatus = false;
-	{
-		if (::CreateDirectory(emergencySavedDir.c_str(), NULL) == FALSE && ::GetLastError() == ERROR_ALREADY_EXISTS) {
-			filestatus = dumpFiles(emergencySavedDir.c_str(), TEXT("File"));
-		}
-	}
-
-	bool status = filestatus;// && dumpstatus;
-	return status;
+	::CreateDirectory(emergencySavedDir.c_str(), NULL);
+	return dumpFiles(emergencySavedDir.c_str(), TEXT("File"));
 }
 
 bool Notepad_plus::dumpFiles(const TCHAR * outdir, const TCHAR * fileprefix) {

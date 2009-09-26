@@ -120,29 +120,25 @@ LanguageName ScintillaEditView::langNames[L_EXTERNAL+1] = {
 
 int getNbDigits(int aNum, int base)
 {
-	int nbChiffre = 1;
-	int diviseur = base;
+	int nbDigits = 1;
+	int divider = base;
 
 	for (;;)
 	{
-		int result = aNum / diviseur;
+		int result = aNum / divider;
 		if (!result)
 			break;
 		else
 		{
-			diviseur *= base;
-			nbChiffre++;
+			divider *= base;
+			nbDigits++;
 		}
 	}
-	if ((base == 16) && (nbChiffre % 2 != 0))
-		nbChiffre += 1;
+	if ((base == 16) && (nbDigits % 2 != 0))
+		nbDigits += 1;
 
-	return nbChiffre;
+	return nbDigits;
 };
-
-//const int MASK_RED   = 0xFF0000;
-//const int MASK_GREEN = 0x00FF00;
-//const int MASK_BLUE  = 0x0000FF;
 
 void ScintillaEditView::init(HINSTANCE hInst, HWND hPere)
 {
@@ -3283,21 +3279,21 @@ bool ScintillaEditView::isNeededFolderMarge( LangType typeDoc ) const
 {
 	switch (typeDoc)
 	{
-	case L_NFO:
-	case L_BATCH:
-	case L_TXT:
-	case L_MAKEFILE:
-	case L_SQL:
-	case L_ASM:
+		case L_NFO:
+		case L_BATCH:
+		case L_TXT:
+		case L_MAKEFILE:
+		case L_SQL:
+		case L_ASM:
 		//case L_TEX:
-	case L_HASKELL:
-	case L_PROPS:
-	case L_SMALLTALK:
-	case L_KIX:
-	case L_ADA:
-		return false;
-	default:
-		return true;
+		case L_HASKELL:
+		case L_PROPS:
+		case L_SMALLTALK:
+		case L_KIX:
+		case L_ADA:
+			return false;
+		default:
+			return true;
 	}
 }
 
@@ -3318,11 +3314,11 @@ int ScintillaEditView::codepage2CharSet() const
 {
 	switch (_codepage)
 	{
-	case CP_CHINESE_TRADITIONAL : return SC_CHARSET_CHINESEBIG5;
-	case CP_CHINESE_SIMPLIFIED : return SC_CHARSET_GB2312;
-	case CP_KOREAN : return SC_CHARSET_HANGUL;
-	case CP_JAPANESE : return SC_CHARSET_SHIFTJIS;
-	case CP_GREEK : return SC_CHARSET_GREEK;
-	default : return 0;
+		case CP_CHINESE_TRADITIONAL : return SC_CHARSET_CHINESEBIG5;
+		case CP_CHINESE_SIMPLIFIED : return SC_CHARSET_GB2312;
+		case CP_KOREAN : return SC_CHARSET_HANGUL;
+		case CP_JAPANESE : return SC_CHARSET_SHIFTJIS;
+		case CP_GREEK : return SC_CHARSET_GREEK;
+		default : return 0;
 	}
 }

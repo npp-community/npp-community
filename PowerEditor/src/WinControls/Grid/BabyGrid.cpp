@@ -3108,12 +3108,11 @@ int AddGrid( UINT menuid)
     {
      //if grid doesn't exist, add it.  otherwise return existing index + MAX_GRIDS
      //if trying to add more than MAX_GRIDS, return -1;
-     int empty_space;
-     int returnvalue = -1;
+     int empty_space = -1;
+     int returnvalue = 0;
      int j;
      BOOL MATCH;
      MATCH=FALSE;
-     empty_space = -1;
      for(j=0;j<MAX_GRIDS;j++)
          {
           if(BGHS[j].gridmenu == menuid)
