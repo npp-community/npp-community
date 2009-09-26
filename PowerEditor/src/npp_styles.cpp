@@ -33,7 +33,6 @@ Style::Style() :
 	_fgColor(COLORREF(-1)),
 	_bgColor(COLORREF(-1)),
 	_colorStyle(COLORSTYLE_ALL),
-	_fontName(NULL),
 	_fontStyle(-1),
 	_fontSize(-1),
 	_keywordClass(-1),
@@ -67,7 +66,7 @@ Style::~Style()
 	}
 }
 
-Style & Style::operator=( const Style & style )
+const Style & Style::operator=( const Style & style )
 {
 	if (this != &style)
 	{
@@ -151,7 +150,7 @@ static int getKwClassFromName(const TCHAR *str) {
 
 
 
-StyleArray & StyleArray::operator=( const StyleArray & sa )
+const StyleArray & StyleArray::operator=( const StyleArray & sa )
 {
 	if (this != &sa)
 	{
@@ -205,7 +204,10 @@ void StyleArray::addStyler(int styleID, TiXmlNode *styleNode)
 		}
 
 		str = element->Attribute(TEXT("fontName"));
-		_styleArray[_nbStyler]._fontName = str;
+		if (str)
+		{
+			_styleArray[_nbStyler]._fontName = str;
+		}
 
 		str = element->Attribute(TEXT("fontStyle"));
 		if (str)
@@ -262,7 +264,7 @@ int StyleArray::getStylerIndexByName( const TCHAR *name ) const
 
 	for (int i = 0 ; i < _nbStyler ; i++)
 	{
-		if (!lstrcmp(_styleArray[i]._styleDesc, name))
+		if (_styleArray[i]._styleDesc == name)
 		{
 			return i;
 		}
@@ -277,35 +279,19 @@ int StyleArray::getStylerIndexByName( const TCHAR *name ) const
 // ***********************************
 
 
-LexerStyler & LexerStyler::operator=( const LexerStyler & ls )
-{
-	if (this != &ls)
-	{
-		*((StyleArray *)this) = ls;
-		// JOCE unchecked string copies....  Bad.  To change for strings.
-		lstrcpy(this->_lexerName, ls._lexerName);
-		lstrcpy(this->_lexerDesc, ls._lexerDesc);
-		lstrcpy(this->_lexerUserExt, ls._lexerUserExt);
-	}
-	return *this;
-}
-
 void LexerStyler::setLexerName( const TCHAR *lexerName )
 {
-	// JOCE unchecked string copies....  Bad.  To change for strings.
-	lstrcpy(_lexerName, lexerName);
+	_lexerName = lexerName;
 }
 
 void LexerStyler::setLexerDesc( const TCHAR *lexerDesc )
 {
-	// JOCE unchecked string copies....  Bad.  To change for strings.
-	lstrcpy(_lexerDesc, lexerDesc);
+	_lexerDesc = lexerDesc;
 }
 
 void LexerStyler::setLexerUserExt( const TCHAR *lexerUserExt )
 {
-	// JOCE unchecked string copies....  Bad.  To change for strings.
-	lstrcpy(_lexerUserExt, lexerUserExt);
+	_lexerUserExt = lexerUserExt;
 }
 
 
@@ -315,7 +301,7 @@ void LexerStyler::setLexerUserExt( const TCHAR *lexerUserExt )
 //
 // ***********************************
 
-LexerStylerArray & LexerStylerArray::operator=( const LexerStylerArray & lsa )
+const LexerStylerArray & LexerStylerArray::operator=( const LexerStylerArray & lsa )
 {
 	if (this != &lsa)
 	{

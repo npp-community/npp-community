@@ -73,7 +73,7 @@ FileDialog *FileDialog::staticThis = NULL;
 //int FileDialog::_dialogFileBoxId = (NppParameters::getInstance())->getWinVersion() < WV_W2K?edt1:cmb13;
 
 FileDialog::FileDialog(HWND hwnd, HINSTANCE hInst)
-	: _nbCharFileExt(0), _nbExt(0), _fileExt(NULL)
+	: _fileExt(NULL), _nbCharFileExt(0), _nbExt(0)
 {
 	staticThis = this;
 
@@ -114,6 +114,8 @@ FileDialog::~FileDialog()
 		_fileExt = NULL;
 	}
 }
+// Lint gets confused with the variable args variable...
+//lint -e438 Last value assigned to variable 'Symbol' not used
 
 // This function set and concatenate the filter into the list box of FileDialog.
 // The 1st parameter is the description of the file type, the 2nd .. Nth parameter(s) is (are)
@@ -147,6 +149,7 @@ void FileDialog::setExtFilter(const TCHAR *extText, const TCHAR *ext, ...)
 
 	setExtsFilter(extText, exts.c_str());
 }
+//lint +e438 (Warning -- Last value assigned to variable 'pArg' not used)
 
 int FileDialog::setExtsFilter(const TCHAR *extText, const TCHAR *exts)
 {
@@ -177,7 +180,6 @@ int FileDialog::setExtsFilter(const TCHAR *extText, const TCHAR *exts)
 	{
 		memcpy(_fileExt, oldFilter, _nbCharFileExt * sizeof(TCHAR));
 		delete[] oldFilter;
-		oldFilter = NULL;
 	}
 
 	// Append new filter
@@ -333,6 +335,10 @@ static BOOL CALLBACK fileDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 					break;
 			}
 		}
+		break;
+
+		default:
+		break;
 	}
 	return oldProc(hwnd, message, wParam, lParam);
 };

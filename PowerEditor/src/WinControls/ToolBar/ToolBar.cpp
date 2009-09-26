@@ -25,16 +25,16 @@
 const int WS_TOOLBARSTYLE = WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | TBSTYLE_TOOLTIPS |TBSTYLE_FLAT | CCS_TOP | BTNS_AUTOSIZE | CCS_NOPARENTALIGN | CCS_NORESIZE | CCS_NODIVIDER;
 
 ToolBar::ToolBar():
-	Window(), _pTBB(NULL), _nrButtons(0), _nrDynButtons(0), _nrTotalButtons(0), _nrCurrentButtons(0), _pRebar(NULL),
-	_toolBarIcons(NULL)
-{}
+	_pTBB(NULL), _toolBarIcons(NULL), _state(TB_STANDARD),
+	_nrButtons(0), _nrDynButtons(0), _nrTotalButtons(0),
+	_nrCurrentButtons(0), _pRebar(NULL)
+{
+	memset(&_rbBand, 0, sizeof(REBARBANDINFO));
+}
 
 ToolBar::~ToolBar()
 {
-	if (_hSelf)
-	{
-		ToolBar::destroy();
-	}
+	ToolBar::destroy();
 }
 
 bool ToolBar::init( HINSTANCE hInst, HWND hPere, toolBarStatusType type,
@@ -118,11 +118,20 @@ void ToolBar::destroy() {
 		_pRebar->removeBand(_rbBand.wID);
 		_pRebar = NULL;
 	}
-	delete [] _pTBB;
-	::DestroyWindow(_hSelf);
-	_hSelf = NULL;
-	_toolBarIcons->destroy();
-	delete _toolBarIcons;
+
+	if (_pTBB)
+	{
+		delete [] _pTBB;
+		_pTBB = NULL;
+	}
+
+	if (_toolBarIcons)
+	{
+		delete _toolBarIcons;
+		_toolBarIcons = NULL;
+	}
+
+	Window::destroy();
 };
 
 int ToolBar::getWidth() const {
@@ -364,10 +373,7 @@ void ToolBar::setDisableImageList() {
 
 ReBar::~ReBar()
 {
-	if (_hSelf)
-	{
-		ReBar::destroy();
-	}
+	ReBar::destroy();
 }
 
 void ReBar::init(HINSTANCE hInst, HWND hPere)

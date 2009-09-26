@@ -29,10 +29,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 ShortcutMapper::ShortcutMapper() :
-	StaticDialog(),
 	_babygrid(NULL),
 	_rightClickMenu(NULL),
-	_currentState(STATE_MENU)
+	_currentState(STATE_MENU),
+	_hTabCtrl(NULL)
 {
 	generic_strncpy(tabNames[0], TEXT("Main menu"), maxTabName);
 	generic_strncpy(tabNames[1], TEXT("Macros"), maxTabName);
@@ -43,17 +43,13 @@ ShortcutMapper::ShortcutMapper() :
 
 ShortcutMapper::~ShortcutMapper()
 {
-	if (_hSelf)
-	{
-		ShortcutMapper::destroy();
-	}
+	ShortcutMapper::destroy();
 }
 
 void ShortcutMapper::destroy()
 {
 	if (_babygrid)
 	{
-		_babygrid->destroy();
 		delete _babygrid;
 		_babygrid = NULL;
 	}
@@ -206,6 +202,7 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 				if (nmh.code == TCN_SELCHANGE) {
 					int index = TabCtrl_GetCurSel(_hTabCtrl);
 					switch (index) {
+						// JOCE Plain numerical values?? makes sense?
 						case 0:
 							_currentState = STATE_MENU;
 							break;
@@ -221,6 +218,7 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 						case 4:
 							_currentState = STATE_SCINTILLA;
 							break;
+						NO_DEFAULT_CASE;
 					}
 					fillOutBabyGrid();
 				}
@@ -281,9 +279,9 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 						case STATE_USER: {
 							//Get UserCommand corresponding to row
 							std::vector<UserCommand> & shortcuts = nppParam->getUserCommandList();
-							UserCommand ucmd = shortcuts[row - 1], prevucmd = shortcuts[row - 1];
+							UserCommand ucmd = shortcuts[row - 1];
 							ucmd.init(_hInst, _hSelf);
-							prevucmd = ucmd;
+							UserCommand prevucmd = ucmd;
 							if (ucmd.doDialog() != -1 && prevucmd != ucmd) {	//shortcut was altered
 								shortcuts[row - 1] = ucmd;
 								_babygrid->setText(row, 1, ucmd.getName());
@@ -297,9 +295,9 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 						case STATE_PLUGIN: {
 							//Get PluginCmdShortcut corresponding to row
 							std::vector<PluginCmdShortcut> & shortcuts = nppParam->getPluginCommandList();
-							PluginCmdShortcut pcsc = shortcuts[row - 1], prevpcsc = shortcuts[row - 1];
+							PluginCmdShortcut pcsc = shortcuts[row - 1];
 							pcsc.init(_hInst, _hSelf);
-							prevpcsc = pcsc;
+							PluginCmdShortcut prevpcsc = pcsc;
 							if (pcsc.doDialog() != -1 && prevpcsc != pcsc) {	//shortcut was altered
 								nppParam->addPluginModifiedIndex(row-1);
 								shortcuts[row - 1] = pcsc;
@@ -448,14 +446,20 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 							case STATE_SCINTILLA: {
 								_rightClickMenu->enableItem(IDM_BABYGRID_DELETE, false);
 								break; }
+							NO_DEFAULT_CASE;
 						}
 
 						_rightClickMenu->display(p);
 						return TRUE;
 					}
 				}
+				break;
+
+				NO_DEFAULT_CASE;
 			}
 		}
+		break;
+
 		default:
 			return FALSE;
 	}

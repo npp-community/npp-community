@@ -12,12 +12,14 @@
 //////////////////
 // Construct from args
 //
-WINRECT::WINRECT(WORD f, INT id, LONG p)
+WINRECT::WINRECT(WORD f, INT id, LONG p) :
+	next(NULL),
+	prev(NULL),
+	flags(f),
+	nID(id),
+	param(p)
 {
-	memset(this, 0, sizeof(WINRECT));
-	flags = f;
-	nID = id;
-	param = p;
+	memset(&rc, 0, sizeof(RECT));
 }
 
 //////////////////
@@ -27,7 +29,7 @@ WINRECT::WINRECT(WORD f, INT id, LONG p)
 //
 WINRECT* WINRECT::Parent()
 {
-	WINRECT* pEntry = NULL;
+	WINRECT* pEntry;
 	for (pEntry=this; pEntry->Prev(); pEntry=pEntry->Prev()) {
 		; // go backwards to the end
 	}

@@ -4,7 +4,7 @@
 struct RecentItem {
 	int _id;
 	std::generic_string _name;
-	RecentItem(const TCHAR * name) : _name(name) {};
+	RecentItem(const TCHAR * name) : _id(-1), _name(name) {};
 };
 
 typedef std::deque<RecentItem> recentList;
@@ -13,7 +13,7 @@ class LastRecentFileList
 {
 public :
 	LastRecentFileList();
-	virtual ~LastRecentFileList();
+	~LastRecentFileList();
 
 	void initMenu(HMENU hMenu, int idBase, int posBase);
 

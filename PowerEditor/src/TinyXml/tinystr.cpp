@@ -23,7 +23,6 @@ distribution.
 */
 
 #include "precompiled_headers.h"
-#include "tinyxml.h"
 
 #ifndef TIXML_USE_STL
 

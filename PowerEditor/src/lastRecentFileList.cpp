@@ -22,10 +22,16 @@
 
 
 LastRecentFileList::LastRecentFileList() :
-	_hasSeparators(false), _size(0), _locked(false)
+	_userMax((NppParameters::getInstance())->getNbMaxFile()),
+	_size(0),
+	_nativeLangEncoding(CP_ACP),
+	_hMenu(NULL),
+	_posBase(0),
+	_idBase(0),
+	_idFreeArray(new bool[NB_MAX_LRF_FILE]),
+	_hasSeparators(false),
+	_locked(false)
 {
-	_idFreeArray = new bool[NB_MAX_LRF_FILE];
-	_userMax = (NppParameters::getInstance())->getNbMaxFile();
 }
 
 LastRecentFileList::~LastRecentFileList()

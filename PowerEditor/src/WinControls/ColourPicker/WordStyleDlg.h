@@ -81,7 +81,6 @@ private :
 	HWND _hFontNameStaticText;
 	HWND _hFontSizeStaticText;
 	HWND _hStyleInfoStaticText;
-	//TCHAR _originalWarning[256];
 
 	LexerStylerArray _lsArray;
     StyleArray _globalStyles;
@@ -92,7 +91,7 @@ private :
 	GlobalOverride _gOverride2restored;
 	bool _restoreInvalid;
 
-	ColourStaticTextHooker* colourHooker;
+	ColourStaticTextHooker* _colourHooker;
 
 	bool _isDirty;
 	bool _isThemeDirty;

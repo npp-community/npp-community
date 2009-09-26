@@ -47,7 +47,7 @@ public:
 
 	BYTE getAcceleratorModifiers();
 
-	Shortcut & operator=(const Shortcut & sc);
+	const Shortcut & operator=(const Shortcut & sc);
 	friend const bool operator==(const Shortcut & a, const Shortcut & b);
 
 	friend inline const bool operator!=(const Shortcut & a, const Shortcut & b) {

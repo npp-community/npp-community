@@ -73,7 +73,6 @@
 #include "TinyXml.h"
 #include "Parameters.h"
 
-#include "npp_winver.h"
 #include "npp_session.h"
 
 const TCHAR Notepad_plus::_className[32] = TEXT("Notepad++");
@@ -82,9 +81,6 @@ const char *urlHttpRegExpr = "http://[a-z0-9_\\-\\+~.:?&@=/%#]*";
 
 int docTabIconIDs[] = {IDI_SAVED_ICON, IDI_UNSAVED_ICON, IDI_READONLY_ICON};
 enum tb_stat {tb_saved, tb_unsaved, tb_ro};
-
-#define DIR_LEFT true
-#define DIR_RIGHT false
 
 struct SortTaskListPred
 {
@@ -105,40 +101,46 @@ struct SortTaskListPred
 	}
 };
 
-Notepad_plus::Notepad_plus(): Window(), _mainWindowStatus(0), _pDocTab(NULL), _pEditView(NULL),
-	_pMainSplitter(NULL), _subSplitter(NULL), _dockingManager(NULL),
-	_recordingMacro(false), _pTrayIco(NULL), _pluginsManager(new PluginsManager()), _isUDDocked(false), _isRTL(false),
-	_linkTriggered(true), _isDocModifing(false), _isHotspotDblClicked(false), _sysMenuEntering(false),
-	// TODO Joce 7/13/09
-	// Since _autoCompleteMain and _autoCompleteSub rely on the views to be initialized, maybe we can push all these guys to the
-	// WM_CREATE.
-	_subEditView(new ScintillaEditView()), _mainEditView(new ScintillaEditView()), _invisibleEditView(new ScintillaEditView()), _fileEditView(new ScintillaEditView()),
-	_autoCompleteMain(new AutoCompletion(_mainEditView)), _autoCompleteSub(new AutoCompletion(_subEditView)), _tabPopupMenu(NULL), _tabPopupDropMenu(NULL),
-	_smartHighlighter(NULL),_mainDocTab(NULL), _subDocTab(NULL),
-	_nativeLangEncoding(CP_ACP), _isFileOpening(false), _docTabIconList(NULL),
-	_toolBar(NULL), _statusBar(NULL), _rebarTop(NULL), _rebarBottom(NULL),
-	_findReplaceDlg(NULL), _incrementFindDlg(NULL), _aboutDlg(NULL), _runDlg(NULL), _goToLineDlg(NULL),
-	_colEditorDlg(NULL), _configStyleDlg(NULL), _preferenceDlg(NULL), _lastRecentFileList(new LastRecentFileList()), _windowsMenu(NULL),
-	_runMacroDlg(NULL)
+Notepad_plus::Notepad_plus():
+	_pMainWindow(NULL), _dockingManager(NULL), _smartHighlighter(NULL),
+	_nativeLangEncoding(CP_ACP),
+	_mainDocTab(NULL), _subDocTab(NULL), _pDocTab(NULL), _pNonDocTab(NULL),
+	_subEditView(new ScintillaEditView()),
+	_mainEditView(new ScintillaEditView()),
+	_invisibleEditView(new ScintillaEditView()),
+	_fileEditView(new ScintillaEditView()),
+	_pEditView(NULL),_pNonEditView(NULL),
+	_pMainSplitter(NULL), _subSplitter(NULL),
+	_autoCompleteMain(new AutoCompletion(_mainEditView)),
+	_autoCompleteSub(new AutoCompletion(_subEditView)),
+	_tabPopupMenu(NULL),_tabPopupDropMenu(NULL),
+	_toolBar(NULL), _docTabIconList(NULL),
+	_statusBar(NULL), _toReduceTabBar(false),
+	_rebarTop(NULL), _rebarBottom(NULL),
+	_findReplaceDlg(NULL), _incrementFindDlg(NULL), _aboutDlg(NULL),
+	_runDlg(NULL), _goToLineDlg(NULL),
+	_colEditorDlg(NULL), _configStyleDlg(NULL), _preferenceDlg(NULL),
+	_lastRecentFileList(new LastRecentFileList()),
+	_windowsMenu(NULL), _mainMenuHandle(NULL),
+	_sysMenuEntering(false),
+	_recordingMacro(false), _runMacroDlg(NULL),
+	_linkTriggered(true), _isDocModifing(false), _isHotspotDblClicked(false),
+	_isUDDocked(false),
+	_pTrayIco(NULL),
+	_zoomOriginalValue(0),
+	_pluginsManager(new PluginsManager()),
+	_isRTL(false),
+	_isFileOpening(false),
+	_mainWindowStatus(0),
+	_activeView(MAIN_VIEW)
 {
-
+	memset(&_nppPath, 0, MAX_PATH * sizeof(TCHAR));
 	ZeroMemory(&_prevSelectedRange, sizeof(_prevSelectedRange));
-	_winVersion = getWinVersion();
 
 	TiXmlDocumentA *nativeLangDocRootA = (NppParameters::getInstance())->getNativeLangA();
 
-	//_subEditView = new ScintillaEditView();
-	//_mainEditView = new ScintillaEditView();
-	//_invisibleEditView = new ScintillaEditView();
-	//_fileEditView = new ScintillaEditView();
-	//_autoCompleteMain = new AutoCompletion(_mainEditView);
-	//_autoCompleteSub = new AutoCompletion(_subEditView);
-	//_smartHighlighter = NULL;
-
-
 	if (nativeLangDocRootA)
 	{
-
 		_nativeLangA =  nativeLangDocRootA->FirstChild("NotepadPlus");
 		if (_nativeLangA)
 		{
@@ -238,14 +240,14 @@ Notepad_plus::Notepad_plus(): Window(), _mainWindowStatus(0), _pDocTab(NULL), _p
 }
 
 // ATTENTION : the order of the destruction is very important
-// because if the parent's window hadle is destroyed before
-// the destruction of its childrens' windows handle,
-// its childrens' windows handle will be destroyed automatically!
+// because if the parent's window handle is destroyed before
+// the destruction of its children's windows handle,
+// its children's windows handle will be destroyed automatically!
 Notepad_plus::~Notepad_plus()
 {
 	(NppParameters::getInstance())->destroyInstance();
-	MainFileManager->destroyInstance();
-	(WcharMbcsConvertor::getInstance())->destroyInstance();
+	FileManager::destroyInstance();
+	WcharMbcsConvertor::destroyInstance();
 	if (_pTrayIco)
 		delete _pTrayIco;
 
@@ -320,8 +322,10 @@ void Notepad_plus::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLine, CmdL
 	newUpperLeft.x = nppGUI._appPos.left + workAreaRect.left;
 	newUpperLeft.y = nppGUI._appPos.top + workAreaRect.top;
 
+	winVer winVersion = getWinVersion();
+
 	// GetSystemMetrics does not support the multi-monitor values on Windows NT and Windows 95.
-	if ((_winVersion != WV_95) && (_winVersion != WV_NT))
+	if ((winVersion != WV_95) && (winVersion != WV_NT))
 	{
 		int margin = ::GetSystemMetrics(SM_CYSMCAPTION);
 		if (newUpperLeft.x > ::GetSystemMetrics(SM_CXVIRTUALSCREEN)-margin)
@@ -571,12 +575,6 @@ void Notepad_plus::killAllChildren()
 	}
 }
 
-
-void Notepad_plus::destroy()
-{
-	::DestroyWindow(_hSelf);
-}
-
 bool Notepad_plus::saveGUIParams()
 {
 	assert(_rebarTop);
@@ -599,7 +597,7 @@ bool Notepad_plus::saveGUIParams()
 						(TabBarPlus::isMultiLine() ? TAB_MULTILINE:0) |\
 						(nppGUI._tabStatus & TAB_HIDE);
 	nppGUI._splitterPos = _subSplitter->isVertical()?POS_VERTICAL:POS_HORIZOTAL;
-	UserDefineDialog *udd = _pEditView->getUserDefineDlg();
+	UserDefineDialog *udd = ScintillaEditView::getUserDefineDlg();
 	bool b = udd->isDocked();
 	nppGUI._userDefineDlgStatus = (b?UDD_DOCKED:0) | (udd->isVisible()?UDD_SHOW:0);
 
@@ -2622,12 +2620,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 			fileClose(bufferToClose, iView);
 			break;
 		}
-		int open = 1;
-		if (isFromPrimary || isFromSecondary)
-			open = notifyDocTab->nbItem();
 		doClose(bufferToClose, iView);
-		//if (open == 1 && canHideView(iView))
-		//	hideView(iView);
 		break;
 
 	}
@@ -3007,12 +3000,12 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 				ClientToScreen(notifRebar->getHSelf(), &pt);
 				_toolBar->doPopop(pt);
 				return TRUE;
-				break; }
+			}
+			NO_DEFAULT_CASE;
 		}
 		//Else forward notification to window of rebarband
 		REBARBANDINFO rbBand;
-		winVer winVersion = getWinVersion();
-		if (winVersion <= WV_W2K)
+		if (getWinVersion() <= WV_W2K)
 		{
 			ZeroMemory(&rbBand, sizeof(REBARBANDINFO));
 			rbBand.cbSize  = sizeof(REBARBANDINFO);
@@ -3346,6 +3339,8 @@ void Notepad_plus::specialCmd(int id, int param)
 			}
 			break;
 		}
+
+		NO_DEFAULT_CASE;
 	}
 }
 
@@ -3531,8 +3526,10 @@ void Notepad_plus::command(int id)
 		case IDM_MACRO_SAVECURRENTMACRO :
 		{
 			if (addCurrentMacro())
+			{
 				assert(_runMacroDlg);
 				_runMacroDlg->initMacroList();
+			}
 			break;
 		}
 		case IDM_EDIT_FULLPATHTOCLIP :
@@ -3760,7 +3757,7 @@ void Notepad_plus::command(int id)
 			assert(_toolBar);
 		    bool isUDDlgVisible = false;
 
-		    UserDefineDialog *udd = _pEditView->getUserDefineDlg();
+		    UserDefineDialog *udd = ScintillaEditView::getUserDefineDlg();
 
 		    if (!udd->isCreated())
 		    {
@@ -4377,6 +4374,8 @@ void Notepad_plus::command(int id)
 					}
 					break;
 				}
+
+				NO_DEFAULT_CASE;
 			}
 
 			if (idEncoding != -1)
@@ -4572,7 +4571,7 @@ void Notepad_plus::command(int id)
 			{
 				if (_nativeLangEncoding == CP_BIG5)
 				{
-					char *authorName = "«J¤µ§^";
+					const char *authorName = "«J¤µ§^";
 					HWND hItem = ::GetDlgItem(_aboutDlg->getHSelf(), IDC_AUTHOR_NAME);
 #ifdef UNICODE
 					WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
@@ -4937,6 +4936,9 @@ void Notepad_plus::command(int id)
 			case IDC_NEXT_DOC :
 				_macro.push_back(recordedMacroStep(id));
 				break;
+
+			NO_DEFAULT_CASE;
+
 		}
 
 }
@@ -5440,7 +5442,7 @@ bool Notepad_plus::reloadLang()
 		changeDlgLang(_colEditorDlg->getHSelf(), "ColumnEditor");
 	}
 
-	UserDefineDialog *udd = _pEditView->getUserDefineDlg();
+	UserDefineDialog *udd = ScintillaEditView::getUserDefineDlg();
 	if (udd && udd->isCreated())
 	{
 		changeUserDefineLang();
@@ -6065,6 +6067,7 @@ void Notepad_plus::changeLangTabContextMenu()
 					element->Attribute("order", &ordre);
 					switch (ordre)
 					{
+						// JOCE Plain numerical values?? makes sense?
 						case 0 :
 							pClose = element->Attribute("name"); break;
 						case 1 :
@@ -6097,6 +6100,8 @@ void Notepad_plus::changeLangTabContextMenu()
 							pGoToNewInst = element->Attribute("name"); break;
 						case 15 :
 							pOpenInNewInst = element->Attribute("name"); break;
+
+						NO_DEFAULT_CASE;
 					}
 				}
 			}
@@ -6459,7 +6464,7 @@ void Notepad_plus::changeUserDefineLang()
 	userDefineDlgNode = userDefineDlgNode->FirstChild("UserDefine");
 	if (!userDefineDlgNode) return;
 
-	UserDefineDialog *userDefineDlg = _pEditView->getUserDefineDlg();
+	UserDefineDialog *userDefineDlg = ScintillaEditView::getUserDefineDlg();
 
 	HWND hDlg = userDefineDlg->getHSelf();
 #ifdef UNICODE
@@ -6511,9 +6516,12 @@ void Notepad_plus::changeUserDefineLang()
 			{
 				switch(id)
 				{
+					// JOCE Plain numerical values?? makes sense?
 					case 0: case 1: case 2: case 3: case 4:
 					case 5: case 6: case 7: case 8:
 						translatedText[id] = name; break;
+
+					NO_DEFAULT_CASE;
 				}
 			}
 		}
@@ -6569,6 +6577,8 @@ void Notepad_plus::changeUserDefineLang()
 				case 1 : changeStyleCtrlsLang(hDlgArrary[i], keywordsID[j], translatedText); break;
 				case 2 : changeStyleCtrlsLang(hDlgArrary[i], commentID[j], translatedText); break;
 				case 3 : changeStyleCtrlsLang(hDlgArrary[i], operatorID[j], translatedText); break;
+
+				NO_DEFAULT_CASE;
 			}
 		}
 		TiXmlNodeA *node = userDefineDlgNode->FirstChild(nodeNameArray[i]);
@@ -7246,18 +7256,23 @@ void Notepad_plus::changeToolBarIcons()
 
 bool Notepad_plus::switchToFile(BufferID id)
 {
-	int i = 0;
-	int iView = currentView();
 	if (id == BUFFER_INVALID)
 		return false;
 
-	if ((i = _pDocTab->getIndexByBuffer(id)) != -1)
+	int i = _pDocTab->getIndexByBuffer(id);
+	int iView = currentView();
+
+	if (i != -1)
 	{
 		iView = currentView();
 	}
-	else if ((i = _pNonDocTab->getIndexByBuffer(id)) != -1)
+	else
 	{
-		iView = otherView();
+		i = _pNonDocTab->getIndexByBuffer(id);
+		if ( i != -1)
+		{
+			iView = otherView();
+		}
 	}
 
 	if (i != -1)
@@ -7832,7 +7847,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
             //--User Define Dialog Section--//
 			int uddStatus = nppGUI._userDefineDlgStatus;
-		    UserDefineDialog *udd = _pEditView->getUserDefineDlg();
+		    UserDefineDialog *udd = ScintillaEditView::getUserDefineDlg();
 
 			bool uddShow = false;
 			switch (uddStatus)
@@ -7900,6 +7915,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			{
 				return ::SendMessage(dis->hwndItem, WM_DRAWITEM, wParam, lParam);
 			}
+			return TRUE;
 		}
 
 		case WM_DOCK_USERDEFINE_DLG:
@@ -8242,6 +8258,8 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 #endif
 					break;
 				}
+
+				NO_DEFAULT_CASE;
 			}
 
             return TRUE;
@@ -8431,12 +8449,18 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			assert(_subDocTab);
 			int nbDocPrimary = _mainDocTab->nbItem();
 			int nbDocSecond = _subDocTab->nbItem();
-			if (lParam == ALL_OPEN_FILES)
-				return nbDocPrimary + nbDocSecond;
-			else if (lParam == PRIMARY_VIEW)
-				return  nbDocPrimary;
-			else if (lParam == SECOND_VIEW)
-				return  nbDocSecond;
+			switch(lParam)
+			{
+				case ALL_OPEN_FILES:
+					return nbDocPrimary + nbDocSecond;
+				case PRIMARY_VIEW:
+					return  nbDocPrimary;
+				case SECOND_VIEW:
+					return  nbDocSecond;
+
+				NO_DEFAULT_CASE;
+			}
+			return TRUE;
 		}
 
 		case NPPM_GETOPENFILENAMESPRIMARY :
@@ -8517,6 +8541,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			{
 				case APPCOMMAND_BROWSER_BACKWARD :
 				case APPCOMMAND_BROWSER_FORWARD :
+				{
 					assert(_mainDocTab);
 					assert(_subDocTab);
 					int nbDoc = viewVisible(MAIN_VIEW)?_mainDocTab->nbItem():0;
@@ -8524,6 +8549,10 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 					if (nbDoc > 1)
 						activateNextDoc((GET_APPCOMMAND_LPARAM(lParam) == APPCOMMAND_BROWSER_FORWARD)?dirDown:dirUp);
 					_linkTriggered = true;
+				}
+				break;
+
+				NO_DEFAULT_CASE;
 			}
 			return ::DefWindowProc(hwnd, Message, wParam, lParam);
 		}
@@ -8571,8 +8600,6 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		{
 			// convert to ASCII
 			Utf8_16_Write     UnicodeConvertor;
-			UINT            length  = 0;
-			char*            buffer  = NULL;
 			ScintillaEditView *pSci;
 
 			if (wParam == MAIN_VIEW)
@@ -8584,8 +8611,8 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 
 			// get text of current scintilla
-			length = pSci->execute(SCI_GETTEXTLENGTH, 0, 0) + 1;
-			buffer = new char[length];
+			UINT length = pSci->execute(SCI_GETTEXTLENGTH, 0, 0) + 1;
+			char* buffer = new char[length];
 			pSci->execute(SCI_GETTEXT, length, (LPARAM)buffer);
 
 			// convert here
@@ -8613,8 +8640,6 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		{
 			// convert
 			Utf8_16_Read    UnicodeConvertor;
-			UINT            length  = 0;
-			char*            buffer  = NULL;
 			ScintillaEditView *pSci;
 
 			if (wParam == MAIN_VIEW)
@@ -8625,8 +8650,8 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 				return -1;
 
 			// get text of current scintilla
-			length = pSci->execute(SCI_GETTEXTLENGTH, 0, 0) + 1;
-			buffer = new char[length];
+			UINT length = pSci->execute(SCI_GETTEXTLENGTH, 0, 0) + 1;
+			char* buffer = new char[length];
 			pSci->execute(SCI_GETTEXT, length, (LPARAM)buffer);
 
 			length = UnicodeConvertor.convert(buffer, length-1);
@@ -9225,6 +9250,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 					return TRUE;
 				}
 */
+				NO_DEFAULT_CASE;
 			}
 			return TRUE;
 		}
@@ -9316,7 +9342,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 		case NPPM_GETWINDOWSVERSION:
 		{
-			return _winVersion;
+			return getWinVersion();
 		}
 
 		case NPPM_MAKECURRENTBUFFERDIRTY :
@@ -9377,8 +9403,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		}
 		case NPPM_ISTABBARHIDDEN :
 		{
-			assert(_mainDocTab);
-			return _mainDocTab->getHideTabBarStatus();
+			return DocTabView::getHideTabBarStatus();
 		}
 
 
@@ -10062,8 +10087,6 @@ const TCHAR * Notepad_plus::fileSaveSession(size_t nbFile, TCHAR ** fileNames, c
 
 const TCHAR * Notepad_plus::fileSaveSession(size_t nbFile, TCHAR ** fileNames)
 {
-	const TCHAR *sessionFileName = NULL;
-
 	FileDialog fDlg(_hSelf, _hInst);
 	const TCHAR *ext = NppParameters::getInstance()->getNppGUI()._definedSessionExt.c_str();
 
@@ -10076,7 +10099,7 @@ const TCHAR * Notepad_plus::fileSaveSession(size_t nbFile, TCHAR ** fileNames)
 		sessionExt += ext;
 		fDlg.setExtFilter(TEXT("Session file"), sessionExt.c_str(), NULL);
 	}
-	sessionFileName = fDlg.doSaveDlg();
+	const TCHAR *sessionFileName = fDlg.doSaveDlg();
 
 	return fileSaveSession(nbFile, fileNames, sessionFileName);
 }
@@ -10218,11 +10241,6 @@ void Notepad_plus::notifyBufferChanged(Buffer * buffer, int mask)
 			}
 			case DOC_DELETED: 	//ask for keep
 			{
-				int index = _pDocTab->getIndexByBuffer(buffer->getID());
-				int iView = currentView();
-				if (index == -1)
-					iView = otherView();
-				//activateBuffer(buffer->getID(), iView);	//activate the buffer in the first view possible
 				didDialog = true;
 				if (doCloseOrNot(buffer->getFullPathName()) == IDNO)
 				{
@@ -10481,7 +10499,7 @@ void Notepad_plus::setFindReplaceFolderFilter(const TCHAR *dir, const TCHAR *fil
 
 int Notepad_plus::doSaveOrNot(const TCHAR *fn)
 {
-	TCHAR pattern[64] = TEXT("Save file \"%s\" ?");
+	const TCHAR* pattern = TEXT("Save file \"%s\" ?");
 	TCHAR phrase[512];
 	wsprintf(phrase, pattern, fn);
 	return doActionOrNot(TEXT("Save"), phrase, MB_YESNOCANCEL | MB_ICONQUESTION | MB_APPLMODAL);
@@ -10489,8 +10507,8 @@ int Notepad_plus::doSaveOrNot(const TCHAR *fn)
 
 int Notepad_plus::doReloadOrNot(const TCHAR *fn, bool dirty)
 {
-	TCHAR* pattern = TEXT("%s\r\rThis file has been modified by another program.\rDo you want to reload it%s?");
-	TCHAR* lose_info_str = dirty ? TEXT(" and lose the changes made in Notepad++") : TEXT("");
+	const TCHAR* pattern = TEXT("%s\r\rThis file has been modified by another program.\rDo you want to reload it%s?");
+	const TCHAR* lose_info_str = dirty ? TEXT(" and lose the changes made in Notepad++") : TEXT("");
 	TCHAR phrase[512];
 	wsprintf(phrase, pattern, fn, lose_info_str);
 	int icon = dirty ? MB_ICONEXCLAMATION : MB_ICONQUESTION;
@@ -10499,7 +10517,7 @@ int Notepad_plus::doReloadOrNot(const TCHAR *fn, bool dirty)
 
 int Notepad_plus::doCloseOrNot(const TCHAR *fn)
 {
-	TCHAR pattern[128] = TEXT("The file \"%s\" doesn't exist anymore.\rKeep this file in editor?");
+	const TCHAR* pattern = TEXT("The file \"%s\" doesn't exist anymore.\rKeep this file in editor?");
 	TCHAR phrase[512];
 	wsprintf(phrase, pattern, fn);
 	return doActionOrNot(TEXT("Keep non existing file"), phrase, MB_YESNO | MB_ICONQUESTION | MB_APPLMODAL);
@@ -10507,7 +10525,7 @@ int Notepad_plus::doCloseOrNot(const TCHAR *fn)
 
 int Notepad_plus::doDeleteOrNot(const TCHAR *fn)
 {
-	TCHAR pattern[128] = TEXT("The file \"%s\"\rwill be deleted from your disk and this document will be closed.\rContinue?");
+	const TCHAR* pattern = TEXT("The file \"%s\"\rwill be deleted from your disk and this document will be closed.\rContinue?");
 	TCHAR phrase[512];
 	wsprintf(phrase, pattern, fn);
 	return doActionOrNot(TEXT("Delete file"), phrase, MB_YESNO | MB_ICONQUESTION | MB_APPLMODAL);
@@ -10534,7 +10552,7 @@ void Notepad_plus::enableConvertMenuItems(formatType f) const
 void Notepad_plus::setDisplayFormat(formatType f)
 {
 	assert(_statusBar);
-	std::generic_string str;
+	const TCHAR * str;
 	switch (f)
 	{
 		case MAC_FORMAT :
@@ -10546,13 +10564,13 @@ void Notepad_plus::setDisplayFormat(formatType f)
 		default :
 			str = TEXT("Dos\\Windows");
 	}
-	_statusBar->setText(str.c_str(), STATUSBAR_EOF_FORMAT);
+	_statusBar->setText(str, STATUSBAR_EOF_FORMAT);
 };
 
 void Notepad_plus::setUniModeText(UniMode um)
 {
 	assert(_statusBar);
-	TCHAR *uniModeText;
+	const TCHAR *uniModeText;
 	switch (um)
 	{
 		case uniUTF8:
@@ -10772,25 +10790,33 @@ int Notepad_plus::getLangFromMenuName(const TCHAR * langName)
 	TCHAR menuLangName[menuSize];
 
 	for ( int i = IDM_LANG_C; i <= IDM_LANG_USER; i++ )
+	{
 		if ( ::GetMenuString( _mainMenuHandle, i, menuLangName, menuSize, MF_BYCOMMAND ) )
+		{
 			if ( !lstrcmp( langName, menuLangName ) )
 			{
 				id	= i;
 				break;
 			}
+		}
+	}
 
-			if ( id == 0 )
+	if ( id == 0 )
+	{
+		for ( int i = IDM_LANG_USER + 1; i <= IDM_LANG_USER_LIMIT; i++ )
+		{
+			if ( ::GetMenuString( _mainMenuHandle, i, menuLangName, menuSize, MF_BYCOMMAND ) )
 			{
-				for ( int i = IDM_LANG_USER + 1; i <= IDM_LANG_USER_LIMIT; i++ )
-					if ( ::GetMenuString( _mainMenuHandle, i, menuLangName, menuSize, MF_BYCOMMAND ) )
-						if ( !lstrcmp( langName, menuLangName ) )
-						{
-							id	= i;
-							break;
-						}
+				if ( !lstrcmp( langName, menuLangName ) )
+				{
+					id	= i;
+					break;
+				}
 			}
+		}
+	}
 
-			return id;
+	return id;
 }
 
 std::generic_string Notepad_plus::getLangFromMenu(const Buffer * buf)

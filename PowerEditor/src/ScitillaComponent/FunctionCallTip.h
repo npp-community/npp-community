@@ -27,8 +27,8 @@ class FunctionCallTip {
 	 friend class AutoCompletion;
 public:
 	FunctionCallTip(ScintillaEditView * pEditView) : _pEditView(pEditView), _pXmlKeyword(NULL), _curPos(0), _startPos(0),
-													_curFunction(NULL), _currentNrOverloads(0), _currentOverload(0),
-													_currentParam(0), _funcName(NULL),
+													_curFunction(NULL), _funcName(NULL),
+													_currentNrOverloads(0), _currentOverload(0), _currentParam(0),
 													_start('('), _stop(')'), _param(','), _terminal(';'), _ignoreCase(true)
 													{};
 	~FunctionCallTip() {/* cleanup(); */};
@@ -48,6 +48,8 @@ private:
 
 	TiXmlElement * _curFunction;	//current function element
 	//cache some XML values n stuff
+
+	// JOCE: We might want to review that in the future. std::string could probalbly serve us way better here.
 	TCHAR * _funcName;				//name of function
 	stringVec _retVals;				//vector of overload return values/types
 	std::vector<stringVec> _overloads;	//vector of overload params (=vector)

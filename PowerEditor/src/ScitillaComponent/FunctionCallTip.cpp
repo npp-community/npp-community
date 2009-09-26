@@ -113,6 +113,9 @@ void FunctionCallTip::close() {
 	_currentOverload = 0;
 }
 
+// Strange things are happening to the loop index variable, but I'm not touching this parsing code with a 10 foot pole.
+// for loop index variable ’Symbol’ whose type category is ’String’modified in body of the for loop
+//lint -e850
 bool FunctionCallTip::getCursorFunction() {
 	int line = _pEditView->execute(SCI_LINEFROMPOSITION, _curPos);
 	int startpos = _pEditView->execute(SCI_POSITIONFROMLINE, line);
@@ -237,6 +240,7 @@ bool FunctionCallTip::getCursorFunction() {
 	}
 	return res;
 }
+//lint +e850
 
 /*
 Find function in XML structure and parse it

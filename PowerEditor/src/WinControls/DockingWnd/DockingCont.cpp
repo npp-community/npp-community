@@ -55,21 +55,28 @@ static LRESULT CALLBACK hookProcMouse(UINT nCode, WPARAM wParam, LPARAM lParam)
 	return ::CallNextHookEx(hookMouse, nCode, wParam, lParam);
 }
 
-
 DockingCont::DockingCont()
 {
-	_isMouseOver		= FALSE;
-	_isMouseClose		= FALSE;
-	_isMouseDown		= FALSE;
+	_isActive           = FALSE;
 	_isFloating			= false;
-	_isTopCaption		= CAPTION_TOP;
-	_dragFromTab		= FALSE;
+	_hCaption           = NULL;
 	_hContTab			= NULL;
-	_hDefaultTabProc	= NULL;
-	_beginDrag			= FALSE;
-	_prevItem			= 0;
 	_hFont				= NULL;
+	_isTopCaption		= CAPTION_TOP;
+	_isMouseDown		= FALSE;
+	_isMouseClose		= FALSE;
+	_isMouseOver		= FALSE;
+	_rcCaption.bottom   =
+	_rcCaption.left     =
+	_rcCaption.right    =
+	_rcCaption.top      = 0;
+	_dragFromTab		= FALSE;
+	_hDefaultCaptionProc= NULL;
+	_hDefaultTabProc	= NULL;
+	_prevItem			= 0;
+	_beginDrag			= FALSE;
 	_bTabTTHover		= FALSE;
+	_iLastHovered       = 0;
 	_bCaptionTT			= FALSE;
 	_bCapTTHover		= FALSE;
 	_hoverMPos			= posClose;
@@ -78,7 +85,7 @@ DockingCont::DockingCont()
 
 DockingCont::~DockingCont()
 {
-	::DeleteObject(_hFont);
+	DockingCont::destroy();
 }
 
 
@@ -438,8 +445,6 @@ void DockingCont::drawCaptionItem(DRAWITEMSTRUCT *pDrawItemStruct)
 	HPEN		hPen		= ::CreatePen(PS_SOLID, 1, ::GetSysColor(COLOR_BTNSHADOW));
 	BITMAP		bmp			= {0};
 	HBITMAP		hBmpCur		= NULL;
-	HBITMAP		hBmpOld 	= NULL;
-	HBITMAP		hBmpNew		= NULL;
 	UINT		length  	= _pszCaption.length();
 
 	INT nSavedDC			= ::SaveDC(hDc);
@@ -563,8 +568,8 @@ void DockingCont::drawCaptionItem(DRAWITEMSTRUCT *pDrawItemStruct)
 
 	// blit bitmap into the destination
 	::GetObject(hBmpCur, sizeof(bmp), &bmp);
-	hBmpOld = (HBITMAP)::SelectObject(dcMem, hBmpCur);
-	hBmpNew = ::CreateCompatibleBitmap(dcMem, bmp.bmWidth, bmp.bmHeight);
+	HBITMAP hBmpOld = (HBITMAP)::SelectObject(dcMem, hBmpCur);
+	HBITMAP hBmpNew = ::CreateCompatibleBitmap(dcMem, bmp.bmWidth, bmp.bmHeight);
 
 	rc = pDrawItemStruct->rcItem;
 	::SelectObject(hDc, hBmpNew);
@@ -635,13 +640,12 @@ LRESULT DockingCont::runProcTab(HWND hwnd, UINT Message, WPARAM wParam, LPARAM l
 		}
 		case WM_LBUTTONUP:
 		{
-			INT				iItem	= 0;
-			TCHITTESTINFO	info	= {0};
+			TCHITTESTINFO	info	= {{0,0},0};
 
 			// get selected sub item
 			info.pt.x = LOWORD(lParam);
 			info.pt.y = HIWORD(lParam);
-			iItem = ::SendMessage(hwnd, TCM_HITTEST, 0, (LPARAM)&info);
+			INT iItem = ::SendMessage(hwnd, TCM_HITTEST, 0, (LPARAM)&info);
 
 			SelectTab(iItem);
 			_beginDrag = FALSE;
@@ -654,14 +658,13 @@ LRESULT DockingCont::runProcTab(HWND hwnd, UINT Message, WPARAM wParam, LPARAM l
 		}
 		case WM_MBUTTONUP:
 		{
-			INT				iItem	= 0;
 			TCITEM			tcItem	= {0};
-			TCHITTESTINFO	info	= {0};
+			TCHITTESTINFO	info	= {{0,0},0};
 
 			// get selected sub item
 			info.pt.x = LOWORD(lParam);
 			info.pt.y = HIWORD(lParam);
-			iItem = ::SendMessage(hwnd, TCM_HITTEST, 0, (LPARAM)&info);
+			INT iItem = ::SendMessage(hwnd, TCM_HITTEST, 0, (LPARAM)&info);
 
 			SelectTab(iItem);
 
@@ -678,13 +681,12 @@ LRESULT DockingCont::runProcTab(HWND hwnd, UINT Message, WPARAM wParam, LPARAM l
 		}
 		case WM_MOUSEMOVE:
 		{
-			INT				iItem	= 0;
-			TCHITTESTINFO	info	= {0};
+			TCHITTESTINFO	info	= {{0,0},0};
 
 			// get selected sub item
 			info.pt.x = LOWORD(lParam);
 			info.pt.y = HIWORD(lParam);
-			iItem = ::SendMessage(hwnd, TCM_HITTEST, 0, (LPARAM)&info);
+			INT iItem = ::SendMessage(hwnd, TCM_HITTEST, 0, (LPARAM)&info);
 
 			if ((_beginDrag == TRUE) && (wParam == MK_LBUTTON))
 			{
@@ -745,15 +747,14 @@ LRESULT DockingCont::runProcTab(HWND hwnd, UINT Message, WPARAM wParam, LPARAM l
 		}
 		case WM_MOUSEHOVER:
 		{
-			INT				iItem	= 0;
 			TCITEM			tcItem	= {0};
 			RECT			rc		= {0};
-			TCHITTESTINFO	info	= {0};
+			TCHITTESTINFO	info	= {{0,0},0};
 
 			// get selected sub item
 			info.pt.x = LOWORD(lParam);
 			info.pt.y = HIWORD(lParam);
-			iItem = ::SendMessage(hwnd, TCM_HITTEST, 0, (LPARAM)&info);
+			INT iItem = ::SendMessage(hwnd, TCM_HITTEST, 0, (LPARAM)&info);
 
 			// recalc mouse position
 			::ClientToScreen(hwnd, &info.pt);
@@ -778,13 +779,12 @@ LRESULT DockingCont::runProcTab(HWND hwnd, UINT Message, WPARAM wParam, LPARAM l
 
 			if ((lpnmhdr->hwndFrom == _hContTab) && (lpnmhdr->code == TCN_GETOBJECT))
 			{
-				INT				iItem	= 0;
-				TCHITTESTINFO	info	= {0};
+				TCHITTESTINFO	info	= {{0,0},0};
 
 				// get selected sub item
 				info.pt.x = LOWORD(lParam);
 				info.pt.y = HIWORD(lParam);
-				iItem = ::SendMessage(hwnd, TCM_HITTEST, 0, (LPARAM)&info);
+				INT iItem = ::SendMessage(hwnd, TCM_HITTEST, 0, (LPARAM)&info);
 
 				SelectTab(iItem);
 			}
@@ -1301,10 +1301,8 @@ void DockingCont::SelectTab(INT iTab)
 
 		for (INT iItem = 0; iItem < iItemCnt; iItem++)
 		{
-			TCHAR *pszTabTxt = NULL;
-
 			::SendMessage(_hContTab, TCM_GETITEM, iItem, (LPARAM)&tcItem);
-			pszTabTxt = ((tTbData*)tcItem.lParam)->pszName;
+			TCHAR *pszTabTxt = ((tTbData*)tcItem.lParam)->pszName;
 
 			// get current font width
 			GetTextExtentPoint32(hDc, pszTabTxt, lstrlen(pszTabTxt), &size);
@@ -1422,9 +1420,16 @@ void DockingCont::setCaptionTop( BOOL isTopCaption )
 
 void DockingCont::destroy()
 {
-	for (INT iTb = _vTbData.size(); iTb > 0; iTb--)
+	if (_hFont)
 	{
-		delete _vTbData[iTb-1];
+		::DeleteObject(_hFont);
+		_hFont = NULL;
 	}
+
+	for (std::vector<tTbData *>::iterator it(_vTbData.begin()); it != _vTbData.end(); ++it)
+	{
+		delete (*it);
+	}
+	_vTbData.clear();
 	::DestroyWindow(_hSelf);
 }

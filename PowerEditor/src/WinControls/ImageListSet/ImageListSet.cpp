@@ -40,6 +40,11 @@ void ToolBarIcons::create(HINSTANCE hInst, int iconSize)
 	reInit(iconSize);
 }
 
+ToolBarIcons::~ToolBarIcons()
+{
+	ToolBarIcons::destroy();
+}
+
 void ToolBarIcons::destroy()
 {
 	_iconListVector[HLIST_DEFAULT].destroy();

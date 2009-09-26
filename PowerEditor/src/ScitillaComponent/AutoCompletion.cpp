@@ -26,15 +26,19 @@
 static bool isInList(std::generic_string word, const std::vector<std::generic_string> & wordArray)
 {
 	for (size_t i = 0 ; i < wordArray.size() ; i++)
+	{
 		if (wordArray[i] == word)
+		{
 			return true;
+		}
+	}
 	return false;
 };
 
 AutoCompletion::AutoCompletion(ScintillaEditView * pEditView) :
-	_funcCompletionActive(false), _pEditView(pEditView), _funcCalltip(new FunctionCallTip(pEditView)),
-	_curLang(L_TXT), _XmlFile(NULL), _activeCompletion(CompletionNone),
-	_pXmlKeyword(NULL), _ignoreCase(true), _keyWords(TEXT(""))
+	_funcCompletionActive(false), _pEditView(pEditView), _curLang(L_TXT),
+	_XmlFile(NULL), _pXmlKeyword(NULL), _activeCompletion(CompletionNone),
+	_ignoreCase(true), _keyWords(TEXT("")), _funcCalltip(new FunctionCallTip(pEditView))
 {
 	//Do not load any language yet
 }
@@ -55,7 +59,6 @@ bool AutoCompletion::showAutoComplete() {
 	int curPos = int(_pEditView->execute(SCI_GETCURRENTPOS));
 	int line = _pEditView->getCurrentLineNumber();
 	int startLinePos = int(_pEditView->execute(SCI_POSITIONFROMLINE, line ));
-	int startWordPos = startLinePos;
 
 	int len = curPos-startLinePos;
 	char * lineBuffer = new char[len+1];
@@ -75,7 +78,7 @@ bool AutoCompletion::showAutoComplete() {
 		offset--;
 
 	}
-	startWordPos = curPos-nrChars;
+	int startWordPos = curPos-nrChars;
 
 	_pEditView->execute(SCI_AUTOCSETSEPARATOR, WPARAM('\n'));
 	_pEditView->execute(SCI_AUTOCSETIGNORECASE, _ignoreCase);
@@ -141,7 +144,12 @@ bool AutoCompletion::showWordComplete(bool autoInsert)
 		return true;
 	}
 
-	sort(wordArray.begin(), wordArray.end());
+	{
+		std::vector<std::generic_string>::iterator begin = wordArray.begin();
+		std::vector<std::generic_string>::iterator end = wordArray.end();
+		sort(begin, end);
+	}
+
 	std::generic_string words(TEXT(""));
 
 	for (size_t i = 0 ; i < wordArray.size() ; i++)
@@ -263,8 +271,8 @@ bool AutoCompletion::setLanguage(LangType language) {
 
 		TiXmlElement * pElem = pAutoNode->FirstChildElement(TEXT("Environment"));
 		if (pElem) {
-			const TCHAR * val = 0;
-			val = pElem->Attribute(TEXT("ignoreCase"));
+
+			const TCHAR * val = pElem->Attribute(TEXT("ignoreCase"));
 			if (val && !lstrcmp(val, TEXT("no"))) {
 				_ignoreCase = false;
 				_funcCalltip->_ignoreCase = false;

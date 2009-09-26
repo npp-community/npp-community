@@ -29,13 +29,17 @@
 class DockingSplitter : public Window
 {
 public :
-	DockingSplitter() : _isLeftButtonDown(FALSE), _hMessage(NULL) {};
-	~DockingSplitter(){};
-
-	virtual void destroy() {};
+	DockingSplitter() : _hMessage(NULL), _isLeftButtonDown(FALSE), _flags(0)
+	{
+		_ptOldPos.x = 0;
+		_ptOldPos.y = 0;
+	}
 
 public:
+	//(Warning -- Member with different signature hides virtual member 'Window::init(struct HINSTANCE__ *, struct HWND__ *)'
+	//lint -e1411
 	void init(HINSTANCE hInst, HWND hWnd, HWND hMessage, UINT flags);
+	//lint +e1411
 
 protected:
 

@@ -82,30 +82,48 @@ struct CloseButtonZone {
 	int _fromRight; // distance from right in pixzl
 };
 
+
+TabBar::TabBar() :
+	_nbItem(0), _hasImgLst(false),
+	_hFont(NULL), _hLargeFont(NULL), _hVerticalFont(NULL), _hVerticalLargeFont(NULL),
+	_ctrlID(-1), _isTraditional(true),
+	_isVertical(false), _isMultiLine(false)
+{
+
+}
+
 TabBar::~TabBar()
 {
-	if (_hSelf)
-	{
-		TabBar::destroy();
-	}
+	TabBar::destroy();
 };
 
 void TabBar::destroy()
 {
 	if (_hFont)
+	{
 		DeleteObject(_hFont);
+		_hFont = NULL;
+	}
 
 	if (_hLargeFont)
+	{
 		DeleteObject(_hLargeFont);
+		_hLargeFont = NULL;
+	}
 
 	if (_hVerticalFont)
+	{
 		DeleteObject(_hVerticalFont);
+		_hVerticalFont = NULL;
+	}
 
 	if (_hVerticalLargeFont)
+	{
 		DeleteObject(_hVerticalLargeFont);
+		_hVerticalLargeFont = NULL;
+	}
 
-	::DestroyWindow(_hSelf);
-	_hSelf = NULL;
+	Window::destroy();
 };
 
 
@@ -290,10 +308,15 @@ long TabBar::getRowCount() const
 }
 
 TabBarPlus::TabBarPlus() :
-	TabBar(), _isDragging(false), _tabBarDefaultProc(NULL), _currentHoverTabItem(-1),
-	_isCloseHover(false), _whichCloseClickDown(-1), _lmbdHit(false), _closeButtonZone(new CloseButtonZone())
+	_isDragging(false), _isDraggingInside(false),
+	_nSrcTab(0), _nTabDragged(0),
+	_tabBarDefaultProc(NULL),
+	_currentHoverTabItem(-1),
+	_closeButtonZone(new CloseButtonZone()),
+	_isCloseHover(false), _whichCloseClickDown(-1), _lmbdHit(false)
 {
-
+	memset(&_draggingPoint, 0, sizeof(POINT));
+	memset(&_currentHoverTabRect, 0, sizeof(RECT));
 }
 
 
@@ -616,6 +639,9 @@ LRESULT TabBarPlus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPara
 			}
 			return TRUE;
 		}
+
+		default:
+		break;
 	}
 	return ::CallWindowProc(_tabBarDefaultProc, hwnd, Message, wParam, lParam);
 }

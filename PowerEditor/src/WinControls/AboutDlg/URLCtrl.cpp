@@ -117,6 +117,11 @@ static COLORREF getParentDlgBkColor(HWND hWnd)
 	return crRet;
 }
 
+URLCtrl::~URLCtrl()
+{
+	URLCtrl::destroy();
+}
+
 void URLCtrl::create(HWND itemHandle, TCHAR * link, COLORREF linkColor)
 {
 	// turn on notify style
@@ -273,6 +278,25 @@ LRESULT URLCtrl::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 	    // HTCLIENT instead.
 	    case WM_NCHITTEST:
 		    return HTCLIENT;
+
+		default:
+		break;
     }
     return ::CallWindowProc(_oldproc, hwnd, Message, wParam, lParam);
+}
+
+void URLCtrl::destroy()
+{
+	if(_hfUnderlined)
+	{
+		::DeleteObject(_hfUnderlined);
+		_hfUnderlined = NULL;
+	}
+
+	if(_hCursor)
+	{
+		::DestroyCursor(_hCursor);
+		_hCursor = NULL;
+	}
+	Window::destroy();
 }

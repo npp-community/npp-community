@@ -142,9 +142,10 @@ struct VisibleGUIConf {
 	//used by fullscreen only
 	WINDOWPLACEMENT _winPlace;
 
-	VisibleGUIConf() : isPostIt(false), isFullScreen(false),
-		isAlwaysOnTop(false), isMenuShown(true), isTabbarShown(true),
-		isStatusbarShown(true), preStyle(WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN)
+	VisibleGUIConf() :
+		isPostIt(false), isFullScreen(false), isMenuShown(true),
+		preStyle(WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN), isTabbarShown(true),
+		isAlwaysOnTop(false), isStatusbarShown(true)
 	{
 		_winPlace.length = 0;
 	};
@@ -157,11 +158,13 @@ class Notepad_plus : public Window {
 public:
 	Notepad_plus();
 	virtual ~Notepad_plus();
-	void init(HINSTANCE, HWND, const TCHAR *cmdLine, CmdLineParams *cmdLineParams);
+	//(Warning -- Member with different signature hides virtual member 'Window::init(struct HINSTANCE__ *, struct HWND__ *)'
+	//lint -e1411
+	void init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLine, CmdLineParams *cmdLineParams);
+	//lint +e1411
 	void killAllChildren();
-	virtual void destroy();
 
-    static const TCHAR * Notepad_plus::getClassName() {
+    static const TCHAR * getClassName() {
 		return _className;
 	};
 
@@ -236,7 +239,6 @@ public:
 	bool addCurrentMacro();
 	void loadLastSession();
 	bool loadSession(Session* session);
-	winVer getWinVersion() const {return _winVersion;};
 
 	bool emergency(std::generic_string emergencySavedDir);
 
@@ -261,19 +263,19 @@ private:
 
     DocTabView* _mainDocTab;
     DocTabView* _subDocTab;
-    DocTabView *_pDocTab;
-	DocTabView *_pNonDocTab;
+    DocTabView* _pDocTab;
+	DocTabView* _pNonDocTab;
 
     ScintillaEditView* _subEditView;
     ScintillaEditView* _mainEditView;
 	ScintillaEditView* _invisibleEditView;	//for searches
 	ScintillaEditView* _fileEditView;		//for FileManager
 
-    ScintillaEditView *_pEditView;
-	ScintillaEditView *_pNonEditView;
+    ScintillaEditView* _pEditView;
+	ScintillaEditView* _pNonEditView;
 
-    SplitterContainer *_pMainSplitter;
-    SplitterContainer *_subSplitter;
+    SplitterContainer* _pMainSplitter;
+    SplitterContainer* _subSplitter;
 
 	// AutoCompletions need to be after ScintillaEditViews, since their constructor depends on them.
 	// If you shuffle them, you'll get a crash on startup.
@@ -335,7 +337,7 @@ private:
 		bool _isActivated;
 		int _x;
 		int _y;
-		ActivateAppInfo() : _isActivated(false), _x(0), _y(0){};
+		ActivateAppInfo() : _isActivated(false), _x(0), _y(0){}
 	} _activeAppInf;
 
 	//Synchronized Scolling
@@ -345,8 +347,8 @@ private:
 		int _column;
 		bool _isSynScollV;
 		bool _isSynScollH;
-		SyncInfo():_line(0), _column(0), _isSynScollV(false), _isSynScollH(false){};
-		bool doSync() const {return (_isSynScollV || _isSynScollH); };
+		SyncInfo():_line(0), _column(0), _isSynScollV(false), _isSynScollH(false){}
+		bool doSync() const {return (_isSynScollV || _isSynScollH); }
 	} _syncInfo;
 
 	bool _isUDDocked;
@@ -354,13 +356,13 @@ private:
 	trayIconControler *_pTrayIco;
 	int _zoomOriginalValue;
 
+	// JOCE: move that to pointers...  That will save us another include in this header.
 	Accelerator _accelerator;
 	ScintillaAccelerator _scintaccelerator;
 
 	PluginsManager* _pluginsManager;
 
 	bool _isRTL;
-	winVer _winVersion;
 
 	bool _isFileOpening;
 

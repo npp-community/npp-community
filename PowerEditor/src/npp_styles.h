@@ -38,12 +38,12 @@ class TiXmlNode;
 struct Style
 {
 	int _styleID;
-	const TCHAR *_styleDesc;
+	std::generic_string _styleDesc;
 
 	COLORREF _fgColor;
 	COLORREF _bgColor;
 	int _colorStyle;
-	const TCHAR *_fontName;
+	std::generic_string _fontName;
 	int _fontStyle;
 	int _fontSize;
 
@@ -55,7 +55,7 @@ struct Style
 
 	~Style();
 
-	Style & operator=(const Style & style);
+	const Style & operator=(const Style & style);
 
 	void setKeywords(const TCHAR *str);
 };
@@ -81,7 +81,7 @@ struct StyleArray
 public:
 	StyleArray() : _nbStyler(0){};
 
-	StyleArray & operator=(const StyleArray & sa);
+	const StyleArray & operator=(const StyleArray & sa);
 
 	int getNbStyler() const {return _nbStyler;}
 	void setNbStyler(int nb) {_nbStyler = nb;}
@@ -108,22 +108,18 @@ protected:
 struct LexerStyler : public StyleArray
 {
 public :
-	LexerStyler():StyleArray(){};
-
-	LexerStyler & operator=(const LexerStyler & ls);
-
 	void setLexerName(const TCHAR *lexerName);
 	void setLexerDesc(const TCHAR *lexerDesc);
 	void setLexerUserExt(const TCHAR *lexerUserExt);
 
-	const TCHAR * getLexerName() const {return _lexerName;}
-	const TCHAR * getLexerDesc() const {return _lexerDesc;}
-	const TCHAR * getLexerUserExt() const {return _lexerUserExt;}
+	const TCHAR * getLexerName() const {return _lexerName.c_str();}
+	const TCHAR * getLexerDesc() const {return _lexerDesc.c_str();}
+	const TCHAR * getLexerUserExt() const {return _lexerUserExt.c_str();}
 
 private :
-	TCHAR _lexerName[16];
-	TCHAR _lexerDesc[32];
-	TCHAR _lexerUserExt[256];
+	std::generic_string _lexerName;
+	std::generic_string _lexerDesc;
+	std::generic_string _lexerUserExt;
 };
 
 #define  MAX_LEXER_STYLE 80
@@ -135,7 +131,7 @@ struct LexerStylerArray
 public :
 	LexerStylerArray() : _nbLexerStyler(0){};
 
-	LexerStylerArray & operator=(const LexerStylerArray & lsa);
+	const LexerStylerArray & operator=(const LexerStylerArray & lsa);
 
 	int getNbLexer() const {return _nbLexerStyler;};
 

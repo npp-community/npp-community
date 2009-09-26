@@ -57,6 +57,11 @@ LRESULT CALLBACK FocusWndProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 DockingManager::DockingManager()
 {
+	_ppWindow = NULL;
+	memset(&_rcWork, 0, sizeof(RECT));
+	memset(&_rect, 0, sizeof(RECT));
+	_ppMainWindow = NULL;
+
 	_isInitialized			= FALSE;
 	_hImageList				= NULL;
 	memset(_iContMap, -1, CONT_MAP_MAX);
@@ -81,11 +86,6 @@ DockingManager::DockingManager()
 
 DockingManager::~DockingManager()
 {
-	if (_hSelf)
-	{
-		DockingManager::destroy();
-	}
-
 	// delete 4 splitters
 	for (int i = 0; i < DOCKCONT_MAX; i++)
 	{
@@ -313,6 +313,8 @@ LRESULT DockingManager::runProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 								_dockData->rcRegion[iCont].right -= offset;
 							}
 							break;
+
+						NO_DEFAULT_CASE;
 					}
 					onSize();
 					break;
@@ -948,12 +950,6 @@ void DockingManager::setDockedContSize(int iCont, int iSize)
 	}
 	onSize();
 }
-
-void DockingManager::destroy()
-{
-	::DestroyWindow(_hSelf);
-	_hSelf = NULL;
-};
 
 int DockingManager::FindEmptyContainer()
 {

@@ -13,6 +13,9 @@ Modified by Don HO <don.h@free.fr>
 #include "precompiled_headers.h"
 #include "babygrid.h"
 
+// Disable Lint check of the indentation. The coding style in this file totally throws it off.
+//lint -e539 Did not expect positive indentation from Location
+
 #define MAX_GRIDS 20
 
 #define MAX_ROWS 32000
@@ -106,7 +109,8 @@ TCHAR data[1000];
 
 
 
-CREATESTRUCT cs,*lpcs;
+CREATESTRUCT cs;
+const CREATESTRUCT *lpcs;
 
 
 int         AddGrid(UINT);
@@ -707,7 +711,7 @@ void DisplayColumn(HWND hWnd,int SI,int c,int offset,HFONT hfont,HFONT hcolumnhe
 
 void DrawCursor(HWND hWnd,int SI)
 	{
-	   RECT rect,rectwhole;
+	   RECT rect;
 	   HDC gdc;
 	   HPEN hpen,holdpen;
 	   int rop;
@@ -719,7 +723,6 @@ void DrawCursor(HWND hWnd,int SI)
        if(BGHS[SI].cursorcol < BGHS[SI].homecol){return;}
 
 	   rect = GetCellRect(hWnd,SI,BGHS[SI].cursorrow,BGHS[SI].cursorcol);
-	   rectwhole=rect;
 	   gdc=GetDC(hWnd);
        BGHS[SI].activecellrect = rect;
 	   rop=GetROP2(gdc);
@@ -800,13 +803,11 @@ void SetHomeRow(HWND hWnd,int SI,int row,int col)
                BGHS[SI].homerow++;
               }
          }
-	 cellrect=GetCellRect(hWnd,SI,row,col);
 		 {
 			 while((row < BGHS[SI].homerow))
 				 {
 				  BGHS[SI].homerow --;
 				  InvalidateRect(hWnd,&gridrect,FALSE);
-				  cellrect=GetCellRect(hWnd,SI,row,col);
 				 }
 		 }
 	 //set the vertical scrollbar position
@@ -818,7 +819,6 @@ void SetHomeRow(HWND hWnd,int SI,int row,int col)
 void SetHomeCol(HWND hWnd,int SI,int row,int col)
 	{
       RECT gridrect,cellrect;
-      BOOL LASTCOLVISIBLE;
       //get rect of grid window
       GetClientRect(hWnd,&gridrect);
       //get rect of current cell
@@ -829,36 +829,15 @@ void SetHomeCol(HWND hWnd,int SI,int row,int col)
            //scroll right is needed
            BGHS[SI].homecol++;
            //see if last column is visible
-           cellrect = GetCellRect(hWnd,SI,row,BGHS[SI].cols);
-           if(cellrect.right <= gridrect.right)
-               {
-                LASTCOLVISIBLE=TRUE;
-               }
-           else
-               {
-                LASTCOLVISIBLE=FALSE;
-               }
            cellrect = GetCellRect(hWnd,SI,row,col);
            InvalidateRect(hWnd,&gridrect,FALSE);
           }
-      cellrect = GetCellRect(hWnd,SI,row,col);
       while((BGHS[SI].cursorcol < BGHS[SI].homecol)&&(BGHS[SI].homecol > 1))
 
           {
            //scroll left is needed
            BGHS[SI].homecol--;
            //see if last column is visible
-           cellrect = GetCellRect(hWnd,SI,row,BGHS[SI].cols);
-           if(cellrect.right <= gridrect.right)
-               {
-                LASTCOLVISIBLE=TRUE;
-               }
-           else
-               {
-                LASTCOLVISIBLE=FALSE;
-               }
-
-           cellrect = GetCellRect(hWnd,SI,row,col);
            InvalidateRect(hWnd,&gridrect,FALSE);
           }
           {
@@ -1378,18 +1357,15 @@ LRESULT CALLBACK GridProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int wmId, wmEvent;
 	PAINTSTRUCT ps;
-	HDC hdc;
 	TCHAR buffer[1000];
 	int SelfIndex;
 	int ReturnValue;
-    UINT SelfMenu;
 	HINSTANCE hInst;
     int iDataType;
     static int ASCII;
 
 
 	SelfIndex=FindGrid((UINT)GetMenu(hWnd));
-    SelfMenu=BGHS[SelfIndex].gridmenu;
 
 	//update the grid width and height variable
 	{
@@ -1418,7 +1394,7 @@ LRESULT CALLBACK GridProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 
 		case WM_PAINT:
-			hdc = BeginPaint(hWnd, &ps);
+			BeginPaint(hWnd, &ps);
 			RECT rt;
 			GetClientRect(hWnd, &rt);
 			CalcVisibleCellBoundaries(SelfIndex);
@@ -1731,7 +1707,7 @@ LRESULT CALLBACK GridProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                        SIZE size;
                        int required_width;
                        int current_width;
-                       int required_height = 30;
+                       int required_height;
                        int current_height;
                        int longestline;
                        HFONT holdfont;
@@ -1746,7 +1722,6 @@ LRESULT CALLBACK GridProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                            }
                        //if there are \n codes in the generic_string, find the longest line
                        longestline=FindLongestLine(hdc,(TCHAR*)lParam,&size);
-                       //GetTextExtentPoint32(hdc,(TCHAR*)lParam,lstrlen((TCHAR*)lParam),&size);
                        required_width = longestline+15;
                        required_height = size.cy;
                        //count lines
@@ -2123,6 +2098,7 @@ LRESULT CALLBACK GridProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				{
 				 BGHS[SelfIndex].textcolor = RGB(0,0,0);
 				}
+			break;
 
         case WM_MOUSEMOVE:
               int x,y,r,c,t,z;
@@ -2961,7 +2937,7 @@ LRESULT CALLBACK GridProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
              static int SI,cheight;
              static int savewidth,saveheight;
-             int intin,intout;
+             int intout;
              SI=SelfIndex;
 
 
@@ -2979,7 +2955,6 @@ LRESULT CALLBACK GridProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
              if((BGHS[SI].SHOWINTEGRALROWS)&&(BGHS[SI].VSCROLL))
                  {
                   saveheight=HIWORD(lParam);
-                  intin=saveheight;
                   savewidth=LOWORD(lParam);
                   cheight=HIWORD(lParam);
                   cheight-=BGHS[SI].titleheight;
@@ -3175,7 +3150,6 @@ int BinarySearchListBox(HWND lbhWnd,TCHAR* searchtext)
       int p;
      BOOL FOUND;
 
-     FOUND=FALSE;
      //get count of items in listbox
      lbcount = SendMessage(lbhWnd,LB_GETCOUNT,0,0);
      if(lbcount == 0)

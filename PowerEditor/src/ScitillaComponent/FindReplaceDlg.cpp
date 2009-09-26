@@ -62,7 +62,6 @@ private:
 int Searching::convertExtendedToString(const TCHAR * query, TCHAR * result, int length) {	//query may equal to result, since it always gets smaller
 	int i = 0, j = 0;
 	int charLeft = length;
-	bool isGood = true;
 	TCHAR current;
 	while(i < length) {	//because the backslash escape quences always reduce the size of the std::generic_string, no overflow checks have to be made for target, assuming parameters are correct
 		current = query[i];
@@ -111,11 +110,11 @@ int Searching::convertExtendedToString(const TCHAR * query, TCHAR * result, int 
 					}
 					//not enough chars to make parameter, use default method as fallback
 					}
+					//lint -fallthrough
 				default: {	//unknown sequence, treat as regular text
 					result[j] = '\\';
 					j++;
 					result[j] = current;
-					isGood = false;
 					break;
 				}
 			}
@@ -496,18 +495,29 @@ void FindReplaceDlg::updateCombos()
 class Finder : public DockingDlgInterface {
 	friend class FindReplaceDlg;
 public:
-	Finder() : DockingDlgInterface(IDD_FINDRESULT), _pMainFoundInfos(&_foundInfos1), _pMainMarkings(&_markings1) {
+	Finder() :
+		DockingDlgInterface(IDD_FINDRESULT),
+		_ppEditView(NULL),
+		_pMainFoundInfos(&_foundInfos1),
+		_pMainMarkings(&_markings1),
+		nFoundFiles(0),
+		_lastFileHeaderPos(0),
+		_lastSearchHeaderPos(0)
+	{
 		_MarkingsStruct._length = 0;
 		_MarkingsStruct._markings = NULL;
-	};
+	}
 
 	~Finder() {
 		_scintView.destroy();
 	}
+	//(Warning -- Member with different signature hides virtual member 'Window::init(struct HINSTANCE__ *, struct HWND__ *)'
+	//lint -e1411
 	void init(HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView) {
 		DockingDlgInterface::init(hInst, hPere);
 		_ppEditView = ppEditView;
-	};
+	}
+	//lint +e1411
 
 	void addSearchLine(const TCHAR *searchName) {
 		std::generic_string str = TEXT("Search \"");
@@ -521,7 +531,7 @@ public:
 
 		_pMainFoundInfos->push_back(EmptyFoundInfo);
 		_pMainMarkings->push_back(EmptySearchResultMarking);
-	};
+	}
 
 	void addFileNameTitle(const TCHAR * fileName) {
 		std::generic_string str = TEXT("  ");
@@ -535,7 +545,7 @@ public:
 
 		_pMainFoundInfos->push_back(EmptyFoundInfo);
 		_pMainMarkings->push_back(EmptySearchResultMarking);
-	};
+	}
 
 	void addFileHitCount(int count) {
 		TCHAR text[20];
@@ -544,7 +554,7 @@ public:
 		_scintView.insertGenericTextFrom(_lastFileHeaderPos, text);
 		setFinderReadOnly(true);
 		nFoundFiles++;
-	};
+	}
 
 	void addSearchHitCount(int count) {
 		TCHAR text[50];
@@ -552,7 +562,7 @@ public:
 		setFinderReadOnly(false);
 		_scintView.insertGenericTextFrom(_lastSearchHeaderPos, text);
 		setFinderReadOnly(true);
-	};
+	}
 
 
 	void add(FoundInfo fi, SearchResultMarking mi, const TCHAR* foundline, int lineNb) {
@@ -577,7 +587,7 @@ public:
 		_scintView.addGenericText(str.c_str(), &mi._start, &mi._end);
 		setFinderReadOnly(true);
 		_pMainMarkings->push_back(mi);
-	};
+	}
 
 	void setFinderStyle();
 
@@ -587,7 +597,7 @@ public:
 		setFinderReadOnly(false);
 		_scintView.execute(SCI_CLEARALL);
 		setFinderReadOnly(true);
-	};
+	}
 
 	void beginNewFilesSearch() {
 		_scintView.execute(SCI_SETLEXER, SCLEX_NULL);
@@ -599,7 +609,7 @@ public:
 
 		// fold all old searches (1st level only)
 		_scintView.collapse(searchHeaderLevel - SC_FOLDLEVELBASE, fold_collapse);
-	};
+	}
 
 	void finishFilesSearch(int count) {
 		std::vector<FoundInfo>* _pOldFoundInfos;
@@ -621,7 +631,7 @@ public:
 		_scintView.execute(SCI_SETSEL, 0, 0);
 
 		_scintView.execute(SCI_SETLEXER, SCLEX_SEARCHRESULT);
-	};
+	}
 
 
 	void gotoNextFoundResult(int direction);
@@ -659,8 +669,6 @@ private:
 	static SearchResultMarking EmptySearchResultMarking;
 };
 
-
-
 FoundInfo Finder::EmptyFoundInfo(0, 0, TEXT(""));
 SearchResultMarking Finder::EmptySearchResultMarking;
 
@@ -697,6 +705,9 @@ bool Finder::notify(SCNotification *notification)
 				isDoubleClicked = false;
 			}
 			break;
+
+		default:
+		break;
 	}
 	return false;
 }
@@ -1327,6 +1338,9 @@ BOOL CALLBACK FindReplaceDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 			}
 			break;
 		}
+
+		default:
+		break;
 	}
 	return FALSE;
 }
@@ -1349,7 +1363,7 @@ bool FindReplaceDlg::processFindNext(const TCHAR *txt2find, FindOption *options,
 	lstrcpy(pText, txt2find);
 
 	if (pOptions->_searchType == FindExtended) {
-		stringSizeFind = Searching::convertExtendedToString(txt2find, pText, stringSizeFind);
+		Searching::convertExtendedToString(txt2find, pText, stringSizeFind);
 	}
 
 	int docLength = int((*_ppEditView)->execute(SCI_GETLENGTH));
@@ -1472,8 +1486,8 @@ bool FindReplaceDlg::processReplace(const TCHAR *txt2find, const TCHAR *txt2repl
 	lstrcpy(pTextReplace, txt2replace);
 
 	if (pOptions->_searchType == FindExtended) {
-		stringSizeFind = Searching::convertExtendedToString(txt2find, pTextFind, stringSizeFind);
-		stringSizeReplace = Searching::convertExtendedToString(txt2replace, pTextReplace, stringSizeReplace);
+		Searching::convertExtendedToString(txt2find, pTextFind, stringSizeFind);
+		Searching::convertExtendedToString(txt2replace, pTextReplace, stringSizeReplace);
 	}
 
 	bool isRegExp = pOptions->_searchType == FindRegex;
@@ -1655,9 +1669,9 @@ int FindReplaceDlg::processRange(ProcessOperation op, const TCHAR *txt2find, con
 	}
 
 	if (pOptions->_searchType == FindExtended) {
-		stringSizeFind = Searching::convertExtendedToString(pTextFind, pTextFind, stringSizeFind);
+		Searching::convertExtendedToString(pTextFind, pTextFind, stringSizeFind);
 		if (op == ProcessReplaceAll)
-			stringSizeReplace = Searching::convertExtendedToString(pTextReplace, pTextReplace, stringSizeReplace);
+			Searching::convertExtendedToString(pTextReplace, pTextReplace, stringSizeReplace);
 	}
 
 	bool isRegExp = pOptions->_searchType == FindRegex;
@@ -1676,12 +1690,9 @@ int FindReplaceDlg::processRange(ProcessOperation op, const TCHAR *txt2find, con
 		}
 	}
 
-	int targetStart = 0;
-	int targetEnd = 0;
-
 	//Initial range for searching
 	(*_ppEditView)->execute(SCI_SETSEARCHFLAGS, flags);
-	targetStart = (*_ppEditView)->searchInTarget(pTextFind, startRange, endRange);
+	int targetStart = (*_ppEditView)->searchInTarget(pTextFind, startRange, endRange);
 
 	if ((targetStart != -1) && (op == ProcessFindAll))	//add new filetitle if this file results in hits
 	{
@@ -1691,7 +1702,7 @@ int FindReplaceDlg::processRange(ProcessOperation op, const TCHAR *txt2find, con
 	{
 		//int posFindBefore = posFind;
 		targetStart = int((*_ppEditView)->execute(SCI_GETTARGETSTART));
-		targetEnd = int((*_ppEditView)->execute(SCI_GETTARGETEND));
+		int targetEnd = int((*_ppEditView)->execute(SCI_GETTARGETEND));
 		if (targetEnd > endRange) {	//we found a result but outside our range, therefore do not process it
 			break;
 		}
@@ -2059,6 +2070,7 @@ void FindReplaceDlg::combo2ExtendedMode(int comboID)
 
 FindReplaceDlg::~FindReplaceDlg()
 {
+	FindReplaceDlg::destroy();
 	if (_pFinder)
 		delete _pFinder;
 	delete [] _uniFileName;
@@ -2130,11 +2142,26 @@ void FindReplaceDlg::updateCombo( int comboID )
 }
 
 FindReplaceDlg::FindReplaceDlg() :
-	StaticDialog(),
-	_pFinder(NULL), _isRTL(false), _isRecursive(true),_isInHiddenDir(false), _fileNameLenMax(1024),
+	_currentStatus(FIND_DLG),
+	_doPurge(false),
+	_doMarkLine(false),
+	_doStyleFoundToken(false),
+	_isInSelection(false),
+	_ppEditView(NULL),
+	_pFinder(NULL), _isRTL(false),
+	_findAllResult(0),
+	_isRecursive(true),
+	_isInHiddenDir(false),
+	_fileNameLenMax(1024),
+	// JOCE: weird.  Probably assumes Unicode == wide char.
+	_uniFileName(new char[(_fileNameLenMax + 3) * 2]),
 	_tab(NULL)
 {
-	_uniFileName = new char[(_fileNameLenMax + 3) * 2];
+	memset(&_findClosePos, 0, sizeof(RECT));
+	memset(&_replaceClosePos, 0, sizeof(RECT));
+	memset(&_findInFilesClosePos, 0, sizeof(RECT));
+
+	memset(&_findAllResultStr, 0, 1024 * sizeof(TCHAR));
 }
 
 void FindReplaceDlg::changeTabName( DIALOG_TYPE index, const TCHAR *name2change )
@@ -2494,11 +2521,14 @@ BOOL CALLBACK FindIncrementDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM 
 							std::generic_string str2Search = _pFRDlg->getTextFromCombo(::GetDlgItem(_hSelf, IDC_INCFINDTEXT), isUnicode);
 							_pFRDlg->processFindNext(str2Search.c_str(), &fo, &findStatus);
 							setFindStatus(findStatus);
+							return TRUE;
 						}
-					return TRUE;
-					case EN_KILLFOCUS :
-					case EN_SETFOCUS :
-						break;
+
+						case EN_KILLFOCUS :
+						case EN_SETFOCUS :
+							break;
+
+						NO_DEFAULT_CASE;
 					}
 				}
 				return TRUE;
@@ -2509,6 +2539,7 @@ BOOL CALLBACK FindIncrementDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM 
 					fo._isWholeWord = false;
 					fo._incrementalType = FirstIncremental;
 					fo._isMatchCase = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_INCFINDMATCHCASE, BM_GETCHECK, 0, 0));
+
 					std::generic_string str2Search = _pFRDlg->getTextFromCombo(::GetDlgItem(_hSelf, IDC_INCFINDTEXT), isUnicode);
 					bool isFound = _pFRDlg->processFindNext(str2Search.c_str(), &fo, &findStatus);
 					setFindStatus(findStatus);
@@ -2519,6 +2550,7 @@ BOOL CALLBACK FindIncrementDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM 
 						(*(_pFRDlg->_ppEditView))->execute(SCI_SETSEL, (WPARAM)-1, range.cpMin);
 					}
 				}
+				return TRUE;
 
 				case IDC_INCFINDHILITEALL :
 				{
@@ -2535,8 +2567,10 @@ BOOL CALLBACK FindIncrementDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM 
 				}
 				return TRUE;
 
+				NO_DEFAULT_CASE;
 			}
 		}
+		break;
 
 		case WM_ERASEBKGND:
 		{
@@ -2558,6 +2592,9 @@ BOOL CALLBACK FindIncrementDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM 
 			return FALSE;
 			break;
 		}
+
+		default:
+		break;
 	}
 	return FALSE;
 }
@@ -2615,6 +2652,12 @@ void FindIncrementDlg::addToRebar(ReBar * rebar)
 
 	_pRebar->addBand(&_rbBand, true);
 }
+
+FindIncrementDlg::~FindIncrementDlg()
+{
+	FindIncrementDlg::destroy();
+}
+
 
 void FindIncrementDlg::init( HINSTANCE hInst, HWND hPere, FindReplaceDlg *pFRDlg, bool isRTL /*= false*/ )
 {

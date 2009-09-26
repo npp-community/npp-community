@@ -28,6 +28,7 @@ class AboutDlg : public StaticDialog
 {
 public :
 	AboutDlg() : StaticDialog(), _emailLink(NULL), _pageLink(NULL) {}
+	~AboutDlg();
 
 	void doDialog();
     virtual void destroy();

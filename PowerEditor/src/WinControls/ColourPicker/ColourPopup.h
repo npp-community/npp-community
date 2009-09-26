@@ -34,21 +34,12 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 class ColourPopup : public Window
 {
 public :
-    ColourPopup() : Window(), isColourChooserLaunched(false) {};
-	ColourPopup(COLORREF defaultColor) : Window(), isColourChooserLaunched(false), _colour(defaultColor) {};
-	~ColourPopup(){};
-
-	bool isCreated() const {
-		return (_hSelf != NULL);
-	};
-
+    ColourPopup();
+	ColourPopup(COLORREF defaultColor);
 	void create(int dialogID);
 
     void doDialog(POINT p);
 
-    virtual void destroy() {
-	    ::DestroyWindow(_hSelf);
-	};
     COLORREF getSelColour(){return _colour;};
 
 private :

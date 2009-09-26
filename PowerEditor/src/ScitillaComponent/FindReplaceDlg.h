@@ -161,6 +161,8 @@ private :
 	bool _isRTL;
 
 	int _findAllResult;
+
+	// JOCE either remove the magic number, or use a std::string if possible.
 	TCHAR _findAllResultStr[1024];
 
 	std::generic_string _filters;
@@ -197,6 +199,7 @@ class FindIncrementDlg : public StaticDialog
 {
 public :
 	FindIncrementDlg() : _pFRDlg(NULL), _pRebar(NULL) {};
+	~FindIncrementDlg();
 	void init(HINSTANCE hInst, HWND hPere, FindReplaceDlg *pFRDlg, bool isRTL = false);
 	virtual void destroy();
 	virtual void display(bool toShow = true) const;
