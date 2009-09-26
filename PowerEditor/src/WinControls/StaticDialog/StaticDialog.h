@@ -18,9 +18,7 @@
 #ifndef STATIC_DIALOG_H
 #define STATIC_DIALOG_H
 
-//#include "resource.h"
 #include "Window.h"
-#include "Notepad_plus_msgs.h"
 
 
 typedef HRESULT (WINAPI * ETDTProc) (HWND, DWORD);
@@ -45,12 +43,7 @@ class StaticDialog : public Window
 {
 public :
 	StaticDialog() : Window() {};
-	~StaticDialog(){
-		if (isCreated()) {
-			::SetWindowLongPtr(_hSelf, GWL_USERDATA, (long)NULL);	//Prevent run_dlgProc from doing anything, since its virtual
-			destroy();
-		}
-	};
+	virtual ~StaticDialog();
 	virtual void create(int dialogID, bool isRTL = false);
 
     virtual bool isCreated() const {
@@ -61,20 +54,9 @@ public :
 
 	void display(bool toShow = true) const;
 
-	POINT getLeftTopPoint(HWND hwnd/*, POINT & p*/) const {
-		RECT rc;
-		::GetWindowRect(hwnd, &rc);
-		POINT p;
-		p.x = rc.left;
-		p.y = rc.top;
-		::ScreenToClient(_hSelf, &p);
-		return p;
-	};
+	POINT getLeftTopPoint(HWND hwnd) const;
 
-    void destroy() {
-		::SendMessage(_hParent, NPPM_MODELESSDIALOG, MODELESSDIALOGREMOVE, (WPARAM)_hSelf);
-		::DestroyWindow(_hSelf);
-	};
+    virtual void destroy();
 
 protected :
 	RECT _rc;

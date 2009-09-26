@@ -1,12 +1,12 @@
 #include "precompiled_headers.h"
 #include "Buffer.h"
 
-#include "Scintilla.h"
-#include "Parameters.h"
-
-
 #include "Notepad_plus.h"
 #include "ScintillaEditView.h"
+#include "Parameters.h"
+#include "Utf8_16.h"
+
+#include "npp_session.h"
 
 FileManager * FileManager::_pSelf = new FileManager();
 
@@ -323,6 +323,72 @@ void Buffer::setDeferredReload() {	//triggers a reload on the next Document acce
 	doNotify(BufferChangeDirty);
 }
 
+Buffer::Buffer( FileManager * pManager, BufferID id, Document doc, DocFileStatus type, const TCHAR *fileName ) :
+	_pManager(pManager), _id(id), _isDirty(false), _doc(doc), _isFileReadOnly(false),
+	_isUserReadOnly(false), _recentTag(-1), _references(0),
+	_canNotify(false), _timeStamp(0), _needReloading(false)
+{
+	NppParameters *pNppParamInst = NppParameters::getInstance();
+	const NewDocDefaultSettings & ndds = (pNppParamInst->getNppGUI()).getNewDocDefaultSettings();
+	_format = ndds._format;
+	_unicodeMode = ndds._encoding;
+
+	_userLangExt[0] = 0;
+	_fullPathName[0] = 0;
+	_fileName = NULL;
+	setFileName(fileName, ndds._lang);
+	updateTimeStamp();
+	checkFileState();
+	_currentStatus = type;
+	_isDirty = false;
+
+	_needLexer = false;	//new buffers do not need lexing, Scintilla takes care of that
+	_canNotify = true;
+}
+
+void Buffer::setLangType( LangType lang, const TCHAR * userLangName /*= TEXT("")*/ )
+{
+	if (lang == _lang && lang != L_USER)
+		return;
+	_lang = lang;
+	if (_lang == L_USER) {
+		lstrcpy(_userLangExt, userLangName);
+	}
+	_needLexer = true;	//change of lang means lexern eeds updating
+	doNotify(BufferChangeLanguage|BufferChangeLexing);
+}
+
+const TCHAR * Buffer::getCommentLineSymbol() const
+{
+	Lang *l = getCurrentLang();
+	if (!l)
+		return NULL;
+	return l->_pCommentLineSymbol;
+}
+
+const TCHAR * Buffer::getCommentStart() const
+{
+	Lang *l = getCurrentLang();
+	if (!l)
+		return NULL;
+	return l->_pCommentStart;
+}
+
+const TCHAR * Buffer::getCommentEnd() const
+{
+	Lang *l = getCurrentLang();
+	if (!l)
+		return NULL;
+	return l->_pCommentEnd;
+}
+
+void Buffer::doNotify( int mask )
+{
+	if (_canNotify)
+	{
+		_pManager->beNotifiedOfBufferChange(this, mask);
+	}
+}
 /*
 pair<size_t, bool> Buffer::getLineUndoState(size_t currentLine) const
 {

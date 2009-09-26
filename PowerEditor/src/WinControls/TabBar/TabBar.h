@@ -20,7 +20,6 @@
 
 #include "Window.h"
 
-
 //Notification message
 #define TCN_TABDROPPED (TCN_FIRST - 10)
 #define TCN_TABDROPPEDOUTSIDE (TCN_FIRST - 11)
@@ -31,8 +30,6 @@
 const int marge = 8;
 const int nbCtrlMax = 10;
 
-#include "menuCmdID.h"
-#include "resource.h"
 
 const TCHAR TABBAR_ACTIVEFOCUSEDINDCATOR[64] = TEXT("Active tab focused indicator");
 const TCHAR TABBAR_ACTIVEUNFOCUSEDINDCATOR[64] = TEXT("Active tab unfocused indicator");
@@ -49,76 +46,28 @@ class TabBar : public Window
 public:
 	TabBar() : Window(), _nbItem(0), _hasImgLst(false), _hFont(NULL){};
 
-	virtual ~TabBar() {};
+	virtual ~TabBar();
 
-	virtual void destroy(){
-		if (_hFont)
-			DeleteObject(_hFont);
-
-		if (_hLargeFont)
-			DeleteObject(_hLargeFont);
-
-		if (_hVerticalFont)
-			DeleteObject(_hVerticalFont);
-
-		if (_hVerticalLargeFont)
-			DeleteObject(_hVerticalLargeFont);
-
-		::DestroyWindow(_hSelf);
-		_hSelf = NULL;
-	};
-
+	virtual void destroy();
 	virtual void init(HINSTANCE hInst, HWND hwnd, bool isVertical = false, bool isTraditional = false, bool isMultiLine = false);
-
 	virtual void reSizeTo(RECT & rc2Ajust);
-
 	int insertAtEnd(const TCHAR *subTabName);
 
-	void activateAt(int index) const {
-		if (getCurrentTabIndex() != index) {
-			::SendMessage(_hSelf, TCM_SETCURSEL, index, 0);}
-			TBHDR nmhdr;
-			nmhdr.hdr.hwndFrom = _hSelf;
-			nmhdr.hdr.code = TCN_SELCHANGE;
-			nmhdr.hdr.idFrom = reinterpret_cast<unsigned int>(this);
-			nmhdr.tabOrigin = index;
-
-	};
+	void activateAt(int index) const;
 	void getCurrentTitle(TCHAR *title, int titleLen);
 
-	int getCurrentTabIndex() const {
-		return ::SendMessage(_hSelf, TCM_GETCURSEL, 0, 0);
-	};
+	int getCurrentTabIndex() const;
 	void deletItemAt(int index);
 
-	void deletAllItem() {
-		::SendMessage(_hSelf, TCM_DELETEALLITEMS, 0, 0);
-		_nbItem = 0;
-	};
+	void deletAllItem();
 
-	void setImageList(HIMAGELIST himl) {
-		_hasImgLst = true;
-		::SendMessage(_hSelf, TCM_SETIMAGELIST, 0, (LPARAM)himl);
-	};
+	void setImageList(HIMAGELIST himl);
 
     int nbItem() const {
         return _nbItem;
     };
 
-	void setFont(TCHAR *fontName, size_t fontSize) {
-		if (_hFont)
-			::DeleteObject(_hFont);
-
-		_hFont = ::CreateFont( fontSize, 0,
-							  (_isVertical) ? 900:0,
-							  (_isVertical) ? 900:0,
-			                   FW_NORMAL,
-				               0, 0, 0, 0,
-				               0, 0, 0, 0,
-					           fontName);
-		if (_hFont)
-			::SendMessage(_hSelf, WM_SETFONT, reinterpret_cast<WPARAM>(_hFont), 0);
-	};
+	void setFont(TCHAR *fontName, size_t fontSize);
 
 	void setVertical(bool b) {
 		_isVertical = b;
@@ -143,49 +92,19 @@ protected:
 	bool _isVertical;
 	bool _isMultiLine;
 
-	long getRowCount() const {
-		return long(::SendMessage(_hSelf, TCM_GETROWCOUNT, 0, 0));
-	};
+	long getRowCount() const;
 };
 
 
-struct CloseButtonZone {
-
-	CloseButtonZone(): _width(11), _hight(11), _fromTop(5), _fromRight(3){};
-
-	bool isHit(int x, int y, const RECT & testZone) const {
-		if (((x + _width + _fromRight) < testZone.right) || (x > (testZone.right - _fromRight)))
-			return false;
-
-		if (((y - _hight - _fromTop) > testZone.top) || (y < (testZone.top + _fromTop)))
-			return false;
-
-		return true;
-	};
-
-	RECT getButtonRectFrom(const RECT & tabItemRect) const {
-		RECT rect;
-		rect.right = tabItemRect.right - _fromRight;
-		rect.left = rect.right - _width;
-		rect.top = tabItemRect.top + _fromTop;
-		rect.bottom = rect.top + _hight;
-
-		return rect;
-	};
-
-	int _width;
-	int _hight;
-
-	int _fromTop; // distance from top in pixzl
-	int _fromRight; // distance from right in pixzl
-};
+struct CloseButtonZone;
 
 class TabBarPlus : public TabBar
 {
 public :
 
-	TabBarPlus() : TabBar(), _isDragging(false), _tabBarDefaultProc(NULL), _currentHoverTabItem(-1),\
-		_isCloseHover(false), _whichCloseClickDown(-1), _lmbdHit(false) {};
+	TabBarPlus();
+	virtual ~TabBarPlus();
+
 	enum tabColourIndex {
 		activeText, activeFocusedTop, activeUnfocusedTop, inactiveText, inactiveBg
 	};
@@ -217,42 +136,10 @@ public :
 		_draggingPoint.y = 0;
 	};
 
-	static void doOwnerDrawTab() {
-		::SendMessage(_hwndArray[0], TCM_SETPADDING, 0, MAKELPARAM(6, 0));
-		for (int i = 0 ; i < _nbCtrl ; i++)
-		{
-			if (_hwndArray[i])
-			{
-				DWORD style = ::GetWindowLongPtr(_hwndArray[i], GWL_STYLE);
-				if (isOwnerDrawTab())
-					style |= TCS_OWNERDRAWFIXED;
-				else
-					style &= ~TCS_OWNERDRAWFIXED;
+	static void doOwnerDrawTab();
+	static void doVertical();
 
-				::SetWindowLongPtr(_hwndArray[i], GWL_STYLE, style);
-				::InvalidateRect(_hwndArray[i], NULL, TRUE);
-
-				const int base = 6;
-				::SendMessage(_hwndArray[i], TCM_SETPADDING, 0, MAKELPARAM(_drawTabCloseButton?base+3:base, 0));
-			}
-		}
-	};
-
-	static void doVertical() {
-		for (int i = 0 ; i < _nbCtrl ; i++)
-		{
-			if (_hwndArray[i])
-				SendMessage(_hwndArray[i], WM_TABSETSTYLE, isVertical(), TCS_VERTICAL);
-		}
-	};
-
-	static void doMultiLine() {
-		for (int i = 0 ; i < _nbCtrl ; i++)
-		{
-			if (_hwndArray[i])
-				SendMessage(_hwndArray[i], WM_TABSETSTYLE, isMultiLine(), TCS_MULTILINE);
-		}
-	};
+	static void doMultiLine();
 
 	static bool isOwnerDrawTab() {return true;};//(_drawInactiveTab || _drawTopBar || _drawTabCloseButton);};
 	static bool drawTopBar() {return _drawTopBar;};
@@ -289,29 +176,7 @@ public :
 		doMultiLine();
 	};
 
-	static void setColour(COLORREF colour2Set, tabColourIndex i) {
-		switch (i)
-		{
-			case activeText:
-				_activeTextColour = colour2Set;
-				break;
-			case activeFocusedTop:
-				_activeTopBarFocusedColour = colour2Set;
-				break;
-			case activeUnfocusedTop:
-				_activeTopBarUnfocusedColour = colour2Set;
-				break;
-			case inactiveText:
-				_inactiveTextColour = colour2Set;
-				break;
-			case inactiveBg :
-				_inactiveBgColour = colour2Set;
-				break;
-			default :
-				return;
-		}
-		doOwnerDrawTab();
-	};
+	static void setColour(COLORREF colour2Set, tabColourIndex i);
 
 protected:
     // it's the boss to decide if we do the drag N drop
@@ -327,7 +192,7 @@ protected:
 	RECT _currentHoverTabRect;
 	int _currentHoverTabItem;
 
-	CloseButtonZone _closeButtonZone;
+	CloseButtonZone* _closeButtonZone;
 	bool _isCloseHover;
 	int _whichCloseClickDown;
 	bool _lmbdHit; // Left Mouse Button Down Hit
@@ -364,13 +229,7 @@ protected:
 		return getTabIndexAt(p.x, p.y);
 	};
 
-	int getTabIndexAt(int x, int y) {
-		TCHITTESTINFO hitInfo;
-		hitInfo.pt.x = x;
-		hitInfo.pt.y = y;
-
-		return ::SendMessage(_hSelf, TCM_HITTEST, 0, (LPARAM)&hitInfo);
-	};
+	int getTabIndexAt(int x, int y);
 
 	bool isPointInParentZone(POINT screenPoint) const {
         RECT parentZone;

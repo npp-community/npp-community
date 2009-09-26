@@ -17,9 +17,13 @@
 
 
 #include "precompiled_headers.h"
-#include "dockingResource.h"
-#include "Docking.h"
+
 #include "Gripper.h"
+
+#include "dockingResource.h"
+#include "DockingManager.h"
+#include "DockingCont.h"
+#include "npp_winver.h"
 
 #ifndef WH_KEYBOARD_LL
 #define WH_KEYBOARD_LL 13
@@ -250,7 +254,7 @@ void Gripper::create()
 	// start hooking
 	::SetWindowPos(_pCont->getHSelf(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 	::SetCapture(_hSelf);
-	winVer ver = (NppParameters::getInstance())->getWinVersion();
+	winVer ver = getWinVersion();
 	hookMouse = ::SetWindowsHookEx(ver >= WV_W2K?WH_MOUSE_LL:WH_MOUSE, (HOOKPROC)hookProcMouse, _hInst, 0);
 
     if (!hookMouse)
@@ -406,7 +410,7 @@ void Gripper::onButtonUp()
 
 void Gripper::doTabReordering(POINT pt)
 {
-	vector<DockingCont*>	vCont		= _pDockMgr->getContainerInfo();
+	std::vector<DockingCont*>	vCont		= _pDockMgr->getContainerInfo();
 	BOOL					inTab		= FALSE;
 	HWND					hTab		= NULL;
 	HWND					hTabOld		= _hTab;
@@ -628,7 +632,7 @@ void Gripper::getMovingRect(POINT pt, RECT *rc)
 
 DockingCont* Gripper::contHitTest(POINT pt)
 {
-	vector<DockingCont*>	vCont	= _pDockMgr->getContainerInfo();
+	std::vector<DockingCont*>	vCont	= _pDockMgr->getContainerInfo();
 	HWND					hWnd	= ::WindowFromPoint(pt);
 
 	for (UINT iCont = 0; iCont < vCont.size(); iCont++)
@@ -682,7 +686,7 @@ DockingCont* Gripper::contHitTest(POINT pt)
 DockingCont* Gripper::workHitTest(POINT pt, RECT *rc)
 {
 	RECT					rcCont	= {0};
-	vector<DockingCont*>	vCont	= _pDockMgr->getContainerInfo();
+	std::vector<DockingCont*>	vCont	= _pDockMgr->getContainerInfo();
 
 	/* at first test if cursor points into a visible container */
 	for (size_t iCont = 0; iCont < vCont.size(); iCont++)
@@ -784,4 +788,3 @@ void Gripper::initTabInformation()
 	_tcItem.cchTextMax	= 64;
 	::SendMessage(_hTabSource, TCM_GETITEM, _iItem, (LPARAM)&_tcItem);
 }
-

@@ -18,70 +18,26 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
-#include "tinyxmlA.h"
-#include "tinyxml.h"
-
-//#include "ScintillaEditView.h"
-#include "Scintilla.h"
 #include "ScintillaRef.h"
 #include "ToolBar.h"
 #include "UserDefineLangReference.h"
-#include "colors.h"
 #include "shortcut.h"
 #include "ContextMenu.h"
+#include "Notepad_plus_msgs.h"
 
-using namespace std;
+#include "Parameters_def.h"
 
-const bool POS_VERTICAL = true;
-const bool POS_HORIZOTAL = false;
+// JOCE: this needs to be taken out at some point...
+#include "npp_styles.h"
 
-const int UDD_SHOW   = 1; // 0000 0001
-const int UDD_DOCKED = 2; // 0000 0010
+// Forward declarations
+class TiXmlDocument;
+class TiXmlDocumentA;
+class TiXmlElement;
 
-// 0 : 0000 0000 hide & undocked
-// 1 : 0000 0001 show & undocked
-// 2 : 0000 0010 hide & docked
-// 3 : 0000 0011 show & docked
+struct Session;
 
-const int TAB_DRAWTOPBAR = 1;      //  0000 0001
-const int TAB_DRAWINACTIVETAB = 2; //  0000 0010
-const int TAB_DRAGNDROP = 4;       //  0000 0100
-const int TAB_REDUCE = 8;	       //  0000 1000
-const int TAB_CLOSEBUTTON = 16;    //  0001 0000
-const int TAB_DBCLK2CLOSE = 32;    //  0010 0000
-const int TAB_VERTICAL = 64;       //  0100 0000
-const int TAB_MULTILINE = 128;     //  1000 0000
-const int TAB_HIDE = 256;          //1 0000 0000
-
-enum formatType {WIN_FORMAT, MAC_FORMAT, UNIX_FORMAT};
-enum UniMode {uni8Bit=0, uniUTF8=1, uni16BE=2, uni16LE=3, uniCookie=4, uni7Bit=5, uni16BE_NoBOM=6, uni16LE_NoBOM=7, uniEnd};
-enum ChangeDetect {cdDisabled=0, cdEnabled=1, cdAutoUpdate=2, cdGo2end=3, cdAutoUpdateGo2end=4};
-enum BackupFeature {bak_none = 0, bak_simple = 1, bak_verbose = 2};
-enum OpenSaveDirSetting {dir_followCurrent = 0, dir_last = 1, dir_userDef = 2};
-
-const int LANG_INDEX_INSTR = 0;
-const int LANG_INDEX_INSTR2 = 1;
-const int LANG_INDEX_TYPE = 2;
-const int LANG_INDEX_TYPE2 = 3;
-const int LANG_INDEX_TYPE3 = 4;
-const int LANG_INDEX_TYPE4 = 5;
-const int LANG_INDEX_TYPE5 = 6;
-
-const int COPYDATA_PARAMS = 0;
-const int COPYDATA_FILENAMESA = 1;
-const int COPYDATA_FILENAMESW = 2;
-
-
-const bool SCIV_PRIMARY = false;
-const bool SCIV_SECOND = true;
-
-const TCHAR fontSizeStrs[][3] = {TEXT(""), TEXT("8"), TEXT("9"), TEXT("10"), TEXT("11"), TEXT("12"), TEXT("14"), TEXT("16"), TEXT("18"), TEXT("20"), TEXT("22"), TEXT("24"), TEXT("26"), TEXT("28")};
-
-const TCHAR LINEDRAW_FONT[] =  TEXT("LINEDRAW.TTF");
-const TCHAR localConfFile[] = TEXT("doLocalConf.xml");
-const TCHAR notepadStyleFile[] = TEXT("asNotepad.xml");
-
-void cutString(const TCHAR *str2cut, vector<generic_string> & patternVect);
+void cutString(const TCHAR *str2cut, std::vector<std::generic_string> & patternVect);
 /*
 struct HeaderLineState {
 	HeaderLineState() : _headerLineNumber(0), _isCollapsed(false){};
@@ -90,44 +46,6 @@ struct HeaderLineState {
 	bool _isCollapsed;
 };
 */
-struct Position
-{
-	int _firstVisibleLine;
-	int _startPos;
-	int _endPos;
-	int _xOffset;
-	int _selMode;
-	int _scrollWidth;
-	Position() : _firstVisibleLine(0), _startPos(0), _endPos(0), _xOffset(0), _scrollWidth(1), _selMode(0) {};
-};
-
-struct sessionFileInfo : public Position {
-	sessionFileInfo(const TCHAR *fn) {
-		if (fn) _fileName = fn;
-	};
-	sessionFileInfo(const TCHAR *fn, const TCHAR *ln, Position pos) : Position(pos) {
-		if (fn) _fileName = fn;
-		if (ln)	_langName = ln;
-	};
-
-	sessionFileInfo(generic_string fn) : _fileName(fn){};
-	sessionFileInfo(generic_string fn, Position pos) : Position(pos), _fileName(fn){};
-
-	generic_string _fileName;
-	generic_string	_langName;
-	vector<size_t> marks;
-};
-
-struct Session {
-	size_t nbMainFiles() const {return _mainViewFiles.size();};
-	size_t nbSubFiles() const {return _subViewFiles.size();};
-	size_t _activeView;
-	size_t _activeMainIndex;
-	size_t _activeSubIndex;
-	vector<sessionFileInfo> _mainViewFiles;
-	vector<sessionFileInfo> _subViewFiles;
-};
-
 struct CmdLineParams {
 	bool _isNoPlugin;
 	bool _isReadOnly;
@@ -199,9 +117,9 @@ struct DockingManagerData {
 
 	DockingManagerData() : _leftWidth(200), _rightWidth(200), _topHeight(200), _bottomHight(200) {};
 
-	vector<FloatingWindowInfo>		_flaotingWindowInfo;
-	vector<PlugingDlgDockingInfo>	_pluginDockInfo;
-	vector<ContainerTabInfo>		_containerTabInfo;
+	std::vector<FloatingWindowInfo>		_flaotingWindowInfo;
+	std::vector<PlugingDlgDockingInfo>	_pluginDockInfo;
+	std::vector<ContainerTabInfo>		_containerTabInfo;
 
 	RECT * getFloatingRCFrom(int floatCont) {
 		for (size_t i = 0 ; i < _flaotingWindowInfo.size() ; i++)
@@ -211,242 +129,6 @@ struct DockingManagerData {
 		}
 		return NULL;
 	}
-};
-
-const int FONTSTYLE_BOLD = 1;
-const int FONTSTYLE_ITALIC = 2;
-const int FONTSTYLE_UNDERLINE = 4;
-
-const int COLORSTYLE_FOREGROUND = 0x01;
-const int COLORSTYLE_BACKGROUND = 0x02;
-const int COLORSTYLE_ALL = COLORSTYLE_FOREGROUND|COLORSTYLE_BACKGROUND;
-
-struct Style
-{
-	int _styleID;
-    const TCHAR *_styleDesc;
-
-	COLORREF _fgColor;
-	COLORREF _bgColor;
-	int _colorStyle;
-	const TCHAR *_fontName;
-	int _fontStyle;
-	int _fontSize;
-
-	int _keywordClass;
-	generic_string *_keywords;
-
-	Style():_styleID(-1), _fgColor(COLORREF(-1)), _bgColor(COLORREF(-1)), _colorStyle(COLORSTYLE_ALL), _fontName(NULL), _fontStyle(-1), _fontSize(-1), _keywordClass(-1), _keywords(NULL){};
-
-	~Style(){
-		if (_keywords)
-			delete _keywords;
-	};
-
-	Style(const Style & style)
-	{
-		_styleID = style._styleID;
-		_styleDesc = style._styleDesc;
-		_fgColor = style._fgColor;
-		_bgColor = style._bgColor;
-		_colorStyle = style._colorStyle;
-		_fontName = style._fontName;
-		_fontSize = style._fontSize;
-		_fontStyle = style._fontStyle;
-		_keywordClass = style._keywordClass;
-		if (style._keywords)
-			_keywords = new generic_string(*(style._keywords));
-		else
-			_keywords = NULL;
-	};
-
-	Style & operator=(const Style & style) {
-		if (this != &style)
-		{
-			this->_styleID = style._styleID;
-			this->_styleDesc = style._styleDesc;
-			this->_fgColor = style._fgColor;
-			this->_bgColor = style._bgColor;
-			this->_colorStyle = style._colorStyle;
-			this->_fontName = style._fontName;
-			this->_fontSize = style._fontSize;
-			this->_fontStyle = style._fontStyle;
-			this->_keywordClass = style._keywordClass;
-
-			if (!(this->_keywords) && style._keywords)
-				this->_keywords = new generic_string(*(style._keywords));
-			else if (this->_keywords && style._keywords)
-				this->_keywords->assign(*(style._keywords));
-			else if (this->_keywords && !(style._keywords))
-			{
-				delete (this->_keywords);
-				this->_keywords = NULL;
-			}
-		}
-		return *this;
-	};
-
-	void setKeywords(const TCHAR *str) {
-		if (!_keywords)
-			_keywords = new generic_string(str);
-		else
-			*_keywords = str;
-	};
-};
-
-struct GlobalOverride
-{
-	bool isEnable() const {return (enableFg || enableBg || enableFont || enableFontSize || enableBold || enableItalic || enableUnderLine);};
-	bool enableFg;
-	bool enableBg;
-	bool enableFont;
-	bool enableFontSize;
-	bool enableBold;
-	bool enableItalic;
-	bool enableUnderLine;
-	GlobalOverride():enableFg(false), enableBg(false), enableFont(false), enableFontSize(false), enableBold(false), enableItalic(false), enableUnderLine(false) {};
-};
-
-const int MAX_STYLE = 30;
-
-struct StyleArray
-{
-public:
-    StyleArray() : _nbStyler(0){};
-
-    StyleArray & operator=(const StyleArray & sa)
-    {
-        if (this != &sa)
-        {
-            this->_nbStyler = sa._nbStyler;
-            for (int i = 0 ; i < _nbStyler ; i++)
-            {
-                this->_styleArray[i] = sa._styleArray[i];
-            }
-        }
-        return *this;
-    }
-
-    int getNbStyler() const {return _nbStyler;};
-	void setNbStyler(int nb) {_nbStyler = nb;};
-
-    Style & getStyler(int index) {return _styleArray[index];};
-
-    bool hasEnoughSpace() {return (_nbStyler < MAX_STYLE);};
-    void addStyler(int styleID, TiXmlNode *styleNode);
-
-	void addStyler(int styleID, TCHAR *styleName) {
-		//ZeroMemory(&_styleArray[_nbStyler], sizeof(Style));;
-		_styleArray[_nbStyler]._styleID = styleID;
-		_styleArray[_nbStyler]._styleDesc = styleName;
-		_styleArray[_nbStyler]._fgColor = black;
-		_styleArray[_nbStyler]._bgColor = white;
-		_nbStyler++;
-	};
-
-    int getStylerIndexByID(int id) {
-        for (int i = 0 ; i < _nbStyler ; i++)
-            if (_styleArray[i]._styleID == id)
-                return i;
-        return -1;
-    };
-
-    int getStylerIndexByName(const TCHAR *name) const {
-		if (!name)
-			return -1;
-        for (int i = 0 ; i < _nbStyler ; i++)
-			if (!lstrcmp(_styleArray[i]._styleDesc, name))
-                return i;
-        return -1;
-    };
-
-protected:
-	Style _styleArray[MAX_STYLE];
-	int _nbStyler;
-};
-
-struct LexerStyler : public StyleArray
-{
-public :
-    LexerStyler():StyleArray(){};
-
-    LexerStyler & operator=(const LexerStyler & ls)
-    {
-        if (this != &ls)
-        {
-            *((StyleArray *)this) = ls;
-            lstrcpy(this->_lexerName, ls._lexerName);
-			lstrcpy(this->_lexerDesc, ls._lexerDesc);
-			lstrcpy(this->_lexerUserExt, ls._lexerUserExt);
-        }
-        return *this;
-    }
-
-    void setLexerName(const TCHAR *lexerName) {
-        lstrcpy(_lexerName, lexerName);
-    };
-
-	void setLexerDesc(const TCHAR *lexerDesc) {
-        lstrcpy(_lexerDesc, lexerDesc);
-    };
-
-	void setLexerUserExt(const TCHAR *lexerUserExt) {
-        lstrcpy(_lexerUserExt, lexerUserExt);
-    };
-
-    const TCHAR * getLexerName() const {return _lexerName;};
-	const TCHAR * getLexerDesc() const {return _lexerDesc;};
-    const TCHAR * getLexerUserExt() const {return _lexerUserExt;};
-
-private :
-	TCHAR _lexerName[16];
-	TCHAR _lexerDesc[32];
-	TCHAR _lexerUserExt[256];
-};
-
-const int MAX_LEXER_STYLE = 80;
-
-struct LexerStylerArray
-{
-public :
-	LexerStylerArray() : _nbLexerStyler(0){};
-
-    LexerStylerArray & operator=(const LexerStylerArray & lsa)
-    {
-        if (this != &lsa)
-        {
-            this->_nbLexerStyler = lsa._nbLexerStyler;
-            for (int i = 0 ; i < this->_nbLexerStyler ; i++)
-                this->_lexerStylerArray[i] = lsa._lexerStylerArray[i];
-        }
-        return *this;
-    }
-
-    int getNbLexer() const {return _nbLexerStyler;};
-
-    LexerStyler & getLexerFromIndex(int index)
-    {
-        return _lexerStylerArray[index];
-    };
-
-    const TCHAR * getLexerNameFromIndex(int index) const {return _lexerStylerArray[index].getLexerName();}
-	const TCHAR * getLexerDescFromIndex(int index) const {return _lexerStylerArray[index].getLexerDesc();}
-
-    LexerStyler * getLexerStylerByName(const TCHAR *lexerName) {
-		if (!lexerName) return NULL;
-        for (int i = 0 ; i < _nbLexerStyler ; i++)
-        {
-            if (!lstrcmp(_lexerStylerArray[i].getLexerName(), lexerName))
-                return &(_lexerStylerArray[i]);
-        }
-        return NULL;
-    };
-    bool hasEnoughSpace() {return (_nbLexerStyler < MAX_LEXER_STYLE);};
-    void addLexerStyler(const TCHAR *lexerName, const TCHAR *lexerDesc, const TCHAR *lexerUserExt, TiXmlNode *lexerNode);
-	void eraseAll();
-private :
-	LexerStyler _lexerStylerArray[MAX_LEXER_STYLE];
-	int _nbLexerStyler;
 };
 
 struct NewDocDefaultSettings
@@ -461,9 +143,9 @@ struct NewDocDefaultSettings
 struct LangMenuItem {
 	LangType _langType;
 	int	_cmdID;
-	generic_string _langName;
+	std::generic_string _langName;
 
-	LangMenuItem(LangType lt, int cmdID = 0, generic_string langName = TEXT("")):
+	LangMenuItem(LangType lt, int cmdID = 0, std::generic_string langName = TEXT("")):
 	_langType(lt), _cmdID(cmdID), _langName(langName){};
 };
 
@@ -471,17 +153,17 @@ struct PrintSettings {
 	bool _printLineNumber;
 	int _printOption;
 
-	generic_string _headerLeft;
-	generic_string _headerMiddle;
-	generic_string _headerRight;
-	generic_string _headerFontName;
+	std::generic_string _headerLeft;
+	std::generic_string _headerMiddle;
+	std::generic_string _headerRight;
+	std::generic_string _headerFontName;
 	int _headerFontStyle;
 	int _headerFontSize;
 
-	generic_string _footerLeft;
-	generic_string _footerMiddle;
-	generic_string _footerRight;
-	generic_string _footerFontName;
+	std::generic_string _footerLeft;
+	std::generic_string _footerMiddle;
+	std::generic_string _footerRight;
+	std::generic_string _footerFontName;
 	int _footerFontStyle;
 	int _footerFontSize;
 
@@ -525,6 +207,7 @@ struct NppGUI
 		_defaultDir[0] = 0;
 		_defaultDirExp[0] = 0;
 	};
+
 	toolBarStatusType _toolBarStatus;		// small, large ou standard
 	bool _toolbarShow;
 	bool _statusBarShow;		// show ou hide
@@ -572,7 +255,7 @@ struct NppGUI
 	NewDocDefaultSettings _newDocDefaultSettings;
 	void setTabReplacedBySpace(bool b) {_tabReplacedBySpace = b;};
 	const NewDocDefaultSettings & getNewDocDefaultSettings() const {return _newDocDefaultSettings;};
-	vector<LangMenuItem> _excludedLangList;
+	std::vector<LangMenuItem> _excludedLangList;
 	bool _isLangMenuCompact;
 
 	PrintSettings _printSettings;
@@ -586,7 +269,7 @@ struct NppGUI
 	size_t  _autocFromLen;
 	bool _funcParams;
 
-	generic_string _definedSessionExt;
+	std::generic_string _definedSessionExt;
 	bool _neverUpdate;
 	bool _doesExistUpdater;
 	int _caretBlinkRate;
@@ -597,7 +280,7 @@ struct NppGUI
 	OpenSaveDirSetting _openSaveDir;
 	TCHAR _defaultDir[MAX_PATH];
 	TCHAR _defaultDirExp[MAX_PATH];	//expanded environment variables
-	generic_string _themeName;
+	std::generic_string _themeName;
 };
 
 struct ScintillaViewParams
@@ -622,16 +305,16 @@ struct ScintillaViewParams
 
 };
 
-const int NB_LIST = 20;
-const int NB_MAX_LRF_FILE = 30;
-const int NB_MAX_USER_LANG = 30;
-const int NB_MAX_EXTERNAL_LANG = 30;
-const int LANG_NAME_LEN = 32;
+#define NB_LIST 20
+#define NB_MAX_LRF_FILE 30
+#define NB_MAX_USER_LANG 30
+#define NB_MAX_EXTERNAL_LANG 30
+#define LANG_NAME_LEN 32
 
-const int NB_MAX_FINDHISTORY_FIND    = 30;
-const int NB_MAX_FINDHISTORY_REPLACE = 30;
-const int NB_MAX_FINDHISTORY_PATH    = 30;
-const int NB_MAX_FINDHISTORY_FILTER  = 20;
+#define NB_MAX_FINDHISTORY_FIND    30
+#define NB_MAX_FINDHISTORY_REPLACE 30
+#define NB_MAX_FINDHISTORY_PATH    30
+#define NB_MAX_FINDHISTORY_FILTER  20
 
 struct Lang
 {
@@ -697,51 +380,18 @@ friend class SymbolsStyleDialog;
 friend class UserDefineDialog;
 
 public :
-	UserLangContainer(){
-		_name = TEXT("new user define");
-		_ext = TEXT("");
+	UserLangContainer();
+	UserLangContainer(const TCHAR *name, const TCHAR *ext);
 
-		// Keywords list of Delimiters (index 0)
-		lstrcpy(_keywordLists[0], TEXT("000000"));
-		for (int i = 1 ; i < nbKeywodList ; i++)
-			*_keywordLists[i] = '\0';
-	};
-	UserLangContainer(const TCHAR *name, const TCHAR *ext) : _name(name), _ext(ext) {
-		// Keywords list of Delimiters (index 0)
-		lstrcpy(_keywordLists[0], TEXT("000000"));
-		for (int j = 1 ; j < nbKeywodList ; j++)
-			*_keywordLists[j] = '\0';
-	};
+	UserLangContainer & operator=(const UserLangContainer & ulc);
 
-	UserLangContainer & operator=(const UserLangContainer & ulc) {
-		if (this != &ulc)
-        {
-			this->_name = ulc._name;
-			this->_ext = ulc._ext;
-			this->_isCaseIgnored = ulc._isCaseIgnored;
-			this->_styleArray = ulc._styleArray;
-			int nbStyler = this->_styleArray.getNbStyler();
-			for (int i = 0 ; i < nbStyler ; i++)
-			{
-				Style & st = this->_styleArray.getStyler(i);
-				if (st._bgColor == COLORREF(-1))
-					st._bgColor = white;
-				if (st._fgColor == COLORREF(-1))
-					st._fgColor = black;
-			}
-			for (int i = 0 ; i < nbKeywodList ; i++)
-				lstrcpy(this->_keywordLists[i], ulc._keywordLists[i]);
-		}
-		return *this;
-	};
-
-	int getNbKeywordList() {return nbKeywodList;};
-	const TCHAR * getName() {return _name.c_str();};
-	const TCHAR * getExtention() {return _ext.c_str();};
+	int getNbKeywordList() {return nbKeywodList;}
+	const TCHAR * getName() {return _name.c_str();}
+	const TCHAR * getExtention() {return _ext.c_str();}
 
 private:
-	generic_string _name;
-	generic_string _ext;
+	std::generic_string _name;
+	std::generic_string _ext;
 
 	StyleArray _styleArray;
 	TCHAR _keywordLists[nbKeywodList][max_char];
@@ -789,10 +439,10 @@ struct FindHistory {
 	int _nbFindHistoryFind;
 	int _nbFindHistoryReplace;
 
-	generic_string *_pFindHistoryPath[NB_MAX_FINDHISTORY_PATH];
-	generic_string *_pFindHistoryFilter[NB_MAX_FINDHISTORY_FILTER];
-	generic_string *_pFindHistoryFind[NB_MAX_FINDHISTORY_FIND];
-	generic_string *_pFindHistoryReplace[NB_MAX_FINDHISTORY_REPLACE];
+	std::generic_string *_pFindHistoryPath[NB_MAX_FINDHISTORY_PATH];
+	std::generic_string *_pFindHistoryFilter[NB_MAX_FINDHISTORY_FILTER];
+	std::generic_string *_pFindHistoryFind[NB_MAX_FINDHISTORY_FIND];
+	std::generic_string *_pFindHistoryReplace[NB_MAX_FINDHISTORY_REPLACE];
 
 	bool _isMatchWord;
 	bool _isMatchCase;
@@ -824,25 +474,25 @@ public :
 		wchar_t *_xmlFileName;
 	};
 
-	bool addLanguageFromXml(wstring xmlFullPath);
-	wstring getLangFromXmlFileName(wchar_t *fn) const;
+	bool addLanguageFromXml(std::wstring xmlFullPath);
+	std::wstring getLangFromXmlFileName(wchar_t *fn) const;
 
-	wstring getXmlFilePathFromLangName(wchar_t *langName) const;
+	std::wstring getXmlFilePathFromLangName(wchar_t *langName) const;
 	bool switchToLang(wchar_t *lang2switch) const;
 
 	size_t size() const {
 		return _localizationList.size();
 	};
 
-	pair<wstring, wstring> getElementFromIndex(size_t index) {
+	std::pair<std::wstring, std::wstring> getElementFromIndex(size_t index) {
 		if (index >= _localizationList.size())
-			return pair<wstring, wstring>(TEXT(""), TEXT(""));
+			return std::pair<std::wstring, std::wstring>(TEXT(""), TEXT(""));
 		return _localizationList[index];
 	};
 
 private :
-	vector< pair< wstring, wstring > > _localizationList;
-	wstring _nativeLangPath;
+	std::vector< std::pair< std::wstring, std::wstring > > _localizationList;
+	std::wstring _nativeLangPath;
 };
 #endif
 
@@ -857,20 +507,20 @@ public :
 		TCHAR *_xmlFileName;
 	};
 
-	void addThemeFromXml(generic_string xmlFullPath) {
-		_themeList.push_back(pair<generic_string, generic_string>(getThemeFromXmlFileName(xmlFullPath.c_str()), xmlFullPath));
+	void addThemeFromXml(std::generic_string xmlFullPath) {
+		_themeList.push_back(std::pair<std::generic_string, std::generic_string>(getThemeFromXmlFileName(xmlFullPath.c_str()), xmlFullPath));
 	};
 
-	void addDefaultThemeFromXml(generic_string xmlFullPath) {
-		_themeList.push_back(pair<generic_string, generic_string>(TEXT("Default (styles.xml)"), xmlFullPath));
+	void addDefaultThemeFromXml(std::generic_string xmlFullPath) {
+		_themeList.push_back(std::pair<std::generic_string, std::generic_string>(TEXT("Default (styles.xml)"), xmlFullPath));
 	};
 
-	generic_string getThemeFromXmlFileName(const TCHAR *fn) const;
+	std::generic_string getThemeFromXmlFileName(const TCHAR *fn) const;
 
-	generic_string getXmlFilePathFromThemeName(const TCHAR *themeName) const {
+	std::generic_string getXmlFilePathFromThemeName(const TCHAR *themeName) const {
 		if (!themeName || themeName[0])
 			return TEXT("");
-		generic_string themePath = _stylesXmlPath;
+		std::generic_string themePath = _stylesXmlPath;
 		return themePath;
 	};
 
@@ -887,21 +537,21 @@ public :
 	};
 
 
-	pair<generic_string, generic_string> & getElementFromIndex(size_t index) {
+	std::pair<std::generic_string, std::generic_string> & getElementFromIndex(size_t index) {
 		//if (index >= _themeList.size())
-			//return pair<generic_string, generic_string>(TEXT(""), TEXT(""));
+			//return std::pair<std::generic_string, std::generic_string>(TEXT(""), TEXT(""));
 		return _themeList[index];
 	};
 
 private :
-	vector< pair< generic_string, generic_string > > _themeList;
-	generic_string _stylesXmlPath;
+	std::vector< std::pair< std::generic_string, std::generic_string > > _themeList;
+	std::generic_string _stylesXmlPath;
 };
 
-const int NB_LANG = 80;
+#define NB_LANG 80
 
-const bool DUP = true;
-const bool FREE = false;
+#define DUP true
+#define FREE false
 
 class NppParameters
 {
@@ -963,7 +613,7 @@ public:
 
 	int getNbLRFile() const {return _nbFile;};
 
-	generic_string *getLRFile(int index) const {
+	std::generic_string *getLRFile(int index) const {
 		return _LRFileList[index];
 	};
 
@@ -977,18 +627,7 @@ public:
         return _svp[whichOne];
     };
 
-	bool writeNbHistoryFile(int nb) {
-		if (!_pXmlUserDoc) return false;
-
-		TiXmlNode *nppRoot = _pXmlUserDoc->FirstChild(TEXT("NotepadPlus"));
-		if (!nppRoot) return false;
-
-		TiXmlNode *historyNode = nppRoot->FirstChildElement(TEXT("History"));
-		if (!historyNode) return false;
-
-		(historyNode->ToElement())->SetAttribute(TEXT("nbMaxFile"), nb);
-		return true;
-	};
+	bool writeNbHistoryFile(int nb);
 
 	bool writeHistory(const TCHAR *fullpath);
 
@@ -1021,7 +660,7 @@ public:
     };
 
 	void setFontList(HWND hWnd);
-	const vector<generic_string> & getFontList() const {return _fontlist;};
+	const std::vector<std::generic_string> & getFontList() const {return _fontlist;};
 
 	int getNbUserLang() const {return _nbUserLang;};
 	UserLangContainer & getULCFromIndex(int i) {return *_userLangArray[i];};
@@ -1047,11 +686,11 @@ public:
 	bool ExternalLangHasRoom() const {return _nbExternalLang < NB_MAX_EXTERNAL_LANG;};
 
 	void getExternalLexerFromXmlTree(TiXmlDocument *doc);
-	vector<TiXmlDocument *> * getExternalLexerDoc() { return &_pXmlExternalLexerDoc;};
+	std::vector<TiXmlDocument *> * getExternalLexerDoc() { return &_pXmlExternalLexerDoc;};
 
 	void writeUserDefinedLang();
 	void writeShortcuts();
-	void writeSession(const Session & session, const TCHAR *fileName = NULL);
+	void writeSession(const Session * session, const TCHAR *fileName = NULL);
 	bool writeFindHistory();
 
 
@@ -1073,7 +712,7 @@ public:
 
 		for (int i = 0 ; i < _nbUserLang ; i++)
 		{
-			vector<generic_string> extVect;
+			std::vector<std::generic_string> extVect;
 			cutString(_userLangArray[i]->_ext.c_str(), extVect);
 			for (size_t j = 0 ; j < extVect.size() ; j++)
 				if (!generic_stricmp(extVect[j].c_str(), ext))
@@ -1129,22 +768,22 @@ public:
 
 	bool isRemappingShortcut() const {return _shortcuts.size() != 0;};
 
-	vector<CommandShortcut> & getUserShortcuts() {return _shortcuts;};
-	vector<int> & getUserModifiedShortcuts() {return _customizedShortcuts;};
+	std::vector<CommandShortcut> & getUserShortcuts() {return _shortcuts;};
+	std::vector<int> & getUserModifiedShortcuts() {return _customizedShortcuts;};
 	void addUserModifiedIndex(int index);
 
-	vector<MacroShortcut> & getMacroList() {return _macros;};
-	vector<UserCommand> & getUserCommandList() {return _userCommands;};
-	vector<PluginCmdShortcut> & getPluginCommandList() {return _pluginCommands;};
-	vector<int> & getPluginModifiedKeyIndices() {return _pluginCustomizedCmds;};
+	std::vector<MacroShortcut> & getMacroList() {return _macros;};
+	std::vector<UserCommand> & getUserCommandList() {return _userCommands;};
+	std::vector<PluginCmdShortcut> & getPluginCommandList() {return _pluginCommands;};
+	std::vector<int> & getPluginModifiedKeyIndices() {return _pluginCustomizedCmds;};
 	void addPluginModifiedIndex(int index);
 
-	vector<ScintillaKeyMap> & getScintillaKeyList() {return _scintillaKeyCommands;};
-	vector<int> & getScintillaModifiedKeyIndices() {return _scintillaModifiedKeyIndices;};
+	std::vector<ScintillaKeyMap> & getScintillaKeyList() {return _scintillaKeyCommands;};
+	std::vector<int> & getScintillaModifiedKeyIndices() {return _scintillaModifiedKeyIndices;};
 	void addScintillaModifiedIndex(int index);
 
-	vector<MenuItemUnit> & getContextMenuItems() {return _contextMenuItems;};
-	const Session & getSession() const {return _session;};
+	std::vector<MenuItemUnit> & getContextMenuItems() {return _contextMenuItems;};
+	Session* getSession() const {return _session;};
 	bool hasCustomContextMenu() const {return !_contextMenuItems.empty();};
 
 	void setAccelerator(Accelerator *pAccel) {_pAccelerator = pAccel;};
@@ -1157,14 +796,14 @@ public:
 	const TCHAR * getWorkingDir() const {return _currentDirectory;};
 	void setWorkingDir(const TCHAR * newPath);
 
-	bool loadSession(Session & session, const TCHAR *sessionFileName);
+	bool loadSession(Session* session, const TCHAR *sessionFileName);
 	int langTypeToCommandID(LangType lt) const;
 	WNDPROC getEnableThemeDlgTexture() const {return _enableThemeDialogTextureFuncAddr;};
 
 	struct FindDlgTabTitiles {
-		generic_string _find;
-		generic_string _replace;
-		generic_string _findInFiles;
+		std::generic_string _find;
+		std::generic_string _replace;
+		std::generic_string _findInFiles;
 		FindDlgTabTitiles() : _find(TEXT("")), _replace(TEXT("")), _findInFiles(TEXT("")) {};
 		bool isWellFilled() {
 			return (lstrcmp(_find.c_str(), TEXT("")) != 0 && lstrcmp(_replace.c_str(), TEXT("")) && lstrcmp(_findInFiles.c_str(), TEXT("")));
@@ -1173,38 +812,7 @@ public:
 
 	FindDlgTabTitiles & getFindDlgTabTitiles() { return _findDlgTabTitiles;};
 
-	const char * getNativeLangMenuStringA(int itemID) {
-		if (!_pXmlNativeLangDocA)
-			return NULL;
-
-		TiXmlNodeA * node =  _pXmlNativeLangDocA->FirstChild("NotepadPlus");
-		if (!node) return NULL;
-
-		node = node->FirstChild("Native-Langue");
-		if (!node) return NULL;
-
-		node = node->FirstChild("Menu");
-		if (!node) return NULL;
-
-		node = node->FirstChild("Main");
-		if (!node) return NULL;
-
-		node = node->FirstChild("Commands");
-		if (!node) return NULL;
-
-		for (TiXmlNodeA *childNode = node->FirstChildElement("Item");
-			childNode ;
-			childNode = childNode->NextSibling("Item") )
-		{
-			TiXmlElementA *element = childNode->ToElement();
-			int id;
-			if (element->Attribute("id", &id) && (id == itemID))
-			{
-				return element->Attribute("name");
-			}
-		}
-		return NULL;
-	};
+	const char * getNativeLangMenuStringA(int itemID);
 
 	bool asNotepadStyle() const {return _asNotepadStyle;};
 
@@ -1214,7 +822,6 @@ public:
 
 	bool getContextMenuFromXmlTree(HMENU mainMenuHadle);
 	bool reloadContextMenuFromXmlTree(HMENU mainMenuHadle);
-	winVer getWinVersion() { return _winVersion;};
 	FindHistory & getFindHistory() {return _findHistory;};
 	bool _isFindReplacing; // an on the fly variable for find/replace functions
 
@@ -1239,14 +846,14 @@ private:
 	TiXmlDocumentA *_pXmlNativeLangDocA;
 	//TiXmlDocumentA *_pXmlEnglishDocA;
 
-	vector<TiXmlDocument *> _pXmlExternalLexerDoc;
+	std::vector<TiXmlDocument *> _pXmlExternalLexerDoc;
 
 	NppGUI _nppGUI;
 	ScintillaViewParams _svp[2];
 	Lang *_langList[NB_LANG];
 	int _nbLang;
 
-	generic_string *_LRFileList[NB_MAX_LRF_FILE];
+	std::generic_string *_LRFileList[NB_MAX_LRF_FILE];
 	int _nbFile;
 	int _nbMaxFile;
 
@@ -1266,7 +873,7 @@ private:
 	LexerStylerArray _lexerStylerArray;
     StyleArray _widgetStyleArray;
 
-	vector<generic_string> _fontlist;
+	std::vector<std::generic_string> _fontlist;
 
 	HMODULE _hUser32;
 	HMODULE _hUXTheme;
@@ -1275,23 +882,23 @@ private:
 	WNDPROC _enableThemeDialogTextureFuncAddr;
 
 
-	vector<CommandShortcut> _shortcuts;			//main menu shortuts. Static size
-	vector<int> _customizedShortcuts;			//altered main menu shortcuts. Indices static. Needed when saving alterations
-	vector<MacroShortcut> _macros;				//macro shortcuts, dynamic size, defined on loading macros and adding/deleting them
-	vector<UserCommand> _userCommands;			//run shortcuts, dynamic size, defined on loading run commands and adding/deleting them
-	vector<PluginCmdShortcut> _pluginCommands;	//plugin commands, dynamic size, defined on loading plugins
-	vector<int> _pluginCustomizedCmds;			//plugincommands that have been altered. Indices determined after loading ALL plugins. Needed when saving alterations
+	std::vector<CommandShortcut> _shortcuts;			//main menu shortuts. Static size
+	std::vector<int> _customizedShortcuts;			//altered main menu shortcuts. Indices static. Needed when saving alterations
+	std::vector<MacroShortcut> _macros;				//macro shortcuts, dynamic size, defined on loading macros and adding/deleting them
+	std::vector<UserCommand> _userCommands;			//run shortcuts, dynamic size, defined on loading run commands and adding/deleting them
+	std::vector<PluginCmdShortcut> _pluginCommands;	//plugin commands, dynamic size, defined on loading plugins
+	std::vector<int> _pluginCustomizedCmds;			//plugincommands that have been altered. Indices determined after loading ALL plugins. Needed when saving alterations
 
-	vector<ScintillaKeyMap> _scintillaKeyCommands;	//scintilla keycommands. Static size
-	vector<int> _scintillaModifiedKeyIndices;		//modified scintilla keys. Indices static, determined by searching for commandId. Needed when saving alterations
+	std::vector<ScintillaKeyMap> _scintillaKeyCommands;	//scintilla keycommands. Static size
+	std::vector<int> _scintillaModifiedKeyIndices;		//modified scintilla keys. Indices static, determined by searching for commandId. Needed when saving alterations
 #ifdef UNICODE
 	LocalizationSwitcher _localizationSwitcher;
 #endif
 	ThemeSwitcher _themeSwitcher;
 
-	//vector<generic_string> _noMenuCmdNames;
-	vector<MenuItemUnit> _contextMenuItems;
-	Session _session;
+	//std::vector<std::generic_string> _noMenuCmdNames;
+	std::vector<MenuItemUnit> _contextMenuItems;
+	Session* _session;
 
 	TCHAR _shortcutsPath[MAX_PATH];
 	TCHAR _contextMenuPath[MAX_PATH];
@@ -1308,10 +915,8 @@ private:
 	FindDlgTabTitiles _findDlgTabTitiles;
 	bool _asNotepadStyle;
 
-	winVer _winVersion;
-
 	static int CALLBACK EnumFontFamExProc(ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX * /*lpntme*/, int /*FontType*/, LPARAM lParam) {
-		vector<generic_string> *pStrVect = (vector<generic_string> *)lParam;
+		std::vector<std::generic_string> *pStrVect = (std::vector<std::generic_string> *)lParam;
         size_t vectSize = pStrVect->size();
 
 		//Search through all the fonts, EnumFontFamiliesEx never states anything about order

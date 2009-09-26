@@ -18,12 +18,21 @@
 #include "precompiled_headers.h"
 #include "RunDlg.h"
 #include "FileDialog.h"
-//#include "resource.h"
+#include "resource.h"
 #include "Notepad_plus_msgs.h"
 #include "shortcut.h"
 #include "Parameters.h"
-#include "Notepad_plus.h"
+#include "RunDlg_rc.h"
 
+const TCHAR fullCurrentPath[] = TEXT("FULL_CURRENT_PATH");
+const TCHAR currentDirectory[] = TEXT("CURRENT_DIRECTORY");
+const TCHAR onlyFileName[] = TEXT("FILE_NAME");
+const TCHAR fileNamePart[] = TEXT("NAME_PART");
+const TCHAR fileExtPart[] = TEXT("EXT_PART");
+const TCHAR currentWord[] = TEXT("CURRENT_WORD");
+const TCHAR nppDir[] = TEXT("NPP_DIRECTORY");
+const TCHAR currentLine[] = TEXT("CURRENT_LINE");
+const TCHAR currentColumn[] = TEXT("CURRENT_COLUMN");
 
 void Command::extractArgs(TCHAR *cmd2Exec, TCHAR *args, const TCHAR *cmdEntier)
 {
@@ -64,7 +73,7 @@ void Command::extractArgs(TCHAR *cmd2Exec, TCHAR *args, const TCHAR *cmdEntier)
 }
 
 
-int whichVar(TCHAR *str)
+static int whichVar(TCHAR *str)
 {
 	if (!lstrcmp(fullCurrentPath, str))
 		return FULL_CURRENT_PATH;

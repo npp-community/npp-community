@@ -21,14 +21,14 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #define USER_DEFINE_LANG_REFERENCE_H
 
-const int langNameLenMax = 16;
-const int extsLenMax = 256;
+#define langNameLenMax 16
+#define extsLenMax 256
 
-const int nbKeywodList = 9;
+#define nbKeywodList 9
 //const int max_char = 4096;
-const int max_char = 1024*30;
+#define max_char  1024*30
 
-const int nbPrefixListAllowed = 4;
+#define nbPrefixListAllowed 4
 
 
 #endif //USER_DEFINE_LANG_REFERENCE_H

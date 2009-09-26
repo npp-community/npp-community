@@ -20,56 +20,26 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef COLUMNEDITOR_H
 #define COLUMNEDITOR_H
 
-#include "columnEditor_rc.h"
 #include "StaticDialog.h"
-#include "ScintillaEditView.h"
 
 const bool activeText = true;
 const bool activeNumeric = false;
+
+// Forward declarations
+class ScintillaEditView;
 
 class ColumnEditorDlg : public StaticDialog
 {
 public :
 	ColumnEditorDlg() : StaticDialog() {};
 
-	void init(HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView) {
-		Window::init(hInst, hPere);
-		if (!ppEditView)
-			throw int(9900);
-		_ppEditView = ppEditView;
-	};
-
-	virtual void create(int dialogID, bool isRTL = false) {
-		StaticDialog::create(dialogID, isRTL);
-	};
-
-	void doDialog(bool isRTL = false) {
-		if (!isCreated())
-			create(IDD_COLUMNEDIT, isRTL);
-		bool isTextMode = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_COL_TEXT_RADIO, BM_GETCHECK, 0, 0));
-		display();
-		::SetFocus(::GetDlgItem(_hSelf, isTextMode?IDC_COL_TEXT_EDIT:IDC_COL_INITNUM_EDIT));
-	};
-
-    virtual void display(bool toShow = true) const {
-        Window::display(toShow);
-        if (toShow)
-            ::SetFocus(::GetDlgItem(_hSelf, ID_GOLINE_EDIT));
-    };
-
+	void init(HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView);
+	virtual void create(int dialogID, bool isRTL = false);
+	void doDialog(bool isRTL = false);
+    virtual void display(bool toShow = true) const;
 	void switchTo(bool toText);
 
-	UCHAR getFormat() {
-		bool isLeadingZeros = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_COL_LEADZERO_CHECK, BM_GETCHECK, 0, 0));
-		UCHAR f = 0; // Dec by default
-		if (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_COL_HEX_RADIO, BM_GETCHECK, 0, 0))
-			f = 1;
-		else if (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_COL_OCT_RADIO, BM_GETCHECK, 0, 0))
-			f = 2;
-		else if (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_COL_BIN_RADIO, BM_GETCHECK, 0, 0))
-			f = 3;
-		return (f | (isLeadingZeros?MASK_ZERO_LEADING:0));
-	};
+	UCHAR getFormat();
 
 protected :
 	virtual BOOL CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
@@ -77,7 +47,5 @@ protected :
 private :
 
     ScintillaEditView **_ppEditView;
-
-
 };
 #endif// COLUMNEDITOR_H

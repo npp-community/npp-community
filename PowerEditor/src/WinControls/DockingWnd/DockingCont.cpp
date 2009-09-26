@@ -16,15 +16,11 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
+#include "DockingCont.h"
 #include "dockingResource.h"
 #include "Docking.h"
-#include "DockingCont.h"
-#include "DropData.h"
-#include "SplitterContainer.h"
-#include "WindowInterface.h"
 #include "ToolTip.h"
-#include "Parameters.h"
-#include "Common.h"
+#include "npp_winver.h"
 
 #ifndef WH_MOUSE_LL
 #define WH_MOUSE_LL 14
@@ -115,11 +111,11 @@ void DockingCont::doDialog(bool willBeShown, bool isFloating)
 }
 
 
-tTbData* DockingCont::createToolbar(tTbData data)
+tTbData* DockingCont::createToolbar(tTbData* data)
 {
 	tTbData *pTbData = new tTbData;
 
-	*pTbData = data;
+	*pTbData = *data;
 
 	// force window style of client window
 	::SetWindowLongPtr(pTbData->hClient, GWL_STYLE, CHILD_STYLES);
@@ -144,19 +140,19 @@ tTbData* DockingCont::createToolbar(tTbData data)
 }
 
 
-void DockingCont::removeToolbar(tTbData TbData)
+void DockingCont::removeToolbar(tTbData* TbData)
 {
 	// remove from list
 	for (size_t iTb = 0; iTb < _vTbData.size(); iTb++)
 	{
-		if (_vTbData[iTb]->hClient == TbData.hClient)
+		if (_vTbData[iTb]->hClient == TbData->hClient)
 		{
 			// remove tab
 			removeTab(_vTbData[iTb]);
 
 			// free resources
 			delete _vTbData[iTb];
-			vector<tTbData*>::iterator itr = _vTbData.begin() + iTb;
+			std::vector<tTbData*>::iterator itr = _vTbData.begin() + iTb;
 			_vTbData.erase(itr);
 		}
 	}
@@ -230,9 +226,9 @@ tTbData* DockingCont::getDataOfActiveTb()
 	return pTbData;
 }
 
-vector<tTbData*> DockingCont::getDataOfVisTb()
+std::vector<tTbData*> DockingCont::getDataOfVisTb()
 {
-	vector<tTbData*>	vTbData;
+	std::vector<tTbData*>	vTbData;
 	TCITEM				tcItem		= {0};
 	INT					iItemCnt	= ::SendMessage(_hContTab, TCM_GETITEMCOUNT, 0, 0);
 
@@ -287,7 +283,7 @@ LRESULT DockingCont::runProcCaption(HWND hwnd, UINT Message, WPARAM wParam, LPAR
 
 				// start hooking
 				hWndServer		= _hCaption;
-				winVer ver = (NppParameters::getInstance())->getWinVersion();
+				winVer ver = getWinVersion();
 				hookMouse	= ::SetWindowsHookEx(ver >= WV_W2K?WH_MOUSE_LL:WH_MOUSE, (HOOKPROC)hookProcMouse, _hInst, 0);
 
 				if (!hookMouse)
@@ -1406,3 +1402,30 @@ LPARAM DockingCont::NotifyParent(UINT message)
 	return ::SendMessage(_hParent, message, 0, (LPARAM)this);
 }
 
+BOOL DockingCont::updateInfo( HWND hClient )
+{
+	for (size_t iTb = 0; iTb < _vTbData.size(); iTb++)
+	{
+		if (_vTbData[iTb]->hClient == hClient)
+		{
+			updateCaption();
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+void DockingCont::setCaptionTop( BOOL isTopCaption )
+{
+	_isTopCaption = (isTopCaption == CAPTION_TOP);
+	onSize();
+}
+
+void DockingCont::destroy()
+{
+	for (INT iTb = _vTbData.size(); iTb > 0; iTb--)
+	{
+		delete _vTbData[iTb-1];
+	}
+	::DestroyWindow(_hSelf);
+}

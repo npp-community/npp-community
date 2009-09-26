@@ -17,9 +17,13 @@
 
 #include "precompiled_headers.h"
 #include "AutoCompletion.h"
-#include "Notepad_plus_msgs.h"
+#include "FunctionCallTip.h"
+#include "ScintillaEditView.h"
+#include "tinyxml.h"
+#include "Buffer.h"
+#include "Parameters.h"
 
-static bool isInList(generic_string word, const vector<generic_string> & wordArray)
+static bool isInList(std::generic_string word, const std::vector<std::generic_string> & wordArray)
 {
 	for (size_t i = 0 ; i < wordArray.size() ; i++)
 		if (wordArray[i] == word)
@@ -27,11 +31,21 @@ static bool isInList(generic_string word, const vector<generic_string> & wordArr
 	return false;
 };
 
-AutoCompletion::AutoCompletion(ScintillaEditView * pEditView) : _funcCompletionActive(false), _pEditView(pEditView), _funcCalltip(pEditView),
-																_curLang(L_TXT), _XmlFile(TEXT("")), _activeCompletion(CompletionNone),
-																_pXmlKeyword(NULL), _ignoreCase(true), _keyWords(TEXT(""))
+AutoCompletion::AutoCompletion(ScintillaEditView * pEditView) :
+	_funcCompletionActive(false), _pEditView(pEditView), _funcCalltip(new FunctionCallTip(pEditView)),
+	_curLang(L_TXT), _XmlFile(NULL), _activeCompletion(CompletionNone),
+	_pXmlKeyword(NULL), _ignoreCase(true), _keyWords(TEXT(""))
 {
 	//Do not load any language yet
+}
+
+AutoCompletion::~AutoCompletion()
+{
+	delete _funcCalltip;
+	if (_XmlFile)
+	{
+		delete _XmlFile;
+	}
 }
 
 bool AutoCompletion::showAutoComplete() {
@@ -88,7 +102,7 @@ bool AutoCompletion::showWordComplete(bool autoInsert)
 
 	_pEditView->getGenericText(beginChars, startPos, curPos);
 
-	generic_string expr(TEXT("\\<"));
+	std::generic_string expr(TEXT("\\<"));
 	expr += beginChars;
 	expr += TEXT("[^ \\t.,;:\"()=<>'+!\\[\\]]*");
 
@@ -97,7 +111,7 @@ bool AutoCompletion::showWordComplete(bool autoInsert)
 	int flags = SCFIND_WORDSTART | SCFIND_MATCHCASE | SCFIND_REGEXP | SCFIND_POSIX;
 
 	_pEditView->execute(SCI_SETSEARCHFLAGS, flags);
-	vector<generic_string> wordArray;
+	std::vector<std::generic_string> wordArray;
 	int posFind = _pEditView->searchInTarget(expr.c_str(), 0, docLength);
 
 	while (posFind != -1)
@@ -128,7 +142,7 @@ bool AutoCompletion::showWordComplete(bool autoInsert)
 	}
 
 	sort(wordArray.begin(), wordArray.end());
-	generic_string words(TEXT(""));
+	std::generic_string words(TEXT(""));
 
 	for (size_t i = 0 ; i < wordArray.size() ; i++)
 	{
@@ -150,7 +164,7 @@ bool AutoCompletion::showFunctionComplete() {
 	if (!_funcCompletionActive)
 		return false;
 
-	if (_funcCalltip.updateCalltip(0, true)) {
+	if (_funcCalltip->updateCalltip(0, true)) {
 		_activeCompletion = CompletionFunc;
 		return true;
 	}
@@ -163,8 +177,8 @@ void AutoCompletion::update(int character)
 	if (!_funcCompletionActive && nppGUI._autocStatus == nppGUI.autoc_func)
 		return;
 
-	if (nppGUI._funcParams || _funcCalltip.isVisible()) {
-		if (_funcCalltip.updateCalltip(character)) {	//calltip visible because triggered by autocomplete, set mode
+	if (nppGUI._funcParams || _funcCalltip->isVisible()) {
+		if (_funcCalltip->updateCalltip(character)) {	//calltip visible because triggered by autocomplete, set mode
 			_activeCompletion = CompletionFunc;
 			return;	//only return in case of success, else autocomplete
 		}
@@ -195,9 +209,9 @@ void AutoCompletion::callTipClick(int direction) {
 		return;
 
 	if (direction == 1) {
-		_funcCalltip.showPrevOverload();
+		_funcCalltip->showPrevOverload();
 	} else if (direction == 2) {
-		_funcCalltip.showNextOverload();
+		_funcCalltip->showNextOverload();
 	}
 }
 
@@ -213,13 +227,17 @@ bool AutoCompletion::setLanguage(LangType language) {
 	lstrcat(path, getApiFileName());
 	lstrcat(path, TEXT(".xml"));
 
-	_XmlFile = TiXmlDocument(path);
-	_funcCompletionActive = _XmlFile.LoadFile();
+	if (_XmlFile)
+	{
+		delete _XmlFile;
+	}
+	_XmlFile = new TiXmlDocument(path);
+	_funcCompletionActive = _XmlFile->LoadFile();
 
 	TiXmlNode * pAutoNode = NULL;
 	if (_funcCompletionActive) {
 		_funcCompletionActive = false;	//safety
-		TiXmlNode * pNode = _XmlFile.FirstChild(TEXT("NotepadPlus"));
+		TiXmlNode * pNode = _XmlFile->FirstChild(TEXT("NotepadPlus"));
 		if (!pNode)
 			return false;
 		pAutoNode = pNode = pNode->FirstChildElement(TEXT("AutoComplete"));
@@ -237,11 +255,11 @@ bool AutoCompletion::setLanguage(LangType language) {
 	if(_funcCompletionActive) {	//try setting up environment
 		//setup defaults
 		_ignoreCase = true;
-		_funcCalltip._start = '(';
-		_funcCalltip._stop = ')';
-		_funcCalltip._param = ',';
-		_funcCalltip._terminal = ';';
-		_funcCalltip._ignoreCase = true;
+		_funcCalltip->_start = '(';
+		_funcCalltip->_stop = ')';
+		_funcCalltip->_param = ',';
+		_funcCalltip->_terminal = ';';
+		_funcCalltip->_ignoreCase = true;
 
 		TiXmlElement * pElem = pAutoNode->FirstChildElement(TEXT("Environment"));
 		if (pElem) {
@@ -249,27 +267,27 @@ bool AutoCompletion::setLanguage(LangType language) {
 			val = pElem->Attribute(TEXT("ignoreCase"));
 			if (val && !lstrcmp(val, TEXT("no"))) {
 				_ignoreCase = false;
-				_funcCalltip._ignoreCase = false;
+				_funcCalltip->_ignoreCase = false;
 			}
 			val = pElem->Attribute(TEXT("startFunc"));
 			if (val && val[0])
-				_funcCalltip._start = val[0];
+				_funcCalltip->_start = val[0];
 			val = pElem->Attribute(TEXT("stopFunc"));
 			if (val && val[0])
-				_funcCalltip._stop = val[0];
+				_funcCalltip->_stop = val[0];
 			val = pElem->Attribute(TEXT("paramSeparator"));
 			if (val && val[0])
-				_funcCalltip._param = val[0];
+				_funcCalltip->_param = val[0];
 			val = pElem->Attribute(TEXT("terminal"));
 			if (val && val[0])
-				_funcCalltip._terminal = val[0];
+				_funcCalltip->_terminal = val[0];
 		}
 	}
 
 	if (_funcCompletionActive) {
-		_funcCalltip.setLanguageXML(_pXmlKeyword);
+		_funcCalltip->setLanguageXML(_pXmlKeyword);
 	} else {
-		_funcCalltip.setLanguageXML(NULL);
+		_funcCalltip->setLanguageXML(NULL);
 	}
 
 	_keyWords = TEXT("");

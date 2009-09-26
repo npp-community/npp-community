@@ -18,9 +18,24 @@
 #include "precompiled_headers.h"
 #include "ToolBar.h"
 #include "Shortcut.h"
-#include "Parameters.h"
+#include "npp_winver.h"
+#include "ImageListSet.h"
+
 
 const int WS_TOOLBARSTYLE = WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | TBSTYLE_TOOLTIPS |TBSTYLE_FLAT | CCS_TOP | BTNS_AUTOSIZE | CCS_NOPARENTALIGN | CCS_NORESIZE | CCS_NODIVIDER;
+
+ToolBar::ToolBar():
+	Window(), _pTBB(NULL), _nrButtons(0), _nrDynButtons(0), _nrTotalButtons(0), _nrCurrentButtons(0), _pRebar(NULL),
+	_toolBarIcons(NULL)
+{}
+
+ToolBar::~ToolBar()
+{
+	if (_hSelf)
+	{
+		ToolBar::destroy();
+	}
+}
 
 bool ToolBar::init( HINSTANCE hInst, HWND hPere, toolBarStatusType type,
 					ToolBarButtonUnit *buttonUnitArray, int arraySize)
@@ -29,8 +44,9 @@ bool ToolBar::init( HINSTANCE hInst, HWND hPere, toolBarStatusType type,
 	_state = type;
 	int iconSize = (_state == TB_LARGE?32:16);
 
-	_toolBarIcons.init(buttonUnitArray, arraySize);
-	_toolBarIcons.create(_hInst, iconSize);
+	_toolBarIcons = new ToolBarIcons;
+	_toolBarIcons->init(buttonUnitArray, arraySize);
+	_toolBarIcons->create(_hInst, iconSize);
 
 	INITCOMMONCONTROLSEX icex;
 	icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
@@ -105,7 +121,8 @@ void ToolBar::destroy() {
 	delete [] _pTBB;
 	::DestroyWindow(_hSelf);
 	_hSelf = NULL;
-	_toolBarIcons.destroy();
+	_toolBarIcons->destroy();
+	delete _toolBarIcons;
 };
 
 int ToolBar::getWidth() const {
@@ -125,6 +142,49 @@ int ToolBar::getHeight() const {
 
 	return totalHeight;
 }
+
+void ToolBar::reduce() {
+	if (_state == TB_SMALL)
+		return;
+
+	_toolBarIcons->resizeIcon(16);
+	bool recreate = (_state == TB_STANDARD);
+	setState(TB_SMALL);
+	reset(recreate);	//recreate toolbar if std icons were used
+	Window::redraw();
+}
+
+void ToolBar::enlarge() {
+	if (_state == TB_LARGE)
+		return;
+
+	_toolBarIcons->resizeIcon(32);
+	bool recreate = (_state == TB_STANDARD);
+	setState(TB_LARGE);
+	reset(recreate);	//recreate toolbar if std icons were used
+	Window::redraw();
+}
+
+void ToolBar::setToUglyIcons() {
+	if (_state == TB_STANDARD)
+		return;
+	bool recreate = true;
+	setState(TB_STANDARD);
+	reset(recreate);	//must recreate toolbar if setting to internal bitmaps
+	Window::redraw();
+}
+
+bool ToolBar::getCheckState(int ID2Check) const {
+	return bool(::SendMessage(_hSelf, TB_GETSTATE, (WPARAM)ID2Check, 0) & TBSTATE_CHECKED);
+}
+
+void ToolBar::setCheck(int ID2Check, bool willBeChecked) const {
+	::SendMessage(_hSelf, TB_CHECKBUTTON, (WPARAM)ID2Check, (LPARAM)MAKELONG(willBeChecked, 0));
+}
+
+bool ToolBar::changeIcons(int whichLst, int iconIndex, const TCHAR *iconLocation) {
+	return _toolBarIcons->replaceIcon(whichLst, iconIndex, iconLocation);
+};
 
 void ToolBar::reset(bool create)
 {
@@ -178,7 +238,7 @@ void ToolBar::reset(bool create)
 		TBADDBITMAP addbmpdyn = {0, 0};
 		for (size_t i = 0 ; i < _nrButtons ; i++)
 		{
-			addbmp.nID = _toolBarIcons.getStdIconAt(i);
+			addbmp.nID = _toolBarIcons->getStdIconAt(i);
 			::SendMessage(_hSelf, TB_ADDBITMAP, 1, (LPARAM)&addbmp);
 		}
 		if (_nrDynButtons > 0) {
@@ -239,7 +299,7 @@ void ToolBar::doPopop(POINT chevPoint) {
 	if (start < _nrCurrentButtons) {	//some buttons are hidden
 		HMENU menu = ::CreatePopupMenu();
 		int cmd;
-		generic_string text;
+		std::generic_string text;
 		while (start < _nrCurrentButtons) {
 			cmd = _pTBB[start].idCommand;
 			getNameStrFromCmd(cmd, text);
@@ -261,7 +321,7 @@ void ToolBar::addToRebar(ReBar * rebar) {
 		return;
 	_pRebar = rebar;
 
-	winVer winVersion = (NppParameters::getInstance())->getWinVersion();
+	winVer winVersion = getWinVersion();
 	if (winVersion <= WV_W2K)
 	{
 		ZeroMemory(&_rbBand, sizeof(REBARBANDINFO));
@@ -287,6 +347,27 @@ void ToolBar::addToRebar(ReBar * rebar) {
 	_pRebar->addBand(&_rbBand, true);
 
 	_rbBand.fMask   = RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_IDEALSIZE | RBBIM_SIZE;
+}
+
+void ToolBar::setDefaultImageList() {
+	::SendMessage(_hSelf, TB_SETIMAGELIST , (WPARAM)0, (LPARAM)_toolBarIcons->getDefaultLst());
+}
+
+void ToolBar::setHotImageList() {
+	::SendMessage(_hSelf, TB_SETHOTIMAGELIST , (WPARAM)0, (LPARAM)_toolBarIcons->getHotLst());
+}
+
+void ToolBar::setDisableImageList() {
+	::SendMessage(_hSelf, TB_SETDISABLEDIMAGELIST, (WPARAM)0, (LPARAM)_toolBarIcons->getDisableLst());
+};
+
+
+ReBar::~ReBar()
+{
+	if (_hSelf)
+	{
+		ReBar::destroy();
+	}
 }
 
 void ReBar::init(HINSTANCE hInst, HWND hPere)
@@ -347,7 +428,7 @@ void ReBar::setIDVisible(int id, bool show)
 		return;	//error
 
 	REBARBANDINFO rbBand;
-	winVer winVersion = (NppParameters::getInstance())->getWinVersion();
+	winVer winVersion = getWinVersion();
 	if (winVersion <= WV_W2K)
 	{
 		ZeroMemory(&rbBand, sizeof(REBARBANDINFO));
@@ -374,7 +455,7 @@ bool ReBar::getIDVisible(int id)
 	if (index == -1 )
 		return false;	//error
 	REBARBANDINFO rbBand;
-	winVer winVersion = (NppParameters::getInstance())->getWinVersion();
+	winVer winVersion = getWinVersion();
 	if (winVersion <= WV_W2K)
 	{
 		ZeroMemory(&rbBand, sizeof(REBARBANDINFO));

@@ -17,8 +17,12 @@
 
 #include "precompiled_headers.h"
 #include "Printer.h"
+#include "Buffer.h"
+#include "ScintillaEditView.h"
+#include "RunDlg.h"
+#include "Parameters.h"
 
-void replaceStr(generic_string & str, generic_string str2BeReplaced, generic_string replacement)
+static void replaceStr(std::generic_string & str, std::generic_string str2BeReplaced, std::generic_string replacement)
 {
 	size_t pos = str.find(str2BeReplaced);
 
@@ -259,7 +263,7 @@ size_t Printer::doPrint(bool justDoIt)
 	{
 		frPrint.rc.top += headerLineHeight + headerLineHeight / 2;
 
-		generic_string headerLeftPart = nppGUI._printSettings._headerLeft;
+		std::generic_string headerLeftPart = nppGUI._printSettings._headerLeft;
 		if (headerLeftPart != TEXT(""))
 		{
 			replaceStr(headerLeftPart, shortDateVar, shortDate);
@@ -268,7 +272,7 @@ size_t Printer::doPrint(bool justDoIt)
 			expandNppEnvironmentStrs(headerLeftPart.c_str(), headerL, headerSize, _pdlg.hwndOwner);
 		}
 
-		generic_string headerMiddlePart = nppGUI._printSettings._headerMiddle;
+		std::generic_string headerMiddlePart = nppGUI._printSettings._headerMiddle;
 		if (headerMiddlePart != TEXT(""))
 		{
 			replaceStr(headerMiddlePart, shortDateVar, shortDate);
@@ -277,7 +281,7 @@ size_t Printer::doPrint(bool justDoIt)
 			expandNppEnvironmentStrs(headerMiddlePart.c_str(), headerM, headerSize, _pdlg.hwndOwner);
 		}
 
-		generic_string headerRightPart = nppGUI._printSettings._headerRight;
+		std::generic_string headerRightPart = nppGUI._printSettings._headerRight;
 		if (headerRightPart != TEXT(""))
 		{
 			replaceStr(headerRightPart, shortDateVar, shortDate);
@@ -292,7 +296,7 @@ size_t Printer::doPrint(bool justDoIt)
 	{
 		frPrint.rc.bottom -= footerLineHeight + footerLineHeight / 2;
 
-		generic_string footerLeftPart = nppGUI._printSettings._footerLeft;
+		std::generic_string footerLeftPart = nppGUI._printSettings._footerLeft;
 		if (footerLeftPart != TEXT(""))
 		{
 			replaceStr(footerLeftPart, shortDateVar, shortDate);
@@ -301,7 +305,7 @@ size_t Printer::doPrint(bool justDoIt)
 			expandNppEnvironmentStrs(footerLeftPart.c_str(), footerL, headerSize, _pdlg.hwndOwner);
 		}
 
-		generic_string footerMiddlePart = nppGUI._printSettings._footerMiddle;
+		std::generic_string footerMiddlePart = nppGUI._printSettings._footerMiddle;
 		if (footerMiddlePart != TEXT(""))
 		{
 			replaceStr(footerMiddlePart, shortDateVar, shortDate);
@@ -310,7 +314,7 @@ size_t Printer::doPrint(bool justDoIt)
 			expandNppEnvironmentStrs(footerMiddlePart.c_str(), footerM, headerSize, _pdlg.hwndOwner);
 		}
 
-		generic_string footerRightPart = nppGUI._printSettings._footerRight;
+		std::generic_string footerRightPart = nppGUI._printSettings._footerRight;
 		if (footerRightPart != TEXT(""))
 		{
 			replaceStr(footerRightPart, shortDateVar, shortDate);
@@ -362,7 +366,7 @@ size_t Printer::doPrint(bool justDoIt)
 				// Left part
 				if (headerL[0] != '\0')
 				{
-					generic_string headerLeft(headerL);
+					std::generic_string headerLeft(headerL);
 					size_t pos = headerLeft.find(pageVar);
 
 					if (pos != headerLeft.npos)
@@ -375,7 +379,7 @@ size_t Printer::doPrint(bool justDoIt)
 				// Middle part
 				if (headerM != '\0')
 				{
-					generic_string headerMiddle(headerM);
+					std::generic_string headerMiddle(headerM);
 					size_t pos = headerMiddle.find(pageVar);
 					if (pos != headerMiddle.npos)
 						headerMiddle.replace(pos, lstrlen(pageVar), pageString);
@@ -387,7 +391,7 @@ size_t Printer::doPrint(bool justDoIt)
 				// Right part
 				if (headerR != '\0')
 				{
-					generic_string headerRight(headerR);
+					std::generic_string headerRight(headerR);
 					size_t pos = headerRight.find(pageVar);
 					if (pos != headerRight.npos)
 						headerRight.replace(pos, lstrlen(pageVar), pageString);
@@ -430,7 +434,7 @@ size_t Printer::doPrint(bool justDoIt)
 				// Left part
 				if (footerL[0] != '\0')
 				{
-					generic_string footerLeft(footerL);
+					std::generic_string footerLeft(footerL);
 					size_t pos = footerLeft.find(pageVar);
 					if (pos != footerLeft.npos)
 						footerLeft.replace(pos, lstrlen(pageVar), pageString);
@@ -442,7 +446,7 @@ size_t Printer::doPrint(bool justDoIt)
 				// Middle part
 				if (footerM[0] != '\0')
 				{
-					generic_string footerMiddle(footerM);
+					std::generic_string footerMiddle(footerM);
 					size_t pos = footerMiddle.find(pageVar);
 					if (pos != footerMiddle.npos)
 						footerMiddle.replace(pos, lstrlen(pageVar), pageString);
@@ -454,7 +458,7 @@ size_t Printer::doPrint(bool justDoIt)
 				// Right part
 				if (footerR[0] != '\0')
 				{
-					generic_string footerRight(footerR);
+					std::generic_string footerRight(footerR);
 					size_t pos = footerRight.find(pageVar);
 					if (pos != footerRight.npos)
 						footerRight.replace(pos, lstrlen(pageVar), pageString);

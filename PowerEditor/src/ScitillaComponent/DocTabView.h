@@ -19,31 +19,22 @@
 #define DOCTABVIEW_H
 
 #include "TabBar.h"
-#include "ScintillaEditView.h"
-#include "ImageListSet.h"
+#include "BufferID.h"
 
 const int SAVED_IMG_INDEX = 0;
 const int UNSAVED_IMG_INDEX = 1;
 const int REDONLY_IMG_INDEX = 2;
 
+class ScintillaEditView;
+class IconList;
+
 class DocTabView : public TabBarPlus
 {
 public :
 	DocTabView():TabBarPlus(), _pView(NULL) {};
-	virtual ~DocTabView(){};
+	virtual ~DocTabView();
 
-	virtual void destroy() {
-		TabBarPlus::destroy();
-	};
-
-	void init(HINSTANCE hInst, HWND parent, ScintillaEditView * pView, IconList *pIconList = NULL)
-	{
-		TabBarPlus::init(hInst, parent);
-		_pView = pView;
-		if (pIconList)
-			TabBar::setImageList(pIconList->getHandle());
-		return;
-	};
+	void init(HINSTANCE hInst, HWND parent, ScintillaEditView* pView, IconList *pIconList = NULL);
 
 	void addBuffer(BufferID buffer);
 	void closeBuffer(BufferID buffer);
@@ -69,20 +60,7 @@ public :
 		return _hideTabBarStatus;
 	};
 
-	virtual void reSizeTo(RECT & rc) {
-		if (_hideTabBarStatus)
-		{
-			RECT rcTmp = rc;
-
-			TabBar::reSizeTo(rcTmp);
-			_pView->reSizeTo(rc);
-		}
-		else
-		{
-			TabBar::reSizeTo(rc);
-			_pView->reSizeTo(rc);
-		}
-	};
+	virtual void reSizeTo(RECT & rc);
 
 private :
 	ScintillaEditView *_pView;

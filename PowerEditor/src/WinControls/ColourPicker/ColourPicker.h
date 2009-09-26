@@ -21,7 +21,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define COLOUR_PICKER_H
 
 #include "Window.h"
-#include "ColourPopup.h"
+
+class ColourPopup;
 
 //#define CP_CLASS_NAME "colourPickerButton"
 #define CPN_COLOURPICKED (BN_CLICKED)

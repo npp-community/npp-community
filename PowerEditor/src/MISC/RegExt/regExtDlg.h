@@ -21,7 +21,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define REG_EXT_DLG_H
 
 #include "StaticDialog.h"
-#include "regExtDlgRc.h"
 
 const int extNameLen = 32;
 

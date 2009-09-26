@@ -19,37 +19,20 @@
 #define RUN_DLG_H
 
 #include "StaticDialog.h"
-#include "RunDlg_rc.h"
-#include "Common.h"
-
-//static void extractArgs(TCHAR *cmd2Exec, TCHAR *args, const TCHAR *cmdEntier);
-
-using namespace std;
 
 #define CURRENTWORD_MAXLENGTH 2048
 
-const TCHAR fullCurrentPath[] = TEXT("FULL_CURRENT_PATH");
-const TCHAR currentDirectory[] = TEXT("CURRENT_DIRECTORY");
-const TCHAR onlyFileName[] = TEXT("FILE_NAME");
-const TCHAR fileNamePart[] = TEXT("NAME_PART");
-const TCHAR fileExtPart[] = TEXT("EXT_PART");
-const TCHAR currentWord[] = TEXT("CURRENT_WORD");
-const TCHAR nppDir[] = TEXT("NPP_DIRECTORY");
-const TCHAR currentLine[] = TEXT("CURRENT_LINE");
-const TCHAR currentColumn[] = TEXT("CURRENT_COLUMN");
-
-int whichVar(TCHAR *str);
 void expandNppEnvironmentStrs(const TCHAR *strSrc, TCHAR *stringDest, size_t strDestLen, HWND hWnd);
 
 class Command {
 public :
 	Command(){};
 	Command(TCHAR *cmd) : _cmdLine(cmd){};
-	Command(generic_string cmd) : _cmdLine(cmd){};
+	Command(std::generic_string cmd) : _cmdLine(cmd){};
 	HINSTANCE run(HWND hWnd);
 
 protected :
-	generic_string _cmdLine;
+	std::generic_string _cmdLine;
 private :
 	void extractArgs(TCHAR *cmd2Exec, TCHAR *args, const TCHAR *cmdEntier);
 };
@@ -60,10 +43,6 @@ public :
 	RunDlg() : StaticDialog() {};
 
 	void doDialog(bool isRTL = false);
-
-    virtual void destroy() {
-
-    };
 
 protected :
 	virtual BOOL CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);

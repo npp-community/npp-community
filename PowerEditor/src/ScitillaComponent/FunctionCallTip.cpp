@@ -17,7 +17,9 @@
 
 #include "precompiled_headers.h"
 #include "FunctionCallTip.h"
+#include "ScintillaEditView.h"
 
+#include "tinyxml.h"
 
 struct Token {
 	TCHAR * token;
@@ -414,4 +416,9 @@ void FunctionCallTip::cleanup() {
 		delete [] _funcName;
 	_funcName = 0;
 	_pEditView = NULL;
+}
+
+bool FunctionCallTip::isVisible()
+{
+	return _pEditView?_pEditView->execute(SCI_CALLTIPACTIVE) == TRUE:false;
 }

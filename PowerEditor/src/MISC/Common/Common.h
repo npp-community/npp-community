@@ -86,7 +86,8 @@ std::string wstring2string(const std::wstring & rwString, UINT codepage);
 
 TCHAR *BuildMenuFileName(TCHAR *buffer, int len, int pos, const TCHAR *filename);
 
-class WcharMbcsConvertor {
+class WcharMbcsConvertor
+{
 public:
 	static WcharMbcsConvertor * getInstance() {return _pSelf;};
 	static void destroyInstance() {delete _pSelf;};
@@ -97,14 +98,8 @@ public:
 	const char * wchar2char(const wchar_t * wcStr, UINT codepage, long *mstart, long *mend);
 
 protected:
-	WcharMbcsConvertor() : _multiByteStr(NULL), _wideCharStr(NULL), _multiByteAllocLen(0), _wideCharAllocLen(0), initSize(1024) {
-	};
-	~WcharMbcsConvertor() {
-		if (_multiByteStr)
-			delete [] _multiByteStr;
-		if (_wideCharStr)
-			delete [] _wideCharStr;
-	};
+	WcharMbcsConvertor();
+	~WcharMbcsConvertor();
 
 	static WcharMbcsConvertor * _pSelf;
 
@@ -117,7 +112,6 @@ protected:
 private:
 	// Since there's no public ctor, we need to void the default assignment operator.
 	WcharMbcsConvertor& operator= (const WcharMbcsConvertor&);
-
 };
 
 

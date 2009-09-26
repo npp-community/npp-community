@@ -17,36 +17,17 @@
 
 #ifndef NOTEPAD_PLUS_H
 #define NOTEPAD_PLUS_H
-#include "Window.h"
-#include "ScintillaEditView.h"
-#include "ToolBar.h"
-#include "ImageListSet.h"
-#include "DocTabView.h"
 
-#include "StaticDialog.h"
-#include "SplitterContainer.h"
-#include "FindReplaceDlg.h"
-#include "AboutDlg.h"
-#include "RunDlg.h"
-#include "UserDefineDialog.h"
-#include "StatusBar.h"
-#include "Parameters.h"
-#include "lastRecentFileList.h"
-#include "GoToLineDlg.h"
-#include "columnEditor.h"
-#include "WordStyleDlg.h"
-#include "trayIconControler.h"
-#include "ContextMenu.h"
-#include "PluginsManager.h"
+#include "BufferID.h"
+#include "Parameters_def.h"
+#include "ScintillaRef.h"
+#include "Window.h"
 #include "Notepad_plus_msgs.h"
-#include "preferenceDlg.h"
-#include "WindowsDlg.h"
-#include "RunMacroDlg.h"
-#include "DockingManager.h"
-#include "Process.h"
-#include "AutoCompletion.h"
-#include "Buffer.h"
-#include "SmartHighlighter.h"
+
+// To be removed later.  Need to be included since Parameters.h was removed from ScintillaEditView.h
+#include "shortcut.h"
+
+#include "npp_styles.h"  // For StyleArray, etc.
 
 #define MENU 0x01
 #define TOOLBAR 0x02
@@ -72,7 +53,49 @@ enum Views {
 };
 */
 
+// Forward declarations.
+class DockingManager;
+
+class FindReplaceDlg;
+class FindIncrementDlg;
+class AboutDlg;
+class RunDlg;
+class GoToLineDlg;
+class ColumnEditorDlg;
+class WordStyleDlg;
+class PreferenceDlg;
+class WindowsMenu;
+class RunMacroDlg;
+
+class ContextMenu;
+class StatusBar;
+class ToolBar;
+class ReBar;
+
+class ScintillaEditView;
+class DocTabView;
+class IconList;
+class trayIconControler;
+class SplitterContainer;
+
+class LastRecentFileList;
+class SmartHighlighter;
+class AutoCompletion;
+class PluginsManager;
+class ShortcutMapper;
+
+
 struct TaskListInfo;
+
+struct tTbData;
+
+class TiXmlNodeA;
+class TiXmlNode;
+
+// Stuff from Parameters.h
+struct CmdLineParams;
+struct Session;
+
 static TiXmlNodeA * searchDlgNode(TiXmlNodeA *node, const char *dlgTagName);
 
 struct iconLocator {
@@ -115,10 +138,10 @@ class Notepad_plus : public Window {
 	enum comment_mode {cm_comment, cm_uncomment, cm_toggle};
 public:
 	Notepad_plus();
-	virtual inline ~Notepad_plus();
+	virtual ~Notepad_plus();
 	void init(HINSTANCE, HWND, const TCHAR *cmdLine, CmdLineParams *cmdLineParams);
-	inline void killAllChildren();
-	virtual inline void destroy();
+	void killAllChildren();
+	virtual void destroy();
 
     static const TCHAR * Notepad_plus::getClassName() {
 		return _className;
@@ -128,14 +151,7 @@ public:
 	void getTaskListInfo(TaskListInfo *tli);
 
 	// For filtering the modeless Dialog message
-	inline bool isDlgsMsg(MSG *msg, bool unicodeSupported) const {
-		for (size_t i = 0; i < _hModelessDlgs.size(); i++)
-		{
-			if (unicodeSupported?(::IsDialogMessageW(_hModelessDlgs[i], msg)):(::IsDialogMessageA(_hModelessDlgs[i], msg)))
-				return true;
-		}
-		return false;
-	};
+	bool isDlgsMsg(MSG *msg, bool unicodeSupported) const;
 
 // fileOperations
 	//The doXXX functions apply to a single buffer and dont need to worry about views, with the excpetion of doClose, since closing one view doesnt have to mean the document is gone
@@ -145,9 +161,9 @@ public:
 	void doClose(BufferID, int whichOne);
 	//bool doDelete(const TCHAR *fileName) const {return ::DeleteFile(fileName) != 0;};
 
-	inline void fileNew();
+	void fileNew();
 	void fileOpen();
-	inline bool fileReload();
+	bool fileReload();
 	bool fileClose(BufferID id = BUFFER_INVALID, int curView = -1);	//use curView to override view to close from
 	bool fileCloseAll();
 	bool fileCloseAllButCurrent();
@@ -166,17 +182,12 @@ public:
 	void filePrint(bool showDialog);
 	bool saveScintillaParams(bool whichOne);
 
-	inline bool saveGUIParams();
-
-	inline void saveDockingParams();
-
-	inline void saveUserDefineLangs();
-
-	inline void saveShortcuts();
-
-	inline void saveSession(const Session & session);
-
-	inline void saveFindHistory();
+	bool saveGUIParams();
+	void saveDockingParams();
+	void saveUserDefineLangs();
+	void saveShortcuts();
+	void saveSession(const Session & session);
+	void saveFindHistory();
 
 	void getCurrentOpenedFiles(Session & session);
 
@@ -188,7 +199,7 @@ public:
 	void changeFindReplaceDlgLang();
 	void changeConfigLang();
 	void changeUserDefineLang();
-	void changeMenuLang(generic_string & pluginsTrans, generic_string & windowTrans);
+	void changeMenuLang(std::generic_string & pluginsTrans, std::generic_string & windowTrans);
 	void changeLangTabContextMenu();
 	void changeLangTabDrapContextMenu();
 	void changePrefereceDlgLang();
@@ -200,18 +211,16 @@ public:
 
 	bool doBlockComment(comment_mode currCommentMode);
 	bool doStreamComment();
-	inline void doTrimTrailing();
+	void doTrimTrailing();
 
-	inline HACCEL getAccTable() const{
-		return _accelerator.getAccTable();
-	};
+	HACCEL getAccTable() const;
 
 	bool addCurrentMacro();
-	inline void loadLastSession();
-	bool loadSession(Session & session);
+	void loadLastSession();
+	bool loadSession(Session* session);
 	winVer getWinVersion() const {return _winVersion;};
 
-	bool emergency(generic_string emergencySavedDir);
+	bool emergency(std::generic_string emergencySavedDir);
 
 	void notifyBufferChanged(Buffer * buffer, int mask);
 	bool findInFiles();
@@ -223,62 +232,65 @@ private:
 	static const TCHAR _className[32];
 	TCHAR _nppPath[MAX_PATH];
     Window *_pMainWindow;
-	DockingManager _dockingManager;
+	DockingManager* _dockingManager;
 
-	AutoCompletion _autoCompleteMain;
-	AutoCompletion _autoCompleteSub;	//each Scintilla has its own autoComplete
-
-	SmartHighlighter _smartHighlighter;
+	SmartHighlighter* _smartHighlighter;
 
 	TiXmlNode *_toolIcons;
 	TiXmlNodeA *_nativeLangA;
 
 	int _nativeLangEncoding;
 
-    DocTabView _mainDocTab;
-    DocTabView _subDocTab;
+    DocTabView* _mainDocTab;
+    DocTabView* _subDocTab;
     DocTabView *_pDocTab;
 	DocTabView *_pNonDocTab;
 
-    ScintillaEditView _subEditView;
-    ScintillaEditView _mainEditView;
-	ScintillaEditView _invisibleEditView;	//for searches
-	ScintillaEditView _fileEditView;		//for FileManager
+    ScintillaEditView* _subEditView;
+    ScintillaEditView* _mainEditView;
+	ScintillaEditView* _invisibleEditView;	//for searches
+	ScintillaEditView* _fileEditView;		//for FileManager
 
     ScintillaEditView *_pEditView;
 	ScintillaEditView *_pNonEditView;
 
     SplitterContainer *_pMainSplitter;
-    SplitterContainer _subSplitter;
+    SplitterContainer *_subSplitter;
 
-    ContextMenu _tabPopupMenu, _tabPopupDropMenu;
+	// AutoCompletions need to be after ScintillaEditViews, since their constructor depends on them.
+	// If you shuffle them, you'll get a crash on startup.
+	AutoCompletion* _autoCompleteMain;
+	AutoCompletion* _autoCompleteSub;	//each Scintilla has its own autoComplete
 
-	ToolBar	_toolBar;
-	IconList _docTabIconList;
+    ContextMenu* _tabPopupMenu;
+    ContextMenu* _tabPopupDropMenu;
 
-    StatusBar _statusBar;
+	ToolBar*	_toolBar;
+	IconList* _docTabIconList;
+
+    StatusBar* _statusBar;
 	bool _toReduceTabBar;
-	ReBar _rebarTop;
-	ReBar _rebarBottom;
+	ReBar* _rebarTop;
+	ReBar* _rebarBottom;
 
 	// Dialog
-	FindReplaceDlg _findReplaceDlg;
-	FindIncrementDlg _incrementFindDlg;
-    AboutDlg _aboutDlg;
-	RunDlg _runDlg;
-    GoToLineDlg _goToLineDlg;
-	ColumnEditorDlg _colEditorDlg;
-	WordStyleDlg _configStyleDlg;
-	PreferenceDlg _preference;
+	FindReplaceDlg* _findReplaceDlg;
+	FindIncrementDlg* _incrementFindDlg;
+    AboutDlg* _aboutDlg;
+	RunDlg* _runDlg;
+    GoToLineDlg* _goToLineDlg;
+	ColumnEditorDlg* _colEditorDlg;
+	WordStyleDlg* _configStyleDlg;
+	PreferenceDlg* _preferenceDlg;
 
 	// a handle list of all the Notepad++ dialogs
-	vector<HWND> _hModelessDlgs;
+	std::vector<HWND> _hModelessDlgs;
 
-	LastRecentFileList _lastRecentFileList;
+	LastRecentFileList* _lastRecentFileList;
 
-	vector<iconLocator> _customIconVect;
+	std::vector<iconLocator> _customIconVect;
 
-	WindowsMenu _windowsMenu;
+	WindowsMenu* _windowsMenu;
 	HMENU _mainMenuHandle;
 
 	bool _sysMenuEntering;
@@ -291,7 +303,7 @@ private:
 	// Keystroke macro recording and playback
 	Macro _macro;
 	bool _recordingMacro;
-	RunMacroDlg _runMacroDlg;
+	RunMacroDlg* _runMacroDlg;
 
 	// For hotspot
 	bool _linkTriggered;
@@ -327,7 +339,7 @@ private:
 	Accelerator _accelerator;
 	ScintillaAccelerator _scintaccelerator;
 
-	PluginsManager _pluginsManager;
+	PluginsManager* _pluginsManager;
 
 	bool _isRTL;
 	winVer _winVersion;
@@ -337,48 +349,17 @@ private:
 	class ScintillaCtrls {
 	public :
 		//ScintillaCtrls();
-		void init(HINSTANCE hInst, HWND hNpp) {
-			_hInst = hInst;
-			_hParent = hNpp;
-		};
-
-		HWND createSintilla(HWND hParent) {
-			_hParent = hParent;
-
-			ScintillaEditView *scint = new ScintillaEditView;
-			scint->init(_hInst, _hParent);
-			_scintVector.push_back(scint);
-			return scint->getHSelf();
-		};
-		bool destroyScintilla(HWND handle2Destroy) {
-			for (size_t i = 0 ; i < _scintVector.size() ; i++)
-			{
-				if (_scintVector[i]->getHSelf() == handle2Destroy)
-				{
-					_scintVector[i]->destroy();
-					delete _scintVector[i];
-
-					vector<ScintillaEditView *>::iterator it2delete = _scintVector.begin()+ i;
-					_scintVector.erase(it2delete);
-					return true;
-				}
-			}
-			return false;
-		};
-		void destroy() {
-			for (size_t i = 0 ; i < _scintVector.size() ; i++)
-			{
-				_scintVector[i]->destroy();
-				delete _scintVector[i];
-			}
-		};
+		void init(HINSTANCE hInst, HWND hNpp);
+		HWND createSintilla(HWND hParent);
+		bool destroyScintilla(HWND handle2Destroy);
+		void destroy();
 	private:
-		vector<ScintillaEditView *> _scintVector;
+		std::vector<ScintillaEditView *> _scintVector;
 		HINSTANCE _hInst;
 		HWND _hParent;
 	} _scintillaCtrls4Plugins;
 
-	vector<pair<int, int> > _hideLinesMarks;
+	std::vector<std::pair<int, int> > _hideLinesMarks;
 	StyleArray _hotspotStyles;
 
 	static LRESULT CALLBACK Notepad_plus_Proc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
@@ -429,43 +410,12 @@ private:
 	void performPostReload(int whichOne);
 //END: Document management
 
-	int doSaveOrNot(const TCHAR *fn) {
-		TCHAR pattern[64] = TEXT("Save file \"%s\" ?");
-		TCHAR phrase[512];
-		wsprintf(phrase, pattern, fn);
-		return doActionOrNot(TEXT("Save"), phrase, MB_YESNOCANCEL | MB_ICONQUESTION | MB_APPLMODAL);
-	};
-
-	int doReloadOrNot(const TCHAR *fn, bool dirty) {
-		TCHAR* pattern = TEXT("%s\r\rThis file has been modified by another program.\rDo you want to reload it%s?");
-		TCHAR* lose_info_str = dirty ? TEXT(" and lose the changes made in Notepad++") : TEXT("");
-		TCHAR phrase[512];
-		wsprintf(phrase, pattern, fn, lose_info_str);
-		int icon = dirty ? MB_ICONEXCLAMATION : MB_ICONQUESTION;
-		return doActionOrNot(TEXT("Reload"), phrase, MB_YESNO | MB_APPLMODAL | icon);
-	};
-
-	int doCloseOrNot(const TCHAR *fn) {
-		TCHAR pattern[128] = TEXT("The file \"%s\" doesn't exist anymore.\rKeep this file in editor?");
-		TCHAR phrase[512];
-		wsprintf(phrase, pattern, fn);
-		return doActionOrNot(TEXT("Keep non existing file"), phrase, MB_YESNO | MB_ICONQUESTION | MB_APPLMODAL);
-	};
-
-	int doDeleteOrNot(const TCHAR *fn) {
-		TCHAR pattern[128] = TEXT("The file \"%s\"\rwill be deleted from your disk and this document will be closed.\rContinue?");
-		TCHAR phrase[512];
-		wsprintf(phrase, pattern, fn);
-		return doActionOrNot(TEXT("Delete file"), phrase, MB_YESNO | MB_ICONQUESTION | MB_APPLMODAL);
-	};
-
-	int doActionOrNot(const TCHAR *title, const TCHAR *displayText, int type) {
-		return ::MessageBox(_hSelf, displayText, title, type);
-	};
-	void enableMenu(int cmdID, bool doEnable) const {
-		int flag = doEnable?MF_ENABLED | MF_BYCOMMAND:MF_DISABLED | MF_GRAYED | MF_BYCOMMAND;
-		::EnableMenuItem(_mainMenuHandle, cmdID, flag);
-	}
+	int doSaveOrNot(const TCHAR *fn);
+	int doReloadOrNot(const TCHAR *fn, bool dirty);
+	int doCloseOrNot(const TCHAR *fn);
+	int doDeleteOrNot(const TCHAR *fn);
+	int doActionOrNot(const TCHAR *title, const TCHAR *displayText, int type);
+	void enableMenu(int cmdID, bool doEnable) const;
 	void enableCommand(int cmdID, bool doEnable, int which) const;
 	void checkClipboard();
 	void checkDocState();
@@ -479,58 +429,17 @@ private:
 
 	void dynamicCheckMenuAndTB() const;
 
-	void enableConvertMenuItems(formatType f) const {
-		enableCommand(IDM_FORMAT_TODOS, (f != WIN_FORMAT), MENU);
-		enableCommand(IDM_FORMAT_TOUNIX, (f != UNIX_FORMAT), MENU);
-		enableCommand(IDM_FORMAT_TOMAC, (f != MAC_FORMAT), MENU);
-	};
+	void enableConvertMenuItems(formatType f) const;
 
 	void checkUnicodeMenuItems(UniMode um) const;
 
-	generic_string getLangDesc(LangType langType, bool shortDesc = false);
+	std::generic_string getLangDesc(LangType langType, bool shortDesc = false);
 
-	void setLangStatus(LangType langType){
-		_statusBar.setText(getLangDesc(langType).c_str(), STATUSBAR_DOC_TYPE);
-	};
+	void setLangStatus(LangType langType);
 
-	void setDisplayFormat(formatType f) {
-		std::generic_string str;
-		switch (f)
-		{
-			case MAC_FORMAT :
-				str = TEXT("MAC");
-				break;
-			case UNIX_FORMAT :
-				str = TEXT("UNIX");
-				break;
-			default :
-				str = TEXT("Dos\\Windows");
-		}
-		_statusBar.setText(str.c_str(), STATUSBAR_EOF_FORMAT);
-	};
+	void setDisplayFormat(formatType f);
 
-	void setUniModeText(UniMode um)
-	{
-		TCHAR *uniModeText;
-		switch (um)
-		{
-			case uniUTF8:
-				uniModeText = TEXT("UTF-8"); break;
-			case uni16BE:
-				uniModeText = TEXT("UCS-2 Big Endian"); break;
-			case uni16LE:
-				uniModeText = TEXT("UCS-2 Little Endian"); break;
-			case uni16BE_NoBOM:
-				uniModeText = TEXT("UCS-2 BE w/o BOM"); break;
-			case uni16LE_NoBOM:
-				uniModeText = TEXT("UCS-2 LE w/o BOM"); break;
-			case uniCookie:
-				uniModeText = TEXT("ANSI as UTF-8"); break;
-			default :
-				uniModeText = TEXT("ANSI");
-		}
-		_statusBar.setText(uniModeText, STATUSBAR_UNICODE_TYPE);
-	};
+	void setUniModeText(UniMode um);
 
 	void checkLangsMenu(int id) const ;
 
@@ -538,183 +447,30 @@ private:
 
 	enum LangType menuID2LangType(int cmdID);
 
-    int getFolderMarginStyle() const {
-        if (::GetMenuState(_mainMenuHandle, IDM_VIEW_FOLDERMAGIN_SIMPLE, MF_BYCOMMAND) == MF_CHECKED)
-            return IDM_VIEW_FOLDERMAGIN_SIMPLE;
+    int getFolderMarginStyle() const;
 
-        if (::GetMenuState(_mainMenuHandle, IDM_VIEW_FOLDERMAGIN_ARROW, MF_BYCOMMAND) == MF_CHECKED)
-            return IDM_VIEW_FOLDERMAGIN_ARROW;
-
-        if (::GetMenuState(_mainMenuHandle, IDM_VIEW_FOLDERMAGIN_CIRCLE, MF_BYCOMMAND) == MF_CHECKED)
-            return IDM_VIEW_FOLDERMAGIN_CIRCLE;
-
-        if (::GetMenuState(_mainMenuHandle, IDM_VIEW_FOLDERMAGIN_BOX, MF_BYCOMMAND) == MF_CHECKED)
-            return IDM_VIEW_FOLDERMAGIN_BOX;
-
-		return 0;
-    };
-
-	void checkFolderMarginStyleMenu(int id2Check) const {
-		::CheckMenuRadioItem(_mainMenuHandle, IDM_VIEW_FOLDERMAGIN_SIMPLE, IDM_VIEW_FOLDERMAGIN_BOX, id2Check, MF_BYCOMMAND);
-	};
-
-    int getFolderMaginStyleIDFrom(folderStyle fStyle) const {
-        switch (fStyle)
-        {
-            case FOLDER_STYLE_SIMPLE : return IDM_VIEW_FOLDERMAGIN_SIMPLE;
-            case FOLDER_STYLE_ARROW : return IDM_VIEW_FOLDERMAGIN_ARROW;
-            case FOLDER_STYLE_CIRCLE : return IDM_VIEW_FOLDERMAGIN_CIRCLE;
-            case FOLDER_STYLE_BOX : return IDM_VIEW_FOLDERMAGIN_BOX;
-			default : return FOLDER_TYPE;
-        }
-        //return
-    };
-
-	void checkMenuItem(int itemID, bool willBeChecked) const {
-		::CheckMenuItem(_mainMenuHandle, itemID, MF_BYCOMMAND | (willBeChecked?MF_CHECKED:MF_UNCHECKED));
-	};
+	void checkFolderMarginStyleMenu(int id2Check) const;
+    int getFolderMaginStyleIDFrom(folderStyle fStyle) const;
+	void checkMenuItem(int itemID, bool willBeChecked) const;
 	void charAdded(TCHAR chAdded);
 	void MaintainIndentation(TCHAR ch);
 
 	void addHotSpot(bool docIsModifing = false);
 
-    void bookmarkAdd(int lineno) const {
-		if (lineno == -1)
-			lineno = _pEditView->getCurrentLineNumber();
-		if (!bookmarkPresent(lineno))
-			_pEditView->execute(SCI_MARKERADD, lineno, MARK_BOOKMARK);
-	};
-    void bookmarkDelete(int lineno) const {
-		if (lineno == -1)
-			lineno = _pEditView->getCurrentLineNumber();
-		if ( bookmarkPresent(lineno))
-			_pEditView->execute(SCI_MARKERDELETE, lineno, MARK_BOOKMARK);
-	};
-    bool bookmarkPresent(int lineno) const {
-		if (lineno == -1)
-			lineno = _pEditView->getCurrentLineNumber();
-		LRESULT state = _pEditView->execute(SCI_MARKERGET, lineno);
-		return ((state & (1 << MARK_BOOKMARK)) != 0);
-	};
-    void bookmarkToggle(int lineno) const {
-		if (lineno == -1)
-			lineno = _pEditView->getCurrentLineNumber();
-
-		if (bookmarkPresent(lineno))
-			bookmarkDelete(lineno);
-		else
-		bookmarkAdd(lineno);
-	};
+    void bookmarkAdd(int lineno) const;
+    void bookmarkDelete(int lineno) const;
+    bool bookmarkPresent(int lineno) const;
+    void bookmarkToggle(int lineno) const;
     void bookmarkNext(bool forwardScan);
-	void bookmarkClearAll() const {
-		_pEditView->execute(SCI_MARKERDELETEALL, MARK_BOOKMARK);
-	};
+	void bookmarkClearAll() const;
 
-
-	void copyMarkedLines() {
-		int lastLine = _pEditView->lastZeroBasedLineNumber();
-		generic_string globalStr = TEXT("");
-		for (int i = lastLine ; i >= 0 ; i--)
-		{
-			if (bookmarkPresent(i))
-			{
-				generic_string currentStr = getMarkedLine(i) + globalStr;
-				globalStr = currentStr;
-			}
-		}
-		str2Cliboard(globalStr.c_str());
-	};
-
-	void cutMarkedLines() {
-		int lastLine = _pEditView->lastZeroBasedLineNumber();
-		generic_string globalStr = TEXT("");
-
-		_pEditView->execute(SCI_BEGINUNDOACTION);
-		for (int i = lastLine ; i >= 0 ; i--)
-		{
-			if (bookmarkPresent(i))
-			{
-				generic_string currentStr = getMarkedLine(i) + globalStr;
-				globalStr = currentStr;
-
-				deleteMarkedline(i);
-			}
-		}
-		_pEditView->execute(SCI_ENDUNDOACTION);
-		str2Cliboard(globalStr.c_str());
-	};
-
-	void deleteMarkedLines() {
-		int lastLine = _pEditView->lastZeroBasedLineNumber();
-
-		_pEditView->execute(SCI_BEGINUNDOACTION);
-		for (int i = lastLine ; i >= 0 ; i--)
-		{
-			if (bookmarkPresent(i))
-				deleteMarkedline(i);
-		}
-		_pEditView->execute(SCI_ENDUNDOACTION);
-	};
-
-	void pasteToMarkedLines() {
-		int clipFormat;
-	#ifdef UNICODE
-		clipFormat = CF_UNICODETEXT;
-	#else
-		clipFormat = CF_TEXT;
-	#endif
-		BOOL canPaste = ::IsClipboardFormatAvailable(clipFormat);
-		if (!canPaste)
-			return;
-		int lastLine = _pEditView->lastZeroBasedLineNumber();
-
-		::OpenClipboard(_hSelf);
-		HANDLE clipboardData = ::GetClipboardData(clipFormat);
-		LPVOID clipboardDataPtr = ::GlobalLock(clipboardData);
-
-		generic_string clipboardStr = (const TCHAR *)clipboardDataPtr;
-
-		::GlobalUnlock(clipboardData);
-		::CloseClipboard();
-
-		_pEditView->execute(SCI_BEGINUNDOACTION);
-		for (int i = lastLine ; i >= 0 ; i--)
-		{
-			if (bookmarkPresent(i))
-			{
-				replaceMarkedline(i, clipboardStr.c_str());
-			}
-		}
-		_pEditView->execute(SCI_ENDUNDOACTION);
-	};
-
-	void deleteMarkedline(int ln) {
-		int lineLen = _pEditView->execute(SCI_LINELENGTH, ln);
-		int lineBegin = _pEditView->execute(SCI_POSITIONFROMLINE, ln);
-
-		bookmarkDelete(ln);
-		TCHAR emptyString[2] = TEXT("");
-		_pEditView->replaceTarget(emptyString, lineBegin, lineBegin + lineLen);
-	};
-
-	void replaceMarkedline(int ln, const TCHAR *str) {
-		int lineBegin = _pEditView->execute(SCI_POSITIONFROMLINE, ln);
-		int lineEnd = _pEditView->execute(SCI_GETLINEENDPOSITION, ln);
-
-		_pEditView->replaceTarget(str, lineBegin, lineEnd);
-	};
-
-	generic_string getMarkedLine(int ln) {
-		int lineLen = _pEditView->execute(SCI_LINELENGTH, ln);
-		int lineBegin = _pEditView->execute(SCI_POSITIONFROMLINE, ln);
-
-		TCHAR * buf = new TCHAR[lineLen+1];
-		_pEditView->getGenericText(buf, lineBegin, lineBegin + lineLen);
-		generic_string line = buf;
-		delete [] buf;
-
-		return line;
-	};
+	void copyMarkedLines();
+	void cutMarkedLines();
+	void deleteMarkedLines();
+	void pasteToMarkedLines();
+	void deleteMarkedline(int ln);
+	void replaceMarkedline(int ln, const TCHAR *str);
+	std::generic_string getMarkedLine(int ln);
 
     void findMatchingBracePos(int & braceAtCaret, int & braceOpposite);
     void braceMatch();
@@ -733,116 +489,32 @@ private:
 	bool findInOpenedFiles();
 	bool findInCurrentFile();
 
-	bool matchInList(const TCHAR *fileName, const vector<generic_string> & patterns);
-	void getMatchedFileNames(const TCHAR *dir, const vector<generic_string> & patterns, vector<generic_string> & fileNames, bool isRecursive, bool isInHiddenDir);
+	bool matchInList(const TCHAR *fileName, const std::vector<std::generic_string> & patterns);
+	void getMatchedFileNames(const TCHAR *dir, const std::vector<std::generic_string> & patterns, std::vector<std::generic_string> & fileNames, bool isRecursive, bool isInHiddenDir);
 
 	void doSynScorll(HWND hW);
-	void setWorkingDir(TCHAR *dir) {
-		NppParameters * params = NppParameters::getInstance();
-		if (params->getNppGUI()._openSaveDir == dir_last)
-			return;
-		if (params->getNppGUI()._openSaveDir == dir_userDef)
-		{
-			params->setWorkingDir(NULL);
-		}
-		else if (dir && PathIsDirectory(dir))
-		{
-			params->setWorkingDir(dir);
-		}
-	}
+	void setWorkingDir(TCHAR *dir);
 	bool str2Cliboard(const TCHAR *str2cpy);
 	bool bin2Cliboard(const UCHAR *uchar2cpy, size_t length);
 
 	bool getIntegralDockingData(tTbData & dockData, int & iCont, bool & isVisible);
 
-	int getLangFromMenuName(const TCHAR * langName) {
-		int	id	= 0;
-		const int menuSize = 64;
-		TCHAR menuLangName[menuSize];
+	int getLangFromMenuName(const TCHAR * langName);
 
-		for ( int i = IDM_LANG_C; i <= IDM_LANG_USER; i++ )
-			if ( ::GetMenuString( _mainMenuHandle, i, menuLangName, menuSize, MF_BYCOMMAND ) )
-				if ( !lstrcmp( langName, menuLangName ) )
-				{
-					id	= i;
-					break;
-				}
-
-		if ( id == 0 )
-		{
-			for ( int i = IDM_LANG_USER + 1; i <= IDM_LANG_USER_LIMIT; i++ )
-				if ( ::GetMenuString( _mainMenuHandle, i, menuLangName, menuSize, MF_BYCOMMAND ) )
-					if ( !lstrcmp( langName, menuLangName ) )
-					{
-						id	= i;
-						break;
-					}
-		}
-
-		return id;
-	};
-
-	generic_string getLangFromMenu(const Buffer * buf) {
-
-		int	id;
-		generic_string userLangName;
-		const int nbChar = 32;
-		TCHAR menuLangName[nbChar];
-
-		id = (NppParameters::getInstance())->langTypeToCommandID( buf->getLangType() );
-		if ( ( id != IDM_LANG_USER ) || !( buf->isUserDefineLangExt() ) )
-		{
-			::GetMenuString(_mainMenuHandle, id, menuLangName, nbChar-1, MF_BYCOMMAND);
-			userLangName = menuLangName;
-		}
-		else
-		{
-			userLangName = buf->getUserDefineLangName();
-		}
-		return	userLangName;
-	};
+	std::generic_string getLangFromMenu(const Buffer * buf);
 
 	void setFileOpenSaveDlgFilters(FileDialog & fDlg);
 	void markSelectedTextInc(bool enable);
 
-	Style * getStyleFromName(const TCHAR *styleName) {
-		StyleArray & stylers = (NppParameters::getInstance())->getMiscStylerArray();
-
-		int i = stylers.getStylerIndexByName(styleName);
-		Style * st = NULL;
-		if (i != -1)
-		{
-			Style & style = stylers.getStyler(i);
-			st = &style;
-		}
-		return st;
-	};
+	Style * getStyleFromName(const TCHAR *styleName);
 
 	bool dumpFiles(const TCHAR * outdir, const TCHAR * fileprefix = TEXT(""));	//helper func
 	void drawTabbarColoursFromStylerArray();
 
 	void loadCommandlineParams(const TCHAR * commandLine, CmdLineParams * pCmdParams);
 
-	bool noOpenedDoc() const {
-		if (_mainDocTab.isVisible() && _subDocTab.isVisible())
-			return false;
-		if (_pDocTab->nbItem() == 1)
-		{
-			BufferID buffer = _pDocTab->getBufferByIndex(0);
-			Buffer * buf = MainFileManager->getBufferByID(buffer);
-			if (!buf->isDirty() && buf->isUntitled())
-				return true;
-		}
-		return false;
-	};
-
-	void EnableMouseWheelZoom(bool enable)
-	{
-		_subEditView.execute(SCI_SETWHEELZOOMING, enable);
-		_mainEditView.execute(SCI_SETWHEELZOOMING, enable);
-		_invisibleEditView.execute(SCI_SETWHEELZOOMING, enable);
-		_fileEditView.execute(SCI_SETWHEELZOOMING, enable);
-	}
+	bool noOpenedDoc() const;
+	void EnableMouseWheelZoom(bool enable);
 };
 
 #endif //NOTEPAD_PLUS_H

@@ -19,12 +19,15 @@
 #define FIND_REPLACE_DLG_H
 
 #include "StaticDialog.h"
-#include "FindReplaceDlg_rc.h"
-#include "Buffer.h"
-#include "ScintillaEditView.h"
-#include "StatusBar.h"
-#include "DockingDlgInterface.h"
+#include "BufferID.h"
 
+// Forward declarations
+class Finder;
+class Searching;
+
+class ScintillaEditView;
+class TabBar;
+class ReBar;
 
 #define FIND_RECURSIVE 1
 #define FIND_INHIDDENDIR 2
@@ -39,14 +42,6 @@ enum DIALOG_TYPE {FIND_DLG, REPLACE_DLG, FINDINFILES_DLG};
 //#define FIND_REPLACE_STR_MAX 256
 
 enum InWhat{ALL_OPEN_DOCS, FILES_IN_DIR, CURRENT_DOC};
-
-struct FoundInfo {
-	FoundInfo(int start, int end, const TCHAR *fullPath)
-		: _start(start), _end(end), _fullPath(fullPath) {};
-	int _start;
-	int _end;
-	std::generic_string _fullPath;
-};
 
 struct TargetRange {
 	int targetStart;
@@ -68,246 +63,24 @@ struct FindOption {
 		_isWrapAround(true), _whichDirection(DIR_DOWN), _incrementalType(NotIncremental){};
 };
 
-//This class contains generic search functions as static functions for easy access
-class Searching {
-public:
-	static int convertExtendedToString(const TCHAR * query, TCHAR * result, int length);
-	static TargetRange t;
-	static int buildSearchFlags(FindOption * option) {
-		return	(option->_isWholeWord ? SCFIND_WHOLEWORD : 0) |
-				(option->_isMatchCase ? SCFIND_MATCHCASE : 0) |
-				(option->_searchType == FindRegex ? SCFIND_REGEXP|SCFIND_POSIX : 0);
-	};
-	static void displaySectionCentered(int posStart, int posEnd, ScintillaEditView * pEditView, bool isDownwards = true);
-
-private:
-	static bool readBase(const TCHAR * str, int * value, int base, int size);
-
-};
-
-//Finder: Dockable window that contains search results
-class Finder : public DockingDlgInterface {
-friend class FindReplaceDlg;
-public:
-	Finder() : DockingDlgInterface(IDD_FINDRESULT), _pMainFoundInfos(&_foundInfos1), _pMainMarkings(&_markings1) {
-		_MarkingsStruct._length = 0;
-		_MarkingsStruct._markings = NULL;
-	};
-
-	~Finder() {
-		_scintView.destroy();
-	}
-	void init(HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView) {
-		DockingDlgInterface::init(hInst, hPere);
-		_ppEditView = ppEditView;
-	};
-
-	void addSearchLine(const TCHAR *searchName) {
-		generic_string str = TEXT("Search \"");
-		str += searchName;
-		str += TEXT("\"\r\n");
-
-		setFinderReadOnly(false);
-		_scintView.addGenericText(str.c_str());
-		setFinderReadOnly(true);
-		_lastSearchHeaderPos = _scintView.execute(SCI_GETCURRENTPOS) - 2;
-
-		_pMainFoundInfos->push_back(EmptyFoundInfo);
-		_pMainMarkings->push_back(EmptySearchResultMarking);
-	};
-
-	void addFileNameTitle(const TCHAR * fileName) {
-		generic_string str = TEXT("  ");
-		str += fileName;
-		str += TEXT("\r\n");
-
-		setFinderReadOnly(false);
-		_scintView.addGenericText(str.c_str());
-		setFinderReadOnly(true);
-		_lastFileHeaderPos = _scintView.execute(SCI_GETCURRENTPOS) - 2;
-
-		_pMainFoundInfos->push_back(EmptyFoundInfo);
-		_pMainMarkings->push_back(EmptySearchResultMarking);
-	};
-
-	void addFileHitCount(int count) {
-		TCHAR text[20];
-		wsprintf(text, TEXT(" (%i hits)"), count);
-		setFinderReadOnly(false);
-		_scintView.insertGenericTextFrom(_lastFileHeaderPos, text);
-		setFinderReadOnly(true);
-		nFoundFiles++;
-	};
-
-	void addSearchHitCount(int count) {
-		TCHAR text[50];
-		wsprintf(text, TEXT(" (%i hits in %i files)"), count, nFoundFiles);
-		setFinderReadOnly(false);
-		_scintView.insertGenericTextFrom(_lastSearchHeaderPos, text);
-		setFinderReadOnly(true);
-	};
-
-
-	void add(FoundInfo fi, SearchResultMarking mi, const TCHAR* foundline, int lineNb) {
-		_pMainFoundInfos->push_back(fi);
-		std::generic_string str = TEXT("\tLine ");
-
-		TCHAR lnb[16];
-		wsprintf(lnb, TEXT("%d"), lineNb);
-		str += lnb;
-		str += TEXT(": ");
-		mi._start += str.length();
-		mi._end += str.length();
-		str += foundline;
-
-		if (str.length() >= SC_SEARCHRESULT_LINEBUFFERMAXLENGTH)
-		{
-			const TCHAR * endOfLongLine = TEXT("...\r\n");
-			str = str.substr(0, SC_SEARCHRESULT_LINEBUFFERMAXLENGTH - lstrlen(endOfLongLine) - 1);
-			str += endOfLongLine;
-		}
-		setFinderReadOnly(false);
-		_scintView.addGenericText(str.c_str(), &mi._start, &mi._end);
-		setFinderReadOnly(true);
-		_pMainMarkings->push_back(mi);
-	};
-
-	void setFinderStyle();
-
-	void removeAll() {
-		_pMainFoundInfos->clear();
-		_pMainMarkings->clear();
-		setFinderReadOnly(false);
-		_scintView.execute(SCI_CLEARALL);
-		setFinderReadOnly(true);
-	};
-
-	void beginNewFilesSearch() {
-		_scintView.execute(SCI_SETLEXER, SCLEX_NULL);
-
-		_scintView.execute(SCI_SETCURRENTPOS, 0);
-		_pMainFoundInfos = _pMainFoundInfos == &_foundInfos1 ? &_foundInfos2 : &_foundInfos1;
-		_pMainMarkings = _pMainMarkings == &_markings1 ? &_markings2 : &_markings1;
-		nFoundFiles = 0;
-
-		// fold all old searches (1st level only)
-		_scintView.collapse(searchHeaderLevel - SC_FOLDLEVELBASE, fold_collapse);
-	};
-
-	void finishFilesSearch(int count) {
-		std::vector<FoundInfo>* _pOldFoundInfos;
-		std::vector<SearchResultMarking>* _pOldMarkings;
-		_pOldFoundInfos = _pMainFoundInfos == &_foundInfos1 ? &_foundInfos2 : &_foundInfos1;
-		_pOldMarkings = _pMainMarkings == &_markings1 ? &_markings2 : &_markings1;
-
-		_pOldFoundInfos->insert(_pOldFoundInfos->begin(), _pMainFoundInfos->begin(), _pMainFoundInfos->end());
-		_pOldMarkings->insert(_pOldMarkings->begin(), _pMainMarkings->begin(), _pMainMarkings->end());
-		_pMainFoundInfos->clear();
-		_pMainMarkings->clear();
-		_pMainFoundInfos = _pOldFoundInfos;
-		_pMainMarkings = _pOldMarkings;
-
-		_MarkingsStruct._length = _pMainMarkings->size();
-		_MarkingsStruct._markings = &((*_pMainMarkings)[0]);
-
-		addSearchHitCount(count);
-		_scintView.execute(SCI_SETSEL, 0, 0);
-
-		_scintView.execute(SCI_SETLEXER, SCLEX_SEARCHRESULT);
-	};
-
-
-	void gotoNextFoundResult(int direction);
-	void GotoFoundLine();
-	void DeleteResult();
-
-protected :
-	virtual BOOL CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
-	bool notify(SCNotification *notification);
-
-private:
-
-	enum { searchHeaderLevel = SC_FOLDLEVELBASE + 1, fileHeaderLevel, resultLevel };
-
-	ScintillaEditView **_ppEditView;
-	std::vector<FoundInfo> _foundInfos1;
-	std::vector<FoundInfo> _foundInfos2;
-	std::vector<FoundInfo>* _pMainFoundInfos;
-	std::vector<SearchResultMarking> _markings1;
-	std::vector<SearchResultMarking> _markings2;
-	std::vector<SearchResultMarking>* _pMainMarkings;
-	SearchResultMarkings _MarkingsStruct;
-
-	ScintillaEditView _scintView;
-	unsigned int nFoundFiles;
-
-	int _lastFileHeaderPos;
-	int _lastSearchHeaderPos;
-
-	void setFinderReadOnly(bool isReadOnly) {
-		_scintView.execute(SCI_SETREADONLY, isReadOnly);
-	};
-
-	static FoundInfo EmptyFoundInfo;
-	static SearchResultMarking EmptySearchResultMarking;
-};
-
 enum FindStatus { FSFound, FSNotFound, FSTopReached, FSEndReached};
 //FindReplaceDialog: standard find/replace window
 class FindReplaceDlg : public StaticDialog
 {
 friend class FindIncrementDlg;
 public :
-	FindReplaceDlg() : StaticDialog(), _pFinder(NULL), _isRTL(false), _isRecursive(true),_isInHiddenDir(false),\
-		_fileNameLenMax(1024) {
-		_uniFileName = new char[(_fileNameLenMax + 3) * 2];
-		_winVer = (NppParameters::getInstance())->getWinVersion();
-	};
-	~FindReplaceDlg() {
-		_tab.destroy();
-		if (_pFinder)
-			delete _pFinder;
-		delete [] _uniFileName;
-	};
+	FindReplaceDlg();
+	~FindReplaceDlg();
 
-	void init(HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView) {
-		Window::init(hInst, hPere);
-		if (!ppEditView)
-			throw int(9900);
-		_ppEditView = ppEditView;
-	};
+	virtual void destroy();
+
+	void init(HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView);
 
 	virtual void create(int dialogID, bool isRTL = false);
 
-	void initOptionsFromDlg()	{
-		_options._isWholeWord = isCheckedOrNot(IDWHOLEWORD);
-		_options._isMatchCase = isCheckedOrNot(IDMATCHCASE);
-		_options._searchType = isCheckedOrNot(IDREGEXP)?FindRegex:isCheckedOrNot(IDEXTENDED)?FindExtended:FindNormal;
-		_options._isWrapAround = isCheckedOrNot(IDWRAP);
-		_isInSelection = isCheckedOrNot(IDC_IN_SELECTION_CHECK);
+	void initOptionsFromDlg();
 
-		_doPurge = isCheckedOrNot(IDC_PURGE_CHECK);
-		_doMarkLine = isCheckedOrNot(IDC_MARKLINE_CHECK);
-		_doStyleFoundToken = isCheckedOrNot(IDC_STYLEFOUND_CHECK);
-
-		::EnableWindow(::GetDlgItem(_hSelf, IDCMARKALL), (_doMarkLine || _doStyleFoundToken));
-	};
-
-	void doDialog(DIALOG_TYPE whichType, bool isRTL = false) {
-		if (!isCreated())
-		{
-			create(IDD_FIND_REPLACE_DLG, isRTL);
-			_isRTL = isRTL;
-		}
-
-		if (whichType == FINDINFILES_DLG)
-			enableFindInFilesFunc();
-		else
-			enableReplaceFunc(whichType == REPLACE_DLG);
-
-		::SetFocus(::GetDlgItem(_hSelf, IDFINDWHAT));
-		display();
-	};
+	void doDialog(DIALOG_TYPE whichType, bool isRTL = false);
 	bool processFindNext(const TCHAR *txt2find, FindOption *options = NULL, FindStatus *oFindStatus = NULL);
 	bool processReplace(const TCHAR *txt2find, const TCHAR *txt2replace, FindOption *options = NULL);
 
@@ -321,114 +94,49 @@ public :
 	void replaceAllInOpenedDocs();
 	void findAllIn(InWhat op);
 
-	void setSearchText(TCHAR * txt2find) {
-		HWND hCombo = ::GetDlgItem(_hSelf, IDFINDWHAT);
-		if (txt2find && txt2find[0])
-		{
-			// We got a valid search string
-			::SendMessage(hCombo, CB_SETCURSEL, (WPARAM)-1, 0); // remove selection - to allow using down arrow to get to last searched word
-			::SetDlgItemText(_hSelf, IDFINDWHAT, txt2find);
-		}
-		::SendMessage(hCombo, CB_SETEDITSEL, 0, MAKELPARAM(0, -1)); // select all text - fast edit
-	}
-	void gotoNextFoundResult(int direction = 0) {if (_pFinder) _pFinder->gotoNextFoundResult(direction);};
+	void setSearchText(TCHAR * txt2find);
+	void gotoNextFoundResult(int direction = 0);
 
 	void putFindResult(int result) {
 		_findAllResult = result;
 	};
 	const TCHAR * getDir2Search() const {return _directory.c_str();};
 
-	void getPatterns(vector<generic_string> & patternVect);
+	void getPatterns(std::vector<std::generic_string> & patternVect);
 
 	void launchFindInFilesDlg() {
 		doDialog(FINDINFILES_DLG);
 	};
 
-	void setFindInFilesDirFilter(const TCHAR *dir, const TCHAR *filters) {
-		if (dir)
-		{
-			_directory = dir;
-			::SetDlgItemText(_hSelf, IDD_FINDINFILES_DIR_COMBO, dir);
-		}
-		if (filters)
-		{
-			_filters = filters;
-			::SetDlgItemText(_hSelf, IDD_FINDINFILES_FILTERS_COMBO, filters);
-		}
-	};
+	void setFindInFilesDirFilter(const TCHAR *dir, const TCHAR *filters);
 
-	generic_string getText2search() const {
-		return getTextFromCombo(::GetDlgItem(_hSelf, IDFINDWHAT));
-	};
+	std::generic_string getText2search() const;
 
-	const generic_string & getFilters() const {return _filters;};
-	const generic_string & getDirectory() const {return _directory;};
+	const std::generic_string & getFilters() const {return _filters;};
+	const std::generic_string & getDirectory() const {return _directory;};
 	const FindOption & getCurrentOptions() const {return _options;};
 	bool isRecursive() const { return _isRecursive; };
 	bool isInHiddenDir() const { return _isInHiddenDir; };
 	void saveFindHistory();
-	void changeTabName(DIALOG_TYPE index, const TCHAR *name2change) {
-		TCITEM tie;
-		tie.mask = TCIF_TEXT;
-		tie.pszText = (TCHAR *)name2change;
-		TabCtrl_SetItem(_tab.getHSelf(), index, &tie);
-	}
-	void beginNewFilesSearch()
-	{
-		_pFinder->beginNewFilesSearch();
-		_pFinder->addSearchLine(getText2search().c_str());
-	}
+	void changeTabName(DIALOG_TYPE index, const TCHAR *name2change);
+	void beginNewFilesSearch();
 
-	void finishFilesSearch(int count)
-	{
-		_pFinder->finishFilesSearch(count);
-	}
+	void finishFilesSearch(int count);
 
-	void focusOnFinder() {
-		// Show finder and set focus
-		if (_pFinder)
-		{
-			::SendMessage(_hParent, NPPM_DMMSHOW, 0, (LPARAM)_pFinder->getHSelf());
-			_pFinder->_scintView.getFocus();
-		}
-	};
+	void focusOnFinder();
 
-	HWND getHFindResults() {
-		if (_pFinder)
-			return _pFinder->_scintView.getHSelf();
-		return NULL;
-	}
+	HWND getHFindResults();
 
-	void updateFinderScintilla() {
-		if (_pFinder && _pFinder->isCreated() && _pFinder->isVisible())
-		{
-			_pFinder->setFinderStyle();
-		}
-	};
+	void updateFinderScintilla();
 
 protected :
 	virtual BOOL CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
 	void addText2Combo(const TCHAR * txt2add, HWND comboID, bool isUTF8 = false);
-	generic_string getTextFromCombo(HWND hCombo, bool isUnicode = false) const;
+	std::generic_string getTextFromCombo(HWND hCombo, bool isUnicode = false) const;
 	static LONG originalFinderProc;
 
 	// Window procedure for the finder
-	static LRESULT FAR PASCAL finderProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
-	{
-		if (message == WM_KEYDOWN && (wParam == VK_DELETE || wParam == VK_RETURN))
-		{
-			ScintillaEditView *pScint = (ScintillaEditView *)(::GetWindowLongPtr(hwnd, GWL_USERDATA));
-			Finder *pFinder = (Finder *)(::GetWindowLongPtr(pScint->getHParent(), GWL_USERDATA));
-			if (wParam == VK_RETURN)
-				pFinder->GotoFoundLine();
-			else // VK_DELETE
-				pFinder->DeleteResult();
-			return 0;
-		}
-		else
-			// Call default (original) window procedure
-			return CallWindowProc((WNDPROC) originalFinderProc, hwnd, message, wParam, lParam);
-	}
+	static LRESULT FAR PASCAL finderProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
     void combo2ExtendedMode(int comboID);
 
 private :
@@ -450,89 +158,33 @@ private :
 	int _findAllResult;
 	TCHAR _findAllResultStr[1024];
 
-	generic_string _filters;
-	generic_string _directory;
+	std::generic_string _filters;
+	std::generic_string _directory;
 	bool _isRecursive;
 	bool _isInHiddenDir;
 
 	int _fileNameLenMax;
 	char *_uniFileName;
 
-	TabBar _tab;
-	winVer _winVer;
+	TabBar* _tab;
 
 	void enableReplaceFunc(bool isEnable);
 	void enableFindInFilesControls(bool isEnable = true);
-	void enableFindInFilesFunc() {
-		enableFindInFilesControls();
+	void enableFindInFilesFunc();
 
-		_currentStatus = FINDINFILES_DLG;
-		gotoCorrectTab();
-		::MoveWindow(::GetDlgItem(_hSelf, IDCANCEL), _findInFilesClosePos.left, _findInFilesClosePos.top, _findInFilesClosePos.right, _findInFilesClosePos.bottom, TRUE);
+	void setDefaultButton(int nID);
 
-		TCHAR label[MAX_PATH];
-		_tab.getCurrentTitle(label, MAX_PATH);
-		::SetWindowText(_hSelf, label);
-
-		setDefaultButton(IDD_FINDINFILES_FIND_BUTTON);
-	};
-
-	//////////////////
-
-	void setDefaultButton(int nID)
-	{
-#if 0
-		// There is a problem when you:
-		// 1. open the find dialog
-		// 2. press the "close" buttom
-		// 3. open it again
-		// 4. search for a non existing text
-		// 5. when the "Can't find the text:" messagebox appears, hit "OK"
-		// 6. now, the "Close" button looks like the default button. (but it only looks like that)
-		//    if you hit "Enter" the "Find" button will be "pressed".
-		// I thought this code might fix this but it doesn't
-		// See: http://msdn.microsoft.com/en-us/library/ms645413(VS.85).aspx
-
-		HWND pButton;
-		DWORD dwDefInfo = SendMessage(_hSelf, DM_GETDEFID, 0, 0L);
-		if (HIWORD(dwDefInfo) == DC_HASDEFID && (int)LOWORD(dwDefInfo) != nID)
-		{
-			// Reset 'DefButton' style
-			pButton = GetDlgItem(_hSelf, (int)LOWORD(dwDefInfo));
-			if (pButton)
-				SendMessage(pButton, BM_SETSTYLE, LOWORD(BS_PUSHBUTTON | BS_RIGHT ), MAKELPARAM(TRUE, 0));
-		}
-
-		SendMessage(_hSelf, DM_SETDEFID, (WPARAM)nID, 0L);
-		pButton = GetDlgItem(_hSelf, nID);
-		if (pButton)
-		{
-			SendMessage(pButton, BM_SETSTYLE, LOWORD(BS_DEFPUSHBUTTON), MAKELPARAM(TRUE, 0));
-		}
-#endif
-		SendMessage(_hSelf, DM_SETDEFID, (WPARAM)nID, 0L);
-	}
-	////////////////////////
-
-	void gotoCorrectTab() {
-		int currentIndex = _tab.getCurrentTabIndex();
-		if (currentIndex != _currentStatus)
-			_tab.activateAt(_currentStatus);
-	};
+	void gotoCorrectTab();
 
 	bool isCheckedOrNot(int checkControlID) const {
 		return (BST_CHECKED == ::SendMessage(::GetDlgItem(_hSelf, checkControlID), BM_GETCHECK, 0, 0));
 	};
 
 	void updateCombos();
-	void updateCombo(int comboID) {
-		bool isUnicode = (*_ppEditView)->getCurrentBuffer()->getUnicodeMode() != uni8Bit;
-		HWND hCombo = ::GetDlgItem(_hSelf, comboID);
-		addText2Combo(getTextFromCombo(hCombo, isUnicode).c_str(), hCombo, isUnicode);
-	};
+	void updateCombo(int comboID);
 	void fillFindHistory();
-	void fillComboHistory(int id, int count, generic_string **pStrings);
-	void saveComboHistory(int id, int maxcount, int& oldcount, generic_string **pStrings);
+	void fillComboHistory(int id, int count, std::generic_string **pStrings);
+	void saveComboHistory(int id, int maxcount, int& oldcount, std::generic_string **pStrings);
 };
 
 //FindIncrementDlg: incremental search dialog, docked in rebar
@@ -540,28 +192,12 @@ class FindIncrementDlg : public StaticDialog
 {
 public :
 	FindIncrementDlg() : _pFRDlg(NULL), _pRebar(NULL) {};
-	void init(HINSTANCE hInst, HWND hPere, FindReplaceDlg *pFRDlg, bool isRTL = false) {
-		Window::init(hInst, hPere);
-		if (!pFRDlg)
-			throw int(9910);
-		_pFRDlg = pFRDlg;
-		create(IDD_INCREMENT_FIND, isRTL);
-		_isRTL = isRTL;
-	};
+	void init(HINSTANCE hInst, HWND hPere, FindReplaceDlg *pFRDlg, bool isRTL = false);
 	virtual void destroy();
 	virtual void display(bool toShow = true) const;
 
 	void setSearchText(const TCHAR * txt2find, bool isUTF8 = false);
-	void setFindStatus(FindStatus iStatus) {
-		static TCHAR *findStatus[] = { TEXT(""), // FSFound
-		                               TEXT("Phrase not found"), //FSNotFound
-		                               TEXT("Reached top of page, continued from bottom"), // FSTopReached
-		                               TEXT("Reached end of page, continued from top")}; // FSEndReached
-		if (iStatus<0 || iStatus >= sizeof(findStatus)/sizeof(findStatus[0]))
-			return; // out of range
-		::SendDlgItemMessage(_hSelf, IDC_INCFINDSTATUS, WM_SETTEXT, 0, (LPARAM)findStatus[iStatus]);
-	}
-
+	void setFindStatus(FindStatus iStatus);
 	void addToRebar(ReBar * rebar);
 private :
 	bool _isRTL;

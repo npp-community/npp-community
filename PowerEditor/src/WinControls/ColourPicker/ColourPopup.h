@@ -21,7 +21,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define COLOUR_POPUP_H
 
 #include "Window.h"
-#include "ColourPopupResource.h"
 #include "resource.h"
 
 #define WM_PICKUP_COLOR (COLOURPOPUP_USER + 1)
@@ -40,11 +39,7 @@ public :
 
 	void create(int dialogID);
 
-        void doDialog(POINT p) {
-            if (!isCreated())
-                create(IDD_COLOUR_POPUP);
-            ::SetWindowPos(_hSelf, HWND_TOP, p.x, p.y, _rc.right - _rc.left, _rc.bottom - _rc.top, SWP_SHOWWINDOW);
-	};
+    void doDialog(POINT p);
 
     virtual void destroy() {
 	    ::DestroyWindow(_hSelf);
@@ -58,9 +53,6 @@ private :
 
 	static BOOL CALLBACK dlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 	BOOL CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
-
-
-
 };
 
 #endif //COLOUR_POPUP_H

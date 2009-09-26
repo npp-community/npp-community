@@ -18,14 +18,16 @@
 #ifndef SCINTILLA_EDIT_VIEW_H
 #define SCINTILLA_EDIT_VIEW_H
 
-#include "Scintilla.h"
+#include "Window.h"
+#include "BufferID.h"
+#include "Notepad_plus_msgs.h"
 #include "ScintillaRef.h"
-#include "SciLexer.h"
-#include "Buffer.h"
-#include "colors.h"
-#include "UserDefineDialog.h"
-#include "xpm_icons.h"
-#include "resource.h"
+
+// Forward declarations
+class NppParameters;
+struct CharacterRange;
+class UserDefineDialog;
+struct Style;
 
 #ifndef WM_MOUSEWHEEL
 #define WM_MOUSEWHEEL 0x020A
@@ -43,7 +45,6 @@
 #define GET_APPCOMMAND_LPARAM(lParam) ((short)(HIWORD(lParam) & ~FAPPCOMMAND_MASK))
 #endif //WM_APPCOMMAND
 
-class NppParameters;
 
 #define NB_WORD_LIST 4
 #define WORD_LIST_LEN 256
@@ -88,7 +89,7 @@ const bool fold_collapse = false;
 const bool UPPERCASE = true;
 const bool LOWERCASE = false;
 
-typedef vector<pair<int, int> > ColumnModeInfo;
+typedef std::vector<std::pair<int, int> > ColumnModeInfo;
 const UCHAR MASK_FORMAT = 0x03;
 const UCHAR MASK_ZERO_LEADING = 0x04;
 const UCHAR BASE_10 = 0x00; // Dec
@@ -125,40 +126,12 @@ class ScintillaEditView : public Window
 	friend class Notepad_plus;
 	friend class Finder;
 public:
-	ScintillaEditView()
-		: Window(), _pScintillaFunc(NULL),_pScintillaPtr(NULL),
-		  _folderStyle(FOLDER_STYLE_BOX), _lineNumbersShown(false), _wrapRestoreNeeded(false),
-		  _currentHotspotStyleMap(NULL), _currentHotspotOriginMap(NULL)
-	{
-		++_refCount;
-	};
+	ScintillaEditView();
 
-	virtual ~ScintillaEditView()
-	{
-		--_refCount;
-
-		if ((!_refCount)&&(_hLib))
-		{
-			::FreeLibrary(_hLib);
-		}
-
-		for (BufferStyleMap::iterator it(_hotspotStyles.begin()); it != _hotspotStyles.end(); ++it )
-		{
-			for (StyleMap::iterator it2(it->second->begin()) ; it2 != it->second->end() ; ++it2)
-			{
-				if (it2->second._fontName != NULL)
-					delete [] it2->second._fontName;
-			}
-			delete it->second;
-		}
-
-		for (BufferHotspotOriginMap::iterator it(_hotspotOrigins.begin()); it != _hotspotOrigins.end(); ++it )
-		{
-			delete it->second;
-		}
-	};
+	virtual ~ScintillaEditView();
 	virtual void destroy()
 	{
+
 		::DestroyWindow(_hSelf);
 		_hSelf = NULL;
 	};
@@ -177,10 +150,7 @@ public:
 	void insertGenericTextFrom(int position, const TCHAR *text2insert) const;
 	void replaceSelWith(const char * replaceText);
 
-	int getSelectedTextCount() {
-		CharacterRange range = getSelection();
-		return (range.cpMax - range.cpMin);
-	};
+	int getSelectedTextCount();
 
 	char * getSelectedText(char * txt, int size, bool expand = true);
 	TCHAR * getGenericSelectedText(TCHAR * txt, int size, bool expand = true);
@@ -200,40 +170,13 @@ public:
 	void saveCurrentFold();
 	void restoreCurrentFold();
 
-	int getCurrentDocLen() const {
-		return int(execute(SCI_GETLENGTH));
-	};
-
-	CharacterRange getSelection() const {
-		CharacterRange crange;
-		crange.cpMin = long(execute(SCI_GETSELECTIONSTART));
-		crange.cpMax = long(execute(SCI_GETSELECTIONEND));
-		return crange;
-	};
-
-	void getWordToCurrentPos(TCHAR * str, int strLen) const {
-		int caretPos = execute(SCI_GETCURRENTPOS);
-		int startPos = static_cast<int>(execute(SCI_WORDSTARTPOSITION, caretPos, true));
-
-		str[0] = '\0';
-		if ((caretPos - startPos) < strLen)
-			getGenericText(str, startPos, caretPos);
-	};
-
-    void doUserDefineDlg(bool willBeShown = true, bool isRTL = false) {
-        _userDefineDlg.doDialog(willBeShown, isRTL);
-    };
-
-    static UserDefineDialog * getUserDefineDlg() {return &_userDefineDlg;};
-
-    void setCaretColorWidth(int color, int width = 1) const {
-        execute(SCI_SETCARETFORE, color);
-        execute(SCI_SETCARETWIDTH, width);
-    };
-
-	void beSwitched() {
-		_userDefineDlg.setScintilla(this);
-	};
+	int getCurrentDocLen() const;
+	void getSelection(CharacterRange& range) const;
+	void getWordToCurrentPos(TCHAR * str, int strLen) const;
+    void doUserDefineDlg(bool willBeShown = true, bool isRTL = false);
+    static UserDefineDialog * getUserDefineDlg() {return _userDefineDlg;};
+    void setCaretColorWidth(int color, int width = 1) const;
+	void beSwitched();
 
     //Marge member and method
     static const int _SC_MARGE_LINENUMBER;
@@ -241,237 +184,72 @@ public:
     static const int _SC_MARGE_FOLDER;
 	//static const int _SC_MARGE_MODIFMARKER;
 
-    void showMargin(int whichMarge, bool willBeShowed = true) {
-        if (whichMarge == _SC_MARGE_LINENUMBER)
-			showLineNumbersMargin(willBeShowed);
-        else
-		{
-			int width = 3;
-			if (whichMarge == _SC_MARGE_SYBOLE || whichMarge == _SC_MARGE_FOLDER)
-				width = 14;
-            execute(SCI_SETMARGINWIDTHN, whichMarge, willBeShowed?width:0);
-		}
-    };
-
-    bool hasMarginShowed(int witchMarge) {
-		return (execute(SCI_GETMARGINWIDTHN, witchMarge, 0) != 0);
-    };
-
+    void showMargin(int whichMarge, bool willBeShowed = true);
+    bool hasMarginShowed(int witchMarge);
     void marginClick(int position, int modifiers);
-
-    void setMakerStyle(folderStyle style) {
-        if (_folderStyle == style)
-            return;
-        _folderStyle = style;
-        for (int i = 0 ; i < NB_FOLDER_STATE ; i++)
-            defineMarker(_markersArray[FOLDER_TYPE][i], _markersArray[style][i], white, grey);
-    };
+    void setMakerStyle(folderStyle style);
 
     folderStyle getFolderStyle() {return _folderStyle;};
-
-	void showWSAndTab(bool willBeShowed = true) {
-		execute(SCI_SETVIEWWS, willBeShowed?SCWS_VISIBLEALWAYS:SCWS_INVISIBLE);
-	};
-
-	void showEOL(bool willBeShowed = true) {
-		execute(SCI_SETVIEWEOL, willBeShowed);
-	};
-
-	bool isEolVisible() {
-		return (execute(SCI_GETVIEWEOL) != 0);
-	};
+	void showWSAndTab(bool willBeShowed = true);
+	void showEOL(bool willBeShowed = true);
+	bool isEolVisible();
 	void showInvisibleChars(bool willBeShowed = true) {
 		showWSAndTab(willBeShowed);
 		showEOL(willBeShowed);
 	};
 
-	bool isInvisibleCharsShown() {
-		return (execute(SCI_GETVIEWWS) != 0);
-	};
+	bool isInvisibleCharsShown();
+	void showIndentGuideLine(bool willBeShowed = true);
+	bool isShownIndentGuide() const;
 
-	void showIndentGuideLine(bool willBeShowed = true) {
-		execute(SCI_SETINDENTATIONGUIDES, (WPARAM)willBeShowed?(SC_IV_LOOKBOTH):(SC_IV_NONE));
-	};
+	bool isMouseWheelZoomEnable() const;
+	void enableMouseWheelZoom(bool enable);
 
-	bool isShownIndentGuide() const {
-		return (execute(SCI_GETINDENTATIONGUIDES) != 0);
-	};
+    void wrap(bool willBeWrapped = true);
+    bool isWrap() const;
+	bool isWrapSymbolVisible() const;
+    void showWrapSymbol(bool willBeShown = true);
 
-	bool isMouseWheelZoomEnable() const {
-		return (execute(SCI_GETWHEELZOOMING) != 0);
-	};
+	long getCurrentLineNumber()const;
+	long lastZeroBasedLineNumber() const;
 
-	bool enableMouseWheelZoom(bool enable) {
-		execute(SCI_SETWHEELZOOMING, WPARAM(enable));
-	};
+	long getCurrentXOffset()const;
+	void setCurrentXOffset(long xOffset);
 
-    void wrap(bool willBeWrapped = true) {
-        execute(SCI_SETWRAPMODE, (WPARAM)willBeWrapped);
-    };
+	void scroll(int column, int line);
 
-    bool isWrap() const {
-        return (execute(SCI_GETWRAPMODE) == SC_WRAP_WORD);
-    };
+	long getCurrentPointX()const;
+	long getCurrentPointY()const;
 
-	bool isWrapSymbolVisible() const {
-		return (execute(SCI_GETWRAPVISUALFLAGS) != SC_WRAPVISUALFLAG_NONE);
-	};
+	long getTextHeight()const;
 
-    void showWrapSymbol(bool willBeShown = true) {
-		execute(SCI_SETWRAPVISUALFLAGSLOCATION, SC_WRAPVISUALFLAGLOC_END_BY_TEXT);
-		execute(SCI_SETWRAPVISUALFLAGS, willBeShown?SC_WRAPVISUALFLAG_END:SC_WRAPVISUALFLAG_NONE);
-    };
+	void gotoLine(int line);
 
-	long getCurrentLineNumber()const {
-		return long(execute(SCI_LINEFROMPOSITION, execute(SCI_GETCURRENTPOS)));
-	};
+	long getCurrentColumnNumber() const;
 
-	long lastZeroBasedLineNumber() const {
-		int endPos = execute(SCI_GETLENGTH);
-		return execute(SCI_LINEFROMPOSITION, endPos);
-	};
+	long getSelectedByteNumber() const;
 
-	long getCurrentXOffset()const{
-		return long(execute(SCI_GETXOFFSET));
-	};
-
-	void setCurrentXOffset(long xOffset){
-		execute(SCI_SETXOFFSET,xOffset);
-	};
-
-	void scroll(int column, int line){
-		execute(SCI_LINESCROLL, column, line);
-	};
-
-	long getCurrentPointX()const{
-		return long (execute(SCI_POINTXFROMPOSITION, 0, execute(SCI_GETCURRENTPOS)));
-	};
-
-	long getCurrentPointY()const{
-		return long (execute(SCI_POINTYFROMPOSITION, 0, execute(SCI_GETCURRENTPOS)));
-	};
-
-	long getTextHeight()const{
-		return long(execute(SCI_TEXTHEIGHT));
-	};
-
-	void gotoLine(int line){
-		if (line < execute(SCI_GETLINECOUNT))
-			execute(SCI_GOTOLINE,line);
-	};
-
-	long getCurrentColumnNumber() const {
-        return long(execute(SCI_GETCOLUMN, execute(SCI_GETCURRENTPOS)));
-    };
-
-	long getSelectedByteNumber() const {
-		long start = long(execute(SCI_GETSELECTIONSTART));
-		long end = long(execute(SCI_GETSELECTIONEND));
-		return (start < end)?end-start:start-end;
-    };
-
-	long getLineLength(int line) const {
-		return long(execute(SCI_GETLINEENDPOSITION, line) - execute(SCI_POSITIONFROMLINE, line));
-	};
-
-	long getLineIndent(int line) const {
-		return long(execute(SCI_GETLINEINDENTATION, line));
-	};
-
+	long getLineLength(int line) const;
+	long getLineIndent(int line) const;
 	void setLineIndent(int line, int indent) const;
 
-	void showLineNumbersMargin(bool show){
-		if (show == _lineNumbersShown) return;
-		_lineNumbersShown = show;
-		if (show)
-		{
-			updateLineNumberWidth();
-		}
-		else
-		{
-			execute(SCI_SETMARGINWIDTHN, _SC_MARGE_LINENUMBER, 0);
-		}
-	}
+	void showLineNumbersMargin(bool show);
 
-	void updateLineNumberWidth() {
-		if (_lineNumbersShown)
-		{
-			int linesVisible = (int) execute(SCI_LINESONSCREEN);
-			if (linesVisible)
-			{
-				int firstVisibleLineVis = (int) execute(SCI_GETFIRSTVISIBLELINE);
-				int lastVisibleLineVis = linesVisible + firstVisibleLineVis + 1;
-				int i = 0;
-				while (lastVisibleLineVis)
-				{
-					lastVisibleLineVis /= 10;
-					i++;
-				}
-				i = max(i, 3);
-				{
-					int pixelWidth = int(8 + i * execute(SCI_TEXTWIDTH, STYLE_LINENUMBER, (LPARAM)"8"));
-					execute(SCI_SETMARGINWIDTHN, _SC_MARGE_LINENUMBER, pixelWidth);
-				}
-			}
-		}
-	};
+	void updateLineNumberWidth();
 
-	void setCurrentLineHiLiting(bool isHiliting, COLORREF bgColor) const {
-		execute(SCI_SETCARETLINEVISIBLE, isHiliting);
-		if (!isHiliting)
-			return;
-		execute(SCI_SETCARETLINEBACK, bgColor);
-	};
-
-	bool isCurrentLineHiLiting() const {
-		return (execute(SCI_GETCARETLINEVISIBLE) != 0);
-	};
+	void setCurrentLineHiLiting(bool isHiliting, COLORREF bgColor) const;
+	bool isCurrentLineHiLiting() const;
 
 	void performGlobalStyles();
 
 	void expand(int &line, bool doExpand, bool force = false, int visLevels = 0, int level = -1);
 
-	void currentLineUp() const {
-		int currentLine = getCurrentLineNumber();
-		if (currentLine != 0)
-		{
-			execute(SCI_BEGINUNDOACTION);
-			currentLine--;
-			execute(SCI_LINETRANSPOSE);
-			execute(SCI_GOTOLINE, currentLine);
-			execute(SCI_ENDUNDOACTION);
-		}
-	};
-
-	void currentLineDown() const {
-		int currentLine = getCurrentLineNumber();
-		if (currentLine != (execute(SCI_GETLINECOUNT) - 1))
-		{
-			execute(SCI_BEGINUNDOACTION);
-			currentLine++;
-			execute(SCI_GOTOLINE, currentLine);
-			execute(SCI_LINETRANSPOSE);
-			execute(SCI_ENDUNDOACTION);
-		}
-	};
+	void currentLineUp() const;
+	void currentLineDown() const;
 
 	void convertSelectedTextTo(bool Case);
-
-    void convertSelectedTextToLowerCase() {
-		// if system is w2k or xp
-		if ((NppParameters::getInstance())->isTransparentAvailable())
-			convertSelectedTextTo(LOWERCASE);
-		else
-			execute(SCI_LOWERCASE);
-	};
-
-    void convertSelectedTextToUpperCase() {
-		// if system is w2k or xp
-		if ((NppParameters::getInstance())->isTransparentAvailable())
-			convertSelectedTextTo(UPPERCASE);
-		else
-			execute(SCI_UPPERCASE);
-	};
+    void convertSelectedTextToLowerCase();
+    void convertSelectedTextToUpperCase();
 
 	void collapse(int level2Collapse, bool mode);
 	void foldAll(bool mode);
@@ -488,12 +266,7 @@ public:
 	void columnReplace(ColumnModeInfo & cmi, int initial, int incr, UCHAR format);
 
 	void foldChanged(int line, int levelNow, int levelPrev);
-	void clearIndicator(int indicatorNumber) {
-		int docStart = 0;
-		int docEnd = getCurrentDocLen();
-		execute(SCI_SETINDICATORCURRENT, indicatorNumber);
-		execute(SCI_INDICATORCLEARRANGE, docStart, docEnd-docStart);
-	};
+	void clearIndicator(int indicatorNumber);
 
 	static LanguageName ScintillaEditView::langNames[L_EXTERNAL+1];
 
@@ -508,25 +281,7 @@ public:
 	void notifyMarkers(Buffer * buf, bool isHide, int location, bool del);
 	void runMarkers(bool doHide, int searchStart, bool endOfDoc, bool doDelete);
 
-	bool isSelecting() const {
-		static CharacterRange previousSelRange = getSelection();
-		CharacterRange currentSelRange = getSelection();
-
-		if (currentSelRange.cpMin == currentSelRange.cpMax)
-		{
-			previousSelRange = currentSelRange;
-			return false;
-		}
-
-		if ((previousSelRange.cpMin == currentSelRange.cpMin) || (previousSelRange.cpMax == currentSelRange.cpMax))
-		{
-			previousSelRange = currentSelRange;
-			return true;
-		}
-
-		previousSelRange = currentSelRange;
-		return false;
-	};
+	bool isSelecting() const;
 	void setHiLiteResultWords(const TCHAR *keywords);
 /*
 	pair<size_t, bool> getLineUndoState(size_t currentLine) {
@@ -555,29 +310,11 @@ protected:
 	static HINSTANCE _hLib;
 	static int _refCount;
 
-    static UserDefineDialog _userDefineDlg;
+    static UserDefineDialog* _userDefineDlg;
 
     static const int _markersArray[][NB_FOLDER_STATE];
 
-	static LRESULT CALLBACK scintillaStatic_Proc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
-		ScintillaEditView *pScint = (ScintillaEditView *)(::GetWindowLongPtr(hwnd, GWL_USERDATA));
-		//
-		if (Message == WM_MOUSEWHEEL || Message == WM_MOUSEHWHEEL)
-		{
-			POINT pt;
-			POINTS pts = MAKEPOINTS(lParam);
-			POINTSTOPOINT(pt, pts);
-			HWND hwndOnMouse = WindowFromPoint(pt);
-			ScintillaEditView *pScintillaOnMouse = (ScintillaEditView *)(::GetWindowLongPtr(hwndOnMouse, GWL_USERDATA));
-			if (pScintillaOnMouse != pScint)
-				return ::SendMessage(hwndOnMouse, Message, wParam, lParam);
-		}
-		if (pScint)
-			return (pScint->scintillaNew_Proc(hwnd, Message, wParam, lParam));
-		else
-			return ::DefWindowProc(hwnd, Message, wParam, lParam);
-		//
-	};
+	static LRESULT CALLBACK scintillaStatic_Proc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 
 	LRESULT scintillaNew_Proc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 
@@ -604,7 +341,7 @@ protected:
 
 	bool _wrapRestoreNeeded;
 
-	typedef std::map<int, Style> StyleMap;
+	typedef std::map<int, Style*> StyleMap;
 	typedef std::map<BufferID, StyleMap*> BufferStyleMap;
 	BufferStyleMap _hotspotStyles;
 	StyleMap* _currentHotspotStyleMap;
@@ -621,16 +358,15 @@ protected:
 	void setKeywords(LangType langType, const char *keywords, int index);
 	void setLexer(int lexerID, LangType langType, int whichList);
 	inline void makeStyle(LangType langType, const TCHAR **keywordArray = NULL);
+
 	void updateHotspotMaps();
 	bool IsHotspotStyleID(int styleID) const;
 	bool getHotSpotFromStyle(Style& out_hotspot, int idStyleFrom) const;
 	void createHotSpotFromStyle(Style& out_hotspot, int idStyleFrom, int nativeLangEncoding = -1) const;
-	void setHotspotStyle(Style& styleToSet, int originalStyleId);
-	void setStyle(Style styleToSet);			//NOT by reference	(style edited)
-	void setSpecialStyle(const Style& styleToSet);	//by reference
-	void setSpecialIndicator(const Style& styleToSet) {
-		execute(SCI_INDICSETFORE, styleToSet._styleID, styleToSet._bgColor);
-	};
+	void setHotspotStyle(const Style& styleToSet, int originalStyleId);
+	void setStyle(const Style& styleToSet);
+	void setSpecialStyle(const Style& styleToSet);
+	void setSpecialIndicator(const Style& styleToSet);
 
 	//Complex lexers (same lexer, different language)
 	void setXmlLexer(LangType type);
@@ -642,195 +378,50 @@ protected:
 	void setEmbeddedJSLexer();
     void setPhpEmbeddedLexer();
     void setEmbeddedAspLexer();
+
 	//Simple lexers
-	void setCssLexer() {
-		setLexer(SCLEX_CSS, L_CSS, LIST_0 | LIST_1);
-	};
-
-	void setLuaLexer() {
-		setLexer(SCLEX_LUA, L_LUA, LIST_0 | LIST_1 | LIST_2 | LIST_3);
-	};
-
-	void setMakefileLexer() {
-		execute(SCI_SETLEXER, SCLEX_MAKEFILE);
-		makeStyle(L_MAKEFILE);
-	};
-
-	void setIniLexer() {
-		execute(SCI_SETLEXER, SCLEX_PROPERTIES);
-		execute(SCI_STYLESETEOLFILLED, SCE_PROPS_SECTION, true);
-		makeStyle(L_INI);
-	};
-
-
-	void setSqlLexer() {
-		setLexer(SCLEX_SQL, L_SQL, LIST_0);
-	};
-
-	void setBashLexer() {
-		setLexer(SCLEX_BASH, L_BASH, LIST_0);
-	};
-
-	void setVBLexer() {
-		setLexer(SCLEX_VB, L_VB, LIST_0);
-	};
-
-	void setPascalLexer() {
-		setLexer(SCLEX_PASCAL, L_PASCAL, LIST_0);
-	};
-
-	void setPerlLexer() {
-		setLexer(SCLEX_PERL, L_PERL, LIST_0);
-	};
-
-	void setPythonLexer() {
-		setLexer(SCLEX_PYTHON, L_PYTHON, LIST_0);
-	};
-
-	void setBatchLexer() {
-		setLexer(SCLEX_BATCH, L_BATCH, LIST_0);
-	};
-
-	void setTeXLexer() {
-		for (int i = 0 ; i < 4 ; i++)
-			execute(SCI_SETKEYWORDS, i, reinterpret_cast<LPARAM>(TEXT("")));
-		setLexer(SCLEX_TEX, L_TEX, 0);
-	};
-
-	void setNsisLexer() {
-		setLexer(SCLEX_NSIS, L_NSIS, LIST_0 | LIST_1 | LIST_2 | LIST_3);
-	};
-
-	void setFortranLexer() {
-		setLexer(SCLEX_F77, L_FORTRAN, LIST_0 | LIST_1 | LIST_2);
-	};
-
-	void setLispLexer(){
-		setLexer(SCLEX_LISP, L_LISP, LIST_0);
-	};
-
-	void setSchemeLexer(){
-		setLexer(SCLEX_LISP, L_SCHEME, LIST_0);
-	};
-
-	void setAsmLexer(){
-		setLexer(SCLEX_ASM, L_ASM, LIST_0 | LIST_1 | LIST_2 | LIST_3 | LIST_4 | LIST_5);
-	};
-
-	void setDiffLexer(){
-		setLexer(SCLEX_DIFF, L_DIFF, LIST_NONE);
-	};
-
-	void setPropsLexer(){
-		setLexer(SCLEX_PROPERTIES, L_PROPS, LIST_NONE);
-	};
-
-	void setPostscriptLexer(){
-		setLexer(SCLEX_PS, L_PS, LIST_0 | LIST_1 | LIST_2 | LIST_3);
-	};
-
-	void setRubyLexer(){
-		setLexer(SCLEX_RUBY, L_RUBY, LIST_0);
-		execute(SCI_STYLESETEOLFILLED, SCE_RB_POD, true);
-	};
-
-	void setSmalltalkLexer(){
-		setLexer(SCLEX_SMALLTALK, L_SMALLTALK, LIST_0);
-	};
-
-	void setVhdlLexer(){
-		setLexer(SCLEX_VHDL, L_VHDL, LIST_0 | LIST_1 | LIST_2 | LIST_3 | LIST_4 | LIST_5 | LIST_6);
-	};
-
-	void setKixLexer(){
-		setLexer(SCLEX_KIX, L_KIX, LIST_0 | LIST_1 | LIST_2);
-	};
-
-	void setAutoItLexer(){
-		setLexer(SCLEX_AU3, L_AU3, LIST_0 | LIST_1 | LIST_2 | LIST_3 | LIST_4 | LIST_5 | LIST_6);
-	};
-
-	void setCamlLexer(){
-		setLexer(SCLEX_CAML, L_CAML, LIST_0 | LIST_1 | LIST_2);
-	};
-
-	void setAdaLexer(){
-		setLexer(SCLEX_ADA, L_ADA, LIST_0);
-	};
-
-	void setVerilogLexer(){
-		setLexer(SCLEX_VERILOG, L_VERILOG, LIST_0 | LIST_1);
-	};
-
-	void setMatlabLexer(){
-		setLexer(SCLEX_MATLAB, L_MATLAB, LIST_0);
-	};
-
-	void setHaskellLexer(){
-		setLexer(SCLEX_HASKELL, L_HASKELL, LIST_0);
-	};
-
-	void setInnoLexer() {
-		setLexer(SCLEX_INNOSETUP, L_INNO, LIST_0 | LIST_1 | LIST_2 | LIST_3 | LIST_4 | LIST_5);
-	};
-
-	void setCmakeLexer() {
-		setLexer(SCLEX_CMAKE, L_CMAKE, LIST_0 | LIST_1 | LIST_2);
-	};
-
-	void setYamlLexer() {
-		setLexer(SCLEX_YAML, L_YAML, LIST_0);
-	};
-
-	void setSearchResultLexer() {
-		execute(SCI_STYLESETEOLFILLED, SCE_SEARCHRESULT_FILE_HEADER, true);
-		execute(SCI_STYLESETEOLFILLED, SCE_SEARCHRESULT_SEARCH_HEADER, true);
-		setLexer(SCLEX_SEARCHRESULT, L_SEARCHRESULT, 0);
-	};
-
-	bool isNeededFolderMarge(LangType typeDoc) const {
-		switch (typeDoc)
-		{
-			case L_NFO:
-			case L_BATCH:
-			case L_TXT:
-			case L_MAKEFILE:
-            //case L_SQL:
-			case L_ASM:
-			case L_HASKELL:
-			case L_PROPS:
-			case L_SMALLTALK:
-			case L_KIX:
-			case L_ADA:
-				return false;
-			default:
-				return true;
-		}
-	};
+	void setCssLexer();
+	void setLuaLexer();
+	void setMakefileLexer();
+	void setIniLexer();
+	void setSqlLexer();
+	void setBashLexer();
+	void setVBLexer();
+	void setPascalLexer();
+	void setPerlLexer();
+	void setPythonLexer();
+	void setBatchLexer();
+	void setTeXLexer();
+	void setNsisLexer();
+	void setFortranLexer();
+	void setLispLexer();
+	void setSchemeLexer();
+	void setAsmLexer();
+	void setDiffLexer();
+	void setPropsLexer();
+	void setPostscriptLexer();
+	void setRubyLexer();
+	void setSmalltalkLexer();
+	void setVhdlLexer();
+	void setKixLexer();
+	void setAutoItLexer();
+	void setCamlLexer();
+	void setAdaLexer();
+	void setVerilogLexer();
+	void setMatlabLexer();
+	void setHaskellLexer();
+	void setInnoLexer();
+	void setCmakeLexer();
+	void setYamlLexer();
+	void setSearchResultLexer();
+	bool isNeededFolderMarge(LangType typeDoc) const;
 //END: Lexers and Styling
 
-    void defineMarker(int marker, int markerType, COLORREF fore, COLORREF back) {
-	    execute(SCI_MARKERDEFINE, marker, markerType);
-	    execute(SCI_MARKERSETFORE, marker, fore);
-	    execute(SCI_MARKERSETBACK, marker, back);
-    };
+    void defineMarker(int marker, int markerType, COLORREF fore, COLORREF back);
 
-	bool isCJK() const {
-		return ((_codepage == CP_CHINESE_TRADITIONAL) || (_codepage == CP_CHINESE_SIMPLIFIED) ||
-			    (_codepage == CP_JAPANESE) || (_codepage == CP_KOREAN) || (_codepage == CP_GREEK));
-	};
+	bool isCJK() const;
 
-	int codepage2CharSet() const {
-		switch (_codepage)
-		{
-			case CP_CHINESE_TRADITIONAL : return SC_CHARSET_CHINESEBIG5;
-			case CP_CHINESE_SIMPLIFIED : return SC_CHARSET_GB2312;
-			case CP_KOREAN : return SC_CHARSET_HANGUL;
-			case CP_JAPANESE : return SC_CHARSET_SHIFTJIS;
-			case CP_GREEK : return SC_CHARSET_GREEK;
-			default : return 0;
-		}
-	};
+	int codepage2CharSet() const;
 
 	bool expandWordSelection();
 

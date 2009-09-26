@@ -17,18 +17,19 @@
 
 #include "precompiled_headers.h"
 #include "FileDialog.h"
+#include "Parameters.h"
 
-static generic_string changeExt(generic_string fn, generic_string ext)
+static std::generic_string changeExt(std::generic_string fn, std::generic_string ext)
 {
 	if (ext == TEXT(""))
 		return fn;
 
-	generic_string fnExt = fn;
+	std::generic_string fnExt = fn;
 
 	size_t index = fnExt.find_last_of(TEXT("."));
-	generic_string extension = TEXT(".");
+	std::generic_string extension = TEXT(".");
 	extension += ext;
-	if (index == generic_string::npos)
+	if (index == std::generic_string::npos)
 	{
 		fnExt += extension;
 	}
@@ -80,7 +81,7 @@ FileDialog::FileDialog(HWND hwnd, HINSTANCE hInst)
 
 	_fileName[0] = '\0';
 
-	_winVersion = (NppParameters::getInstance())->getWinVersion();
+	_winVersion = getWinVersion();
 
 	_ofn.lStructSize = sizeof(_ofn);
 	if (_winVersion < WV_W2K)
@@ -313,7 +314,7 @@ TCHAR * FileDialog::doSaveDlg()
 
 static HWND hFileDlg = NULL;
 static WNDPROC oldProc = NULL;
-static generic_string currentExt = TEXT("");
+static std::generic_string currentExt = TEXT("");
 
 static BOOL CALLBACK fileDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message)
@@ -332,7 +333,7 @@ static BOOL CALLBACK fileDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 
 					if (currentExt != TEXT(""))
 					{
-						generic_string fnExt = changeExt(fn, currentExt);
+						std::generic_string fnExt = changeExt(fn, currentExt);
 						::SetWindowText(fnControl, fnExt.c_str());
 					}
 					return oldProc(hwnd, message, wParam, lParam);
@@ -357,7 +358,7 @@ static TCHAR * get1stExt(TCHAR *ext) { // precondition : ext should be under the
 	return begin;
 };
 
-static generic_string addExt(HWND textCtrl, HWND typeCtrl) {
+static std::generic_string addExt(HWND textCtrl, HWND typeCtrl) {
 	TCHAR fn[MAX_PATH];
 	::GetWindowText(textCtrl, fn, MAX_PATH);
 
@@ -370,11 +371,11 @@ static generic_string addExt(HWND textCtrl, HWND typeCtrl) {
 	TCHAR *pExt = get1stExt(ext);
 	if (*fn != '\0')
 	{
-		generic_string fnExt = changeExt(fn, pExt);
+		std::generic_string fnExt = changeExt(fn, pExt);
 		::SetWindowText(textCtrl, fnExt.c_str());
 	}
 
-	generic_string returnExt = pExt;
+	std::generic_string returnExt = pExt;
 	delete[] ext;
 	return returnExt;
 };

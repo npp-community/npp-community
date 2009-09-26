@@ -18,10 +18,6 @@
 #ifndef PROCESSUS_H
 #define PROCESSUS_H
 
-#include "Common.h"
-
-using namespace std;
-
 enum progType {WIN32_PROG, CONSOLE_PROG};
 
 class Process
@@ -65,17 +61,17 @@ public:
 protected:
     progType _type;
 
-	// LES ENTREES
+	// INPUTS
     TCHAR _command[MAX_PATH];
 	TCHAR _args[MAX_PATH];
 	TCHAR _curDir[MAX_PATH];
 
-	// LES SORTIES
-	generic_string _stdoutStr;
-	generic_string _stderrStr;
+	// OUTPUTS
+	std::generic_string _stdoutStr;
+	std::generic_string _stderrStr;
 	int _exitCode;
 
-	// LES HANDLES
+	// HANDLES
     HANDLE _hPipeOutR;
 	HANDLE _hPipeErrR;
 	HANDLE _hProcess;

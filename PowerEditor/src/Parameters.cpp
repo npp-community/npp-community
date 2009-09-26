@@ -16,11 +16,21 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
+#include "tinyxmlA.h"
+#include "tinyxml.h"
+
 #include "Parameters.h"
 #include "FileDialog.h"
 #include "ScintillaEditView.h"
 
 #include "keys.h"
+#include "MenuCmdID.h"
+
+#include "resource.h"
+#include "colors.h"
+
+#include "npp_winver.h"
+#include "npp_session.h"
 
 struct WinMenuKeyDefinition {	//more or less matches accelerator table definition, easy copy/paste
 	//const TCHAR * name;	//name retrieved from menu?
@@ -172,7 +182,7 @@ WinMenuKeyDefinition winKeyDefs[] = {	//array of accelerator keys for all std me
 	{VK_NULL, 	IDM_FORMAT_CONV2_UCS_2BE,			false, false, false, NULL},
 	{VK_NULL, 	IDM_FORMAT_CONV2_UCS_2LE,			false, false, false, NULL},
 
-	{VK_NULL, 	IDM_SETTING_PREFERECE,				false, false, false, NULL},
+	{VK_NULL, 	IDM_SETTING_PREFERENCE,				false, false, false, NULL},
 	{VK_NULL, 	IDM_LANGSTYLE_CONFIG_DLG,			false, false, false, NULL},
 	{VK_NULL, 	IDM_SETTING_SHORTCUT_MAPPER,		false, false, false, NULL},
 
@@ -344,10 +354,6 @@ static int decStrVal(const TCHAR *str) {
 	return strVal(str, 10);
 };
 
-static int hexStrVal(const TCHAR *str) {
-	return strVal(str, 16);
-};
-
 static int getKwClassFromName(const TCHAR *str) {
 	if (!lstrcmp(TEXT("instre1"), str)) return LANG_INDEX_INSTR;
 	if (!lstrcmp(TEXT("instre2"), str)) return LANG_INDEX_INSTR2;
@@ -366,7 +372,7 @@ static int getKwClassFromName(const TCHAR *str) {
 #ifdef UNICODE
 #include "localizationString.h"
 
-wstring LocalizationSwitcher::getLangFromXmlFileName(wchar_t *fn) const
+std::wstring LocalizationSwitcher::getLangFromXmlFileName(wchar_t *fn) const
 {
 	size_t nbItem = sizeof(localizationDefs)/sizeof(LocalizationSwitcher::LocalizationDefinition);
 	for (size_t i = 0 ; i < nbItem ; i++)
@@ -377,7 +383,7 @@ wstring LocalizationSwitcher::getLangFromXmlFileName(wchar_t *fn) const
 	return TEXT("");
 }
 
-wstring LocalizationSwitcher::getXmlFilePathFromLangName(wchar_t *langName) const
+std::wstring LocalizationSwitcher::getXmlFilePathFromLangName(wchar_t *langName) const
 {
 	for (size_t i = 0 ; i < _localizationList.size() ; i++)
 	{
@@ -387,13 +393,13 @@ wstring LocalizationSwitcher::getXmlFilePathFromLangName(wchar_t *langName) cons
 	return TEXT("");
 }
 
-bool LocalizationSwitcher::addLanguageFromXml(wstring xmlFullPath)
+bool LocalizationSwitcher::addLanguageFromXml(std::wstring xmlFullPath)
 {
 	wchar_t * fn = ::PathFindFileNameW(xmlFullPath.c_str());
-	wstring foundLang = getLangFromXmlFileName(fn);
+	std::wstring foundLang = getLangFromXmlFileName(fn);
 	if (foundLang != TEXT(""))
 	{
-		_localizationList.push_back(pair<wstring, wstring>(foundLang, xmlFullPath));
+		_localizationList.push_back(std::pair<std::wstring, std::wstring>(foundLang, xmlFullPath));
 		return true;
 	}
 	return false;
@@ -401,7 +407,7 @@ bool LocalizationSwitcher::addLanguageFromXml(wstring xmlFullPath)
 
 bool LocalizationSwitcher::switchToLang(wchar_t *lang2switch) const
 {
-	wstring langPath = getXmlFilePathFromLangName(lang2switch);
+	std::wstring langPath = getXmlFilePathFromLangName(lang2switch);
 	if (langPath == TEXT(""))
 		return false;
 
@@ -411,7 +417,7 @@ bool LocalizationSwitcher::switchToLang(wchar_t *lang2switch) const
 #endif
 
 
-generic_string ThemeSwitcher::getThemeFromXmlFileName(const TCHAR *xmlFullPath) const
+std::generic_string ThemeSwitcher::getThemeFromXmlFileName(const TCHAR *xmlFullPath) const
 {
 	if ( 0 == _tcscmp(xmlFullPath, TEXT("")))
 	{
@@ -420,104 +426,12 @@ generic_string ThemeSwitcher::getThemeFromXmlFileName(const TCHAR *xmlFullPath) 
 	TCHAR fn[MAX_PATH];
 	lstrcpy(fn, ::PathFindFileName(xmlFullPath));
 	PathRemoveExtension(fn);
-	generic_string themeName = fn;
+	std::generic_string themeName = fn;
 	return themeName;
 }
 
-typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO);
-
-winVer getWindowsVersion()
-{
-	OSVERSIONINFOEX osvi;
-	SYSTEM_INFO si;
-	PGNSI pGNSI;
-	BOOL bOsVersionInfoEx;
-
-	ZeroMemory(&si, sizeof(SYSTEM_INFO));
-	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
-
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-
-	bOsVersionInfoEx = GetVersionEx ((OSVERSIONINFO *) &osvi);
-	if( !bOsVersionInfoEx )
-	{
-		osvi.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-		if (! GetVersionEx ( (OSVERSIONINFO *) &osvi) )
-			return WV_UNKNOWN;
-	}
-
-	pGNSI = (PGNSI) GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetNativeSystemInfo");
-	if(pGNSI != NULL)
-		pGNSI(&si);
-	else
-		GetSystemInfo(&si);
-
-   switch (osvi.dwPlatformId)
-   {
-		case VER_PLATFORM_WIN32_NT:
-		{
-			if ( osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1 )
-			{
-				return WV_WIN7;
-			}
-
-			if ( osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0 )
-			{
-				return WV_VISTA;
-			}
-
-			if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2 )
-			{
-				if (osvi.wProductType == VER_NT_WORKSTATION &&
-					   si.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_AMD64)
-				{
-					return WV_XPX64;
-				}
-				return WV_S2003;
-			}
-
-			if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1 )
-				return WV_XP;
-
-			if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0 )
-				return WV_W2K;
-
-			if ( osvi.dwMajorVersion <= 4 )
-				return WV_NT;
-		}
-		break;
-
-		// Test for the Windows Me/98/95.
-		case VER_PLATFORM_WIN32_WINDOWS:
-		{
-			if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 0)
-			{
-				return WV_95;
-			}
-
-			if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 10)
-			{
-				return WV_98;
-			}
-
-			if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 90)
-			{
-				return WV_ME;
-			}
-		}
-		break;
-
-      case VER_PLATFORM_WIN32s:
-		return WV_WIN32S;
-
-	  default :
-		return WV_UNKNOWN;
-   }
-   return WV_UNKNOWN;
-}
-
 NppParameters * NppParameters::_pSelf = new NppParameters;
-int FileDialog::_dialogFileBoxId = (NppParameters::getInstance())->getWinVersion() < WV_W2K?edt1:cmb13;
+int FileDialog::_dialogFileBoxId = getWinVersion() < WV_W2K?edt1:cmb13;
 
 NppParameters::NppParameters() : _pXmlDoc(NULL),_pXmlUserDoc(NULL), _pXmlUserStylerDoc(NULL),\
 								_pXmlUserLangDoc(NULL), /*_pXmlNativeLangDoc(NULL), */_pXmlNativeLangDocA(NULL),\
@@ -527,13 +441,12 @@ NppParameters::NppParameters() : _pXmlDoc(NULL),_pXmlUserDoc(NULL), _pXmlUserSty
 								_transparentFuncAddr(NULL), _enableThemeDialogTextureFuncAddr(NULL),\
 								_isTaskListRBUTTONUP_Active(false), _fileSaveDlgFilterIndex(-1), _asNotepadStyle(false), _isFindReplacing(false)
 {
+	_session = new Session();
+
 	_findHistory._nbFindHistoryPath = 0;
 	_findHistory._nbFindHistoryFilter = 0;
 	_findHistory._nbFindHistoryFind = 0;
 	_findHistory._nbFindHistoryReplace = 0;
-
-	//Get windows version
-	_winVersion = getWindowsVersion();
 
 	// Prepare for default path
 	TCHAR nppPath[MAX_PATH];
@@ -572,8 +485,10 @@ NppParameters::~NppParameters()
 		FreeLibrary(_hUXTheme);
 
 	::RemoveFontResource(LINEDRAW_FONT);
+
+	delete _session;
 }
-void cutString(const TCHAR *str2cut, vector<generic_string> & patternVect)
+void cutString(const TCHAR *str2cut, std::vector<std::generic_string> & patternVect)
 {
 	TCHAR str2scan[MAX_PATH];
 	lstrcpy(str2scan, str2cut);
@@ -1238,7 +1153,7 @@ bool NppParameters::getContextMenuFromXmlTree(HMENU mainMenuHadle)
 						::GetMenuString(mainMenuHadle, i, menuEntryString, 64, MF_BYPOSITION);
 						if (generic_stricmp(menuEntryName, purgeMenuItemString(menuEntryString).c_str()) == 0)
 						{
-							vector< pair<HMENU, int> > parentMenuPos;
+							std::vector< std::pair<HMENU, int> > parentMenuPos;
 							HMENU topMenu = ::GetSubMenu(mainMenuHadle, i);
 							int maxTopMenuPos = ::GetMenuItemCount(topMenu);
 							HMENU currMenu = topMenu;
@@ -1250,7 +1165,7 @@ bool NppParameters::getContextMenuFromXmlTree(HMENU mainMenuHadle)
 							do {
 								if ( ::GetSubMenu( currMenu, currMenuPos ) ) {
 									//  Go into sub menu
-									parentMenuPos.push_back( ::make_pair( currMenu, currMenuPos ) );
+									parentMenuPos.push_back( std::make_pair( currMenu, currMenuPos ) );
 									currMenu = ::GetSubMenu( currMenu, currMenuPos );
 									currMenuPos = 0;
 									currMaxMenuPos = ::GetMenuItemCount(currMenu);
@@ -1342,12 +1257,12 @@ void NppParameters::setWorkingDir(const TCHAR * newPath)
 	}
 }
 
-bool NppParameters::loadSession(Session & session, const TCHAR *sessionFileName)
+bool NppParameters::loadSession(Session* session, const TCHAR *sessionFileName)
 {
 	TiXmlDocument *pXmlSessionDocument = new TiXmlDocument(sessionFileName);
 	bool loadOkay = pXmlSessionDocument->LoadFile();
 	if (loadOkay)
-		loadOkay = getSessionFromXmlTree(pXmlSessionDocument, &session);
+		loadOkay = getSessionFromXmlTree(pXmlSessionDocument, session);
 
 	delete pXmlSessionDocument;
 	return loadOkay;
@@ -1359,7 +1274,7 @@ bool NppParameters::getSessionFromXmlTree(TiXmlDocument *pSessionDoc, Session *p
 		return false;
 
 	TiXmlDocument **ppSessionDoc = &_pXmlSessionDoc;
-	Session *ptrSession = &_session;
+	Session *ptrSession = _session;
 
 	if (pSessionDoc)
 	{
@@ -1498,7 +1413,7 @@ void NppParameters::feedFileListParameters(TiXmlNode *node)
 		const TCHAR *filePath = (childNode->ToElement())->Attribute(TEXT("filename"));
 		if (filePath)
 		{
-			_LRFileList[_nbFile] = new generic_string(filePath);
+			_LRFileList[_nbFile] = new std::generic_string(filePath);
 			_nbFile++;
 		}
 	}
@@ -1519,7 +1434,7 @@ void NppParameters::feedFindHistoryParameters(TiXmlNode *node)
 			const TCHAR *filePath = (childNode->ToElement())->Attribute(TEXT("name"));
 			if (filePath)
 			{
-				_findHistory._pFindHistoryPath[_findHistory._nbFindHistoryPath++] = new generic_string(filePath);
+				_findHistory._pFindHistoryPath[_findHistory._nbFindHistoryPath++] = new std::generic_string(filePath);
 			}
 		}
 	}
@@ -1534,7 +1449,7 @@ void NppParameters::feedFindHistoryParameters(TiXmlNode *node)
 			const TCHAR *fileFilter = (childNode->ToElement())->Attribute(TEXT("name"));
 			if (fileFilter)
 			{
-				_findHistory._pFindHistoryFilter[_findHistory._nbFindHistoryFilter++] = new generic_string(fileFilter);
+				_findHistory._pFindHistoryFilter[_findHistory._nbFindHistoryFilter++] = new std::generic_string(fileFilter);
 			}
 		}
 	}
@@ -1549,7 +1464,7 @@ void NppParameters::feedFindHistoryParameters(TiXmlNode *node)
 			const TCHAR *fileFind = (childNode->ToElement())->Attribute(TEXT("name"));
 			if (fileFind)
 			{
-				_findHistory._pFindHistoryFind[_findHistory._nbFindHistoryFind++] = new generic_string(fileFind);
+				_findHistory._pFindHistoryFind[_findHistory._nbFindHistoryFind++] = new std::generic_string(fileFind);
 			}
 		}
 	}
@@ -1564,7 +1479,7 @@ void NppParameters::feedFindHistoryParameters(TiXmlNode *node)
 			const TCHAR *fileReplace = (childNode->ToElement())->Attribute(TEXT("name"));
 			if (fileReplace)
 			{
-				_findHistory._pFindHistoryReplace[_findHistory._nbFindHistoryReplace++] = new generic_string(fileReplace);
+				_findHistory._pFindHistoryReplace[_findHistory._nbFindHistoryReplace++] = new std::generic_string(fileReplace);
 			}
 		}
 	}
@@ -2009,8 +1924,9 @@ void NppParameters::insertScintKey(TiXmlNode *scintKeyRoot, const ScintillaKeyMa
 	}
 }
 
-void NppParameters::writeSession(const Session & session, const TCHAR *fileName)
+void NppParameters::writeSession(const Session* session, const TCHAR *fileName)
 {
+	assert(session);
 	const TCHAR *pathName = fileName?fileName:_sessionPath;
 
 	_pXmlSessionDoc = new TiXmlDocument(pathName);
@@ -2019,49 +1935,49 @@ void NppParameters::writeSession(const Session & session, const TCHAR *fileName)
 	if (root)
 	{
 		TiXmlNode *sessionNode = root->InsertEndChild(TiXmlElement(TEXT("Session")));
-		(sessionNode->ToElement())->SetAttribute(TEXT("activeView"), (int)session._activeView);
+		(sessionNode->ToElement())->SetAttribute(TEXT("activeView"), (int)session->_activeView);
 
 		TiXmlNode *mainViewNode = sessionNode->InsertEndChild(TiXmlElement(TEXT("mainView")));
-		(mainViewNode->ToElement())->SetAttribute(TEXT("activeIndex"), (int)session._activeMainIndex);
-		for (size_t i = 0 ; i < session._mainViewFiles.size() ; i++)
+		(mainViewNode->ToElement())->SetAttribute(TEXT("activeIndex"), (int)session->_activeMainIndex);
+		for (size_t i = 0 ; i < session->_mainViewFiles.size() ; i++)
 		{
 			TiXmlNode *fileNameNode = mainViewNode->InsertEndChild(TiXmlElement(TEXT("File")));
 
-			(fileNameNode->ToElement())->SetAttribute(TEXT("firstVisibleLine"), session._mainViewFiles[i]._firstVisibleLine);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("xOffset"), session._mainViewFiles[i]._xOffset);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("scrollWidth"), session._mainViewFiles[i]._scrollWidth);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("startPos"), session._mainViewFiles[i]._startPos);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("endPos"), session._mainViewFiles[i]._endPos);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("selMode"), session._mainViewFiles[i]._selMode);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("lang"), session._mainViewFiles[i]._langName.c_str());
-			(fileNameNode->ToElement())->SetAttribute(TEXT("filename"), session._mainViewFiles[i]._fileName.c_str());
+			(fileNameNode->ToElement())->SetAttribute(TEXT("firstVisibleLine"), session->_mainViewFiles[i]._firstVisibleLine);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("xOffset"), session->_mainViewFiles[i]._xOffset);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("scrollWidth"), session->_mainViewFiles[i]._scrollWidth);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("startPos"), session->_mainViewFiles[i]._startPos);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("endPos"), session->_mainViewFiles[i]._endPos);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("selMode"), session->_mainViewFiles[i]._selMode);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("lang"), session->_mainViewFiles[i]._langName.c_str());
+			(fileNameNode->ToElement())->SetAttribute(TEXT("filename"), session->_mainViewFiles[i]._fileName.c_str());
 
-			for (size_t j = 0 ; j < session._mainViewFiles[i].marks.size() ; j++)
+			for (size_t j = 0 ; j < session->_mainViewFiles[i].marks.size() ; j++)
 			{
-				size_t markLine = session._mainViewFiles[i].marks[j];
+				size_t markLine = session->_mainViewFiles[i].marks[j];
 				TiXmlNode *markNode = fileNameNode->InsertEndChild(TiXmlElement(TEXT("Mark")));
 				markNode->ToElement()->SetAttribute(TEXT("line"), markLine);
 			}
 		}
 
 		TiXmlNode *subViewNode = sessionNode->InsertEndChild(TiXmlElement(TEXT("subView")));
-		(subViewNode->ToElement())->SetAttribute(TEXT("activeIndex"), (int)session._activeSubIndex);
-		for (size_t i = 0 ; i < session._subViewFiles.size() ; i++)
+		(subViewNode->ToElement())->SetAttribute(TEXT("activeIndex"), (int)session->_activeSubIndex);
+		for (size_t i = 0 ; i < session->_subViewFiles.size() ; i++)
 		{
 			TiXmlNode *fileNameNode = subViewNode->InsertEndChild(TiXmlElement(TEXT("File")));
 
-			(fileNameNode->ToElement())->SetAttribute(TEXT("firstVisibleLine"), session._subViewFiles[i]._firstVisibleLine);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("xOffset"), session._subViewFiles[i]._xOffset);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("scrollWidth"), session._subViewFiles[i]._scrollWidth);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("startPos"), session._subViewFiles[i]._startPos);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("endPos"), session._subViewFiles[i]._endPos);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("selMode"), session._subViewFiles[i]._selMode);
-			(fileNameNode->ToElement())->SetAttribute(TEXT("lang"), session._subViewFiles[i]._langName.c_str());
-			(fileNameNode->ToElement())->SetAttribute(TEXT("filename"), session._subViewFiles[i]._fileName.c_str());
+			(fileNameNode->ToElement())->SetAttribute(TEXT("firstVisibleLine"), session->_subViewFiles[i]._firstVisibleLine);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("xOffset"), session->_subViewFiles[i]._xOffset);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("scrollWidth"), session->_subViewFiles[i]._scrollWidth);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("startPos"), session->_subViewFiles[i]._startPos);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("endPos"), session->_subViewFiles[i]._endPos);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("selMode"), session->_subViewFiles[i]._selMode);
+			(fileNameNode->ToElement())->SetAttribute(TEXT("lang"), session->_subViewFiles[i]._langName.c_str());
+			(fileNameNode->ToElement())->SetAttribute(TEXT("filename"), session->_subViewFiles[i]._fileName.c_str());
 
-			for (size_t j = 0 ; j < session._subViewFiles[i].marks.size() ; j++)
+			for (size_t j = 0 ; j < session->_subViewFiles[i].marks.size() ; j++)
 			{
-				size_t markLine = session._subViewFiles[i].marks[j];
+				size_t markLine = session->_subViewFiles[i].marks[j];
 				TiXmlNode *markNode = fileNameNode->InsertEndChild(TiXmlElement(TEXT("Mark")));
 				markNode->ToElement()->SetAttribute(TEXT("line"), markLine);
 			}
@@ -2336,74 +2252,6 @@ void LexerStylerArray::eraseAll()
 	}
 
 	_nbLexerStyler = 0;
-}
-
-void StyleArray::addStyler(int styleID, TiXmlNode *styleNode)
-{
-	_styleArray[_nbStyler]._styleID = styleID;
-
-	if (styleNode)
-	{
-		TiXmlElement *element = styleNode->ToElement();
-
-		// For _fgColor, _bgColor :
-		// RGB() | (result & 0xFF000000) It's the case for -1 (0xFFFFFFFF)
-		// returned by hexStrVal(str)
-		const TCHAR *str = element->Attribute(TEXT("name"));
-		if (str)
-		{
-			_styleArray[_nbStyler]._styleDesc = str;
-		}
-
-		str = element->Attribute(TEXT("fgColor"));
-		if (str)
-		{
-			unsigned long result = hexStrVal(str);
-			_styleArray[_nbStyler]._fgColor = (RGB((result >> 16) & 0xFF, (result >> 8) & 0xFF, result & 0xFF)) | (result & 0xFF000000);
-
-		}
-
-		str = element->Attribute(TEXT("bgColor"));
-		if (str)
-		{
-			unsigned long result = hexStrVal(str);
-			_styleArray[_nbStyler]._bgColor = (RGB((result >> 16) & 0xFF, (result >> 8) & 0xFF, result & 0xFF)) | (result & 0xFF000000);
-		}
-
-		str = element->Attribute(TEXT("colorStyle"));
-		if (str)
-		{
-			_styleArray[_nbStyler]._colorStyle = decStrVal(str);
-		}
-
-		str = element->Attribute(TEXT("fontName"));
-		_styleArray[_nbStyler]._fontName = str;
-
-		str = element->Attribute(TEXT("fontStyle"));
-		if (str)
-		{
-			_styleArray[_nbStyler]._fontStyle = decStrVal(str);
-		}
-
-		str = element->Attribute(TEXT("fontSize"));
-		if (str)
-		{
-			_styleArray[_nbStyler]._fontSize = decStrVal(str);
-		}
-
-		str = element->Attribute(TEXT("keywordClass"));
-		if (str)
-		{
-			_styleArray[_nbStyler]._keywordClass = getKwClassFromName(str);
-		}
-
-		TiXmlNode *v = styleNode->FirstChild();
-		if (v)
-		{
-			_styleArray[_nbStyler]._keywords = new generic_string(v->Value());
-		}
-	}
-	_nbStyler++;
 }
 
 bool NppParameters::writeHistory(const TCHAR *fullpath)
@@ -4833,4 +4681,104 @@ void NppParameters::addScintillaModifiedIndex(int index)
 	{
 		_scintillaModifiedKeyIndices.push_back(index);
 	}
+}
+
+bool NppParameters::writeNbHistoryFile( int nb )
+{
+	if (!_pXmlUserDoc) return false;
+
+	TiXmlNode *nppRoot = _pXmlUserDoc->FirstChild(TEXT("NotepadPlus"));
+	if (!nppRoot) return false;
+
+	TiXmlNode *historyNode = nppRoot->FirstChildElement(TEXT("History"));
+	if (!historyNode) return false;
+
+	(historyNode->ToElement())->SetAttribute(TEXT("nbMaxFile"), nb);
+	return true;
+}
+
+const char * NppParameters::getNativeLangMenuStringA( int itemID )
+{
+	if (!_pXmlNativeLangDocA)
+		return NULL;
+
+	TiXmlNodeA * node =  _pXmlNativeLangDocA->FirstChild("NotepadPlus");
+	if (!node) return NULL;
+
+	node = node->FirstChild("Native-Langue");
+	if (!node) return NULL;
+
+	node = node->FirstChild("Menu");
+	if (!node) return NULL;
+
+	node = node->FirstChild("Main");
+	if (!node) return NULL;
+
+	node = node->FirstChild("Commands");
+	if (!node) return NULL;
+
+	for (TiXmlNodeA *childNode = node->FirstChildElement("Item");
+		childNode ;
+		childNode = childNode->NextSibling("Item") )
+	{
+		TiXmlElementA *element = childNode->ToElement();
+		int id;
+		if (element->Attribute("id", &id) && (id == itemID))
+		{
+			return element->Attribute("name");
+		}
+	}
+	return NULL;
+}
+
+UserLangContainer::UserLangContainer()
+{
+	_name = TEXT("new user define");
+	_ext = TEXT("");
+
+	// Keywords list of Delimiters (index 0)
+	lstrcpy(_keywordLists[0], TEXT("000000"));
+	for (int i = 1 ; i < nbKeywodList ; i++)
+	{
+		*_keywordLists[i] = '\0';
+	}
+}
+
+UserLangContainer::UserLangContainer( const TCHAR *name, const TCHAR *ext ) : _name(name), _ext(ext)
+{
+	// Keywords list of Delimiters (index 0)
+	lstrcpy(_keywordLists[0], TEXT("000000"));
+	for (int j = 1 ; j < nbKeywodList ; j++)
+	{
+		*_keywordLists[j] = '\0';
+	}
+}
+
+UserLangContainer & UserLangContainer::operator=( const UserLangContainer & ulc )
+{
+	if (this != &ulc)
+	{
+		_name = ulc._name;
+		_ext = ulc._ext;
+		_isCaseIgnored = ulc._isCaseIgnored;
+		_styleArray = ulc._styleArray;
+		int nbStyler = _styleArray.getNbStyler();
+		for (int i = 0 ; i < nbStyler ; i++)
+		{
+			Style & st = _styleArray.getStyler(i);
+			if (st._bgColor == COLORREF(-1))
+			{
+				st._bgColor = white;
+			}
+			if (st._fgColor == COLORREF(-1))
+			{
+				st._fgColor = black;
+			}
+		}
+		for (int i = 0 ; i < nbKeywodList ; i++)
+		{
+			lstrcpy(_keywordLists[i], ulc._keywordLists[i]);
+		}
+	}
+	return *this;
 }

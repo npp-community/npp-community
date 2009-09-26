@@ -23,31 +23,19 @@
 
 #define SPC_CLASS_NAME TEXT("splitterContainer")
 
-#define ROTATION_A_GAUCHE 2000
-#define ROTATION_A_DROITE 2001
-
 typedef bool DIRECTION;
 const bool LEFT = true;
 const bool RIGHT = false;
 
-
-
 class SplitterContainer : public Window
 {
 public :
-	SplitterContainer(): Window(), _x(0), _y(0), _hPopupMenu(NULL),
-		_dwSplitterStyle(SV_ENABLERDBLCLK | SV_ENABLELDBLCLK | SV_RESIZEWTHPERCNT){
-	};
-	~SplitterContainer(){};
+	SplitterContainer();
+	~SplitterContainer();
 	void create(Window *pWin0, Window *pWin1, int splitterSize = 4,
 				SplitterMode mode = DYNAMIC, int ratio = 50,  bool _isVertical = true);
 
-	void destroy() {
-		if (_hPopupMenu)
-			::DestroyMenu(_hPopupMenu);
-		_splitter.destroy();
-		::DestroyWindow(_hSelf);
-	};
+	void destroy();
 	void reSizeTo(RECT & rc) {
 		_x = rc.left;
 		_y = rc.top;
@@ -68,7 +56,6 @@ public :
 
     void setWin0(Window *pWin) {
         _pWin0 = pWin;
-
     };
 
     void setWin1(Window *pWin) {
@@ -95,7 +82,6 @@ private :
 	static LRESULT CALLBACK staticWinProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 	LRESULT runProc(UINT Message, WPARAM wParam, LPARAM lParam);
 	void rotateTo(DIRECTION direction);
-
 };
 
 #endif //SPLITTER_CONTAINER_H

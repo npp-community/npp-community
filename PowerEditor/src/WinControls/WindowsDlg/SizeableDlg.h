@@ -1,16 +1,16 @@
-
-
 #include "StaticDialog.h"
-#include "WindowsDlgRc.h"
-#include "WinMgr.h"
+
+class WINRECT;
+class CWinMgr;
 
 class SizeableDlg : public StaticDialog {
 	typedef StaticDialog MyBaseClass;
 public:
 	SizeableDlg(WINRECT* pWinMap);
+	~SizeableDlg();
 
 protected:
-	CWinMgr _winMgr;	  // window manager
+	CWinMgr* _winMgr;	  // window manager
 
 	virtual BOOL CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
 	virtual BOOL onInitDialog();

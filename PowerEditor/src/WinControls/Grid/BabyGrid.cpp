@@ -12,7 +12,6 @@ Modified by Don HO <don.h@free.fr>
 
 #include "precompiled_headers.h"
 #include "babygrid.h"
-#include "Common.h"
 
 #define MAX_GRIDS 20
 

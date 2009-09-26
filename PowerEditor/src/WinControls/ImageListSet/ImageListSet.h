@@ -81,7 +81,7 @@ private :
 	int _iconSize;
 };
 
-typedef struct
+struct ToolBarButtonUnit
 {
 	int _cmdID;
 
@@ -90,7 +90,7 @@ typedef struct
 	int _grayIcon;
 
 	int _stdIcon;
-}ToolBarButtonUnit;
+};
 
 typedef std::vector<ToolBarButtonUnit> ToolBarIconIDs;
 

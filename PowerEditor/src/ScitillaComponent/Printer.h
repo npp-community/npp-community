@@ -18,9 +18,7 @@
 #ifndef PRINTER_H
 #define PRINTER_H
 
-#include "ScintillaEditView.h"
-#include "RunDlg.h"
-#include "Parameters.h"
+class ScintillaEditView;
 
 struct RangeToFormat {
 	HDC hdc;

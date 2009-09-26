@@ -56,7 +56,7 @@ BOOL Process::run()
 		startup.hStdOutput = hPipeOutW;
 		startup.hStdError = hPipeErrW;
 
-		generic_string cmd = TEXT("\"");
+		std::generic_string cmd = TEXT("\"");
 		cmd += _command;
 		cmd += TEXT("\"");
 
@@ -65,8 +65,8 @@ BOOL Process::run()
 			cmd += TEXT(" ");
 			cmd += _args;
 		}
-        BOOL started = ::CreateProcess(NULL,        // command is part of input generic_string
-						(TCHAR *)cmd.c_str(),         // (writeable) command generic_string
+        BOOL started = ::CreateProcess(NULL,        // command is part of input std::generic_string
+						(TCHAR *)cmd.c_str(),         // (writeable) command std::generic_string
 						NULL,        // process security
 						NULL,        // thread security
 						TRUE,        // inherit handles flag
@@ -206,7 +206,7 @@ void Process::listenerStdOut()
 		}
 		//outbytesRead = lstrlen(bufferOut);
 		bufferOut[outbytesRead] = '\0';
-		generic_string s;
+		std::generic_string s;
 		s.assign(bufferOut);
 		_stdoutStr += s;
 
@@ -265,7 +265,7 @@ void Process::listenerStdErr()
 		}
 		//outbytesRead = lstrlen(bufferOut);
 		bufferErr[errbytesRead] = '\0';
-		generic_string s;
+		std::generic_string s;
 		s.assign(bufferErr);
 		_stderrStr += s;
 

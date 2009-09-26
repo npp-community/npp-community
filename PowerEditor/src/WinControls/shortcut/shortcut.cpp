@@ -21,6 +21,7 @@
 #include "ScintillaEditView.h"
 #include "resource.h"
 #include "Notepad_plus.h"
+#include "shortcutRc.h"
 
 #include "keys.h"
 const int KEY_STR_LEN = 16;
@@ -132,7 +133,37 @@ KeyIDNAME namedKeyArray[] = {
 {TEXT("<>"), VK_OEM_102},
 };
 
+static int keyTranslate(int keyIn) {
+	switch (keyIn) {
+		case VK_DOWN:		return SCK_DOWN;
+		case VK_UP:			return SCK_UP;
+		case VK_LEFT:		return SCK_LEFT;
+		case VK_RIGHT:		return SCK_RIGHT;
+		case VK_HOME:		return SCK_HOME;
+		case VK_END:		return SCK_END;
+		case VK_PRIOR:		return SCK_PRIOR;
+		case VK_NEXT:		return SCK_NEXT;
+		case VK_DELETE:		return SCK_DELETE;
+		case VK_INSERT:		return SCK_INSERT;
+		case VK_ESCAPE:		return SCK_ESCAPE;
+		case VK_BACK:		return SCK_BACK;
+		case VK_TAB:		return SCK_TAB;
+		case VK_RETURN:		return SCK_RETURN;
+		case VK_ADD:		return SCK_ADD;
+		case VK_SUBTRACT:	return SCK_SUBTRACT;
+		case VK_DIVIDE:		return SCK_DIVIDE;
+		case VK_OEM_2:		return '/';
+		case VK_OEM_3:		return '`';
+		case VK_OEM_4:		return '[';
+		case VK_OEM_5:		return '\\';
+		case VK_OEM_6:		return ']';
+		default:			return keyIn;
+	}
+}
+
 #define nrKeys sizeof(namedKeyArray)/sizeof(KeyIDNAME)
+
+
 
 /*
 TCHAR vKeyArray[][KEY_STR_LEN] = \
@@ -157,9 +188,9 @@ UCHAR vkeyValue[] = {\
 0x76, 0x77, 0x78, 0x79, 0x7A, 0x7B};
 */
 
-generic_string Shortcut::toString() const
+std::generic_string Shortcut::toString() const
 {
-	generic_string sc = TEXT("");
+	std::generic_string sc = TEXT("");
 	if (!isEnabled())
 		return sc;
 
@@ -170,7 +201,7 @@ generic_string Shortcut::toString() const
 	if (_keyCombo._isShift)
 		sc += TEXT("Shift+");
 
-	generic_string keyString;
+	std::generic_string keyString;
 	getKeyStrFromVal(_keyCombo._key, keyString);
 	sc += keyString;
 	return sc;
@@ -196,12 +227,12 @@ void Shortcut::setName(const TCHAR * name) {
 	_name[i] = 0;
 }
 
-generic_string ScintillaKeyMap::toString() const {
+std::generic_string ScintillaKeyMap::toString() const {
 	return toString(0);
 }
 
-generic_string ScintillaKeyMap::toString(int index) const {
-	generic_string sc = TEXT("");
+std::generic_string ScintillaKeyMap::toString(int index) const {
+	std::generic_string sc = TEXT("");
 	if (!isEnabled())
 		return sc;
 
@@ -213,7 +244,7 @@ generic_string ScintillaKeyMap::toString(int index) const {
 	if (kc._isShift)
 		sc += TEXT("Shift+");
 
-	generic_string keyString;
+	std::generic_string keyString;
 	getKeyStrFromVal(kc._key, keyString);
 	sc += keyString;
 	return sc;
@@ -262,7 +293,7 @@ size_t ScintillaKeyMap::getSize() const {
 	return size;
 }
 
-void getKeyStrFromVal(UCHAR keyVal, generic_string & str)
+void getKeyStrFromVal(UCHAR keyVal, std::generic_string & str)
 {
 	str = TEXT("");
 	bool found = false;
@@ -279,23 +310,23 @@ void getKeyStrFromVal(UCHAR keyVal, generic_string & str)
 		str = TEXT("Unlisted");
 }
 
-void getNameStrFromCmd(INT cmd, generic_string & str)
+void getNameStrFromCmd(INT cmd, std::generic_string & str)
 {
 	if ((cmd >= ID_MACRO) && (cmd < ID_MACRO_LIMIT))
 	{
-		vector<MacroShortcut> & theMacros = (NppParameters::getInstance())->getMacroList();
+		std::vector<MacroShortcut> & theMacros = (NppParameters::getInstance())->getMacroList();
 		int i = cmd - ID_MACRO;
 		str = theMacros[i].getName();
 	}
 	else if ((cmd >= ID_USER_CMD) && (cmd < ID_USER_CMD_LIMIT))
 	{
-		vector<UserCommand> & userCommands = (NppParameters::getInstance())->getUserCommandList();
+		std::vector<UserCommand> & userCommands = (NppParameters::getInstance())->getUserCommandList();
 		int i = cmd - ID_USER_CMD;
 		str = userCommands[i].getName();
 	}
 	else if ((cmd >= ID_PLUGINS_CMD) && (cmd < ID_PLUGINS_CMD_LIMIT))
 	{
-		vector<PluginCmdShortcut> & pluginCmds = (NppParameters::getInstance())->getPluginCommandList();
+		std::vector<PluginCmdShortcut> & pluginCmds = (NppParameters::getInstance())->getPluginCommandList();
 		int i = 0;
 		for (size_t j = 0 ; j < pluginCmds.size() ; j++)
 		{
@@ -437,15 +468,94 @@ BOOL CALLBACK Shortcut::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam
 	}
 }
 
+int Shortcut::doDialog()
+{
+	return ::DialogBoxParam(_hInst, MAKEINTRESOURCE(IDD_SHORTCUT_DLG), _hParent,  (DLGPROC)dlgProc, (LPARAM)this);
+}
+
+Shortcut::Shortcut() :
+	_canModifyName(false)
+{
+	setName(TEXT(""));
+	_keyCombo._isCtrl = false;
+	_keyCombo._isAlt = false;
+	_keyCombo._isShift = false;
+	_keyCombo._key = 0;
+}
+
+Shortcut::Shortcut( const TCHAR *name, bool isCtrl, bool isAlt, bool isShift, UCHAR key ) :
+	_canModifyName(false)
+{
+	_name[0] = '\0';
+	if (name) {
+		setName(name);
+	} else {
+		setName(TEXT(""));
+	}
+	_keyCombo._isCtrl = isCtrl;
+	_keyCombo._isAlt = isAlt;
+	_keyCombo._isShift = isShift;
+	_keyCombo._key = key;
+}
+
+Shortcut::Shortcut( const Shortcut & sc )
+{
+	setName(sc.getMenuName());
+	_keyCombo = sc._keyCombo;
+	_canModifyName = sc._canModifyName;
+}
+
+BYTE Shortcut::getAcceleratorModifiers()
+{
+	return ( FVIRTKEY | (_keyCombo._isCtrl?FCONTROL:0) | (_keyCombo._isAlt?FALT:0) | (_keyCombo._isShift?FSHIFT:0) );
+}
+
+Shortcut & Shortcut::operator=( const Shortcut & sc )
+{
+	//Do not allow setting empty names
+	//So either we have an empty name or the other name has to be set
+	if (_name[0] == 0 || sc._name[0] != 0) {
+		setName(sc.getMenuName());
+	}
+	_keyCombo = sc._keyCombo;
+	this->_canModifyName = sc._canModifyName;
+	return *this;
+}
+
+bool Shortcut::isValid() const
+{
+	//valid should only be used in cases where the shortcut isEnabled().
+	if (_keyCombo._key == 0)
+		return true;	//disabled _keyCombo always valid, just disabled
+
+	//These keys need a modifier, else invalid
+	if ( ((_keyCombo._key >= 'A') && (_keyCombo._key <= 'Z')) || ((_keyCombo._key >= '0') && (_keyCombo._key <= '9')) || _keyCombo._key == VK_SPACE || _keyCombo._key == VK_CAPITAL || _keyCombo._key == VK_BACK || _keyCombo._key == VK_RETURN) {
+		return ((_keyCombo._isCtrl) || (_keyCombo._isAlt));
+	}
+	// the remaining keys are always valid
+	return true;
+}
+
+std::generic_string Shortcut::toMenuItemString() const
+{
+	//std::generic_string suitable for menu
+	std::generic_string str = _menuName;
+	if(isEnabled())
+	{
+		str += TEXT("\t");
+		str += toString();
+	}
+	return str;
+}
 // return true if one of CommandShortcuts is deleted. Otherwise false.
 void Accelerator::updateShortcuts()
 {
 	NppParameters *pNppParam = NppParameters::getInstance();
 
-	vector<CommandShortcut> & shortcuts = pNppParam->getUserShortcuts();
-	vector<MacroShortcut> & macros  = pNppParam->getMacroList();
-	vector<UserCommand> & userCommands = pNppParam->getUserCommandList();
-	vector<PluginCmdShortcut> & pluginCommands = pNppParam->getPluginCommandList();
+	std::vector<CommandShortcut> & shortcuts = pNppParam->getUserShortcuts();
+	std::vector<MacroShortcut> & macros  = pNppParam->getMacroList();
+	std::vector<UserCommand> & userCommands = pNppParam->getUserCommandList();
+	std::vector<PluginCmdShortcut> & pluginCommands = pNppParam->getPluginCommandList();
 
 	size_t nbMenu = shortcuts.size();
 	size_t nbMacro = macros.size();
@@ -504,22 +614,22 @@ void Accelerator::updateShortcuts()
 
 void Accelerator::updateFullMenu() {
 	NppParameters * pNppParam = NppParameters::getInstance();
-	vector<CommandShortcut> commands = pNppParam->getUserShortcuts();
+	std::vector<CommandShortcut> commands = pNppParam->getUserShortcuts();
 	for(size_t i = 0; i < commands.size(); i++) {
 		updateMenuItemByCommand(commands[i]);
 	}
 
-	vector<MacroShortcut> mcommands = pNppParam->getMacroList();
+	std::vector<MacroShortcut> mcommands = pNppParam->getMacroList();
 	for(size_t i = 0; i < mcommands.size(); i++) {
 		updateMenuItemByCommand(mcommands[i]);
 	}
 
-	vector<UserCommand> ucommands = pNppParam->getUserCommandList();
+	std::vector<UserCommand> ucommands = pNppParam->getUserCommandList();
 	for(size_t i = 0; i < ucommands.size(); i++) {
 		updateMenuItemByCommand(ucommands[i]);
 	}
 
-	vector<PluginCmdShortcut> pcommands = pNppParam->getPluginCommandList();
+	std::vector<PluginCmdShortcut> pcommands = pNppParam->getPluginCommandList();
 	for(size_t i = 0; i < pcommands.size(); i++) {
 		updateMenuItemByCommand(pcommands[i]);
 	}
@@ -534,6 +644,28 @@ void Accelerator::updateMenuItemByCommand(CommandShortcut csc) {
 	UINT cmdFlags = GetMenuState(_hAccelMenu, cmdID, MF_BYCOMMAND );
 	cmdFlags = MF_BYCOMMAND | (cmdFlags&MF_CHECKED) ? ( MF_CHECKED ) : ( MF_UNCHECKED );
 	::ModifyMenu(_hAccelMenu, cmdID, cmdFlags, cmdID, csc.toMenuItemString().c_str());
+}
+
+Accelerator::~Accelerator()
+{
+	if (_hAccTable)
+		::DestroyAcceleratorTable(_hAccTable);
+	if (_pAccelArray)
+		delete [] _pAccelArray;
+}
+
+void Accelerator::init( HMENU hMenu, HWND menuParent )
+{
+	_hAccelMenu = hMenu;
+	_hMenuParent = menuParent;
+	updateShortcuts();
+}
+
+void Accelerator::reNew()
+{
+	if(_hAccTable)
+		::DestroyAcceleratorTable(_hAccTable);
+	_hAccTable = ::CreateAcceleratorTable(_pAccelArray, _nbAccelItems);
 }
 
 recordedMacroStep::recordedMacroStep(int iMessage, long wParam, long lParam)
@@ -595,7 +727,7 @@ void recordedMacroStep::PlayBack(Window* pNotepad, ScintillaEditView *pEditView)
 	}
 }
 
-void ScintillaAccelerator::init(vector<HWND> * vScintillas, HMENU hMenu, HWND menuParent) {
+void ScintillaAccelerator::init(std::vector<HWND> * vScintillas, HMENU hMenu, HWND menuParent) {
 	_hAccelMenu = hMenu;
 	_hMenuParent = menuParent;
 	size_t nr = vScintillas->size();
@@ -608,7 +740,7 @@ void ScintillaAccelerator::init(vector<HWND> * vScintillas, HMENU hMenu, HWND me
 void ScintillaAccelerator::updateKeys()
 {
 	NppParameters *pNppParam = NppParameters::getInstance();
-	vector<ScintillaKeyMap> & map = pNppParam->getScintillaKeyList();
+	std::vector<ScintillaKeyMap> & map = pNppParam->getScintillaKeyList();
 	int mapSize = (int)map.size();
 	int index;
 
@@ -649,7 +781,7 @@ void ScintillaAccelerator::updateMenuItemByID(ScintillaKeyMap skm, int id)
 		}
 		i++;
 	}
-	generic_string menuItem = cmdName;
+	std::generic_string menuItem = cmdName;
 	if (skm.isEnabled())
 	{
 		menuItem += TEXT("\t");
@@ -769,7 +901,7 @@ BOOL CALLBACK ScintillaKeyMap::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /
 					if (res > -1) {
 						if (res == oldsize) {
 							::SendDlgItemMessage(_hSelf, IDC_LIST_KEYS, LB_INSERTSTRING, (WPARAM)-1, (LPARAM)toString(res).c_str());
-						}else {	//update current generic_string, can happen if it was disabled
+						}else {	//update current std::generic_string, can happen if it was disabled
 							updateListItem(res);
 						}
 						::SendDlgItemMessage(_hSelf, IDC_LIST_KEYS, LB_SETCURSEL, res, 0);
@@ -821,4 +953,67 @@ BOOL CALLBACK ScintillaKeyMap::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /
 		default :
 			return FALSE;
 	}
+}
+
+int ScintillaKeyMap::doDialog()
+{
+	return ::DialogBoxParam(_hInst, MAKEINTRESOURCE(IDD_SHORTCUTSCINT_DLG), _hParent,  (DLGPROC)dlgProc, (LPARAM)this);
+}
+
+ScintillaKeyMap::ScintillaKeyMap( Shortcut sc, long scintillaKeyID, unsigned long id ) : Shortcut(sc), _menuCmdID(id), _scintillaKeyID(scintillaKeyID)
+{
+	_keyCombos.clear();
+	_keyCombos.push_back(_keyCombo);
+	_keyCombo._key = 0;
+	size = 1;
+}
+
+int ScintillaKeyMap::toKeyDef( int index ) const
+{
+	KeyCombo kc = _keyCombos[index];
+	int keymod = (kc._isCtrl?SCMOD_CTRL:0) | (kc._isAlt?SCMOD_ALT:0) | (kc._isShift?SCMOD_SHIFT:0);
+	return keyTranslate((int)kc._key) + (keymod << 16);
+}
+
+void ScintillaKeyMap::clearDups()
+{
+	if (size > 1)
+		_keyCombos.erase(_keyCombos.begin()+1, _keyCombos.end());
+	size = 1;
+}
+
+const bool operator==( const Shortcut & a, const Shortcut & b )
+{
+	return ((lstrcmp(a.getMenuName(), b.getMenuName()) == 0) &&
+		(a._keyCombo._isCtrl == b._keyCombo._isCtrl) &&
+		(a._keyCombo._isAlt == b._keyCombo._isAlt) &&
+		(a._keyCombo._isShift == b._keyCombo._isShift) &&
+		(a._keyCombo._key == b._keyCombo._key)
+		);
+}
+
+const bool operator==( const ScintillaKeyMap & a, const ScintillaKeyMap & b )
+{
+	bool equal = a.size == b.size;
+	if (!equal)
+		return false;
+	int i = 0;
+	while(equal && (i < a.size)) {
+		equal =
+			(a._keyCombos[i]._isCtrl	== b._keyCombos[i]._isCtrl) &&
+			(a._keyCombos[i]._isAlt		== b._keyCombos[i]._isAlt) &&
+			(a._keyCombos[i]._isShift	== b._keyCombos[i]._isShift) &&
+			(a._keyCombos[i]._key		== b._keyCombos[i]._key);
+		i++;
+	}
+	return equal;
+}
+
+bool PluginCmdShortcut::isValid() const
+{
+	if (!Shortcut::isValid())
+		return false;
+	if ((!_moduleName[0]) || (_internalID == -1))
+		return false;
+	return true;
 }

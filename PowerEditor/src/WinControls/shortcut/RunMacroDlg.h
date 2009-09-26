@@ -21,13 +21,6 @@
 #define RUN_MACRO_DLG_H
 
 #include "StaticDialog.h"
-#include "RunMacroDlg_rc.h"
-#include "Buffer.h"
-#include "ScintillaEditView.h"
-#include "StatusBar.h"
-
-
-using namespace std;
 
 #define RM_CANCEL -1
 #define RM_RUN_MULTI 1
@@ -37,53 +30,19 @@ class RunMacroDlg : public StaticDialog
 {
 public :
 	RunMacroDlg() : StaticDialog(), m_Mode(RM_RUN_MULTI), m_Times(1) {};
-	~RunMacroDlg() {
-	};
 
-	void init(HINSTANCE hInst, HWND hPere/*, ScintillaEditView **ppEditView*/) {
-		Window::init(hInst, hPere);
-	};
-
-	void doDialog(bool isRTL = false) {
-		if (!isCreated())
-			create(IDD_RUN_MACRO_DLG, isRTL);
-		else
-			::ShowWindow(_hSelf, SW_SHOW);
-	};
-
-	//virtual void create(int, bool = false);
-
-	void initMacroList() {
-		if (!isCreated()) return;
-
-		NppParameters *pNppParam = NppParameters::getInstance();
-		vector<MacroShortcut> & macroList = pNppParam->getMacroList();
-
-		::SendDlgItemMessage(_hSelf, IDC_MACRO_COMBO, CB_RESETCONTENT, 0, 0);
-
-		if (::SendMessage(_hParent, WM_ISCURRENTMACRORECORDED, 0, 0))
-			::SendDlgItemMessage(_hSelf, IDC_MACRO_COMBO, CB_ADDSTRING, 0, (LPARAM)TEXT("Current recorded macro"));
-
-		for (size_t i = 0 ; i < macroList.size() ; i++)
-			::SendDlgItemMessage(_hSelf, IDC_MACRO_COMBO, CB_ADDSTRING, 0, (LPARAM)macroList[i].getName());
-
-		::SendDlgItemMessage(_hSelf, IDC_MACRO_COMBO, CB_SETCURSEL, 0, 0);
-		m_macroIndex = 0;
-	};
+	void init(HINSTANCE hInst, HWND hPere);
+	void doDialog(bool isRTL = false);
+	void initMacroList();
 
 	int getMode() const {return m_Mode;};
 	int getTimes() const {return m_Times;};
-	int getMacro2Exec() const {
-		bool isCurMacroPresent = ::SendMessage(_hParent, WM_ISCURRENTMACRORECORDED, 0, 0) == TRUE;
-		return isCurMacroPresent?(m_macroIndex - 1):m_macroIndex;
-	};
+	int getMacro2Exec() const;
 
 private :
 	virtual BOOL CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
 
-	bool isCheckedOrNot(int checkControlID) const {
-		return (BST_CHECKED == ::SendMessage(::GetDlgItem(_hSelf, checkControlID), BM_GETCHECK, 0, 0));
-	};
+	bool isCheckedOrNot(int checkControlID) const;
 
 	void check(int);
 

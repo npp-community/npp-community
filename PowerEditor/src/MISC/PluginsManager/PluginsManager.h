@@ -18,8 +18,6 @@
 #ifndef PLUGINSMANAGER_H
 #define PLUGINSMANAGER_H
 
-#include "resource.h"
-#include "Parameters.h"
 #include "PluginInterface.h"
 
 typedef BOOL (__cdecl * PFUNCISUNICODE)();
@@ -140,8 +138,8 @@ private:
 	NppData _nppData;
 	HMENU _hPluginsMenu;
 
-	vector<PluginInfo *> _pluginInfos;
-	vector<PluginCommand> _pluginsCommands;
+	std::vector<PluginInfo *> _pluginInfos;
+	std::vector<PluginCommand> _pluginsCommands;
 	bool _isDisabled;
 };
 

@@ -17,9 +17,35 @@
 
 #include "precompiled_headers.h"
 #include "SplitterContainer.h"
-#include "Common.h"
+
+
+#define LEFT_ROTATION 2000
+#define RIGHT_ROTATION 2001
 
 bool SplitterContainer::_isRegistered = false;
+
+SplitterContainer::SplitterContainer():
+	Window(), _x(0), _y(0), _hPopupMenu(NULL),
+	_dwSplitterStyle(SV_ENABLERDBLCLK | SV_ENABLELDBLCLK | SV_RESIZEWTHPERCNT)
+{
+}
+
+SplitterContainer::~SplitterContainer()
+{
+	if (_hSelf)
+	{
+		SplitterContainer::destroy();
+	}
+}
+
+void SplitterContainer::destroy()
+{
+	if (_hPopupMenu)
+		::DestroyMenu(_hPopupMenu);
+	_splitter.destroy();
+	::DestroyWindow(_hSelf);
+	_hSelf = NULL;
+}
 
 void SplitterContainer::create(Window *pWin0, Window *pWin1, int splitterSize,
                                SplitterMode mode, int ratio, bool isVertical)
@@ -137,10 +163,10 @@ LRESULT SplitterContainer::runProc(UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			switch (LOWORD(wParam))
 			{
-				case ROTATION_A_GAUCHE:
+				case LEFT_ROTATION:
 					rotateTo(LEFT);
 					return TRUE;
-				case ROTATION_A_DROITE:
+				case RIGHT_ROTATION:
 					rotateTo(RIGHT);
 					return TRUE;
 			}
@@ -195,8 +221,8 @@ LRESULT SplitterContainer::runProc(UINT message, WPARAM wParam, LPARAM lParam)
 					POINT p;
 					::GetCursorPos(&p);
 					_hPopupMenu = ::CreatePopupMenu();
-					::InsertMenu(_hPopupMenu, 1, MF_BYPOSITION, ROTATION_A_GAUCHE, TEXT("Rotate to left"));
-					::InsertMenu(_hPopupMenu, 0, MF_BYPOSITION, ROTATION_A_DROITE, TEXT("Rotate to right"));
+					::InsertMenu(_hPopupMenu, 1, MF_BYPOSITION, LEFT_ROTATION, TEXT("Rotate to left"));
+					::InsertMenu(_hPopupMenu, 0, MF_BYPOSITION, RIGHT_ROTATION, TEXT("Rotate to right"));
 				}
 
 				::TrackPopupMenu(_hPopupMenu, TPM_LEFTALIGN, p.x, p.y, 0, _hSelf, NULL);

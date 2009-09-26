@@ -20,66 +20,18 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef USER_DEFINE_H
 #define USER_DEFINE_H
 
-#include "UserDefineResource.h"
+#include "StaticDialog.h"
 #include "ControlsTab.h"
-#include "ColourPicker.h"
-#include "UserDefineLangReference.h"
-//#include "Parameters.h"
 
-#ifdef __GNUC__
-
-static int min(int a, int b) {
-	return (a<b)?a:b;
-};
-
-static int max(int a, int b) {
-	return (a>b)?a:b;
-};
-
-#endif //__GNUC__
 class ScintillaEditView;
 class UserLangContainer;
+class ColourPicker;
 struct Style;
 
-#define WL_LEN_MAX 1024
+#define DOCK true
+#define UNDOCK false
 
-#define BOLD_MASK     1
-#define ITALIC_MASK   2
-
-const int nbWordList = 4;
-const int nbBlockColor = 5;
-const int nbBoolean = 5;
-
-const bool DOCK = true;
-const bool UNDOCK = false;
-
-const int maxNbGroup = 10;
-
-const int KWL_FOLDER_OPEN_INDEX = 1;
-const int KWL_FOLDER_CLOSE_INDEX = 2;
-const int KWL_OPERATOR_INDEX = 3;
-const int KWL_COMMENT_INDEX = 4;
-const int KWL_KW1_INDEX = 5;
-const int KWL_KW2_INDEX = 6;
-const int KWL_KW3_INDEX = 7;
-const int KWL_KW4_INDEX = 8;
-const int KWL_DELIM_INDEX = 0;
-
-const int STYLE_DEFAULT_INDEX = 0;
-const int STYLE_BLOCK_OPEN_INDEX = 1;
-const int STYLE_BLOCK_CLOSE_INDEX = 2;
-const int STYLE_WORD1_INDEX = 3;
-const int STYLE_WORD2_INDEX = 4;
-const int STYLE_WORD3_INDEX = 5;
-const int STYLE_WORD4_INDEX = 6;
-const int STYLE_COMMENT_INDEX = 7;
-const int STYLE_COMMENTLINE_INDEX = 8;
-const int STYLE_NUMBER_INDEX = 9;
-const int STYLE_OPERATOR_INDEX = 10;
-const int STYLE_DELIM2_INDEX = 11;
-const int STYLE_DELIM3_INDEX = 12;
-
-
+#define maxNbGroup 10
 
 class SharedParametersDialog : public StaticDialog
 {
@@ -125,37 +77,7 @@ public:
 protected :
 	void setKeywords2List(int ctrlID);
 
-	int getGroupIndexFromCombo(int ctrlID, bool & isFontSize) const {
-        switch (ctrlID)
-        {
-			case IDC_DEFAULT_FONT_COMBO :
-                isFontSize = false;
-                return STYLE_DEFAULT_INDEX;
-
-            case IDC_DEFAULT_FONTSIZE_COMBO :
-                isFontSize = true;
-                return STYLE_DEFAULT_INDEX;
-
-            case IDC_FOLDEROPEN_FONT_COMBO :
-                isFontSize = false;
-                return STYLE_BLOCK_OPEN_INDEX;
-
-            case IDC_FOLDEROPEN_FONTSIZE_COMBO :
-                isFontSize = true;
-                return STYLE_BLOCK_OPEN_INDEX;
-
-            case IDC_FOLDERCLOSE_FONT_COMBO :
-                isFontSize = false;
-                return STYLE_BLOCK_CLOSE_INDEX;
-
-            case IDC_FOLDERCLOSE_FONTSIZE_COMBO :
-                isFontSize = true;
-                return STYLE_BLOCK_CLOSE_INDEX;
-
-            default :
-                return -1;
-        }
-	};
+	int getGroupIndexFromCombo(int ctrlID, bool & isFontSize) const;
 	int getStylerIndexFromCP(HWND hWnd, bool & isFG, ColourPicker **ppCP) const;
 	int getGroupeIndexFromCheck(int ctrlID, int & fontStyleMask) const;
 };
@@ -171,45 +93,7 @@ protected :
 	void setKeywords2List(int id);
 
     // SEE @REF #01
-    int getGroupIndexFromCombo(int ctrlID, bool & isFontSize)  const {
-        switch (ctrlID)
-		{
-			case IDC_KEYWORD1_FONT_COMBO :
-                isFontSize = false;
-                return STYLE_WORD1_INDEX;
-
-			case IDC_KEYWORD1_FONTSIZE_COMBO :
-                isFontSize = true;
-                return STYLE_WORD1_INDEX;
-
-			case IDC_KEYWORD2_FONT_COMBO :
-                isFontSize = false;
-                return STYLE_WORD2_INDEX;
-
-			case IDC_KEYWORD2_FONTSIZE_COMBO :
-                isFontSize = true;
-                return STYLE_WORD2_INDEX;
-
-            case IDC_KEYWORD3_FONT_COMBO :
-                isFontSize = false;
-                return STYLE_WORD3_INDEX;
-
-			case IDC_KEYWORD3_FONTSIZE_COMBO :
-                isFontSize = true;
-                return STYLE_WORD3_INDEX;
-
-			case IDC_KEYWORD4_FONT_COMBO :
-                isFontSize = false;
-                return STYLE_WORD4_INDEX;
-
-			case IDC_KEYWORD4_FONTSIZE_COMBO :
-                isFontSize = true;
-                return STYLE_WORD4_INDEX;
-
-			default :
-                return -1;
-		}
-    };
+    int getGroupIndexFromCombo(int ctrlID, bool & isFontSize)  const;
     int getStylerIndexFromCP(HWND hWnd, bool & isFG, ColourPicker **ppCP) const;
     int getGroupeIndexFromCheck(int ctrlID, int & fontStyleMask) const;
 };
@@ -224,38 +108,7 @@ protected :
 	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 
     void setKeywords2List(int id);
-    int getGroupIndexFromCombo(int ctrlID, bool & isFontSize) const {
-        switch (ctrlID)
-		{
-			case IDC_COMMENT_FONT_COMBO :
-                isFontSize = false;
-                return STYLE_COMMENT_INDEX;
-
-			case IDC_COMMENT_FONTSIZE_COMBO :
-                isFontSize = true;
-                return STYLE_COMMENT_INDEX;
-
-			case IDC_COMMENTLINE_FONT_COMBO :
-                isFontSize = false;
-                return STYLE_COMMENTLINE_INDEX;
-
-			case IDC_COMMENTLINE_FONTSIZE_COMBO :
-                isFontSize = true;
-                return STYLE_COMMENTLINE_INDEX;
-
-			case IDC_NUMBER_FONT_COMBO :
-                isFontSize = false;
-                return STYLE_NUMBER_INDEX;
-
-			case IDC_NUMBER_FONTSIZE_COMBO :
-                isFontSize = true;
-                return STYLE_NUMBER_INDEX;
-
-
-			default :
-                return -1;
-		}
-    };
+    int getGroupIndexFromCombo(int ctrlID, bool & isFontSize) const;
 
     int getStylerIndexFromCP(HWND hWnd, bool & isFG, ColourPicker **ppCP) const;
     int getGroupeIndexFromCheck(int ctrlID, int & fontStyleMask) const;
@@ -275,37 +128,7 @@ public :
 protected :
 	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
     void setKeywords2List(int /*ctrlID*/) {}
-    int getGroupIndexFromCombo(int ctrlID, bool & isFontSize) const {
-		switch (ctrlID)
-		{
-			case IDC_SYMBOL_FONT_COMBO :
-				isFontSize = false;
-				return STYLE_OPERATOR_INDEX;
-
-			case IDC_SYMBOL_FONTSIZE_COMBO :
-				isFontSize = true;
-				return STYLE_OPERATOR_INDEX;
-
-			case IDC_SYMBOL_FONT2_COMBO :
-				isFontSize = false;
-				return STYLE_DELIM2_INDEX;
-
-			case IDC_SYMBOL_FONTSIZE2_COMBO :
-				isFontSize = true;
-				return STYLE_DELIM2_INDEX;
-
-			case IDC_SYMBOL_FONT3_COMBO :
-				isFontSize = false;
-				return STYLE_DELIM3_INDEX;
-
-			case IDC_SYMBOL_FONTSIZE3_COMBO :
-				isFontSize = true;
-				return STYLE_DELIM3_INDEX;
-
-			default :
-                return -1;
-		}
-	};
+    int getGroupIndexFromCombo(int ctrlID, bool & isFontSize) const;
     int getStylerIndexFromCP(HWND hWnd, bool & isFG, ColourPicker **ppCP) const;
     int getGroupeIndexFromCheck(int ctrlID, int & fontStyleMask) const;
 
@@ -349,6 +172,7 @@ public :
 	void destroy() {
 		// A Ajouter les fils...
 	};
+
 	int getWidth() const {
 		return _dlgPos.right;
 	};
@@ -356,11 +180,7 @@ public :
 	int getHeight() const {
 		return _dlgPos.bottom;
 	};
-	void doDialog(bool willBeShown = true, bool isRTL = false) {
-		if (!isCreated())
-			create(IDD_GLOBAL_USERDEFINE_DLG, isRTL);
-		display(willBeShown);
-	};
+	void doDialog(bool willBeShown = true, bool isRTL = false);
 
 	virtual void reSizeTo(RECT & rc) // should NEVER be const !!!
 	{
@@ -373,7 +193,7 @@ public :
     bool isDocked() const {return _status == DOCK;};
 	void setDockStatus(bool isDocked) {_status = isDocked;};
 
-	int getNbKeywordList() {return nbKeywodList;};
+	int getNbKeywordList();
 	bool isDirty() const {return _isDirty;};
 	HWND getFolderHandle() const {
 		return _folderStyleDlg.getHSelf();
@@ -429,72 +249,5 @@ protected :
     int getGroupeIndexFromCheck(int /*ctrlID*/, int & /*fontStyleMask*/) const {return -1;};
 	void updateDlg();
 };
-
-class StringDlg : public StaticDialog
-{
-public :
-    StringDlg() : StaticDialog() {};
-    void init(HINSTANCE hInst, HWND parent, TCHAR *title, TCHAR *staticName, TCHAR *text2Set, int txtLen = 0) {
-        Window::init(hInst, parent);
-		lstrcpy(_title, title);
-		lstrcpy(_static, staticName);
-		lstrcpy(_textValue, text2Set);
-		_txtLen = txtLen;
-    };
-
-    long doDialog() {
-		return long(::DialogBoxParam(_hInst, MAKEINTRESOURCE(IDD_STRING_DLG), _hParent,  (DLGPROC)dlgProc, (LPARAM)this));
-    };
-
-	virtual void destroy() {};
-
-protected :
-	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
-	{
-
-		switch (Message)
-		{
-			case WM_INITDIALOG :
-			{
-				::SetWindowText(_hSelf, _title);
-				::SetDlgItemText(_hSelf, IDC_STRING_STATIC, _static);
-				::SetDlgItemText(_hSelf, IDC_STRING_EDIT, _textValue);
-				if (_txtLen)
-					::SendDlgItemMessage(_hSelf, IDC_STRING_EDIT, EM_SETLIMITTEXT, _txtLen, 0);
-
-				return TRUE;
-			}
-
-			case WM_COMMAND :
-			{
-				switch (wParam)
-				{
-					case IDOK :
-					{
-						::GetDlgItemText(_hSelf, IDC_STRING_EDIT, _textValue, 256);
-						::EndDialog(_hSelf, int(_textValue));
-						return TRUE;
-					}
-
-					case IDCANCEL :
-						::EndDialog(_hSelf, 0);
-						return TRUE;
-
-					default:
-						return FALSE;
-				}
-			}
-			default :
-				return FALSE;
-		}
-	}
-
-private :
-	TCHAR _title[64];
-    TCHAR _textValue[256];
-	TCHAR _static[32];
-	int _txtLen;
-};
-
 
 #endif //USER_DEFINE_H

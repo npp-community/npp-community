@@ -19,9 +19,57 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
 #include "ShortcutMapper.h"
-#include "Notepad_plus.h"
+#include "Parameters.h"
+#include "PluginInterface.h"
+#include "BabyGrid.h"
+#include "ShortcutMapper_rc.h"
 
-void ShortcutMapper::initTabs() {
+#include "BabyGridWrapper.h"
+#include "ContextMenu.h"
+
+
+ShortcutMapper::ShortcutMapper() :
+	StaticDialog(),
+	_babygrid(NULL),
+	_rightClickMenu(NULL),
+	_currentState(STATE_MENU)
+{
+	generic_strncpy(tabNames[0], TEXT("Main menu"), maxTabName);
+	generic_strncpy(tabNames[1], TEXT("Macros"), maxTabName);
+	generic_strncpy(tabNames[2], TEXT("Run commands"), maxTabName);
+	generic_strncpy(tabNames[3], TEXT("Plugin commands"), maxTabName);
+	generic_strncpy(tabNames[4], TEXT("Scintilla commands"), maxTabName);
+}
+
+ShortcutMapper::~ShortcutMapper()
+{
+	if (_hSelf)
+	{
+		ShortcutMapper::destroy();
+	}
+}
+
+void ShortcutMapper::destroy()
+{
+	if (_babygrid)
+	{
+		_babygrid->destroy();
+		delete _babygrid;
+		_babygrid = NULL;
+	}
+
+	if (_rightClickMenu)
+	{
+		delete _rightClickMenu;
+		_rightClickMenu = NULL;
+	}
+
+	StaticDialog::destroy();
+}
+
+
+void ShortcutMapper::initTabs()
+{
 	HWND hTab = _hTabCtrl = ::GetDlgItem(_hSelf, IDC_BABYGRID_TABBAR);
 	TCITEM tie;
 	tie.mask = TCIF_TEXT;
@@ -37,93 +85,102 @@ void ShortcutMapper::initTabs() {
 	::SendMessage(hTab, TCM_INSERTITEM, 4, (LPARAM)(&tie) );
 }
 
-void ShortcutMapper::translateTab(int index, const TCHAR * newname) {
+void ShortcutMapper::translateTab(int index, const TCHAR * newname)
+{
 	if (index < 0 || index > 4)
 		return;
 	generic_strncpy(tabNames[index], newname, maxTabName);
 }
 
-void ShortcutMapper::initBabyGrid() {
+void ShortcutMapper::initBabyGrid()
+{
 	RECT rect;
 	getClientRect(rect);
 
-	_babygrid.init(_hInst, _hSelf, IDD_BABYGRID_ID1);
-	//_babygrid.reSizeTo(rect);
-	_babygrid.reSizeToWH(rect);
-	_babygrid.hideCursor();
-	_babygrid.makeColAutoWidth();
-	_babygrid.setColsNumbered(false);
-	_babygrid.setColWidth(0, 30);
-	_babygrid.setColWidth(1, 250);
+	if (!_babygrid)
+	{
+		_babygrid = new BabyGridWrapper();
+	}
+
+	_babygrid->init(_hInst, _hSelf, IDD_BABYGRID_ID1);
+	//_babygrid->reSizeTo(rect);
+	_babygrid->reSizeToWH(rect);
+	_babygrid->hideCursor();
+	_babygrid->makeColAutoWidth();
+	_babygrid->setColsNumbered(false);
+	_babygrid->setColWidth(0, 30);
+	_babygrid->setColWidth(1, 250);
 }
 
 void ShortcutMapper::fillOutBabyGrid()
 {
+	assert(_babygrid);
+
 	NppParameters *nppParam = NppParameters::getInstance();
-	_babygrid.clear();
+	_babygrid->clear();
 
 	size_t nrItems = 0;
 
 	switch(_currentState) {
 		case STATE_MENU: {
 			nrItems = nppParam->getUserShortcuts().size();
-			_babygrid.setLineColNumber(nrItems, 2);
+			_babygrid->setLineColNumber(nrItems, 2);
 			break; }
 		case STATE_MACRO: {
 			nrItems = nppParam->getMacroList().size();
-			_babygrid.setLineColNumber(nrItems, 2);
+			_babygrid->setLineColNumber(nrItems, 2);
 			break; }
 		case STATE_USER: {
 			nrItems = nppParam->getUserCommandList().size();
-			_babygrid.setLineColNumber(nrItems, 2);
+			_babygrid->setLineColNumber(nrItems, 2);
 			break; }
 		case STATE_PLUGIN: {
 			nrItems = nppParam->getPluginCommandList().size();
-			_babygrid.setLineColNumber(nrItems, 2);
+			_babygrid->setLineColNumber(nrItems, 2);
 			break; }
 		case STATE_SCINTILLA: {
 			nrItems = nppParam->getScintillaKeyList().size();
-			_babygrid.setLineColNumber(nrItems, 2);
+			_babygrid->setLineColNumber(nrItems, 2);
 			break; }
 	}
 
-	_babygrid.setText(0, 1, TEXT("Name"));
-	_babygrid.setText(0, 2, TEXT("Shortcut"));
+	_babygrid->setText(0, 1, TEXT("Name"));
+	_babygrid->setText(0, 2, TEXT("Shortcut"));
 
 	switch(_currentState) {
 		case STATE_MENU: {
-			vector<CommandShortcut> & cshortcuts = nppParam->getUserShortcuts();
+			std::vector<CommandShortcut> & cshortcuts = nppParam->getUserShortcuts();
 			for(size_t i = 0; i < nrItems; i++) {
-				_babygrid.setText(i+1, 1, cshortcuts[i].getName());
-				_babygrid.setText(i+1, 2, cshortcuts[i].toString().c_str());
+				_babygrid->setText(i+1, 1, cshortcuts[i].getName());
+				_babygrid->setText(i+1, 2, cshortcuts[i].toString().c_str());
 			}
 			break; }
 		case STATE_MACRO: {
-			vector<MacroShortcut> & cshortcuts = nppParam->getMacroList();
+			std::vector<MacroShortcut> & cshortcuts = nppParam->getMacroList();
 			for(size_t i = 0; i < nrItems; i++) {
-				_babygrid.setText(i+1, 1, cshortcuts[i].getName());
-				_babygrid.setText(i+1, 2, cshortcuts[i].toString().c_str());
+				_babygrid->setText(i+1, 1, cshortcuts[i].getName());
+				_babygrid->setText(i+1, 2, cshortcuts[i].toString().c_str());
 			}
 			break; }
 		case STATE_USER: {
-			vector<UserCommand> & cshortcuts = nppParam->getUserCommandList();
+			std::vector<UserCommand> & cshortcuts = nppParam->getUserCommandList();
 			for(size_t i = 0; i < nrItems; i++) {
-				_babygrid.setText(i+1, 1, cshortcuts[i].getName());
-				_babygrid.setText(i+1, 2, cshortcuts[i].toString().c_str());
+				_babygrid->setText(i+1, 1, cshortcuts[i].getName());
+				_babygrid->setText(i+1, 2, cshortcuts[i].toString().c_str());
 			}
 			break; }
 		case STATE_PLUGIN: {
-			vector<PluginCmdShortcut> & cshortcuts = nppParam->getPluginCommandList();
+			std::vector<PluginCmdShortcut> & cshortcuts = nppParam->getPluginCommandList();
 			for(size_t i = 0; i < nrItems; i++) {
-				_babygrid.setText(i+1, 1, cshortcuts[i].getName());
-				_babygrid.setText(i+1, 2, cshortcuts[i].toString().c_str());
+				_babygrid->setText(i+1, 1, cshortcuts[i].getName());
+				_babygrid->setText(i+1, 2, cshortcuts[i].toString().c_str());
 			}
 			break; }
 		case STATE_SCINTILLA: {
-			vector<ScintillaKeyMap> & cshortcuts = nppParam->getScintillaKeyList();
+			std::vector<ScintillaKeyMap> & cshortcuts = nppParam->getScintillaKeyList();
 			for(size_t i = 0; i < nrItems; i++) {
-				_babygrid.setText(i+1, 1, cshortcuts[i].getName());
-				_babygrid.setText(i+1, 2, cshortcuts[i].toString().c_str());
+				_babygrid->setText(i+1, 1, cshortcuts[i].getName());
+				_babygrid->setText(i+1, 2, cshortcuts[i].toString().c_str());
 			}
 			break; }
 	}
@@ -135,11 +192,10 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 	{
 		case WM_INITDIALOG :
 		{
-
 			initBabyGrid();
 			initTabs();
 			fillOutBabyGrid();
-			_babygrid.display();
+			_babygrid->display();
 			goToCenter();
 			return TRUE;
 		}
@@ -188,19 +244,20 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 
 				case IDM_BABYGRID_MODIFY :
 				{
+					assert(_babygrid);
 					NppParameters *nppParam = NppParameters::getInstance();
-					int row = _babygrid.getSelectedRow();
+					int row = _babygrid->getSelectedRow();
 
 					switch(_currentState) {
 						case STATE_MENU: {
 							//Get CommandShortcut corresponding to row
-							vector<CommandShortcut> & shortcuts = nppParam->getUserShortcuts();
+							std::vector<CommandShortcut> & shortcuts = nppParam->getUserShortcuts();
 							CommandShortcut csc = shortcuts[row - 1], prevcsc = shortcuts[row - 1];
 							csc.init(_hInst, _hSelf);
 							if (csc.doDialog() != -1 && prevcsc != csc) {	//shortcut was altered
 								nppParam->addUserModifiedIndex(row-1);
 								shortcuts[row - 1] = csc;
-								_babygrid.setText(row, 2, csc.toString().c_str());
+								_babygrid->setText(row, 2, csc.toString().c_str());
 								//Notify current Accelerator class to update everything
 								nppParam->getAccelerator()->updateShortcuts();
 
@@ -208,13 +265,13 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 							break; }
 						case STATE_MACRO: {
 							//Get MacroShortcut corresponding to row
-							vector<MacroShortcut> & shortcuts = nppParam->getMacroList();
+							std::vector<MacroShortcut> & shortcuts = nppParam->getMacroList();
 							MacroShortcut msc = shortcuts[row - 1], prevmsc = shortcuts[row - 1];
 							msc.init(_hInst, _hSelf);
 							if (msc.doDialog() != -1 && prevmsc != msc) {	//shortcut was altered
 								shortcuts[row - 1] = msc;
-								_babygrid.setText(row, 1, msc.getName());
-								_babygrid.setText(row, 2, msc.toString().c_str());
+								_babygrid->setText(row, 1, msc.getName());
+								_babygrid->setText(row, 2, msc.toString().c_str());
 
 								//Notify current Accelerator class to update everything
 								nppParam->getAccelerator()->updateShortcuts();
@@ -223,14 +280,14 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 							break; }
 						case STATE_USER: {
 							//Get UserCommand corresponding to row
-							vector<UserCommand> & shortcuts = nppParam->getUserCommandList();
+							std::vector<UserCommand> & shortcuts = nppParam->getUserCommandList();
 							UserCommand ucmd = shortcuts[row - 1], prevucmd = shortcuts[row - 1];
 							ucmd.init(_hInst, _hSelf);
 							prevucmd = ucmd;
 							if (ucmd.doDialog() != -1 && prevucmd != ucmd) {	//shortcut was altered
 								shortcuts[row - 1] = ucmd;
-								_babygrid.setText(row, 1, ucmd.getName());
-								_babygrid.setText(row, 2, ucmd.toString().c_str());
+								_babygrid->setText(row, 1, ucmd.getName());
+								_babygrid->setText(row, 2, ucmd.toString().c_str());
 
 								//Notify current Accelerator class to update everything
 								nppParam->getAccelerator()->updateShortcuts();
@@ -239,14 +296,14 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 							break; }
 						case STATE_PLUGIN: {
 							//Get PluginCmdShortcut corresponding to row
-							vector<PluginCmdShortcut> & shortcuts = nppParam->getPluginCommandList();
+							std::vector<PluginCmdShortcut> & shortcuts = nppParam->getPluginCommandList();
 							PluginCmdShortcut pcsc = shortcuts[row - 1], prevpcsc = shortcuts[row - 1];
 							pcsc.init(_hInst, _hSelf);
 							prevpcsc = pcsc;
 							if (pcsc.doDialog() != -1 && prevpcsc != pcsc) {	//shortcut was altered
 								nppParam->addPluginModifiedIndex(row-1);
 								shortcuts[row - 1] = pcsc;
-								_babygrid.setText(row, 2, pcsc.toString().c_str());
+								_babygrid->setText(row, 2, pcsc.toString().c_str());
 
 								//Notify current Accelerator class to update everything
 								nppParam->getAccelerator()->updateShortcuts();
@@ -262,7 +319,7 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 							break; }
 						case STATE_SCINTILLA: {
 							//Get ScintillaKeyMap corresponding to row
-							vector<ScintillaKeyMap> & shortcuts = nppParam->getScintillaKeyList();
+							std::vector<ScintillaKeyMap> & shortcuts = nppParam->getScintillaKeyList();
 							ScintillaKeyMap skm = shortcuts[row - 1], prevskm = shortcuts[row-1];
 							skm.init(_hInst, _hSelf);
 							if (skm.doDialog() != -1 && prevskm != skm)
@@ -270,7 +327,7 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 								//shortcut was altered
 								nppParam->addScintillaModifiedIndex(row-1);
 								shortcuts[row-1] = skm;
-								_babygrid.setText(row, 2, skm.toString().c_str());
+								_babygrid->setText(row, 2, skm.toString().c_str());
 
 								//Notify current Accelerator class to update key
 								nppParam->getScintillaAccelerator()->updateKeys();
@@ -285,7 +342,8 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 					NppParameters *nppParam = NppParameters::getInstance();
 					if (::MessageBox(_hSelf, TEXT("Are you sure you want to delete this shortcut?"), TEXT("Are you sure?"), MB_OKCANCEL) == IDOK)
 					{
-						const int row = _babygrid.getSelectedRow();
+						assert(_babygrid);
+						const int row = _babygrid->getSelectedRow();
 						int shortcutIndex = row-1;
 						int cmdID = -1;// = _pAccel->_pAccelArray[row-1].cmd;
 
@@ -301,8 +359,8 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 								return FALSE;			//this is bad
 								break; }
 							case STATE_MACRO: {
-								vector<MacroShortcut> & theMacros = nppParam->getMacroList();
-								vector<MacroShortcut>::iterator it = theMacros.begin();
+								std::vector<MacroShortcut> & theMacros = nppParam->getMacroList();
+								std::vector<MacroShortcut>::iterator it = theMacros.begin();
 								cmdID = theMacros[shortcutIndex].getID();
 								theMacros.erase(it + shortcutIndex);
 								fillOutBabyGrid();
@@ -320,8 +378,8 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 								//::SendMessage(_hParent, NPPM_INTERNAL_MACROLIST_MODIFIED, 0, 0);
 								break; }
 							case STATE_USER: {
-								vector<UserCommand> & theUserCmds = nppParam->getUserCommandList();
-								vector<UserCommand>::iterator it = theUserCmds.begin();
+								std::vector<UserCommand> & theUserCmds = nppParam->getUserCommandList();
+								std::vector<UserCommand>::iterator it = theUserCmds.begin();
 								cmdID = theUserCmds[shortcutIndex].getID();
 								theUserCmds.erase(it + shortcutIndex);
 								fillOutBabyGrid();
@@ -369,26 +427,30 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 					{
 						POINT p;
 						::GetCursorPos(&p);
-						if (!_rightClickMenu.isCreated())
+						if (!_rightClickMenu)
 						{
-							vector<MenuItemUnit> itemUnitArray;
+							_rightClickMenu = new ContextMenu();
+						}
+						if (!_rightClickMenu->isCreated())
+						{
+							std::vector<MenuItemUnit> itemUnitArray;
 							itemUnitArray.push_back(MenuItemUnit(IDM_BABYGRID_MODIFY, TEXT("Modify")));
 							itemUnitArray.push_back(MenuItemUnit(IDM_BABYGRID_DELETE, TEXT("Delete")));
-							_rightClickMenu.create(_hSelf, itemUnitArray);
+							_rightClickMenu->create(_hSelf, itemUnitArray);
 						}
 						switch(_currentState) {
 							case STATE_MACRO:
 							case STATE_USER: {
-								_rightClickMenu.enableItem(IDM_BABYGRID_DELETE, true);
+								_rightClickMenu->enableItem(IDM_BABYGRID_DELETE, true);
 								break; }
 							case STATE_MENU:
 							case STATE_PLUGIN:
 							case STATE_SCINTILLA: {
-								_rightClickMenu.enableItem(IDM_BABYGRID_DELETE, false);
+								_rightClickMenu->enableItem(IDM_BABYGRID_DELETE, false);
 								break; }
 						}
 
-						_rightClickMenu.display(p);
+						_rightClickMenu->display(p);
 						return TRUE;
 					}
 				}
@@ -399,3 +461,17 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 	}
 	return FALSE;
 }
+
+void ShortcutMapper::doDialog( bool isRTL /*= false*/ )
+{
+	if (isRTL)
+	{
+		DLGTEMPLATE *pMyDlgTemplate = NULL;
+		HGLOBAL hMyDlgTemplate = makeRTLResource(IDD_SHORTCUTMAPPER_DLG, &pMyDlgTemplate);
+		::DialogBoxIndirectParam(_hInst, pMyDlgTemplate, _hParent,  (DLGPROC)dlgProc, (LPARAM)this);
+		::GlobalFree(hMyDlgTemplate);
+	}
+	else
+		::DialogBoxParam(_hInst, MAKEINTRESOURCE(IDD_SHORTCUTMAPPER_DLG), _hParent, (DLGPROC)dlgProc, (LPARAM)this);
+}
+

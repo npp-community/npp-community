@@ -18,6 +18,9 @@
 #include "precompiled_headers.h"
 #include "SmartHighlighter.h"
 
+#include "ScintillaEditView.h"
+#include "FindReplaceDlg.h"
+
 #define MAXLINEHIGHLIGHT 400	//prevent highlighter from doing too much work when a lot is visible
 
 SmartHighlighter::SmartHighlighter(FindReplaceDlg * pFRDlg)
@@ -29,7 +32,8 @@ SmartHighlighter::SmartHighlighter(FindReplaceDlg * pFRDlg)
 void SmartHighlighter::highlightView(ScintillaEditView * pHighlightView)
 {
 	//Get selection
-	CharacterRange range = pHighlightView->getSelection();
+	CharacterRange range;
+	pHighlightView->getSelection(range);
 
 	//Clear marks
 	pHighlightView->clearIndicator(SCE_UNIVERSAL_FOUND_STYLE_2);
@@ -101,7 +105,7 @@ void SmartHighlighter::highlightView(ScintillaEditView * pHighlightView)
 
 	for(; currentLine < lastLine; currentLine++) {
 		int docLine = (int)pHighlightView->execute(SCI_DOCLINEFROMVISIBLE, currentLine);
-		if (docLine == prevDocLineChecked)
+		if (docLine == prevDocLineChecked || !_pFRDlg)
 			continue;	//still on same line (wordwrap)
 		prevDocLineChecked = docLine;
 		startPos = (int)pHighlightView->execute(SCI_POSITIONFROMLINE, docLine);

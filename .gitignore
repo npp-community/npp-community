@@ -32,4 +32,7 @@ UpgradeLog*.XML
 UpgradeReport*.*
 *.lnt
 *.old
+*.BASE.h
+*.LOCAL.h
+*.REMOTE.h
 

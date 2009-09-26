@@ -18,9 +18,52 @@
 // created by Daniel Volk mordorpost@volkarts.com
 
 #include "precompiled_headers.h"
+
 #include "RunMacroDlg.h"
-#include "ScintillaEditView.h"
+#include "Parameters.h"
+#include "resource.h"
 #include "Notepad_plus_msgs.h"
+#include "RunMacroDlg_rc.h"
+
+
+void RunMacroDlg::init(HINSTANCE hInst, HWND hPere)
+{
+	Window::init(hInst, hPere);
+}
+
+void RunMacroDlg::doDialog(bool isRTL)
+{
+	if (!isCreated())
+		create(IDD_RUN_MACRO_DLG, isRTL);
+	else
+		::ShowWindow(_hSelf, SW_SHOW);
+}
+
+void RunMacroDlg::initMacroList()
+{
+	if (!isCreated()) return;
+
+	NppParameters *pNppParam = NppParameters::getInstance();
+	std::vector<MacroShortcut> & macroList = pNppParam->getMacroList();
+
+	::SendDlgItemMessage(_hSelf, IDC_MACRO_COMBO, CB_RESETCONTENT, 0, 0);
+
+	if (::SendMessage(_hParent, WM_ISCURRENTMACRORECORDED, 0, 0))
+		::SendDlgItemMessage(_hSelf, IDC_MACRO_COMBO, CB_ADDSTRING, 0, (LPARAM)TEXT("Current recorded macro"));
+
+	for (size_t i = 0 ; i < macroList.size() ; i++)
+		::SendDlgItemMessage(_hSelf, IDC_MACRO_COMBO, CB_ADDSTRING, 0, (LPARAM)macroList[i].getName());
+
+	::SendDlgItemMessage(_hSelf, IDC_MACRO_COMBO, CB_SETCURSEL, 0, 0);
+	m_macroIndex = 0;
+}
+
+int RunMacroDlg::getMacro2Exec() const
+{
+	bool isCurMacroPresent = ::SendMessage(_hParent, WM_ISCURRENTMACRORECORDED, 0, 0) == TRUE;
+	return isCurMacroPresent?(m_macroIndex - 1):m_macroIndex;
+};
+
 
 
 BOOL CALLBACK RunMacroDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lParam*/)
@@ -113,3 +156,8 @@ void RunMacroDlg::check(int id)
 	else
 		::SendDlgItemMessage(_hSelf, IDC_M_RUN_EOF, BM_SETCHECK, BST_UNCHECKED, 0);
 }
+
+bool RunMacroDlg::isCheckedOrNot(int checkControlID) const
+{
+	return (BST_CHECKED == ::SendMessage(::GetDlgItem(_hSelf, checkControlID), BM_GETCHECK, 0, 0));
+};
