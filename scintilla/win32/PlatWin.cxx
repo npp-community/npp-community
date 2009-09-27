@@ -350,7 +350,9 @@ class SurfaceImpl : public Surface {
 
 	// Private so SurfaceImpl objects can not be copied
 	SurfaceImpl(const SurfaceImpl &) : Surface() {}
-	SurfaceImpl &operator=(const SurfaceImpl &) { return *this; }
+	// NPPSTART Joce 08/09/09 LintCleanup
+	const SurfaceImpl &operator=(const SurfaceImpl &) { return *this; }
+	// NPPEND
 public:
 	SurfaceImpl();
 	virtual ~SurfaceImpl();
@@ -681,7 +683,9 @@ public:
 			buffer = bufferStandard;
 		}
 	}
-	~VarBuffer() {
+	// NPPSTART Joce 08/09/09 LintCleanup
+	virtual ~VarBuffer() {
+	// NPPEND
 		if (buffer != bufferStandard) {
 			delete []buffer;
 			buffer = 0;

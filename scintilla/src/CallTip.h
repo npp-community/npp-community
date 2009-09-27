@@ -28,7 +28,9 @@ class CallTip {
 
 	// Private so CallTip objects can not be copied
 	CallTip(const CallTip &) {}
-	CallTip &operator=(const CallTip &) { return *this; }
+	// NPPSTART Joce 08/09/09 LintCleanup
+	const CallTip &operator=(const CallTip &) { return *this; }
+	// NPPEND
 	void DrawChunk(Surface *surface, int &x, const char *s,
 		int posStart, int posEnd, int ytext, PRectangle rcClient,
 		bool highlight, bool draw);

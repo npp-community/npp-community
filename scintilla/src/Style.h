@@ -44,7 +44,9 @@ public:
 	Style();
 	Style(const Style &source);
 	~Style();
-	Style &operator=(const Style &source);
+	// NPPSTART Joce 08/09/09 LintCleanup
+	const Style &operator=(const Style &source);
+	// NPPEND
 	void Clear(ColourDesired fore_, ColourDesired back_,
 	           int size_,
 	           const char *fontName_, int characterSet_,

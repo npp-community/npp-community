@@ -1,4 +1,7 @@
-#pragma once
+// NPPSTART Joce 08/09/09 LintCleanup
+#ifndef TARGERVER_H
+#define TARGERVER_H
+// NPPEND
 
 // The following macros define the minimum required platform.  The minimum required platform
 // is the earliest version of Windows, Internet Explorer etc. that has the necessary features to run
@@ -22,3 +25,7 @@
 //#ifndef _WIN32_IE                       // Specifies that the minimum required platform is Internet Explorer 7.0.
 //#define _WIN32_IE 0x0600        // Change this to the appropriate value to target other versions of IE.
 //#endif
+
+// NPPSTART Joce 08/09/09 LintCleanup
+#endif //TARGERVER_H
+// NPPEND

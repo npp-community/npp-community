@@ -271,7 +271,9 @@ class QuoteCls {
         Up    = q.Up;
         Down  = q.Down;
     }
-    QuoteCls& operator=(const QuoteCls& q) { // assignment constructor
+	// NPPSTART Joce 08/09/09 LintCleanup
+	const QuoteCls& operator=(const QuoteCls& q) { // assignment constructor
+	// NPPEND
         if (this != &q) {
             Count = q.Count;
             Up    = q.Up;

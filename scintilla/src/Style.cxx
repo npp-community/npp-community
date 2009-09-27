@@ -52,7 +52,9 @@ Style::~Style() {
 	aliasOfDefaultFont = false;
 }
 
-Style &Style::operator=(const Style &source) {
+// NPPSTART Joce 08/09/09 LintCleanup
+const Style &Style::operator=(const Style &source) {
+// NPPEND
 	if (this == &source)
 		return * this;
 	Clear(ColourDesired(0, 0, 0), ColourDesired(0xff, 0xff, 0xff),

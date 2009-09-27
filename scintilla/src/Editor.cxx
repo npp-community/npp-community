@@ -328,7 +328,9 @@ const char *ControlCharacterString(unsigned char ch) {
 class AutoLineLayout {
 	LineLayoutCache &llc;
 	LineLayout *ll;
-	AutoLineLayout &operator=(const AutoLineLayout &) { return * this; }
+	// NPPSTART Joce 08/09/09 LintCleanup
+	const AutoLineLayout &operator=(const AutoLineLayout &) { return * this; }
+	// NPPEND
 public:
 	AutoLineLayout(LineLayoutCache &llc_, LineLayout *ll_) : llc(llc_), ll(ll_) {}
 	~AutoLineLayout() {

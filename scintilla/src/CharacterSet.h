@@ -5,6 +5,11 @@
 // Copyright 2007 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
+// NPPSTART Joce 08/09/09 LintCleanup
+#ifndef CHARACTERSET_H
+#define CHARACTERSET_H
+// NPPEND
+
 class CharacterSet {
 	int size;
 	bool valueAfter;
@@ -56,3 +61,7 @@ public:
 		return (val < size) ? bset[val] : valueAfter;
 	}
 };
+
+// NPPSTART Joce 08/09/09 LintCleanup
+#endif // CHARACTERSET_H
+// NPPEND

@@ -24,7 +24,9 @@
 #include "Platform.h"
 
 #include "Scintilla.h"
-#include "SString.h"
+// NPPSTART Joce 08/09/09 LintCleanup
+//#include "SString.h"
+// NPPEND
 #ifdef SCI_LEXER
 #include "SciLexer.h"
 #include "PropSet.h"
@@ -178,7 +180,7 @@ class ScintillaWin :
 	ScintillaWin(HWND hwnd);
 	ScintillaWin(const ScintillaWin &) : ScintillaBase() {}
 	virtual ~ScintillaWin();
-	ScintillaWin &operator=(const ScintillaWin &) { return *this; }
+	const ScintillaWin &operator=(const ScintillaWin &) { return *this; }
 
 	virtual void Initialise();
 	virtual void Finalise();

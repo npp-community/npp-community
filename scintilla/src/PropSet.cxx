@@ -14,7 +14,9 @@
 //#include <stdio.h>
 // NPPEND
 
-#include "Platform.h"
+// NPPSTART Joce 08/09/09 LintCleanup
+//#include "Platform.h"
+// NPPEND
 
 #include "PropSet.h"
 

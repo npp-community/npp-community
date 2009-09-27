@@ -5,6 +5,11 @@
 // Copyright 1998-2004 by Neil Hodgson <neilh@scintilla.org>
 // This file is in the public domain.
 
+// NPPSTART Joce 08/09/09 LintCleanup
+#ifndef STYLECONTEXT_H
+#define STYLECONTEXT_H
+// NPPEND
+
 #ifdef SCI_NAMESPACE
 namespace Scintilla {
 #endif
@@ -16,9 +21,11 @@ namespace Scintilla {
 class StyleContext {
 	Accessor &styler;
 	unsigned int endPos;
-	StyleContext& operator=(const StyleContext&) {
+	// NPPSTART Joce 08/09/09 LintCleanup
+	const StyleContext& operator=(const StyleContext&) {
 		return *this;
 	}
+	// NPPEND
 	void GetNextChar(unsigned int pos) {
 		chNext = static_cast<unsigned char>(styler.SafeGetCharAt(pos+1));
 		if (styler.IsLeadByte(static_cast<char>(chNext))) {
@@ -177,3 +184,7 @@ inline bool IsADigit(unsigned int ch, unsigned int base) {
 		       ((ch >= 'a') && (ch < 'a' + base - 10));
 	}
 }
+
+// NPPSTART Joce 08/09/09 LintCleanup
+#endif // STYLECONTEXT_H
+//NPPEND

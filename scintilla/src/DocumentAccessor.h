@@ -6,6 +6,11 @@
 // Copyright 1998-2001 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
+// NPPSTART Joce 08/09/09 LintCleanup
+#ifndef DOCUMENTACCESSOR_H
+#define DOCUMENTACCESSOR_H
+// NPPEND
+
 #ifdef SCI_NAMESPACE
 namespace Scintilla {
 #endif
@@ -17,7 +22,9 @@ class Document;
 class DocumentAccessor : public Accessor {
 	// Private so DocumentAccessor objects can not be copied
 	DocumentAccessor(const DocumentAccessor &source) : Accessor(), props(source.props) {}
-	DocumentAccessor &operator=(const DocumentAccessor &) { return *this; }
+	// NPPSTART Joce 08/09/09 LintCleanup
+	const DocumentAccessor &operator=(const DocumentAccessor &) { return *this; }
+	// NPPEND
 
 protected:
 	Document *pdoc;
@@ -74,3 +81,7 @@ public:
 #ifdef SCI_NAMESPACE
 }
 #endif
+
+// NPPSTART Joce 08/09/09 LintCleanup
+#endif // DOCUMENTACCESSOR_H
+//NPPEND

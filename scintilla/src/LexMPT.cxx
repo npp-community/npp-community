@@ -22,7 +22,9 @@
 #include "KeyWords.h"
 #include "Scintilla.h"
 #include "SciLexer.h"
-#include "SString.h"
+// NPPSTART Joce 08/09/09 LintCleanup
+//#include "SString.h"
+// NPPEND
 
 #ifdef SCI_NAMESPACE
 using namespace Scintilla;
