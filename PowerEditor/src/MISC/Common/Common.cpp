@@ -477,6 +477,7 @@ TCHAR *BuildMenuFileName(TCHAR *buffer, int len, int pos, const TCHAR *filename)
 	return buffer;
 }
 
+
 BOOL PathRemoveFileSpec(generic_string & path)
 {
 	size_t inLen = path.length();
@@ -501,3 +502,38 @@ BOOL PathRemoveFileSpec(generic_string & path)
 	return inLen != path.length();
 }
 
+// JOCE: Needs tests!!
+BOOL PathAppend(generic_string &strDest, const generic_string str2append)
+{
+	if (strDest == TEXT("") && str2append == TEXT("")) // "" + ""
+	{
+		strDest = TEXT("\\");
+		return TRUE;
+	}
+
+	if (strDest == TEXT("") && str2append != TEXT("")) // "" + titi
+	{
+		strDest = str2append;
+		return TRUE;
+	}
+
+	if (strDest[strDest.length() - 1] == '\\' && (str2append != TEXT("") && str2append[0] == '\\')) // toto\ + \titi
+	{
+		strDest.erase(strDest.length() - 1, 1);
+		strDest += str2append;
+		return TRUE;
+	}
+
+	if ((strDest[strDest.length() - 1] == '\\' && (str2append != TEXT("") && str2append[0] != '\\')) // toto\ + titi
+		|| (strDest[strDest.length() - 1] != '\\' && (str2append != TEXT("") && str2append[0] == '\\'))) // toto + \titi
+	{
+		strDest += str2append;
+		return TRUE;
+	}
+
+	// toto + titi
+	strDest += TEXT("\\");
+	strDest += str2append;
+
+	return TRUE;
+}

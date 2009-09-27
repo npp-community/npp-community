@@ -118,8 +118,15 @@ void WordStyleDlg::restoreGlobalOverrideValues()
 Style & WordStyleDlg::getCurrentStyler()
 {
 	int styleIndex = ::SendDlgItemMessage(_hSelf, IDC_STYLES_LIST, LB_GETCURSEL, 0, 0);
+	if (styleIndex == LB_ERR)
+	{
+		styleIndex = 0;
+	}
+
 	if (_currentLexerIndex == 0)
+	{
 		return _globalStyles.getStyler(styleIndex);
+	}
 	else
 	{
 		LexerStyler & lexerStyler = _lsArray.getLexerFromIndex(_currentLexerIndex - 1);
@@ -287,7 +294,6 @@ BOOL CALLBACK WordStyleDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPar
 			{
 				std::pair<generic_string, generic_string> & themeInfo = themeSwitcher.getElementFromIndex(i);
 				int j = ::SendMessage(_hSwitch2ThemeCombo, CB_ADDSTRING, 0, (LPARAM)themeInfo.first.c_str());
-				::SendMessage(_hSwitch2ThemeCombo, CB_SETITEMDATA, j, (LPARAM)themeInfo.second.c_str());
 				if (! themeInfo.second.compare( nppParamInst->getNppGUI()._themeName ) )
 				{
 					_currentThemeIndex = j;
@@ -801,7 +807,11 @@ void WordStyleDlg::switchToTheme()
 
 	generic_string prevThemeName(_themeName);
 	_themeName.clear();
-	_themeName.assign( (TCHAR *)::SendMessage(_hSwitch2ThemeCombo, CB_GETITEMDATA, iSel, 0) );
+
+	NppParameters *nppParamInst = NppParameters::getInstance();
+    ThemeSwitcher & themeSwitcher = nppParamInst->getThemeSwitcher();
+	std::pair<generic_string, generic_string> & themeInfo = themeSwitcher.getElementFromIndex(iSel);
+    _themeName = themeInfo.second;
 
 	if (_isThemeDirty)
 	{
@@ -818,9 +828,6 @@ void WordStyleDlg::switchToTheme()
 		if ( mb_response == IDYES )
 			(NppParameters::getInstance())->writeStyles(_lsArray, _globalStyles);
 	}
-
-
-	NppParameters *nppParamInst = NppParameters::getInstance();
 	nppParamInst->reloadStylers(&_themeName[0]);
 
 	loadLangListFromNppParam();
@@ -1022,3 +1029,11 @@ void WordStyleDlg::apply()
 	::EnableWindow(::GetDlgItem(_hSelf, IDOK), FALSE);
 	::SendMessage(_hParent, WM_UPDATESCINTILLAS, 0, 0);
 }
+
+void WordStyleDlg::addLastThemeEntry()
+{
+	NppParameters *nppParamInst = NppParameters::getInstance();
+	ThemeSwitcher & themeSwitcher = nppParamInst->getThemeSwitcher();
+	std::pair<generic_string, generic_string> & themeInfo = themeSwitcher.getElementFromIndex(themeSwitcher.size() - 1);
+	::SendMessage(_hSwitch2ThemeCombo, CB_ADDSTRING, 0, (LPARAM)themeInfo.first.c_str());
+};

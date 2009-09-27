@@ -207,6 +207,121 @@ struct PrintSettings {
 	};
 };
 
+class Date {
+public:
+    Date() : _year(2008), _month(4), _day(26){};
+    Date(unsigned long year, unsigned long month, unsigned long day) {
+        assert(year > 0 && year <= 9999); // I don't think Notepad++ will last till AD 10000 :)
+        assert(month > 0 && month <= 12);
+        assert(day > 0 && day <= 31);
+        assert(!(month == 2 && day > 29) &&
+               !(month == 4 && day > 30) &&
+               !(month == 6 && day > 30) &&
+               !(month == 9 && day > 30) &&
+               !(month == 11 && day > 30));
+
+        _year = year;
+        _month = month;
+        _day = day;
+    };
+
+    Date(const TCHAR *dateStr) { // timeStr should be Notepad++ date format : YYYYMMDD
+        assert(dateStr);
+        if (lstrlen(dateStr) == 8)
+        {
+            generic_string ds(dateStr);
+            generic_string yyyy(ds, 0, 4);
+            generic_string mm(ds, 4, 2);
+            generic_string dd(ds, 6, 2);
+
+            int y = generic_atoi(yyyy.c_str());
+            int m = generic_atoi(mm.c_str());
+            int d = generic_atoi(dd.c_str());
+
+            if ((y > 0 && y <= 9999) && (m > 0 && m <= 12) && (d > 0 && d <= 31))
+            {
+                _year = y;
+                _month = m;
+                _day = d;
+                return;
+            }
+        }
+        now();
+    };
+
+    // The constructor which makes the date of number of days from now
+    // nbDaysFromNow could be negative if user want to make a date in the past
+    // if the value of nbDaysFromNow is 0 then the date will be now
+    Date(int nbDaysFromNow)
+    {
+        const time_t oneDay = (60 * 60 * 24);
+
+        time_t rawtime;
+        tm timeinfo;
+
+        time(&rawtime);
+        rawtime += (nbDaysFromNow * oneDay);
+
+        localtime_s(&timeinfo, &rawtime);
+
+        _year = timeinfo.tm_year+1900;
+        _month = timeinfo.tm_mon+1;
+        _day = timeinfo.tm_mday;
+    }
+
+    void now() {
+        time_t rawtime;
+        tm timeinfo;
+
+        time(&rawtime);
+        localtime_s(&timeinfo, &rawtime);
+
+        _year = timeinfo.tm_year+1900;
+        _month = timeinfo.tm_mon+1;
+        _day = timeinfo.tm_mday;
+    }
+
+    generic_string toString() { // Return Notepad++ date format : YYYYMMDD
+        TCHAR dateStr[8+1];
+        wsprintf(dateStr, TEXT("%04d%02d%02d"), _year, _month, _day);
+        return dateStr;
+    };
+
+    bool operator<(const Date & compare) const {
+        if (this->_year != compare._year)
+            return (this->_year < compare._year);
+        if (this->_month != compare._month)
+            return (this->_month < compare._month);
+        return (this->_day < compare._day);
+    };
+    bool operator>(const Date & compare) const {
+        if (this->_year != compare._year)
+            return (this->_year > compare._year);
+        if (this->_month != compare._month)
+            return (this->_month > compare._month);
+        return (this->_day > compare._day);
+    };
+    bool operator==(const Date & compare) const {
+        if (this->_year != compare._year)
+            return false;
+        if (this->_month != compare._month)
+            return false;
+        return (this->_day == compare._day);
+    };
+    bool operator!=(const Date & compare) const {
+        if (this->_year != compare._year)
+            return true;
+        if (this->_month != compare._month)
+            return true;
+        return (this->_day != compare._day);
+    };
+
+private:
+    unsigned long _year;
+    unsigned long _month;
+    unsigned long _day;
+};
+
 struct NppGUI
 {
 	NppGUI() :
@@ -217,8 +332,7 @@ struct NppGUI
 		_rememberLastSession(true), _enableMouseWheelZoom(true),  _doTaskList(true), _maitainIndent(true), _enableSmartHilite(true),
 		_enableTagsMatchHilite(true), _enableTagAttrsHilite(true), _enableHiliteNonHTMLZone(false), _styleMRU(true), _styleURL(0),
 		_isLangMenuCompact(false), _backup(bak_none), _useDir(false), _autocStatus(autoc_none), _autocFromLen(1), _funcParams(false),
-		_neverUpdate(false), _doesExistUpdater(false), _caretBlinkRate(250), _caretWidth(1), _shortTitlebar(false),
-		_openSaveDir(dir_followCurrent)
+		_doesExistUpdater(false), _caretBlinkRate(250), _caretWidth(1), _shortTitlebar(false), _openSaveDir(dir_followCurrent)
 	{
 		_appPos.left = 0;
 		_appPos.top = 0;
@@ -292,7 +406,14 @@ struct NppGUI
 	bool _funcParams;
 
 	generic_string _definedSessionExt;
-	bool _neverUpdate;
+
+    struct AutoUpdateOptions {
+        bool _doAutoUpdate;
+        int _intervalDays;
+        Date _nextUpdateDate;
+        AutoUpdateOptions(): _doAutoUpdate(true), _intervalDays(15), _nextUpdateDate(Date()) {};
+    } _autoUpdateOpt;
+
 	bool _doesExistUpdater;
 	int _caretBlinkRate;
 	int _caretWidth;
@@ -572,11 +693,6 @@ friend class NppParameters;
 
 public :
 	ThemeSwitcher(){};
-
-	struct ThemeDefinition {
-		TCHAR *_themeName;
-		TCHAR *_xmlFileName;
-	};
 
 	void addThemeFromXml(generic_string xmlFullPath) {
 		_themeList.push_back(std::pair<generic_string, generic_string>(getThemeFromXmlFileName(xmlFullPath.c_str()), xmlFullPath));
@@ -860,8 +976,8 @@ public:
 	ScintillaAccelerator * getScintillaAccelerator() {return _pScintAccelerator;};
 
 	generic_string getNppPath() const {return _nppPath;};
-	const TCHAR * getAppDataNppDir() const {return _appdataNppDir;};
-	const TCHAR * getWorkingDir() const {return _currentDirectory;};
+	const TCHAR * getAppDataNppDir() const {return _appdataNppDir.c_str();};
+	const TCHAR * getWorkingDir() const {return _currentDirectory.c_str();};
 	void setWorkingDir(const TCHAR * newPath);
 
 	bool loadSession(Session* session, const TCHAR *sessionFileName);
@@ -939,9 +1055,7 @@ private:
 	// JOCE use a std::vector instead!
 	UserLangContainer *_userLangArray[NB_MAX_USER_LANG];
 	int _nbUserLang;
-	// JOCE use a std::string instead
-	TCHAR _userDefineLangPath[MAX_PATH];
-	// JOCE use a std::vector instead!
+	generic_string _userDefineLangPath;
 	ExternalLangContainer *_externalLangArray[NB_MAX_EXTERNAL_LANG];
 	int _nbExternalLang;
 
@@ -980,15 +1094,14 @@ private:
 	std::vector<MenuItemUnit> _contextMenuItems;
 	Session* _session;
 
-	// JOCE: Could / should be repalced by std::strings.
-	TCHAR _shortcutsPath[MAX_PATH];
-	TCHAR _contextMenuPath[MAX_PATH];
-	TCHAR _sessionPath[MAX_PATH];
+	generic_string _shortcutsPath;
+	generic_string _contextMenuPath;
+	generic_string _sessionPath;
 	generic_string _nppPath;
-	TCHAR _userPath[MAX_PATH];
-	TCHAR _stylerPath[MAX_PATH];
-	TCHAR _appdataNppDir[MAX_PATH]; // sentinel of the absence of "doLocalConf.xml" : (_appdataNppDir == TEXT(""))?"doLocalConf.xml present":"doLocalConf.xml absent"
-	TCHAR _currentDirectory[MAX_PATH];
+	generic_string _userPath;
+	generic_string _stylerPath;
+	generic_string _appdataNppDir; // sentinel of the absence of "doLocalConf.xml" : (_appdataNppDir == TEXT(""))?"doLocalConf.xml present":"doLocalConf.xml absent"
+	generic_string _currentDirectory;
 
 	Accelerator *_pAccelerator;
 	ScintillaAccelerator * _pScintAccelerator;

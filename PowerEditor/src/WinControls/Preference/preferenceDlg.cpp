@@ -862,7 +862,7 @@ BOOL CALLBACK SettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPa
 			::SendDlgItemMessage(_hSelf, IDC_CHECK_MIN2SYSTRAY, BM_SETCHECK, nppGUI._isMinimizedToTray, 0);
 			::SendDlgItemMessage(_hSelf, IDC_CHECK_REMEMBERSESSION, BM_SETCHECK, nppGUI._rememberLastSession, 0);
 			::SendDlgItemMessage(_hSelf, IDC_CHECK_ENABLEWHEELZOOM, BM_SETCHECK, nppGUI._enableMouseWheelZoom, 0);
-			::SendDlgItemMessage(_hSelf, IDC_CHECK_AUTOUPDATE, BM_SETCHECK, !nppGUI._neverUpdate, 0);
+            ::SendDlgItemMessage(_hSelf, IDC_CHECK_AUTOUPDATE, BM_SETCHECK, nppGUI._autoUpdateOpt._doAutoUpdate, 0);
 
 			bool isVistaAndAfter = (getWinVersion() >= WV_VISTA);
 			if (isVistaAndAfter)
@@ -995,7 +995,7 @@ BOOL CALLBACK SettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPa
 				return TRUE;
 
 				case IDC_CHECK_AUTOUPDATE:
-					nppGUI._neverUpdate = !isCheckedOrNot(wParam);
+                    nppGUI._autoUpdateOpt._doAutoUpdate = isCheckedOrNot(wParam);
 					return TRUE;
 
 				case IDC_CHECK_MIN2SYSTRAY:

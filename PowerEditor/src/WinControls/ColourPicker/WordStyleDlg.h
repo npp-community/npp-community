@@ -62,6 +62,7 @@ public :
 
 	void apply();
 
+	void addLastThemeEntry();
 private :
     ColourPicker *_pFgColour;
     ColourPicker *_pBgColour;
@@ -99,7 +100,6 @@ private :
 	bool _isShownGOCtrls;
 
 	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
-
 
 	Style & getCurrentStyler();
 	int whichTabColourIndex();
