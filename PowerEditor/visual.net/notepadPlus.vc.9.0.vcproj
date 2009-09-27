@@ -829,6 +829,14 @@
 				RelativePath="..\tests\testPathRemoveFileSpec.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\tests\testPathAppend.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\tests\testPathCanonicalize.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

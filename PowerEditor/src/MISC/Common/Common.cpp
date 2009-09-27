@@ -502,38 +502,149 @@ BOOL PathRemoveFileSpec(generic_string & path)
 	return inLen != path.length();
 }
 
-// JOCE: Needs tests!!
-BOOL PathAppend(generic_string &strDest, const generic_string str2append)
+
+BOOL PathAppend(generic_string &path, const generic_string &more)
 {
-	if (strDest == TEXT("") && str2append == TEXT("")) // "" + ""
+	BOOL moreEmpty = more.empty() || (more.size() == 1 && more[0] == TEXT('\\'));
+
+	if ((path.empty() && moreEmpty)
+		|| (!path.empty() && !moreEmpty && path[path.size() - 1] != TEXT('\\')))
 	{
-		strDest = TEXT("\\");
-		return TRUE;
+		path += TEXT("\\");
 	}
 
-	if (strDest == TEXT("") && str2append != TEXT("")) // "" + titi
+	if (!moreEmpty)
 	{
-		strDest = str2append;
-		return TRUE;
+		if (more[0] == TEXT('\\'))
+			path.append(more, 1, generic_string::npos);
+		else
+			path.append(more);
 	}
 
-	if (strDest[strDest.length() - 1] == '\\' && (str2append != TEXT("") && str2append[0] == '\\')) // toto\ + \titi
-	{
-		strDest.erase(strDest.length() - 1, 1);
-		strDest += str2append;
-		return TRUE;
-	}
+	PathCanonicalize(path);
 
-	if ((strDest[strDest.length() - 1] == '\\' && (str2append != TEXT("") && str2append[0] != '\\')) // toto\ + titi
-		|| (strDest[strDest.length() - 1] != '\\' && (str2append != TEXT("") && str2append[0] == '\\'))) // toto + \titi
-	{
-		strDest += str2append;
-		return TRUE;
-	}
 
-	// toto + titi
-	strDest += TEXT("\\");
-	strDest += str2append;
 
 	return TRUE;
+}
+
+
+
+BOOL PathCanonicalize(generic_string& path)
+{
+	generic_string::size_type position     = path.size();
+	generic_string::size_type lastPosition = position;
+	generic_string::size_type removeFrom   = position;
+	generic_string::size_type stopAt	   = 0;
+
+	int upDirElements   = 0;
+	int sameDirElements = 0;
+
+	/* Note this mirrors a bug with win32 PathCanonicalize not supporting
+	 * relative paths with drive letters (e.g. C:abc\\def)
+	 */
+	if (position >= 3 && path.compare(1, 2, TEXT(":\\")) == 0)
+	{
+		stopAt = 2;
+	}
+
+
+	do
+	{
+		position = path.find_last_of(TEXT('\\'), position);
+		if (generic_string::npos == position)
+			position = 0;
+
+
+		if (path.compare(position, lastPosition - position, TEXT("\\..")) == 0)
+		{
+			if (0 == sameDirElements  && 0 == upDirElements)
+				removeFrom = lastPosition;
+
+			upDirElements++;
+
+		}
+		else if (path.compare(position, lastPosition - position, TEXT("\\.")) == 0)
+		{
+			if (0 == sameDirElements  && 0 == upDirElements)
+				removeFrom = lastPosition;
+
+			sameDirElements++;
+
+		}
+		else if (0 == position && path.compare(position, lastPosition - position, TEXT("..")) == 0)
+		{
+			// Special case for .. at the start of the path
+
+			if (0 == sameDirElements  && 0 == upDirElements)
+				removeFrom = lastPosition;
+
+			upDirElements++;
+		}
+		else if (0 == position && path.compare(position, lastPosition - position, TEXT(".")) == 0)
+		{
+			// Special case for . at the start of the path
+
+			if (0 == sameDirElements  && 0 == upDirElements)
+				removeFrom = lastPosition;
+
+			sameDirElements++;
+		}
+		else
+		{
+			if (upDirElements > 1)
+			{
+				upDirElements--;
+			}
+			else if (1 == upDirElements)
+			{
+				// strip the \.. and the dir that precedes it (or however many there are
+				// e.g. abc\def\ghi\..\..\jkl  becomes abc\jkl
+				path.erase(position, removeFrom - position);
+
+				upDirElements = 0;
+				sameDirElements = 0;
+			}
+			else if (sameDirElements > 0)
+			{
+				path.erase(lastPosition, removeFrom - lastPosition);
+				sameDirElements = 0;
+			}
+
+		}
+
+		lastPosition = position;
+		if (position > 0)
+			position--;
+
+
+	} while (lastPosition > stopAt);
+
+
+
+	if (upDirElements > 0)
+	{
+		// if any .. path elements remain at the beginning of the path, just remove and leave the backslash
+		path.erase(stopAt, removeFrom - stopAt);
+	}
+	else if (sameDirElements > 0)
+	{
+		// if any . path elements remain, remove them, and leave the backslash only if it was there before
+		if (path[stopAt] == TEXT('\\'))
+			path.erase(stopAt, removeFrom - stopAt);
+		else
+			path.erase(stopAt, removeFrom + 1 - stopAt);
+	}
+
+
+
+	return TRUE;
+
+}
+
+
+BOOL PathCanonicalize(generic_string& path, generic_string& output)
+{
+	output.assign(path);
+	return PathCanonicalize(output);
 }
