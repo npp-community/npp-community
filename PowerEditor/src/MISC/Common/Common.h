@@ -88,7 +88,8 @@ std::string wstring2string(const std::wstring & rwString, UINT codepage);
 
 TCHAR *BuildMenuFileName(TCHAR *buffer, int len, int pos, const TCHAR *filename);
 
-void PathRemoveFileSpec(generic_string & path);
+// MS reimplementations with N++'s generic strings.
+BOOL PathRemoveFileSpec(generic_string & path);
 
 class WcharMbcsConvertor
 {
@@ -136,8 +137,5 @@ private:
 #else
 #define REBARBAND_SIZE sizeof(REBARBANDINFO)
 #endif
-
-void PathRemoveFileSpec(generic_string & path);
-
 
 #endif //M30_IDE_COMMUN_H

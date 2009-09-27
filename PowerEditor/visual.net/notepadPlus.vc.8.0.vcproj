@@ -1699,6 +1699,14 @@
 				</File>
 			</Filter>
 		</Filter>
+		<Filter
+			Name="Tests"
+			>
+			<File
+				RelativePath="..\tests\testPathRemoveFileSpec.cpp"
+				>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>
