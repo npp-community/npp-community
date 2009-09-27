@@ -10,15 +10,15 @@
 
 class URLCtrl : public Window {
 public:
-    URLCtrl():_hfUnderlined(0),_hCursor(0), _msgDest(NULL), _cmdID(0), _oldproc(NULL),
-        _linkColor(), _visitedColor(), _clicking(false) {_URL[0] = '\0';}
+    URLCtrl():_hfUnderlined(0),_hCursor(0), _msgDest(NULL), _cmdID(0), _oldproc(NULL), \
+		_linkColor(), _visitedColor(), _clicking(false){};
     ~URLCtrl();
     void create(HWND itemHandle, TCHAR * link, COLORREF linkColor = RGB(0,0,255));
 	void create(HWND itemHandle, int cmd, HWND msgDest = NULL);
     void destroy();
 
 protected :
-    TCHAR	 _URL[MAX_PATH];
+    generic_string _URL;
     HFONT	_hfUnderlined;
     HCURSOR	_hCursor;
 

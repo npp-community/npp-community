@@ -33,7 +33,7 @@ distribution.
 
 
 /*
-   TiXmlString is an emulation of the std::generic_string template.
+   TiXmlString is an emulation of the string template.
    Its purpose is to allow compiling TinyXML on compilers with no or poor STL support.
    Only the member functions relevant to the TinyXML project have been implemented.
    The buffer allocation is made by a simplistic power of 2 like mechanism : if we increase

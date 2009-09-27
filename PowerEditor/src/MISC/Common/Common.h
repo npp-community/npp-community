@@ -40,7 +40,7 @@
 	#define generic_fopen(pFile, filename, mode) if(_wfopen_s(&pFile, filename, mode) != 0){pFile = NULL;}
 	#define generic_fgets fgetws
 	#define generic_stat _wstat
-	#define generic_string wstring
+	//#define generic_string std::wstring
 	#define COPYDATA_FILENAMES COPYDATA_FILENAMESW
 #else
 	#define NppMainEntry WinMain
@@ -61,9 +61,11 @@
 	#define generic_fopen(pFile, filename, mode) if(fopen_s(&pFile, filename, mode) != 0){pFile = NULL;}
 	#define generic_fgets fgets
 	#define generic_stat _stat
-	#define generic_string string
+	//#define generic_string std::string
 	#define COPYDATA_FILENAMES COPYDATA_FILENAMESA
 #endif
+
+typedef std::basic_string<TCHAR, std::char_traits<TCHAR>, std::allocator<TCHAR> > generic_string;
 
 void folderBrowser(HWND parent, int outputCtrlID, const TCHAR *defaultStr = NULL);
 
@@ -75,8 +77,8 @@ void printStr(const TCHAR *str2print);
 void writeLog(const TCHAR *logFileName, const char *log2write);
 int filter(unsigned int code);
 int getCpFromStringValue(const char * encodingStr);
-std::generic_string purgeMenuItemString(const TCHAR * menuItemStr, bool keepAmpersand = false);
-std::vector<std::generic_string> tokenizeString(const std::generic_string & tokenString, const char delim);
+generic_string purgeMenuItemString(const TCHAR * menuItemStr, bool keepAmpersand = false);
+std::vector<generic_string> tokenizeString(const generic_string & tokenString, const char delim);
 
 void ClientRectToScreenRect(HWND hWnd, RECT* rect);
 void ScreenRectToClientRect(HWND hWnd, RECT* rect);
@@ -85,6 +87,8 @@ std::wstring string2wstring(const std::string & rString, UINT codepage);
 std::string wstring2string(const std::wstring & rwString, UINT codepage);
 
 TCHAR *BuildMenuFileName(TCHAR *buffer, int len, int pos, const TCHAR *filename);
+
+void PathRemoveFileSpec(generic_string & path);
 
 class WcharMbcsConvertor
 {

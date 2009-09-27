@@ -25,7 +25,7 @@ MenuItemUnit::MenuItemUnit() :
 
 }
 
-MenuItemUnit::MenuItemUnit( unsigned long cmdID, std::generic_string itemName, std::generic_string subMenuName/*=TEXT("")*/ ) : _cmdID(cmdID), _itemName(itemName), _subMenuName(subMenuName)
+MenuItemUnit::MenuItemUnit( unsigned long cmdID, generic_string itemName, generic_string subMenuName/*=TEXT("")*/ ) : _cmdID(cmdID), _itemName(itemName), _subMenuName(subMenuName)
 {
 
 }

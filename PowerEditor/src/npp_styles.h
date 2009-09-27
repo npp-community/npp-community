@@ -38,17 +38,17 @@ class TiXmlNode;
 struct Style
 {
 	int _styleID;
-	std::generic_string _styleDesc;
+	generic_string _styleDesc;
 
 	COLORREF _fgColor;
 	COLORREF _bgColor;
 	int _colorStyle;
-	std::generic_string _fontName;
+	generic_string _fontName;
 	int _fontStyle;
 	int _fontSize;
 
 	int _keywordClass;
-	std::generic_string *_keywords;
+	generic_string *_keywords;
 
 	Style();
 	Style(const Style & style);
@@ -117,9 +117,9 @@ public :
 	const TCHAR * getLexerUserExt() const {return _lexerUserExt.c_str();}
 
 private :
-	std::generic_string _lexerName;
-	std::generic_string _lexerDesc;
-	std::generic_string _lexerUserExt;
+	generic_string _lexerName;
+	generic_string _lexerDesc;
+	generic_string _lexerUserExt;
 };
 
 #define  MAX_LEXER_STYLE 80

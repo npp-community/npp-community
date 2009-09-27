@@ -84,7 +84,7 @@ private :
 
 	LexerStylerArray _lsArray;
     StyleArray _globalStyles;
-	std::generic_string _themeName;
+	generic_string _themeName;
 
 	LexerStylerArray _styles2restored;
 	StyleArray _gstyles2restored;
@@ -111,7 +111,7 @@ private :
 	void updateFontSize();
 	void updateUserKeywords();
 	void switchToTheme();
-	void updateThemeName(std::generic_string themeName);
+	void updateThemeName(generic_string themeName);
 
 	void loadLangListFromNppParam();
 

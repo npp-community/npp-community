@@ -308,7 +308,7 @@ void ToolBar::doPopop(POINT chevPoint) {
 	if (start < _nrCurrentButtons) {	//some buttons are hidden
 		HMENU menu = ::CreatePopupMenu();
 		int cmd;
-		std::generic_string text;
+		generic_string text;
 		while (start < _nrCurrentButtons) {
 			cmd = _pTBB[start].idCommand;
 			getNameStrFromCmd(cmd, text);

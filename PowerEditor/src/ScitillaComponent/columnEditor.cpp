@@ -147,11 +147,11 @@ BOOL CALLBACK ColumnEditorDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /
 									line = new TCHAR[lineLen];
 								}
 								(*_ppEditView)->getGenericText(line, lineBegin, lineEnd);
-								std::generic_string s2r(line);
+								generic_string s2r(line);
 
 								if (lineEndCol < cursorCol)
 								{
-									std::generic_string s_space(cursorCol - lineEndCol, ' ');
+									generic_string s_space(cursorCol - lineEndCol, ' ');
 									s2r.append(s_space);
 									s2r.append(str);
 								}
@@ -223,17 +223,17 @@ BOOL CALLBACK ColumnEditorDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /
 									line = new TCHAR[lineLen];
 								}
 								(*_ppEditView)->getGenericText(line, lineBegin, lineEnd);
-								std::generic_string s2r(line);
+								generic_string s2r(line);
 
 								/*
-								Calcule std::generic_string
+								Calcule generic_string
 								*/
 								int2str(str, stringSize, initialNumber, base, nb, isZeroLeading);
 								initialNumber += increaseNumber;
 
 								if (lineEndCol < cursorCol)
 								{
-									std::generic_string s_space(cursorCol - lineEndCol, ' ');
+									generic_string s_space(cursorCol - lineEndCol, ' ');
 									s2r.append(s_space);
 									s2r.append(str);
 								}

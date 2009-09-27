@@ -22,11 +22,11 @@
 #include "RunDlg.h"
 #include "Parameters.h"
 
-static void replaceStr(std::generic_string & str, std::generic_string str2BeReplaced, std::generic_string replacement)
+static void replaceStr(generic_string & str, generic_string str2BeReplaced, generic_string replacement)
 {
 	size_t pos = str.find(str2BeReplaced);
 
-	if (pos != std::generic_string::npos)
+	if (pos != generic_string::npos)
 		str.replace(pos, str2BeReplaced.length(), replacement);
 }
 
@@ -263,7 +263,7 @@ size_t Printer::doPrint(bool justDoIt)
 	{
 		frPrint.rc.top += headerLineHeight + headerLineHeight / 2;
 
-		std::generic_string headerLeftPart = nppGUI._printSettings._headerLeft;
+		generic_string headerLeftPart = nppGUI._printSettings._headerLeft;
 		if (headerLeftPart != TEXT(""))
 		{
 			replaceStr(headerLeftPart, shortDateVar, shortDate);
@@ -272,7 +272,7 @@ size_t Printer::doPrint(bool justDoIt)
 			expandNppEnvironmentStrs(headerLeftPart.c_str(), headerL, headerSize, _pdlg.hwndOwner);
 		}
 
-		std::generic_string headerMiddlePart = nppGUI._printSettings._headerMiddle;
+		generic_string headerMiddlePart = nppGUI._printSettings._headerMiddle;
 		if (headerMiddlePart != TEXT(""))
 		{
 			replaceStr(headerMiddlePart, shortDateVar, shortDate);
@@ -281,7 +281,7 @@ size_t Printer::doPrint(bool justDoIt)
 			expandNppEnvironmentStrs(headerMiddlePart.c_str(), headerM, headerSize, _pdlg.hwndOwner);
 		}
 
-		std::generic_string headerRightPart = nppGUI._printSettings._headerRight;
+		generic_string headerRightPart = nppGUI._printSettings._headerRight;
 		if (headerRightPart != TEXT(""))
 		{
 			replaceStr(headerRightPart, shortDateVar, shortDate);
@@ -296,7 +296,7 @@ size_t Printer::doPrint(bool justDoIt)
 	{
 		frPrint.rc.bottom -= footerLineHeight + footerLineHeight / 2;
 
-		std::generic_string footerLeftPart = nppGUI._printSettings._footerLeft;
+		generic_string footerLeftPart = nppGUI._printSettings._footerLeft;
 		if (footerLeftPart != TEXT(""))
 		{
 			replaceStr(footerLeftPart, shortDateVar, shortDate);
@@ -305,7 +305,7 @@ size_t Printer::doPrint(bool justDoIt)
 			expandNppEnvironmentStrs(footerLeftPart.c_str(), footerL, headerSize, _pdlg.hwndOwner);
 		}
 
-		std::generic_string footerMiddlePart = nppGUI._printSettings._footerMiddle;
+		generic_string footerMiddlePart = nppGUI._printSettings._footerMiddle;
 		if (footerMiddlePart != TEXT(""))
 		{
 			replaceStr(footerMiddlePart, shortDateVar, shortDate);
@@ -314,7 +314,7 @@ size_t Printer::doPrint(bool justDoIt)
 			expandNppEnvironmentStrs(footerMiddlePart.c_str(), footerM, headerSize, _pdlg.hwndOwner);
 		}
 
-		std::generic_string footerRightPart = nppGUI._printSettings._footerRight;
+		generic_string footerRightPart = nppGUI._printSettings._footerRight;
 		if (footerRightPart != TEXT(""))
 		{
 			replaceStr(footerRightPart, shortDateVar, shortDate);
@@ -366,10 +366,10 @@ size_t Printer::doPrint(bool justDoIt)
 				// Left part
 				if (headerL[0] != '\0')
 				{
-					std::generic_string headerLeft(headerL);
+					generic_string headerLeft(headerL);
 					size_t pos = headerLeft.find(pageVar);
 
-					if (pos != std::generic_string::npos)
+					if (pos != generic_string::npos)
 						headerLeft.replace(pos, lstrlen(pageVar), pageString);
 
 					::ExtTextOut(_pdlg.hDC, frPrint.rc.left + 5, frPrint.rc.top - headerLineHeight / 2,
@@ -379,9 +379,9 @@ size_t Printer::doPrint(bool justDoIt)
 				// Middle part
 				if (headerM != '\0')
 				{
-					std::generic_string headerMiddle(headerM);
+					generic_string headerMiddle(headerM);
 					size_t pos = headerMiddle.find(pageVar);
-					if (pos != std::generic_string::npos)
+					if (pos != generic_string::npos)
 						headerMiddle.replace(pos, lstrlen(pageVar), pageString);
 
 					::GetTextExtentPoint32(_pdlg.hDC, headerMiddle.c_str(), static_cast<int>(headerMiddle.length()), &size);
@@ -391,9 +391,9 @@ size_t Printer::doPrint(bool justDoIt)
 				// Right part
 				if (headerR != '\0')
 				{
-					std::generic_string headerRight(headerR);
+					generic_string headerRight(headerR);
 					size_t pos = headerRight.find(pageVar);
-					if (pos != std::generic_string::npos)
+					if (pos != generic_string::npos)
 						headerRight.replace(pos, lstrlen(pageVar), pageString);
 
 					::GetTextExtentPoint32(_pdlg.hDC, headerRight.c_str(), static_cast<int>(headerRight.length()), &size);
@@ -434,9 +434,9 @@ size_t Printer::doPrint(bool justDoIt)
 				// Left part
 				if (footerL[0] != '\0')
 				{
-					std::generic_string footerLeft(footerL);
+					generic_string footerLeft(footerL);
 					size_t pos = footerLeft.find(pageVar);
-					if (pos != std::generic_string::npos)
+					if (pos != generic_string::npos)
 						footerLeft.replace(pos, lstrlen(pageVar), pageString);
 
 					::ExtTextOut(_pdlg.hDC, frPrint.rc.left + 5, frPrint.rc.bottom + footerLineHeight / 2,
@@ -446,9 +446,9 @@ size_t Printer::doPrint(bool justDoIt)
 				// Middle part
 				if (footerM[0] != '\0')
 				{
-					std::generic_string footerMiddle(footerM);
+					generic_string footerMiddle(footerM);
 					size_t pos = footerMiddle.find(pageVar);
-					if (pos != std::generic_string::npos)
+					if (pos != generic_string::npos)
 						footerMiddle.replace(pos, lstrlen(pageVar), pageString);
 
 					::GetTextExtentPoint32(_pdlg.hDC, footerMiddle.c_str(), static_cast<int>(footerMiddle.length()), &size);
@@ -458,9 +458,9 @@ size_t Printer::doPrint(bool justDoIt)
 				// Right part
 				if (footerR[0] != '\0')
 				{
-					std::generic_string footerRight(footerR);
+					generic_string footerRight(footerR);
 					size_t pos = footerRight.find(pageVar);
-					if (pos != std::generic_string::npos)
+					if (pos != generic_string::npos)
 						footerRight.replace(pos, lstrlen(pageVar), pageString);
 					::GetTextExtentPoint32(_pdlg.hDC, footerRight.c_str(), static_cast<int>(footerRight.length()), &size);
 					::ExtTextOut(_pdlg.hDC, frPrint.rc.right - size.cx, frPrint.rc.bottom + footerLineHeight / 2,

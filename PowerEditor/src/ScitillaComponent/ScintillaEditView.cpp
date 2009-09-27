@@ -276,7 +276,7 @@ LRESULT ScintillaEditView::scintillaNew_Proc(HWND hwnd, UINT Message, WPARAM wPa
 					execute(SCI_BEGINUNDOACTION);
 
 					ColumnModeInfo colInfos = getColumnModeSelectInfo();
-					std::generic_string str(1, (TCHAR)wParam);
+					generic_string str(1, (TCHAR)wParam);
 					columnReplace(colInfos, str.c_str());
 
 					int selStart = execute(SCI_GETSELECTIONSTART)+1;
@@ -425,7 +425,7 @@ void ScintillaEditView::setSpecialStyle(const Style & styleToSet)
 		const char * fontNameA = wmc->wchar2char(styleToSet._fontName.c_str(), CP_ACP);
 		execute(SCI_STYLESETFONT, (WPARAM)styleID, (LPARAM)fontNameA);
 #else
-		execute(SCI_STYLESETFONT, (WPARAM)styleID, (LPARAM)styleToSet._fontName);
+		execute(SCI_STYLESETFONT, (WPARAM)styleID, (LPARAM)styleToSet._fontName.c_str());
 #endif
 	}
 	int fontStyle = styleToSet._fontStyle;

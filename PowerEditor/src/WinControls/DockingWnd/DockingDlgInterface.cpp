@@ -25,13 +25,15 @@
 void DockingDlgInterface::init( HINSTANCE hInst, HWND parent )
 {
 	StaticDialog::init(hInst, parent);
-	::GetModuleFileName((HMODULE)hInst, _moduleName, MAX_PATH);
-	lstrcpy(_moduleName, PathFindFileName(_moduleName));
+	TCHAR tmp[MAX_PATH];
+	::GetModuleFileName((HMODULE)hInst, tmp, MAX_PATH);
+	_moduleName = PathFindFileName(tmp);
 }
 
 void DockingDlgInterface::create( tTbData * data, bool isRTL /*= false*/ )
 {
 	StaticDialog::create(_dlgID, isRTL);
+
 	::GetWindowText(_hSelf, _pluginName, MAX_PATH);
 
 	// user information

@@ -770,7 +770,7 @@ void WindowsMenu::init(HINSTANCE hInst, HMENU hMainMenu, const TCHAR *translatio
 
 	if (translation && translation[0])
 	{
-		std::generic_string windowStr(translation);
+		generic_string windowStr(translation);
 		windowStr += TEXT("...");
 		::ModifyMenu(_hMenu, IDM_WINDOW_WINDOWS, MF_BYCOMMAND, IDM_WINDOW_WINDOWS, windowStr.c_str());
 	}

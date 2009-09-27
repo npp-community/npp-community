@@ -52,13 +52,13 @@ protected:
     progType _type;
 
 	// INPUTS
-    std::generic_string _command;
-	std::generic_string _args;
-	std::generic_string _curDir;
+    generic_string _command;
+	generic_string _args;
+	generic_string _curDir;
 
 	// OUTPUTS
-	std::generic_string _stdoutStr;
-	std::generic_string _stderrStr;
+	generic_string _stdoutStr;
+	generic_string _stderrStr;
 	int _exitCode;
 
 	// HANDLES

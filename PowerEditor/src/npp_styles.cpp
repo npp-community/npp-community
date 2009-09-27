@@ -53,7 +53,7 @@ Style::Style( const Style & style )
 	_fontStyle = style._fontStyle;
 	_keywordClass = style._keywordClass;
 	if (style._keywords)
-		_keywords = new std::generic_string(*(style._keywords));
+		_keywords = new generic_string(*(style._keywords));
 	else
 		_keywords = NULL;
 }
@@ -81,7 +81,7 @@ const Style & Style::operator=( const Style & style )
 		this->_keywordClass = style._keywordClass;
 
 		if (!(this->_keywords) && style._keywords)
-			this->_keywords = new std::generic_string(*(style._keywords));
+			this->_keywords = new generic_string(*(style._keywords));
 		else if (this->_keywords && style._keywords)
 			this->_keywords->assign(*(style._keywords));
 		else if (this->_keywords && !(style._keywords))
@@ -97,7 +97,7 @@ void Style::setKeywords( const TCHAR *str )
 {
 	if (!_keywords)
 	{
-		_keywords = new std::generic_string(str);
+		_keywords = new generic_string(str);
 	}
 	else
 	{
@@ -230,7 +230,7 @@ void StyleArray::addStyler(int styleID, TiXmlNode *styleNode)
 		TiXmlNode *v = styleNode->FirstChild();
 		if (v)
 		{
-			_styleArray[_nbStyler]._keywords = new std::generic_string(v->Value());
+			_styleArray[_nbStyler]._keywords = new generic_string(v->Value());
 		}
 	}
 	_nbStyler++;

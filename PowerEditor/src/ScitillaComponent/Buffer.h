@@ -159,7 +159,7 @@ public :
 	void setFileName(const TCHAR *fn, LangType defaultLang = L_TXT);
 
 	const TCHAR * getFullPathName() const {
-		return _fullPathName;
+		return _fullPathName.c_str();
 	};
 
 	const TCHAR * getFileName() const { return _fileName; };
@@ -259,7 +259,7 @@ public :
 	};
 
 	const TCHAR * getUserDefineLangName() const {
-		return _userLangExt;
+		return _userLangExt.c_str();
 	};
 
 	const TCHAR * getCommentLineSymbol() const;
@@ -311,7 +311,7 @@ private :
 	//document properties
 	Document _doc;	//invariable
 	LangType _lang;
-	TCHAR _userLangExt[userLangNameMax]; // it's useful if only (_lang == L_USER)
+	generic_string _userLangExt; // it's useful if only (_lang == L_USER)
 	bool _isDirty;
 	formatType _format;
 	UniMode _unicodeMode;
@@ -329,7 +329,7 @@ private :
 	DocFileStatus _currentStatus;
 	time_t _timeStamp; // 0 if it's a new doc
 	bool _isFileReadOnly;
-	TCHAR _fullPathName[MAX_PATH];
+	generic_string _fullPathName;
 	TCHAR * _fileName;	//points to filename part in _fullPathName
 	bool _needReloading;	//True if Buffer needs to be reloaded on activation
 

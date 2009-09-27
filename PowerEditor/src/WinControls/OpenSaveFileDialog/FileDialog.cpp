@@ -19,17 +19,17 @@
 #include "FileDialog.h"
 #include "Parameters.h"
 
-static std::generic_string changeExt(std::generic_string fn, std::generic_string ext)
+static generic_string changeExt(generic_string fn, generic_string ext)
 {
 	if (ext == TEXT(""))
 		return fn;
 
-	std::generic_string fnExt = fn;
+	generic_string fnExt = fn;
 
 	size_t index = fnExt.find_last_of(TEXT("."));
-	std::generic_string extension = TEXT(".");
+	generic_string extension = TEXT(".");
 	extension += ext;
-	if (index == std::generic_string::npos)
+	if (index == generic_string::npos)
 	{
 		fnExt += extension;
 	}
@@ -126,7 +126,11 @@ FileDialog::~FileDialog()
 // FileDialog.setExtFilter(TEXT("Makefile"), TEXT("makefile"), TEXT("GNUmakefile"), NULL);
 void FileDialog::setExtFilter(const TCHAR *extText, const TCHAR *ext, ...)
 {
-	std::generic_string exts;
+    // fill out the ext array for save as file dialog
+    //if (_nbExt < nbExtMax)
+    //    lstrcpy(_extArray[_nbExt++], ext);
+    //
+	generic_string exts;
 
     va_list pArg;
     va_start(pArg, ext);
@@ -153,7 +157,7 @@ void FileDialog::setExtFilter(const TCHAR *extText, const TCHAR *ext, ...)
 
 int FileDialog::setExtsFilter(const TCHAR *extText, const TCHAR *exts)
 {
-    std::generic_string extFilter = extText;
+    generic_string extFilter = extText;
 	TCHAR *oldFilter = NULL;
 
     extFilter += TEXT(" (");
@@ -249,7 +253,7 @@ stringVector * FileDialog::doOpenMultiFilesDlg()
 		TCHAR fn[MAX_PATH];
 		TCHAR *pFn = _fileName + lstrlen(_fileName) + 1;
 		if (!(*pFn))
-			_fileNames.push_back(std::generic_string(_fileName));
+			_fileNames.push_back(generic_string(_fileName));
 		else
 		{
 			lstrcpy(fn, _fileName);
@@ -262,7 +266,7 @@ stringVector * FileDialog::doOpenMultiFilesDlg()
 		{
 			fn[term] = '\0';
 			lstrcat(fn, pFn);
-			_fileNames.push_back(std::generic_string(fn));
+			_fileNames.push_back(generic_string(fn));
 			pFn += lstrlen(pFn) + 1;
 		}
 
@@ -306,7 +310,7 @@ TCHAR * FileDialog::doSaveDlg()
 
 static HWND hFileDlg = NULL;
 static WNDPROC oldProc = NULL;
-static std::generic_string currentExt = TEXT("");
+static generic_string currentExt = TEXT("");
 
 static BOOL CALLBACK fileDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message)
@@ -325,7 +329,7 @@ static BOOL CALLBACK fileDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 
 					if (currentExt != TEXT(""))
 					{
-						std::generic_string fnExt = changeExt(fn, currentExt);
+						generic_string fnExt = changeExt(fn, currentExt);
 						::SetWindowText(fnControl, fnExt.c_str());
 					}
 					return oldProc(hwnd, message, wParam, lParam);
@@ -338,7 +342,7 @@ static BOOL CALLBACK fileDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 		break;
 
 		default:
-		break;
+			break;
 	}
 	return oldProc(hwnd, message, wParam, lParam);
 };
@@ -354,7 +358,7 @@ static TCHAR * get1stExt(TCHAR *ext) { // precondition : ext should be under the
 	return begin;
 };
 
-static std::generic_string addExt(HWND textCtrl, HWND typeCtrl) {
+static generic_string addExt(HWND textCtrl, HWND typeCtrl) {
 	TCHAR fn[MAX_PATH];
 	::GetWindowText(textCtrl, fn, MAX_PATH);
 
@@ -367,11 +371,11 @@ static std::generic_string addExt(HWND textCtrl, HWND typeCtrl) {
 	TCHAR *pExt = get1stExt(ext);
 	if (*fn != '\0')
 	{
-		std::generic_string fnExt = changeExt(fn, pExt);
+		generic_string fnExt = changeExt(fn, pExt);
 		::SetWindowText(textCtrl, fnExt.c_str());
 	}
 
-	std::generic_string returnExt = pExt;
+	generic_string returnExt = pExt;
 	delete[] ext;
 	return returnExt;
 };

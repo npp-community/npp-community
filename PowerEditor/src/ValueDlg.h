@@ -47,7 +47,7 @@ protected :
 private :
 	int _nbNumber;
     int _defaultValue;
-	std::generic_string _name;
+	generic_string _name;
 	POINT _p;
 
 };

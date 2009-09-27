@@ -119,9 +119,9 @@ static TiXmlNodeA * searchDlgNode(TiXmlNodeA *node, const char *dlgTagName);
 struct iconLocator {
 	int listIndex;
 	int iconIndex;
-	std::generic_string iconLocation;
+	generic_string iconLocation;
 
-	iconLocator(int iList, int iIcon, const std::generic_string iconLoc)
+	iconLocator(int iList, int iIcon, const generic_string iconLoc)
 		: listIndex(iList), iconIndex(iIcon), iconLocation(iconLoc){};
 };
 
@@ -220,7 +220,7 @@ public:
 	void changeFindReplaceDlgLang();
 	void changeConfigLang();
 	void changeUserDefineLang();
-	void changeMenuLang(std::generic_string & pluginsTrans, std::generic_string & windowTrans);
+	void changeMenuLang(generic_string & pluginsTrans, generic_string & windowTrans);
 	void changeLangTabContextMenu();
 	void changeLangTabDrapContextMenu();
 	void changePrefereceDlgLang();
@@ -240,7 +240,7 @@ public:
 	void loadLastSession();
 	bool loadSession(Session* session);
 
-	bool emergency(std::generic_string emergencySavedDir);
+	bool emergency(generic_string emergencySavedDir);
 
 	void notifyBufferChanged(Buffer * buffer, int mask);
 	bool findInFiles();
@@ -250,7 +250,7 @@ public:
 	static HWND gNppHWND;	//static handle to Notepad++ window, NULL if non-existant
 private:
 	static const TCHAR _className[32];
-	TCHAR _nppPath[MAX_PATH];
+	generic_string _nppPath;
     Window *_pMainWindow;
 	DockingManager* _dockingManager;
 
@@ -453,7 +453,7 @@ private:
 
 	void checkUnicodeMenuItems(UniMode um) const;
 
-	std::generic_string getLangDesc(LangType langType, bool shortDesc = false);
+	generic_string getLangDesc(LangType langType, bool shortDesc = false);
 
 	void setLangStatus(LangType langType);
 
@@ -490,7 +490,7 @@ private:
 	void pasteToMarkedLines();
 	void deleteMarkedline(int ln);
 	void replaceMarkedline(int ln, const TCHAR *str);
-	std::generic_string getMarkedLine(int ln);
+	generic_string getMarkedLine(int ln);
 
     void findMatchingBracePos(int & braceAtCaret, int & braceOpposite);
     void braceMatch();
@@ -509,8 +509,8 @@ private:
 	bool findInOpenedFiles();
 	bool findInCurrentFile();
 
-	bool matchInList(const TCHAR *fileName, const std::vector<std::generic_string> & patterns);
-	void getMatchedFileNames(const TCHAR *dir, const std::vector<std::generic_string> & patterns, std::vector<std::generic_string> & fileNames, bool isRecursive, bool isInHiddenDir);
+	bool matchInList(const TCHAR *fileName, const std::vector<generic_string> & patterns);
+	void getMatchedFileNames(const TCHAR *dir, const std::vector<generic_string> & patterns, std::vector<generic_string> & fileNames, bool isRecursive, bool isInHiddenDir);
 
 	void doSynScorll(HWND hW);
 	void setWorkingDir(TCHAR *dir);
@@ -521,7 +521,7 @@ private:
 
 	int getLangFromMenuName(const TCHAR * langName);
 
-	std::generic_string getLangFromMenu(const Buffer * buf);
+	generic_string getLangFromMenu(const Buffer * buf);
 
 	void setFileOpenSaveDlgFilters(FileDialog & fDlg);
 	void markSelectedTextInc(bool enable);

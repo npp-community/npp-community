@@ -23,7 +23,7 @@
 #include "Buffer.h"
 #include "Parameters.h"
 
-static bool isInList(std::generic_string word, const std::vector<std::generic_string> & wordArray)
+static bool isInList(generic_string word, const std::vector<generic_string> & wordArray)
 {
 	for (size_t i = 0 ; i < wordArray.size() ; i++)
 	{
@@ -105,7 +105,7 @@ bool AutoCompletion::showWordComplete(bool autoInsert)
 
 	_pEditView->getGenericText(beginChars, startPos, curPos);
 
-	std::generic_string expr(TEXT("\\<"));
+	generic_string expr(TEXT("\\<"));
 	expr += beginChars;
 	expr += TEXT("[^ \\t.,;:\"()=<>'+!\\[\\]]*");
 
@@ -114,7 +114,7 @@ bool AutoCompletion::showWordComplete(bool autoInsert)
 	int flags = SCFIND_WORDSTART | SCFIND_MATCHCASE | SCFIND_REGEXP | SCFIND_POSIX;
 
 	_pEditView->execute(SCI_SETSEARCHFLAGS, flags);
-	std::vector<std::generic_string> wordArray;
+	std::vector<generic_string> wordArray;
 	int posFind = _pEditView->searchInTarget(expr.c_str(), 0, docLength);
 
 	while (posFind != -1)
@@ -145,12 +145,12 @@ bool AutoCompletion::showWordComplete(bool autoInsert)
 	}
 
 	{
-		std::vector<std::generic_string>::iterator begin = wordArray.begin();
-		std::vector<std::generic_string>::iterator end = wordArray.end();
+		std::vector<generic_string>::iterator begin = wordArray.begin();
+		std::vector<generic_string>::iterator end = wordArray.end();
 		sort(begin, end);
 	}
 
-	std::generic_string words(TEXT(""));
+	generic_string words(TEXT(""));
 
 	for (size_t i = 0 ; i < wordArray.size() ; i++)
 	{

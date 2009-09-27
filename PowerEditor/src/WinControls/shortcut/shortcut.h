@@ -26,8 +26,8 @@
 
 class NppParameters;
 
-void getKeyStrFromVal(UCHAR keyVal, std::generic_string & str);
-void getNameStrFromCmd(INT cmd, std::generic_string & str);
+void getKeyStrFromVal(UCHAR keyVal, generic_string & str);
+void getNameStrFromCmd(INT cmd, generic_string & str);
 
 struct KeyCombo {
 	bool _isCtrl;
@@ -61,8 +61,8 @@ public:
 		return (_keyCombo._key != 0);
 	}
 
-	virtual std::generic_string toString() const;					//the hotkey part
-	std::generic_string toMenuItemString() const;
+	virtual generic_string toString() const;					//the hotkey part
+	generic_string toMenuItemString() const;
 	const KeyCombo & getKeyCombo() const {
 		return _keyCombo;
 	}
@@ -111,8 +111,8 @@ public:
 	bool isEnabled() const;
 	size_t getSize() const;
 
-	std::generic_string toString() const;
-	std::generic_string toString(int index) const;
+	generic_string toString() const;
+	generic_string toString(int index) const;
 
 	int doDialog();
 
@@ -146,7 +146,7 @@ struct recordedMacroStep {
 	int message;
 	long wParameter;
 	long lParameter;
-	std::generic_string sParameter;
+	generic_string sParameter;
 	MacroTypeIndex MacroType;
 
 	recordedMacroStep(int iMessage, long wParam, long lParam);
@@ -181,24 +181,22 @@ public:
 	UserCommand(Shortcut sc, const TCHAR *cmd, int id) : CommandShortcut(sc, id), _cmd(cmd) {_canModifyName = true;};
 	const TCHAR* getCmd() const {return _cmd.c_str();};
 private:
-	std::generic_string _cmd;
+	generic_string _cmd;
 };
 
 class PluginCmdShortcut : public CommandShortcut {
 //friend class NppParameters;
 public:
 	PluginCmdShortcut(Shortcut sc, int id, const TCHAR *moduleName, int internalID) :
-		CommandShortcut(sc, id), _id(id), _internalID(internalID) {
-		lstrcpy(_moduleName, moduleName);
-	};
+		CommandShortcut(sc, id), _id(id), _moduleName(moduleName), _internalID(internalID) {};
 	bool isValid() const;
-	const TCHAR * getModuleName() const {return _moduleName;};
+	const TCHAR * getModuleName() const {return _moduleName.c_str();};
 	int getInternalID() const {return _internalID;};
 	long getID() const {return _id;};
 
 private :
-	long _id;
-	TCHAR _moduleName[nameLenMax];
+	unsigned long _id;
+	generic_string _moduleName;
 	int _internalID;
 };
 

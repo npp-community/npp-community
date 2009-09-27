@@ -22,10 +22,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 struct MenuItemUnit {
 	unsigned long _cmdID;
-	std::generic_string _itemName;
-	std::generic_string _subMenuName;
+	generic_string _itemName;
+	generic_string _subMenuName;
 	MenuItemUnit();
-	MenuItemUnit(unsigned long cmdID, std::generic_string itemName, std::generic_string subMenuName=TEXT(""));
+	MenuItemUnit(unsigned long cmdID, generic_string itemName, generic_string subMenuName=TEXT(""));
 	MenuItemUnit(unsigned long cmdID, const TCHAR *itemName, const TCHAR *subMenuName=NULL);
 };
 

@@ -88,9 +88,9 @@ protected :
 	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/);
 
 private :
-	std::generic_string _title;
-	std::generic_string _textValue;
-	std::generic_string _static;
+	generic_string _title;
+	generic_string _textValue;
+	generic_string _static;
 	int _txtLen;
 };
 
@@ -178,7 +178,7 @@ void SharedParametersDialog::initControls()
         //for the font name combos
         HWND hFontNameCombo = ::GetDlgItem(_hSelf, _fontNameCombo[i]);
 
-        const std::vector<std::generic_string> & fontlist = pNppParam->getFontList();
+        const std::vector<generic_string> & fontlist = pNppParam->getFontList();
         for (int j = 0 ; j < int(fontlist.size()) ; j++)
         {
             int k = ::SendMessage(hFontNameCombo, CB_ADDSTRING, 0, (LPARAM)fontlist[j].c_str());
@@ -1733,7 +1733,7 @@ BOOL CALLBACK UserDefineDialog::run_dlgProc(UINT message, WPARAM wParam, LPARAM 
 
 						if (tmpName)
 						{
-							std::generic_string newNameString(tmpName);
+							generic_string newNameString(tmpName);
 							const TCHAR *newName = newNameString.c_str();
 
 							if (pNppParam->isExistingUserLangName(newName))
