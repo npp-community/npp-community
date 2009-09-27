@@ -250,7 +250,6 @@ public:
 	static HWND gNppHWND;	//static handle to Notepad++ window, NULL if non-existant
 private:
 	static const TCHAR _className[32];
-	generic_string _nppPath;
     Window *_pMainWindow;
 	DockingManager* _dockingManager;
 
@@ -513,7 +512,7 @@ private:
 	void getMatchedFileNames(const TCHAR *dir, const std::vector<generic_string> & patterns, std::vector<generic_string> & fileNames, bool isRecursive, bool isInHiddenDir);
 
 	void doSynScorll(HWND hW);
-	void setWorkingDir(TCHAR *dir);
+	void setWorkingDir(const TCHAR *dir);
 	bool str2Cliboard(const TCHAR *str2cpy);
 	bool bin2Cliboard(const UCHAR *uchar2cpy, size_t length);
 

@@ -302,6 +302,7 @@ public :
 		return _pManager->docLength(_id);
 	};
 
+    Lang * getCurrentLang() const;
 private :
 	FileManager * _pManager;
 	bool _canNotify;
@@ -337,7 +338,6 @@ private :
 	static long _recentTagCtr;
 
 	void updateTimeStamp();
-	Lang * getCurrentLang() const;
 
 	int indexOfReference(ScintillaEditView * identifier) const;
 

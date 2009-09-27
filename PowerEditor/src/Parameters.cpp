@@ -419,9 +419,9 @@ bool LocalizationSwitcher::switchToLang(wchar_t *lang2switch) const
 
 generic_string ThemeSwitcher::getThemeFromXmlFileName(const TCHAR *xmlFullPath) const
 {
-	if (!xmlFullPath[0])
+	if (!xmlFullPath || !xmlFullPath[0])
 	{
-		return xmlFullPath;
+		return TEXT("");
 	}
 	TCHAR fn[MAX_PATH];
 	lstrcpy(fn, ::PathFindFileName(xmlFullPath));

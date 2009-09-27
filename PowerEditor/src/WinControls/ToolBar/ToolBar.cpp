@@ -325,22 +325,13 @@ void ToolBar::doPopop(POINT chevPoint) {
 	}
 }
 
-void ToolBar::addToRebar(ReBar * rebar) {
+void ToolBar::addToRebar(ReBar * rebar)
+{
 	if (_pRebar)
 		return;
 	_pRebar = rebar;
-
-	winVer winVersion = getWinVersion();
-	if (winVersion <= WV_W2K)
-	{
-		ZeroMemory(&_rbBand, sizeof(REBARBANDINFO));
-		_rbBand.cbSize  = sizeof(REBARBANDINFO);
-	}
-	else
-	{
-		ZeroMemory(&_rbBand, REBARBANDINFO_V3_SIZE);
-		_rbBand.cbSize  = REBARBANDINFO_V3_SIZE;
-	}
+	ZeroMemory(&_rbBand, REBARBAND_SIZE);
+	_rbBand.cbSize  = REBARBAND_SIZE;
 
 	_rbBand.fMask   = RBBIM_STYLE | RBBIM_CHILD | RBBIM_CHILDSIZE |
 					  RBBIM_SIZE | RBBIM_IDEALSIZE | RBBIM_ID;
@@ -434,17 +425,8 @@ void ReBar::setIDVisible(int id, bool show)
 		return;	//error
 
 	REBARBANDINFO rbBand;
-	winVer winVersion = getWinVersion();
-	if (winVersion <= WV_W2K)
-	{
-		ZeroMemory(&rbBand, sizeof(REBARBANDINFO));
-		rbBand.cbSize  = sizeof(REBARBANDINFO);
-	}
-	else
-	{
-		ZeroMemory(&rbBand, REBARBANDINFO_V3_SIZE);
-		rbBand.cbSize  = REBARBANDINFO_V3_SIZE;
-	}
+	ZeroMemory(&rbBand, REBARBAND_SIZE);
+	rbBand.cbSize  = REBARBAND_SIZE;
 
 	rbBand.fMask = RBBIM_STYLE;
 	::SendMessage(_hSelf, RB_GETBANDINFO, (WPARAM)index, (LPARAM)&rbBand);
@@ -461,17 +443,9 @@ bool ReBar::getIDVisible(int id)
 	if (index == -1 )
 		return false;	//error
 	REBARBANDINFO rbBand;
-	winVer winVersion = getWinVersion();
-	if (winVersion <= WV_W2K)
-	{
-		ZeroMemory(&rbBand, sizeof(REBARBANDINFO));
-		rbBand.cbSize  = sizeof(REBARBANDINFO);
-	}
-	else
-	{
-		ZeroMemory(&rbBand, REBARBANDINFO_V3_SIZE);
-		rbBand.cbSize  = REBARBANDINFO_V3_SIZE;
-	}
+	ZeroMemory(&rbBand, REBARBAND_SIZE);
+	rbBand.cbSize  = REBARBAND_SIZE;
+
 	rbBand.fMask = RBBIM_STYLE;
 	::SendMessage(_hSelf, RB_GETBANDINFO, (WPARAM)index, (LPARAM)&rbBand);
 	return ((rbBand.fStyle & RBBS_HIDDEN) == 0);

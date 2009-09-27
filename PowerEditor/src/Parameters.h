@@ -342,6 +342,10 @@ struct ScintillaViewParams
 #define NB_MAX_FINDHISTORY_PATH    30
 #define NB_MAX_FINDHISTORY_FILTER  20
 
+
+#define MASK_ReplaceBySpc 0x80
+#define MASK_TabSize 0x7F
+
 struct Lang
 {
 	LangType _langID;
@@ -351,13 +355,17 @@ struct Lang
 	const TCHAR *_pCommentLineSymbol;
 	const TCHAR *_pCommentStart;
 	const TCHAR *_pCommentEnd;
+	bool _isTabReplacedBySpace;
+	int _tabSize;
 
 	Lang():
 		_langID(L_TXT),
 		_defaultExtList(NULL),
 		_pCommentLineSymbol(NULL),
 		_pCommentStart(NULL),
-		_pCommentEnd(NULL)
+		_pCommentEnd(NULL),
+		_isTabReplacedBySpace(false),
+		_tabSize(-1)
 	{
 		for (int i = 0 ; i < NB_LIST ; i++)
 		{
@@ -370,7 +378,9 @@ struct Lang
 		_defaultExtList(NULL),
 		_pCommentLineSymbol(NULL),
 		_pCommentStart(NULL),
-		_pCommentEnd(NULL)
+		_pCommentEnd(NULL),
+		_isTabReplacedBySpace(false),
+		_tabSize(-1)
 	{
 		if (name)
 			_langName = name;
@@ -396,6 +406,12 @@ struct Lang
 		_pCommentEnd = commentEnd;
 	}
 
+    void setTabInfo(int tabInfo) {
+        if (tabInfo == -1 || tabInfo == 0) return;
+        _isTabReplacedBySpace = (tabInfo & MASK_ReplaceBySpc) != 0;
+        _tabSize = tabInfo & MASK_TabSize;
+    };
+
 	const TCHAR * getDefaultExtList() const {
 		return _defaultExtList;
 	}
@@ -410,6 +426,10 @@ struct Lang
 
 	LangType getLangID() const {return _langID;}
 	const TCHAR * getLangName() const {return _langName.c_str();}
+    int getTabInfo() const {
+        if (_tabSize == -1) return -1;
+        return _isTabReplacedBySpace?0x80:0x00 | _tabSize;
+    }
 };
 
 class UserLangContainer

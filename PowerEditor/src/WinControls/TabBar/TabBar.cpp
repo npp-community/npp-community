@@ -952,12 +952,13 @@ void TabBarPlus::exchangeItemData(POINT point)
 					::SendMessage(_hSelf, TCM_SETITEM, i, reinterpret_cast<LPARAM>(&itemData_shift));
 				}
 			}
-			//
 			::SendMessage(_hSelf, TCM_SETITEM, nTab, reinterpret_cast<LPARAM>(&itemData_nDraggedTab));
 
 			//3. update the current index
 			_nTabDragged = nTab;
 
+			// Tell Notepad_plus to notifiy plugins that a D&D operation was done (so doc index has been changed)
+			::SendMessage(_hParent, NPPM_INTERNAL_DOCORDERCHANGED, 0, _nTabDragged);
 		}
 	}
 	else

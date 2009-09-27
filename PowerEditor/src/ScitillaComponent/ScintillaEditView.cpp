@@ -1441,6 +1441,7 @@ void ScintillaEditView::activateBuffer(BufferID buffer)
 	// Due to execute(SCI_CLEARDOCUMENTSTYLE); in defineDocType() function
 	// defineDocType() function should be called here, but not be after the fold info loop
 	defineDocType(_currentBuffer->getLangType());
+    setTabSettings(_currentBuffer->getCurrentLang());
 
 	if (_currentBuffer->getNeedsLexing()) {
 		restyleBuffer();
@@ -3320,11 +3321,26 @@ int ScintillaEditView::codepage2CharSet() const
 {
 	switch (_codepage)
 	{
-		case CP_CHINESE_TRADITIONAL : return SC_CHARSET_CHINESEBIG5;
-		case CP_CHINESE_SIMPLIFIED : return SC_CHARSET_GB2312;
-		case CP_KOREAN : return SC_CHARSET_HANGUL;
-		case CP_JAPANESE : return SC_CHARSET_SHIFTJIS;
-		case CP_GREEK : return SC_CHARSET_GREEK;
-		default : return 0;
+	case CP_CHINESE_TRADITIONAL : return SC_CHARSET_CHINESEBIG5;
+	case CP_CHINESE_SIMPLIFIED : return SC_CHARSET_GB2312;
+	case CP_KOREAN : return SC_CHARSET_HANGUL;
+	case CP_JAPANESE : return SC_CHARSET_SHIFTJIS;
+	case CP_GREEK : return SC_CHARSET_GREEK;
+	default : return 0;
 	}
+}
+
+void ScintillaEditView::setTabSettings(Lang *lang)
+{
+    if (lang->_tabSize != -1 && lang->_tabSize != 0)
+    {
+        execute(SCI_SETTABWIDTH, lang->_tabSize);
+        execute(SCI_SETUSETABS, lang->_isTabReplacedBySpace);
+    }
+    else
+    {
+        const NppGUI & nppgui = (NppParameters::getInstance())->getNppGUI();
+        execute(SCI_SETTABWIDTH, nppgui._tabSize);
+		execute(SCI_SETUSETABS, nppgui._tabReplacedBySpace);
+    }
 }

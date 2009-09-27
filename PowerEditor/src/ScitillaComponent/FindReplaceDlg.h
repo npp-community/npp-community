@@ -198,7 +198,7 @@ private :
 class FindIncrementDlg : public StaticDialog
 {
 public :
-	FindIncrementDlg() : _pFRDlg(NULL), _pRebar(NULL) {};
+	FindIncrementDlg() : _pFRDlg(NULL), _pRebar(NULL), _FindStatus(FSFound) {};
 	~FindIncrementDlg();
 	void init(HINSTANCE hInst, HWND hPere, FindReplaceDlg *pFRDlg, bool isRTL = false);
 	virtual void destroy();
@@ -206,10 +206,15 @@ public :
 
 	void setSearchText(const TCHAR * txt2find, bool isUTF8 = false);
 	void setFindStatus(FindStatus iStatus);
+	FindStatus getFindStatus() {
+		return _FindStatus;
+	}
+
 	void addToRebar(ReBar * rebar);
 private :
 	bool _isRTL;
 	FindReplaceDlg *_pFRDlg;
+	FindStatus _FindStatus;
 
 	ReBar * _pRebar;
 	REBARBANDINFO _rbBand;

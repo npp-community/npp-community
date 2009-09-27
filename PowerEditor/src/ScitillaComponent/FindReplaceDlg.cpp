@@ -2481,10 +2481,25 @@ void FindIncrementDlg::display(bool toShow) const
 }
 
 #define SHIFTED 0x8000
+#define BCKGRD_COLOR (RGB(255,102,102))
+#define TXT_COLOR    (RGB(255,255,255))
 BOOL CALLBACK FindIncrementDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	switch (message)
 	{
+		case WM_CTLCOLOREDIT :
+		{
+			// if the text not found modify the background color of the editor
+			static HBRUSH hBrushBackground = CreateSolidBrush(BCKGRD_COLOR);
+			if (FSNotFound != getFindStatus())
+				return FALSE; // text found, use the default color
+
+			// text not found
+			SetTextColor((HDC)wParam, TXT_COLOR);
+			SetBkColor((HDC)wParam, BCKGRD_COLOR);
+			return (LRESULT)hBrushBackground;
+		}
+
 		case WM_COMMAND :
 		{
 			bool isUnicode = (*(_pFRDlg->_ppEditView))->getCurrentBuffer()->getUnicodeMode() != uni8Bit;
@@ -2641,17 +2656,8 @@ void FindIncrementDlg::addToRebar(ReBar * rebar)
 	RECT client;
 	getClientRect(client);
 
-	winVer winVersion = getWinVersion();
-	if (winVersion <= WV_W2K)
-	{
-		ZeroMemory(&_rbBand, sizeof(REBARBANDINFO));
-		_rbBand.cbSize  = sizeof(REBARBANDINFO);
-	}
-	else
-	{
-		ZeroMemory(&_rbBand, REBARBANDINFO_V3_SIZE);
-		_rbBand.cbSize  = REBARBANDINFO_V3_SIZE;
-	}
+	ZeroMemory(&_rbBand, REBARBAND_SIZE);
+	_rbBand.cbSize  = REBARBAND_SIZE;
 
 	_rbBand.fMask   = RBBIM_STYLE | RBBIM_CHILD | RBBIM_CHILDSIZE |
 					  RBBIM_SIZE | RBBIM_ID;
@@ -2685,11 +2691,19 @@ void FindIncrementDlg::init( HINSTANCE hInst, HWND hPere, FindReplaceDlg *pFRDlg
 
 void FindIncrementDlg::setFindStatus( FindStatus iStatus )
 {
-	static TCHAR *findStatus[] = { TEXT(""), // FSFound
+	static TCHAR *findStatus[] =  {
+		TEXT(""), // FSFound
 		TEXT("Phrase not found"), //FSNotFound
 		TEXT("Reached top of page, continued from bottom"), // FSTopReached
 		TEXT("Reached end of page, continued from top")}; // FSEndReached
 	if (iStatus<0 || iStatus >= sizeof(findStatus)/sizeof(findStatus[0]))
 		return; // out of range
+	_FindStatus = iStatus;
+
+	// get the HWND of the editor
+	HWND hEditor = ::GetDlgItem(_hSelf, IDC_INCFINDTEXT);
+
+	// invalidate the editor rect
+	::InvalidateRect(hEditor, NULL, TRUE);
 	::SendDlgItemMessage(_hSelf, IDC_INCFINDSTATUS, WM_SETTEXT, 0, (LPARAM)findStatus[iStatus]);
 }
