@@ -26,7 +26,6 @@
 #include "FileNameStringSplitter.h"
 #include "ValueDlg.h"
 #include "Utf8_16.h"
-#include "regExtDlg.h"
 #include "ShortcutMapper.h"
 #include "TaskListDlg.h"
 #include "xmlMatchedTagsHighlighter.h"
@@ -371,14 +370,12 @@ void Notepad_plus::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLine, CmdL
 	std::vector<generic_string> patterns;
 	patterns.push_back(TEXT("*.xml"));
 
-	generic_string nppDir(pNppParams->getNppPath());
-	::PathRemoveFileSpec(nppDir);
-
+	generic_string nppDir = pNppParams->getNppPath();
 #ifdef UNICODE
 	LocalizationSwitcher & localizationSwitcher = pNppParams->getLocalizationSwitcher();
 	std::wstring localizationDir = nppDir;
+	PathAppend(localizationDir, TEXT("localization\\"));
 
-	localizationDir += TEXT("\\localization\\");
 	getMatchedFileNames(localizationDir.c_str(), patterns, fileNames, false, false);
 	for (size_t i = 0 ; i < fileNames.size() ; i++)
 	{
@@ -392,7 +389,7 @@ void Notepad_plus::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLine, CmdL
 	//  Get themes from both npp install themes dir and app data themes dir with the per user
 	//  overriding default themes of the same name.
 	generic_string themeDir(pNppParams->getAppDataNppDir());
-	themeDir.append(TEXT("\\themes\\"));
+	PathAppend(themeDir, TEXT("themes\\"));
 
 	getMatchedFileNames(themeDir.c_str(), patterns, fileNames, false, false);
 	for (size_t i = 0 ; i < fileNames.size() ; i++)
@@ -403,7 +400,7 @@ void Notepad_plus::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLine, CmdL
 	fileNames.clear();
 	themeDir.clear();
 	themeDir.assign(nppDir);
-	themeDir.append(TEXT("\\themes\\"));
+	PathAppend(themeDir, TEXT("themes\\"));
 	getMatchedFileNames(themeDir.c_str(), patterns, fileNames, false, false);
 	for (size_t i = 0 ; i < fileNames.size() ; i++)
 	{
@@ -2872,30 +2869,34 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 		::GetCursorPos(&p);
 		::ScreenToClient(_hSelf, &p);
 		HWND hWin = ::RealChildWindowFromPoint(_hSelf, p);
-
-		static generic_string tip = TEXT("");
+		const int tipMaxLen = 1024;
+		static TCHAR tip[tipMaxLen];
+		tip[0] = '\0';
+		generic_string tipTmp(TEXT(""));
 		int id = int(lpttt->hdr.idFrom);
 
 		if (hWin == _rebarTop->getHSelf())
 		{
-			getNameStrFromCmd(id, tip);
+			getNameStrFromCmd(id, tipTmp);
 		}
 		else if (hWin == _mainDocTab->getHSelf())
 		{
 			BufferID idd = _mainDocTab->getBufferByIndex(id);
 			Buffer * buf = MainFileManager->getBufferByID(idd);
-			tip = buf->getFullPathName();
+			tipTmp = buf->getFullPathName();
 		}
 		else if (hWin == _subDocTab->getHSelf())
 		{
 			BufferID idd = _subDocTab->getBufferByIndex(id);
 			Buffer * buf = MainFileManager->getBufferByID(idd);
-			tip = buf->getFullPathName();
+			tipTmp = buf->getFullPathName();
 		}
 		else
 			break;
 
-		lpttt->lpszText = (TCHAR *)tip.c_str();
+		_tcscpy_s(tip, tipMaxLen, tipTmp.c_str());
+
+		lpttt->lpszText = tip;
     }
     break;
 
@@ -4488,13 +4489,55 @@ void Notepad_plus::command(int id)
 			break;
 		}
 
-		case IDM_SETTING_FILEASSOCIATION_DLG :
-		{
-			RegExtDlg regExtDlg;
-			regExtDlg.init(_hInst, _hSelf);
-			regExtDlg.doDialog(_isRTL);
-			break;
-		}
+		case IDM_SETTING_IMPORTPLUGIN :
+        {
+            // get plugin source path
+            const TCHAR *extFilterName = TEXT("Notepad++ pligin");
+            const TCHAR *extFilter = TEXT(".dll");
+            const TCHAR *destDir = TEXT("plugins");
+
+            std::vector<generic_string> copiedFiles = addNppComponents(destDir, extFilterName, extFilter);
+
+            // load plugin
+            std::vector<generic_string> dll2Remove;
+            for (size_t i = 0 ; i < copiedFiles.size() ; i++)
+            {
+                int index = _pluginsManager->loadPlugin(copiedFiles[i].c_str(), dll2Remove);
+                if (_pluginsManager->getMenuHandle())
+                    _pluginsManager->addInMenuFromPMIndex(index);
+            }
+            if (!_pluginsManager->getMenuHandle())
+                _pluginsManager->setMenu(_mainMenuHandle, NULL);
+            ::DrawMenuBar(_hSelf);
+            break;
+        }
+
+        case IDM_SETTING_IMPORTSTYLETHEMS :
+        {
+            // get plugin source path
+            const TCHAR *extFilterName = TEXT("Notepad++ style theme");
+            const TCHAR *extFilter = TEXT(".xml");
+            const TCHAR *destDir = TEXT("themes");
+
+            // load styler
+            NppParameters *pNppParams = NppParameters::getInstance();
+            ThemeSwitcher & themeSwitcher = pNppParams->getThemeSwitcher();
+
+            std::vector<generic_string> copiedFiles = addNppComponents(destDir, extFilterName, extFilter);
+            for (size_t i = 0 ; i < copiedFiles.size() ; i++)
+            {
+                generic_string themeName(themeSwitcher.getThemeFromXmlFileName(copiedFiles[i].c_str()));
+		        if (!themeSwitcher.themeNameExists(themeName.c_str()))
+		        {
+			        themeSwitcher.addThemeFromXml(copiedFiles[i].c_str());
+                    if (_configStyleDlg->isCreated())
+                    {
+                        _configStyleDlg->addLastThemeEntry();
+                    }
+		        }
+            }
+            break;
+        }
 
 		case IDM_SETTING_SHORTCUT_MAPPER :
 		{
@@ -4580,7 +4623,6 @@ void Notepad_plus::command(int id)
 		case IDM_HELP :
 		{
 			generic_string nppHelpPath((NppParameters::getInstance())->getNppPath());
-			::PathRemoveFileSpec(nppHelpPath);
 
 			nppHelpPath += TEXT("\\NppHelp.chm");
 			if (::PathFileExists(nppHelpPath.c_str()))
@@ -4632,8 +4674,11 @@ void Notepad_plus::command(int id)
 		case IDM_UPDATE_NPP :
 		{
 			generic_string updaterDir = (NppParameters::getInstance())->getNppPath();
-			updaterDir += TEXT("\\updater\\");
-			generic_string updaterFullPath = updaterDir + TEXT("gup.exe");
+			PathAppend(updaterDir ,TEXT("updater"));
+
+			generic_string updaterFullPath = updaterDir;
+			PathAppend(updaterFullPath, TEXT("gup.exe"));
+
 			generic_string param = TEXT("-verbose -v");
 			param += VERSION_VALUE;
 			Process updater(updaterFullPath.c_str(), param.c_str(), updaterDir.c_str());
@@ -4844,6 +4889,13 @@ void Notepad_plus::command(int id)
 				int i = id - ID_PLUGINS_CMD;
 				_pluginsManager->runPluginCommand(i);
 			}
+/*UNLOAD
+			else if ((id >= ID_PLUGINS_REMOVING) && (id < ID_PLUGINS_REMOVING_END))
+			{
+				int i = id - ID_PLUGINS_REMOVING;
+				_pluginsManager->unloadPlugin(i, _hSelf);
+			}
+*/
 			else if ((id >= IDM_WINDOW_MRU_FIRST) && (id <= IDM_WINDOW_MRU_LIMIT))
 			{
 				activateDoc(id-IDM_WINDOW_MRU_FIRST);
@@ -10935,4 +10987,42 @@ void Notepad_plus::ScintillaCtrls::destroy()
 		_scintVector[i]->destroy();
 		delete _scintVector[i];
 	}
+}
+
+std::vector<generic_string> Notepad_plus::addNppComponents(const TCHAR *destDir, const TCHAR *extFilterName, const TCHAR *extFilter)
+{
+    FileDialog fDlg(_hSelf, _hInst);
+    fDlg.setExtFilter(extFilterName, extFilter, NULL);
+
+    //setFileOpenSaveDlgFilters(fDlg);
+    std::vector<generic_string> copiedFiles;
+
+    if (stringVector *pfns = fDlg.doOpenMultiFilesDlg())
+    {
+        // Get plugins dir
+		generic_string destDirName = (NppParameters::getInstance())->getNppPath();
+        PathAppend(destDirName, destDir);
+
+        if (!::PathFileExists(destDirName.c_str()))
+        {
+            ::CreateDirectory(destDirName.c_str(), NULL);
+        }
+
+        destDirName += TEXT("\\");
+
+        size_t sz = pfns->size();
+        for (size_t i = 0 ; i < sz ; i++)
+        {
+            if (::PathFileExists(pfns->at(i).c_str()))
+            {
+                // copy to plugins directory
+                generic_string destName = destDirName;
+                destName += ::PathFindFileName(pfns->at(i).c_str());
+                //printStr(destName.c_str());
+                if (::CopyFile(pfns->at(i).c_str(), destName.c_str(), FALSE))
+                    copiedFiles.push_back(destName.c_str());
+            }
+        }
+    }
+    return copiedFiles;
 }

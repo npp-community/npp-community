@@ -25,6 +25,14 @@ void testPathRemoveFileSpec(TCHAR* charPath, generic_string strPath)
 {
 	BOOL strRet = PathRemoveFileSpec(strPath);
 	BOOL charRet = PathRemoveFileSpec(charPath);
+
+	// Fool the compiler in debug so the variables are used.
+	// This will change anyway when the test framework is used.
+	#ifdef NDEBUG
+	strRet = strRet;
+	charRet = charRet;
+	#endif
+
 	assert(strPath == charPath);
 	assert(strRet == charRet);
 }

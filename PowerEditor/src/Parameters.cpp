@@ -450,16 +450,7 @@ NppParameters::NppParameters() :
 	memset(&_langList, 0, NB_LANG * sizeof(Lang *));
 	memset(&_LRFileList, 0, NB_MAX_LRF_FILE * sizeof(generic_string *));
 	memset(&_userLangArray, 0, NB_MAX_USER_LANG * sizeof(UserLangContainer *));
-	memset(&_userDefineLangPath, 0, MAX_PATH * sizeof(TCHAR));
 	memset(&_externalLangArray, 0, NB_MAX_EXTERNAL_LANG * sizeof(ExternalLangContainer *));
-
-	memset(&_shortcutsPath, 0 , MAX_PATH * sizeof(TCHAR));
-	memset(&_contextMenuPath, 0 , MAX_PATH * sizeof(TCHAR));
-	memset(&_sessionPath, 0 , MAX_PATH * sizeof(TCHAR));
-	memset(&_userPath, 0 , MAX_PATH * sizeof(TCHAR));
-	memset(&_stylerPath, 0 , MAX_PATH * sizeof(TCHAR));
-	memset(&_appdataNppDir, 0 , MAX_PATH * sizeof(TCHAR));
-	memset(&_currentDirectory, 0 , MAX_PATH * sizeof(TCHAR));
 
 	_findHistory._nbFindHistoryPath = 0;
 	_findHistory._nbFindHistoryFilter = 0;
@@ -474,13 +465,15 @@ NppParameters::NppParameters() :
 	_nppPath = nppPath;
 
 	//Initialize current directory to startup directory
-	::GetCurrentDirectory(MAX_PATH, _currentDirectory);
+	TCHAR curDir[MAX_PATH];
+	::GetCurrentDirectory(MAX_PATH, curDir);
+	_currentDirectory = curDir;
 
-	TCHAR notepadStylePath[MAX_PATH];
-	lstrcpy(notepadStylePath, _nppPath.c_str());
+	_appdataNppDir = TEXT("");
+	generic_string notepadStylePath(_nppPath);
 	PathAppend(notepadStylePath, notepadStyleFile);
 
-	_asNotepadStyle = (PathFileExists(notepadStylePath) == TRUE);
+	_asNotepadStyle = (PathFileExists(notepadStylePath.c_str()) == TRUE);
 	::AddFontResource(LINEDRAW_FONT);
 
 	//Load initial accelerator key definitions
@@ -547,7 +540,7 @@ bool NppParameters::reloadStylers(TCHAR *stylePath)
 	bool loadOkay = _pXmlUserStylerDoc->LoadFile();
 	if (!loadOkay)
 	{
-		::MessageBox(NULL, TEXT("Load stylers.xml failed!"), TEXT("Configurator"),MB_OK);
+		::MessageBox(NULL, TEXT("Load stylers.xml failed!"), stylePath, MB_OK);
 		delete _pXmlUserStylerDoc;
 		_pXmlUserStylerDoc = NULL;
 		return false;
@@ -567,15 +560,14 @@ bool NppParameters::reloadStylers(TCHAR *stylePath)
 
 bool NppParameters::reloadLang()
 {
-	TCHAR nativeLangPath[MAX_PATH];
-	lstrcpy(nativeLangPath, _nppPath.c_str());
-	PathAppend(nativeLangPath, TEXT("nativeLang.xml"));
+	generic_string nativeLangPath(_nppPath);
+	PathAppend(nativeLangPath, generic_string(TEXT("nativeLang.xml")));
 
-	if (!PathFileExists(nativeLangPath))
+	if (!PathFileExists(nativeLangPath.c_str()))
 	{
-		lstrcpy(nativeLangPath, _userPath);
-		PathAppend(nativeLangPath, TEXT("nativeLang.xml"));
-		if (!PathFileExists(nativeLangPath))
+		nativeLangPath = _userPath;
+		PathAppend(nativeLangPath, generic_string(TEXT("nativeLang.xml")));
+		if (!PathFileExists(nativeLangPath.c_str()))
 			return false;
 	}
 
@@ -584,7 +576,7 @@ bool NppParameters::reloadLang()
 
 	_pXmlNativeLangDocA = new TiXmlDocumentA();
 
-	bool loadOkay = _pXmlNativeLangDocA->LoadUnicodeFilePath(nativeLangPath);
+	bool loadOkay = _pXmlNativeLangDocA->LoadUnicodeFilePath(nativeLangPath.c_str());
 	if (!loadOkay)
 	{
 		delete _pXmlNativeLangDocA;
@@ -601,30 +593,30 @@ bool NppParameters::load()
 	for (int i = 0 ; i < NB_LANG ; _langList[i] = NULL, i++);
 
 	// Make localConf.xml path
-	TCHAR localConfPath[MAX_PATH];
-	lstrcpy(localConfPath, _nppPath.c_str());
+	generic_string localConfPath(_nppPath);
 	PathAppend(localConfPath, localConfFile);
 
 	// Test if localConf.xml exist
-	bool isLocal = (PathFileExists(localConfPath) == TRUE);
+	bool isLocal = (PathFileExists(localConfPath.c_str()) == TRUE);
 
 	if (isLocal)
 	{
-		lstrcpy(_userPath, _nppPath.c_str());
+		_userPath = _nppPath;
 	}
 	else
 	{
 		ITEMIDLIST *pidl;
 		SHGetSpecialFolderLocation(NULL, CSIDL_APPDATA, &pidl);
-		SHGetPathFromIDList(pidl, _userPath);
+		TCHAR tmp[MAX_PATH];
+		SHGetPathFromIDList(pidl, tmp);
+		_userPath = tmp;
 
 		PathAppend(_userPath, TEXT("Notepad++"));
+		_appdataNppDir = _userPath;
 
-		lstrcpy(_appdataNppDir, _userPath);
-
-		if (!PathFileExists(_userPath))
+		if (!PathFileExists(_userPath.c_str()))
 		{
-			::CreateDirectory(_userPath, NULL);
+			::CreateDirectory(_userPath.c_str(), NULL);
 		}
 	}
 
@@ -645,17 +637,14 @@ bool NppParameters::load()
 	//---------------------------------------//
 	// langs.xml : for every user statically //
 	//---------------------------------------//
-	TCHAR langs_xml_path[MAX_PATH];
-	lstrcpy(langs_xml_path, _nppPath.c_str());
+	generic_string langs_xml_path(_nppPath);
 
 	PathAppend(langs_xml_path, TEXT("langs.xml"));
-	if (!PathFileExists(langs_xml_path))
+	if (!PathFileExists(langs_xml_path.c_str()))
 	{
-		TCHAR srcLangsPath[MAX_PATH];
-		lstrcpy(srcLangsPath, _nppPath.c_str());
+		generic_string srcLangsPath(_nppPath);
 		PathAppend(srcLangsPath, TEXT("langs.model.xml"));
-
-		::CopyFile(srcLangsPath, langs_xml_path, TRUE);
+		::CopyFile(srcLangsPath.c_str(), langs_xml_path.c_str(), TRUE);
 	}
 
 	_pXmlDoc = new TiXmlDocument(langs_xml_path);
@@ -673,16 +662,14 @@ bool NppParameters::load()
 	//---------------------------//
 	// config.xml : for per user //
 	//---------------------------//
-	TCHAR configPath[MAX_PATH];
-	lstrcpy(configPath, _userPath);
+	generic_string configPath(_userPath);
 	PathAppend(configPath, TEXT("config.xml"));
 
-	TCHAR srcConfigPath[MAX_PATH];
-	lstrcpy(srcConfigPath, _nppPath.c_str());
+	generic_string srcConfigPath(_nppPath);
 	PathAppend(srcConfigPath, TEXT("config.model.xml"));
 
-	if (!::PathFileExists(configPath))
-		::CopyFile(srcConfigPath, configPath, FALSE);
+	if (!::PathFileExists(configPath.c_str()))
+		::CopyFile(srcConfigPath.c_str(), configPath.c_str(), FALSE);
 
 	_pXmlUserDoc = new TiXmlDocument(configPath);
 	loadOkay = _pXmlUserDoc->LoadFile();
@@ -691,7 +678,7 @@ bool NppParameters::load()
 		int res = ::MessageBox(NULL, TEXT("Load config.xml failed!\rDo you want to recover your config.xml?"), TEXT("Configurator"),MB_YESNO);
 		if (res ==IDYES)
 		{
-			::CopyFile(srcConfigPath, configPath, FALSE);
+			::CopyFile(srcConfigPath.c_str(), configPath.c_str(), FALSE);
 
 			loadOkay = _pXmlUserDoc->LoadFile();
 			if (!loadOkay)
@@ -718,16 +705,15 @@ bool NppParameters::load()
 	// stylers.xml : for per user //
 	//----------------------------//
 
-	lstrcpy(_stylerPath, _userPath);
+	_stylerPath = _userPath;
 	PathAppend(_stylerPath, TEXT("stylers.xml"));
 
-	if (!PathFileExists(_stylerPath))
+	if (!PathFileExists(_stylerPath.c_str()))
 	{
-		TCHAR srcStylersPath[MAX_PATH];
-		lstrcpy(srcStylersPath, _nppPath.c_str());
+		generic_string srcStylersPath(_nppPath);
 		PathAppend(srcStylersPath, TEXT("stylers.model.xml"));
 
-		::CopyFile(srcStylersPath, _stylerPath, TRUE);
+		::CopyFile(srcStylersPath.c_str(), _stylerPath.c_str(), TRUE);
 	}
 
 	if ( _nppGUI._themeName.empty() || (!PathFileExists(_nppGUI._themeName.c_str())) )
@@ -740,7 +726,7 @@ bool NppParameters::load()
 	loadOkay = _pXmlUserStylerDoc->LoadFile();
 	if (!loadOkay)
 	{
-		::MessageBox(NULL, TEXT("Load stylers.xml failed!"), TEXT("Configurator"),MB_OK);
+		::MessageBox(NULL, TEXT("Load stylers.xml failed!"), _stylerPath.c_str(), MB_OK);
 		delete _pXmlUserStylerDoc;
 		_pXmlUserStylerDoc = NULL;
 		isAllLaoded = false;
@@ -755,7 +741,7 @@ bool NppParameters::load()
 	//-----------------------------------//
 	// userDefineLang.xml : for per user //
 	//-----------------------------------//
-	lstrcpy(_userDefineLangPath, _userPath);
+	_userDefineLangPath = _userPath;
 	PathAppend(_userDefineLangPath, TEXT("userDefineLang.xml"));
 
 	_pXmlUserLangDoc = new TiXmlDocument(_userDefineLangPath);
@@ -774,19 +760,18 @@ bool NppParameters::load()
 	// In case of absence of user's nativeLang.xml, //
 	// We'll look in the Notepad++ Dir.             //
 	//----------------------------------------------//
-	TCHAR nativeLangPath[MAX_PATH];
-	lstrcpy(nativeLangPath, _userPath);
+	generic_string nativeLangPath(_userPath);
 	PathAppend(nativeLangPath, TEXT("nativeLang.xml"));
 
-	if (!PathFileExists(nativeLangPath))
+	if (!PathFileExists(nativeLangPath.c_str()))
 	{
-		lstrcpy(nativeLangPath, _nppPath.c_str());
+		nativeLangPath = _nppPath;
 		PathAppend(nativeLangPath, TEXT("nativeLang.xml"));
 	}
 
 	_pXmlNativeLangDocA = new TiXmlDocumentA();
 
-	loadOkay = _pXmlNativeLangDocA->LoadUnicodeFilePath(nativeLangPath);
+	loadOkay = _pXmlNativeLangDocA->LoadUnicodeFilePath(nativeLangPath.c_str());
 	if (!loadOkay)
 	{
 		delete _pXmlNativeLangDocA;
@@ -799,8 +784,7 @@ bool NppParameters::load()
 	//---------------------------------//
 	// toolbarIcons.xml : for per user //
 	//---------------------------------//
-	TCHAR toolbarIconsPath[MAX_PATH];
-	lstrcpy(toolbarIconsPath, _userPath);
+	generic_string toolbarIconsPath(_userPath);
 	PathAppend(toolbarIconsPath, TEXT("toolbarIcons.xml"));
 
 	_pXmlToolIconsDoc = new TiXmlDocument(toolbarIconsPath);
@@ -815,16 +799,15 @@ bool NppParameters::load()
 	//------------------------------//
 	// shortcuts.xml : for per user //
 	//------------------------------//
-	lstrcpy(_shortcutsPath, _userPath);
+	_shortcutsPath = _userPath;
 	PathAppend(_shortcutsPath, TEXT("shortcuts.xml"));
 
-	if (!PathFileExists(_shortcutsPath))
+	if (!PathFileExists(_shortcutsPath.c_str()))
 	{
-		TCHAR srcShortcutsPath[MAX_PATH];
-		lstrcpy(srcShortcutsPath, _nppPath.c_str());
+		generic_string srcShortcutsPath(_nppPath);
 		PathAppend(srcShortcutsPath, TEXT("shortcuts.xml"));
 
-		::CopyFile(srcShortcutsPath, _shortcutsPath, TRUE);
+		::CopyFile(srcShortcutsPath.c_str(), _shortcutsPath.c_str(), TRUE);
 	}
 
 	_pXmlShortcutDoc = new TiXmlDocument(_shortcutsPath);
@@ -849,16 +832,15 @@ bool NppParameters::load()
 	//---------------------------------//
 	// contextMenu.xml : for per user //
 	//---------------------------------//
-	lstrcpy(_contextMenuPath, _userPath);
+	_contextMenuPath = _userPath;
 	PathAppend(_contextMenuPath, TEXT("contextMenu.xml"));
 
-	if (!PathFileExists(_contextMenuPath))
+	if (!PathFileExists(_contextMenuPath.c_str()))
 	{
-		TCHAR srcContextMenuPath[MAX_PATH];
-		lstrcpy(srcContextMenuPath, _nppPath.c_str());
+		generic_string srcContextMenuPath(_nppPath);
 		PathAppend(srcContextMenuPath, TEXT("contextMenu.xml"));
 
-		::CopyFile(srcContextMenuPath, _contextMenuPath, TRUE);
+		::CopyFile(srcContextMenuPath.c_str(), _contextMenuPath.c_str(), TRUE);
 	}
 
 	_pXmlContextMenuDoc = new TiXmlDocument(_contextMenuPath);
@@ -875,7 +857,7 @@ bool NppParameters::load()
 	//----------------------------//
 	// session.xml : for per user //
 	//----------------------------//
-	lstrcpy(_sessionPath, _userPath);
+	_sessionPath = _userPath;
 	PathAppend(_sessionPath, TEXT("session.xml"));
 
 	// Don't load session.xml if not required in order to speed up!!
@@ -1259,17 +1241,17 @@ void NppParameters::setWorkingDir(const TCHAR * newPath)
 {
 	if (newPath && newPath[0])
 	{
-		lstrcpyn(_currentDirectory, newPath, MAX_PATH);	//dont use sizeof
+		_currentDirectory = newPath;
 	}
 	else
 	{
 		if (PathFileExists(_nppGUI._defaultDirExp))
 		{
-			lstrcpyn(_currentDirectory, _nppGUI._defaultDirExp, MAX_PATH);
+			_currentDirectory = _nppGUI._defaultDirExp;
 		}
 		else
 		{
-			lstrcpyn(_currentDirectory, _nppPath.c_str(), MAX_PATH);
+			_currentDirectory = _nppPath.c_str();
 		}
 	}
 }
@@ -1940,7 +1922,7 @@ void NppParameters::insertScintKey(TiXmlNode *scintKeyRoot, const ScintillaKeyMa
 void NppParameters::writeSession(const Session* session, const TCHAR *fileName)
 {
 	assert(session);
-	const TCHAR *pathName = fileName?fileName:_sessionPath;
+	const TCHAR *pathName = fileName?fileName:_sessionPath.c_str();
 
 	_pXmlSessionDoc = new TiXmlDocument(pathName);
 	TiXmlNode *root = _pXmlSessionDoc->InsertEndChild(TiXmlElement(TEXT("NotepadPlus")));
@@ -3129,7 +3111,20 @@ void NppParameters::feedGUIParameters(TiXmlNode *node)
 				val = n->Value();
 				if (val)
 				{
-					_nppGUI._neverUpdate = (!lstrcmp(val, TEXT("yes")))?true:false;
+                    _nppGUI._autoUpdateOpt._doAutoUpdate = (!lstrcmp(val, TEXT("yes")))?false:true;
+				}
+
+                int i;
+                val = element->Attribute(TEXT("intervalDays"), &i);
+                if (val)
+				{
+                    _nppGUI._autoUpdateOpt._intervalDays = i;
+				}
+
+                val = element->Attribute(TEXT("nextUpdateDate"));
+                if (val)
+				{
+                    _nppGUI._autoUpdateOpt._nextUpdateDate = Date(val);
 				}
 			}
 		}
@@ -3795,7 +3790,10 @@ bool NppParameters::writeGUIParams()
 		else if (!lstrcmp(nm, TEXT("noUpdate")))
 		{
 			noUpdateExist = true;
-			const TCHAR *pStr = _nppGUI._neverUpdate?TEXT("yes"):TEXT("no");
+            const TCHAR *pStr = _nppGUI._autoUpdateOpt._doAutoUpdate?TEXT("no"):TEXT("yes");
+
+            element->SetAttribute(TEXT("intervalDays"), _nppGUI._autoUpdateOpt._intervalDays);
+            element->SetAttribute(TEXT("nextUpdateDate"), _nppGUI._autoUpdateOpt._nextUpdateDate.toString().c_str());
 
 			TiXmlNode *n = childNode->FirstChild();
 			if (n)
@@ -3827,7 +3825,7 @@ bool NppParameters::writeGUIParams()
 
 	if (!noUpdateExist)
 	{
-		insertGUIConfigBoolNode(GUIRoot, TEXT("noUpdate"), _nppGUI._neverUpdate);
+        insertGUIConfigBoolNode(GUIRoot, TEXT("noUpdate"), _nppGUI._autoUpdateOpt._doAutoUpdate);
 	}
 
 	if (!autoDetectionExist)

@@ -492,6 +492,26 @@
 					RelativePath="..\src\Misc\Exception\Win32Exception.h"
 					>
 				</File>
+				<Filter
+					Name="Parameters"
+					>
+					<File
+						RelativePath="..\src\MISC\Common\npp_date.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\MISC\Common\npp_session.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\MISC\Common\npp_styles.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\MISC\Common\npp_winver.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="ScintillaComponent"
@@ -796,18 +816,6 @@
 			<Filter
 				Name="Parameters"
 				>
-				<File
-					RelativePath="..\src\npp_session.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\npp_styles.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\npp_winver.h"
-					>
-				</File>
 				<File
 					RelativePath="..\src\Parameters_def.h"
 					>
@@ -1443,6 +1451,26 @@
 					RelativePath="..\src\Misc\Exception\Win32Exception.cpp"
 					>
 				</File>
+				<Filter
+					Name="Parameters"
+					>
+					<File
+						RelativePath="..\src\MISC\Common\npp_date.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\MISC\Common\npp_session.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\MISC\Common\npp_styles.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\MISC\Common\npp_winver.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="ScintillaComponent"
@@ -1683,18 +1711,6 @@
 			<Filter
 				Name="Parameters"
 				>
-				<File
-					RelativePath="..\src\npp_session.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\npp_styles.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\npp_winver.cpp"
-					>
-				</File>
 				<File
 					RelativePath="..\src\Parameters_def.cpp"
 					>

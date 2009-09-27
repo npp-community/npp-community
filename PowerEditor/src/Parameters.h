@@ -51,6 +51,11 @@
 #include "npp_styles.h"
 #endif
 
+// JOCE: this needs to be taken out at some point...
+#ifndef NPP_DATE
+#include "npp_date.h"
+#endif
+
 // Forward declarations
 class TiXmlDocument;
 class TiXmlDocumentA;
@@ -217,8 +222,7 @@ struct NppGUI
 		_rememberLastSession(true), _enableMouseWheelZoom(true),  _doTaskList(true), _maitainIndent(true), _enableSmartHilite(true),
 		_enableTagsMatchHilite(true), _enableTagAttrsHilite(true), _enableHiliteNonHTMLZone(false), _styleMRU(true), _styleURL(0),
 		_isLangMenuCompact(false), _backup(bak_none), _useDir(false), _autocStatus(autoc_none), _autocFromLen(1), _funcParams(false),
-		_neverUpdate(false), _doesExistUpdater(false), _caretBlinkRate(250), _caretWidth(1), _shortTitlebar(false),
-		_openSaveDir(dir_followCurrent)
+		_doesExistUpdater(false), _caretBlinkRate(250), _caretWidth(1), _shortTitlebar(false), _openSaveDir(dir_followCurrent)
 	{
 		_appPos.left = 0;
 		_appPos.top = 0;
@@ -292,7 +296,14 @@ struct NppGUI
 	bool _funcParams;
 
 	generic_string _definedSessionExt;
-	bool _neverUpdate;
+
+    struct AutoUpdateOptions {
+        bool _doAutoUpdate;
+        int _intervalDays;
+        Date _nextUpdateDate;
+        AutoUpdateOptions(): _doAutoUpdate(true), _intervalDays(15), _nextUpdateDate(Date()) {};
+    } _autoUpdateOpt;
+
 	bool _doesExistUpdater;
 	int _caretBlinkRate;
 	int _caretWidth;
@@ -572,11 +583,6 @@ friend class NppParameters;
 
 public :
 	ThemeSwitcher(){};
-
-	struct ThemeDefinition {
-		TCHAR *_themeName;
-		TCHAR *_xmlFileName;
-	};
 
 	void addThemeFromXml(generic_string xmlFullPath) {
 		_themeList.push_back(std::pair<generic_string, generic_string>(getThemeFromXmlFileName(xmlFullPath.c_str()), xmlFullPath));
@@ -860,8 +866,8 @@ public:
 	ScintillaAccelerator * getScintillaAccelerator() {return _pScintAccelerator;};
 
 	generic_string getNppPath() const {return _nppPath;};
-	const TCHAR * getAppDataNppDir() const {return _appdataNppDir;};
-	const TCHAR * getWorkingDir() const {return _currentDirectory;};
+	const TCHAR * getAppDataNppDir() const {return _appdataNppDir.c_str();};
+	const TCHAR * getWorkingDir() const {return _currentDirectory.c_str();};
 	void setWorkingDir(const TCHAR * newPath);
 
 	bool loadSession(Session* session, const TCHAR *sessionFileName);
@@ -939,9 +945,7 @@ private:
 	// JOCE use a std::vector instead!
 	UserLangContainer *_userLangArray[NB_MAX_USER_LANG];
 	int _nbUserLang;
-	// JOCE use a std::string instead
-	TCHAR _userDefineLangPath[MAX_PATH];
-	// JOCE use a std::vector instead!
+	generic_string _userDefineLangPath;
 	ExternalLangContainer *_externalLangArray[NB_MAX_EXTERNAL_LANG];
 	int _nbExternalLang;
 
@@ -980,15 +984,14 @@ private:
 	std::vector<MenuItemUnit> _contextMenuItems;
 	Session* _session;
 
-	// JOCE: Could / should be repalced by std::strings.
-	TCHAR _shortcutsPath[MAX_PATH];
-	TCHAR _contextMenuPath[MAX_PATH];
-	TCHAR _sessionPath[MAX_PATH];
+	generic_string _shortcutsPath;
+	generic_string _contextMenuPath;
+	generic_string _sessionPath;
 	generic_string _nppPath;
-	TCHAR _userPath[MAX_PATH];
-	TCHAR _stylerPath[MAX_PATH];
-	TCHAR _appdataNppDir[MAX_PATH]; // sentinel of the absence of "doLocalConf.xml" : (_appdataNppDir == TEXT(""))?"doLocalConf.xml present":"doLocalConf.xml absent"
-	TCHAR _currentDirectory[MAX_PATH];
+	generic_string _userPath;
+	generic_string _stylerPath;
+	generic_string _appdataNppDir; // sentinel of the absence of "doLocalConf.xml" : (_appdataNppDir == TEXT(""))?"doLocalConf.xml present":"doLocalConf.xml absent"
+	generic_string _currentDirectory;
 
 	Accelerator *_pAccelerator;
 	ScintillaAccelerator * _pScintAccelerator;
