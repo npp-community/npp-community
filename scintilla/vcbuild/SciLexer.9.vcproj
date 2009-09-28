@@ -298,6 +298,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\Selection.cxx"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Style.cxx"
 				>
 			</File>
@@ -745,6 +749,10 @@
 			</File>
 			<File
 				RelativePath="..\src\ScintillaBase.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Selection.h"
 				>
 			</File>
 			<File

@@ -339,7 +339,7 @@ void FindReplaceDlg::create(int dialogID, bool isRTL)
 
 	const TCHAR *find = TEXT("Find");
 	const TCHAR *replace = TEXT("Replace");
-	const TCHAR *findInFiles = TEXT("Find in files");
+	const TCHAR *findInFiles = TEXT("Find in Files");
 
 	NppParameters::FindDlgTabTitiles & fdTitles = NppParameters::getInstance()->getFindDlgTabTitiles();
 

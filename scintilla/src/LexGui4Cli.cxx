@@ -32,7 +32,9 @@ val SCE_GC_OPERATOR=9
 
 #include "Platform.h"
 
-#include "PropSet.h"
+// NPPSTART Joce 09/04/09 MergeMobToIncludeRedux
+//#include "PropSet.h"
+// NPPEND
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "KeyWords.h"
@@ -69,7 +71,9 @@ inline bool isGCOperator(int ch)
 #define isNL(x)			((x)=='\n' || (x)=='\r')
 #define isSpaceOrNL(x)  (isSpace(x) || isNL(x))
 #define BUFFSIZE 500
-#define isFoldPoint(x)  ((styler.LevelAt(x) & SC_FOLDLEVELNUMBERMASK) == 1024)
+// NPPSTART Joce 09/04/09 MergeMobToIncludeRedux
+//#define isFoldPoint(x)  ((styler.LevelAt(x) & SC_FOLDLEVELNUMBERMASK) == 1024)
+// NPPEND
 
 static void colorFirstWord(WordList *keywordlists[], Accessor &styler,
 									StyleContext *sc, char *buff, int length, int)

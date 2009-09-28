@@ -118,7 +118,9 @@ contains requires
 
 #include "Platform.h"
 
-#include "PropSet.h"
+// NPPSTART Joce 09/04/09 MergeMobToIncludeRedux
+//#include "PropSet.h"
+// NPPEND
 #include "Accessor.h"
 #include "KeyWords.h"
 #include "Scintilla.h"
@@ -417,7 +419,7 @@ static unsigned int SkipWhiteSpace(unsigned int currentPos, unsigned int endPos,
 }
 
 static void ClassifyPascalWordFoldPoint(int &levelCurrent, int &lineFoldStateCurrent,
-		unsigned int startPos, unsigned int endPos,
+		int startPos, unsigned int endPos,
 		unsigned int lastStart, unsigned int currentPos, Accessor &styler) {
 	char s[100];
 	GetRangeLowered(lastStart, currentPos, styler, s, sizeof(s));
@@ -474,7 +476,7 @@ static void ClassifyPascalWordFoldPoint(int &levelCurrent, int &lineFoldStateCur
 	} else if (strcmp(s, "interface") == 0) {
 		// "interface" keyword requires special handling...
 		bool ignoreKeyword = true;
-		unsigned int j = lastStart - 1;
+		int j = lastStart - 1;
 		char ch = styler.SafeGetCharAt(j);
 		while ((j >= startPos) && (IsASpaceOrTab(ch) || ch == '\r' || ch == '\n' ||
 			IsStreamCommentStyle(styler.StyleAt(j)))) {

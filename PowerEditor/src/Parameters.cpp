@@ -885,6 +885,8 @@ void NppParameters::destroyInstance()
 {
 	if (_pXmlDoc != NULL)
 	{
+        if (_pXmlDoc->isDirty())
+            _pXmlDoc->SaveFile();
 		delete _pXmlDoc;
 	}
 
@@ -897,8 +899,9 @@ void NppParameters::destroyInstance()
 		delete _pXmlUserStylerDoc;
 
 	if (_pXmlUserLangDoc)
+    {
 		delete _pXmlUserLangDoc;
-
+    }
 	if (_pXmlNativeLangDocA)
 		delete _pXmlNativeLangDocA;
 
@@ -2325,6 +2328,9 @@ void NppParameters::feedKeyWordsParameters(TiXmlNode *node)
 				_langList[_nbLang]->setCommentLineSymbol(element->Attribute(TEXT("commentLine")));
 				_langList[_nbLang]->setCommentStart(element->Attribute(TEXT("commentStart")));
 				_langList[_nbLang]->setCommentEnd(element->Attribute(TEXT("commentEnd")));
+                int i;
+                if (element->Attribute(TEXT("tabSettings"), &i))
+                    _langList[_nbLang]->setTabInfo(i);
 
 				for (TiXmlNode *kwNode = langNode->FirstChildElement(TEXT("Keywords"));
 					kwNode ;
@@ -4456,6 +4462,27 @@ void NppParameters::writeStyles(LexerStylerArray & lexersStylers, StyleArray & g
     }
 
 	_pXmlUserStylerDoc->SaveFile();
+}
+
+
+bool NppParameters::insertTabInfo(const TCHAR *langName, int tabInfo)
+{
+    if (!_pXmlDoc) return false;
+    TiXmlNode *langRoot = (_pXmlDoc->FirstChild(TEXT("NotepadPlus")))->FirstChildElement(TEXT("Languages"));
+    for (TiXmlNode *childNode = langRoot->FirstChildElement(TEXT("Language"));
+		childNode ;
+		childNode = childNode->NextSibling(TEXT("Language")))
+	{
+        TiXmlElement *element = childNode->ToElement();
+		const TCHAR *nm = element->Attribute(TEXT("name"));
+        if (nm && lstrcmp(langName, nm) == 0)
+        {
+            childNode->ToElement()->SetAttribute(TEXT("tabSettings"), tabInfo);
+            _pXmlDoc->makeDirty();
+            return true;
+        }
+    }
+    return false;
 }
 
 void NppParameters::writeStyle2Element(Style & style2Wite, Style & style2Sync, TiXmlElement *element)

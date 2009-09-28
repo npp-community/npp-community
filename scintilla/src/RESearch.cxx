@@ -200,6 +200,7 @@
 
 // NPPSTART Joce 06/09/09 Scintilla_precomp_headers
 #include "precompiled_headers.h"
+//#include <stdlib.h>
 // NPPEND
 
 #include "CharClassify.h"
@@ -829,7 +830,9 @@ int RESearch::Execute(CharacterIndexer &ci, int lp, int endp) {
  *  by tagged expressions (n = 1 to 9).
  */
 
-extern void re_fail(char *,char);
+// NPPSTART Joce 09/04/09 MergeMobToIncludeRedux
+//extern void re_fail(char *,char);
+// NPPEND
 
 #define isinset(x,y)	((x)[((y)&BLKIND)>>3] & bitarr[(y)&BITIND])
 

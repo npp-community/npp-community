@@ -1093,6 +1093,13 @@ public:
 	virtual void Print( FILE* cfile, int depth = 0 ) const;
 	// [internal use]
 	void SetError( int err, const TCHAR* errorLocation, TiXmlParsingData* prevData );
+    void makeDirty() {
+        _isDirty = true;
+    };
+
+    bool isDirty() const {
+        return _isDirty;
+    };
 
 protected :
 	virtual void StreamOut ( TIXML_OSTREAM * out) const;
@@ -1108,6 +1115,7 @@ private:
 	TIXML_STRING errorDesc;
 	int tabsize;
 	TiXmlCursor errorLocation;
+    bool _isDirty;
 };
 
 

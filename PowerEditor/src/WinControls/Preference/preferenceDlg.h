@@ -50,11 +50,8 @@ private :
 	StaticDialog* _fileAssocDlg;
 	StaticDialog* _langMenuDlg;
 	StaticDialog* _printSettingsDlg;
-	StaticDialog* _printSettings2Dlg;
 	StaticDialog* _defaultNewDocDlg;
 	StaticDialog* _backupDlg;
 };
-
-
 
 #endif //PREFERENCE_DLG_H

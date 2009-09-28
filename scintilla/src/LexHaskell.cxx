@@ -30,6 +30,7 @@
 // NPPEND
 
 #include "PropSet.h"
+#include "PropSetSimple.h"
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "KeyWords.h"
@@ -232,7 +233,7 @@ static const char* LexerName = "haskell";
 void EXT_LEXER_DECL Lex(unsigned int lexer, unsigned int startPos, int length, int initStyle,
                         char *words[], WindowID window, char *props)
 {
-   PropSet ps;
+   PropSetSimple ps;
    ps.SetMultiple(props);
    WindowAccessor wa(window, ps);
 

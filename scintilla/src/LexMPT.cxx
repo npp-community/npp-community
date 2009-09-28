@@ -13,24 +13,24 @@
 //#include <stdio.h>
 //#include <ctype.h>
 //#include <stdlib.h>
+//#include <string>
 // NPPEND
 
 #include "Platform.h"
 
-#include "PropSet.h"
+// NPPSTART Joce 09/04/09 MergeMobToIncludeRedux
+//#include "PropSet.h"
+// NPPEND
 #include "Accessor.h"
 #include "KeyWords.h"
 #include "Scintilla.h"
 #include "SciLexer.h"
-// NPPSTART Joce 08/09/09 LintCleanup
-//#include "SString.h"
-// NPPEND
 
 #ifdef SCI_NAMESPACE
 using namespace Scintilla;
 #endif
 
-static int GetLotLineState(SString &line) {
+static int GetLotLineState(std::string &line) {
 	if (line.length()) {
 		// Most of the time the first non-blank character in line determines that line's type
 		// Now finds the first non-blank character
@@ -60,13 +60,13 @@ static int GetLotLineState(SString &line) {
 
 		default:  // Any other line
 			// Checks for message at the end of lot file
-			if (line.contains("PASSED")) {
+			if (line.find("PASSED") != std::string::npos) {
 				return SCE_LOT_PASS;
 			}
-			else if (line.contains("FAILED")) {
+			else if (line.find("FAILED") != std::string::npos) {
 				return SCE_LOT_FAIL;
 			}
-			else if (line.contains("ABORTED")) {
+			else if (line.find("ABORTED") != std::string::npos) {
 				return SCE_LOT_ABORT;
 			}
 			else {
@@ -84,8 +84,8 @@ static void ColourizeLotDoc(unsigned int startPos, int length, int, WordList *[]
 	styler.StartSegment(startPos);
 	bool atLineStart = true;// Arms the 'at line start' flag
 	char chNext = styler.SafeGetCharAt(startPos);
-	SString line("");
-	line.setsizegrowth(256);	// Lot lines are less than 256 chars long most of the time. This should avoid reallocations
+	std::string line("");
+	line.reserve(256);	// Lot lines are less than 256 chars long most of the time. This should avoid reallocations
 
 	// Styles LOT document
 	unsigned int i;			// Declared here because it's used after the for loop

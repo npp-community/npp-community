@@ -95,10 +95,13 @@ ViewStyle::ViewStyle(const ViewStyle &source) {
 
 	selforeset = source.selforeset;
 	selforeground.desired = source.selforeground.desired;
+	selAdditionalForeground.desired = source.selAdditionalForeground.desired;
 	selbackset = source.selbackset;
 	selbackground.desired = source.selbackground.desired;
+	selAdditionalBackground.desired = source.selAdditionalBackground.desired;
 	selbackground2.desired = source.selbackground2.desired;
 	selAlpha = source.selAlpha;
+	selAdditionalAlpha = source.selAdditionalAlpha;
 	selEOLFilled = source.selEOLFilled;
 
 	foldmarginColourSet = source.foldmarginColourSet;
@@ -120,8 +123,9 @@ ViewStyle::ViewStyle(const ViewStyle &source) {
 	selbar.desired = source.selbar.desired;
 	selbarlight.desired = source.selbarlight.desired;
 	caretcolour.desired = source.caretcolour.desired;
+	additionalCaretColour.desired = source.additionalCaretColour.desired;
 	showCaretLineBackground = source.showCaretLineBackground;
-	showCaretLineBackgroundAlways = source.showCaretLineBackgroundAlways;
+    showCaretLineBackgroundAlways = source.showCaretLineBackgroundAlways;
 	caretLineBackground.desired = source.caretLineBackground.desired;
 	caretLineAlpha = source.caretLineAlpha;
 	edgecolour.desired = source.edgecolour.desired;
@@ -180,10 +184,13 @@ void ViewStyle::Init(size_t stylesSize_) {
 
 	selforeset = false;
 	selforeground.desired = ColourDesired(0xff, 0, 0);
+	selAdditionalForeground.desired = ColourDesired(0xff, 0, 0);
 	selbackset = true;
 	selbackground.desired = ColourDesired(0xc0, 0xc0, 0xc0);
+	selAdditionalBackground.desired = ColourDesired(0xd7, 0xd7, 0xd7);
 	selbackground2.desired = ColourDesired(0xb0, 0xb0, 0xb0);
 	selAlpha = SC_ALPHA_NOALPHA;
+	selAdditionalAlpha = SC_ALPHA_NOALPHA;
 	selEOLFilled = false;
 
 	foldmarginColourSet = false;
@@ -200,8 +207,9 @@ void ViewStyle::Init(size_t stylesSize_) {
 	styles[STYLE_LINENUMBER].fore.desired = ColourDesired(0, 0, 0);
 	styles[STYLE_LINENUMBER].back.desired = Platform::Chrome();
 	caretcolour.desired = ColourDesired(0, 0, 0);
+	additionalCaretColour.desired = ColourDesired(0x7f, 0x7f, 0x7f);
 	showCaretLineBackground = false;
-	showCaretLineBackgroundAlways = false;
+    showCaretLineBackgroundAlways = false;
 	caretLineBackground.desired = ColourDesired(0xff, 0xff, 0);
 	caretLineAlpha = SC_ALPHA_NOALPHA;
 	edgecolour.desired = ColourDesired(0xc0, 0xc0, 0xc0);
@@ -263,7 +271,9 @@ void ViewStyle::RefreshColourPalette(Palette &pal, bool want) {
 		markers[i].RefreshColourPalette(pal, want);
 	}
 	pal.WantFind(selforeground, want);
+	pal.WantFind(selAdditionalForeground, want);
 	pal.WantFind(selbackground, want);
+	pal.WantFind(selAdditionalBackground, want);
 	pal.WantFind(selbackground2, want);
 
 	pal.WantFind(foldmarginColour, want);
@@ -274,6 +284,7 @@ void ViewStyle::RefreshColourPalette(Palette &pal, bool want) {
 	pal.WantFind(selbar, want);
 	pal.WantFind(selbarlight, want);
 	pal.WantFind(caretcolour, want);
+	pal.WantFind(additionalCaretColour, want);
 	pal.WantFind(caretLineBackground, want);
 	pal.WantFind(edgecolour, want);
 	pal.WantFind(hotspotForeground, want);

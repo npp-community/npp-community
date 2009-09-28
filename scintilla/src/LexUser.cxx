@@ -29,12 +29,15 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "Platform.h"
 
-#include "PropSet.h"
+// NPPSTART Joce 09/04/09 MergeMobToIncludeRedux
+//#include "PropSet.h"
+// NPPEND
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "KeyWords.h"
 #include "Scintilla.h"
 #include "SciLexer.h"
+#include "CharClassify.h"
 
 // NPPSTART Joce 08/09/09 LintCleanup
 //#define KEYWORD_BOXHEADER 1

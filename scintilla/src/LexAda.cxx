@@ -11,6 +11,7 @@
 //#include <ctype.h>
 //#include <string.h>
 //#include <stdio.h>
+//#include <string>
 // NPPEND
 
 // NPPSTART Joce 08/09/09 LintCleanup
@@ -19,12 +20,11 @@
 
 #include "Accessor.h"
 #include "StyleContext.h"
-#include "PropSet.h"
+// NPPSTART Joce 09/04/09 MergeMobToIncludeRedux
+//#include "PropSet.h"
+// NPPEND
 #include "KeyWords.h"
 #include "SciLexer.h"
-// NPPSTART Joce 08/09/09 LintCleanup
-//#include "SString.h"
-// NPPEND
 
 #ifdef SCI_NAMESPACE
 using namespace Scintilla;
@@ -69,8 +69,8 @@ static inline bool IsDelimiterCharacter(int ch);
 static inline bool IsNumberStartCharacter(int ch);
 static inline bool IsNumberCharacter(int ch);
 static inline bool IsSeparatorOrDelimiterCharacter(int ch);
-static bool IsValidIdentifier(const SString& identifier);
-static bool IsValidNumber(const SString& number);
+static bool IsValidIdentifier(const std::string& identifier);
+static bool IsValidNumber(const std::string& number);
 static inline bool IsWordStartCharacter(int ch);
 static inline bool IsWordCharacter(int ch);
 
@@ -124,7 +124,7 @@ static void ColouriseLabel(StyleContext& sc, WordList& keywords, bool& apostroph
 	sc.Forward();
 	sc.Forward();
 
-	SString identifier;
+	std::string identifier;
 
 	while (!sc.atLineEnd && !IsSeparatorOrDelimiterCharacter(sc.ch)) {
 		identifier += static_cast<char>(tolower(sc.ch));
@@ -151,7 +151,7 @@ static void ColouriseLabel(StyleContext& sc, WordList& keywords, bool& apostroph
 static void ColouriseNumber(StyleContext& sc, bool& apostropheStartsAttribute) {
 	apostropheStartsAttribute = true;
 
-	SString number;
+	std::string number;
 	sc.SetState(SCE_ADA_NUMBER);
 
 	// Get all characters up to a delimiter or a separator, including points, but excluding
@@ -199,7 +199,7 @@ static void ColouriseWord(StyleContext& sc, WordList& keywords, bool& apostrophe
 	apostropheStartsAttribute = true;
 	sc.SetState(SCE_ADA_IDENTIFIER);
 
-	SString word;
+	std::string word;
 
 	while (!sc.atLineEnd && !IsSeparatorOrDelimiterCharacter(sc.ch)) {
 		word += static_cast<char>(tolower(sc.ch));
@@ -328,7 +328,7 @@ static inline bool IsSeparatorOrDelimiterCharacter(int ch) {
 	return IsASpace(ch) || IsDelimiterCharacter(ch);
 }
 
-static bool IsValidIdentifier(const SString& identifier) {
+static bool IsValidIdentifier(const std::string& identifier) {
 	// First character can't be '_', so initialize the flag to true
 	bool lastWasUnderscore = true;
 
@@ -362,8 +362,8 @@ static bool IsValidIdentifier(const SString& identifier) {
 	return true;
 }
 
-static bool IsValidNumber(const SString& number) {
-	int hashPos = number.search("#");
+static bool IsValidNumber(const std::string& number) {
+	size_t hashPos = number.find("#");
 	bool seenDot = false;
 
 	size_t i = 0;
@@ -373,7 +373,7 @@ static bool IsValidNumber(const SString& number) {
 		return false; // Just in case
 
 	// Decimal number
-	if (hashPos == -1) {
+	if (hashPos == std::string::npos) {
 		bool canBeSpecial = false;
 
 		for (; i < length; i++) {
