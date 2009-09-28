@@ -16,7 +16,9 @@
 
 #include "Platform.h"
 
-#include "PropSet.h"
+// NPPSTART Joce 09/04/09 MergeMobToIncludeRedux
+//#include "PropSet.h"
+// NPPEND
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "KeyWords.h"
@@ -419,6 +421,8 @@ static void FoldPyDoc(unsigned int startPos, int length, int /*initStyle - unuse
 	//	This option enables folding multi-line quoted strings when using the Python lexer.
 	const bool foldQuotes = styler.GetPropertyInt("fold.quotes.python") != 0;
 
+	const bool foldCompact = styler.GetPropertyInt("fold.compact") != 0;
+
 	// Backtrack to previous non-blank line so we can determine indent level
 	// for any white space lines (needed esp. within triple quoted strings)
 	// and so we can fix any preceding fold level (which is why we go back
@@ -517,12 +521,21 @@ static void FoldPyDoc(unsigned int startPos, int length, int /*initStyle - unuse
 		while (--skipLine > lineCurrent) {
 			int skipLineIndent = styler.IndentAmount(skipLine, &spaceFlags, NULL);
 
-			if ((skipLineIndent & SC_FOLDLEVELNUMBERMASK) > levelAfterComments)
-				skipLevel = levelBeforeComments;
+			if (foldCompact) {
+				if ((skipLineIndent & SC_FOLDLEVELNUMBERMASK) > levelAfterComments)
+					skipLevel = levelBeforeComments;
 
-			int whiteFlag = skipLineIndent & SC_FOLDLEVELWHITEFLAG;
+				int whiteFlag = skipLineIndent & SC_FOLDLEVELWHITEFLAG;
 
-			styler.SetLevel(skipLine, skipLevel | whiteFlag);
+				styler.SetLevel(skipLine, skipLevel | whiteFlag);
+			} else {
+				if ((skipLineIndent & SC_FOLDLEVELNUMBERMASK) > levelAfterComments &&
+					!(skipLineIndent & SC_FOLDLEVELWHITEFLAG) &&
+					!IsCommentLine(skipLine, styler))
+					skipLevel = levelBeforeComments;
+
+				styler.SetLevel(skipLine, skipLevel);
+			}
 		}
 
 		// Set fold header on non-quote/non-comment line

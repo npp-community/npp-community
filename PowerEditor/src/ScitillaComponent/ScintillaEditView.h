@@ -101,10 +101,11 @@ typedef void * SCINTILLA_PTR;
 #define UPPERCASE true
 #define LOWERCASE false
 
-typedef std::vector<std::pair<int, int> > ColumnModeInfo;
 #define MASK_FORMAT 0x03
 #define MASK_ZERO_LEADING 0x04
 
+#define MASK_FORMAT 0x03
+#define MASK_ZERO_LEADING 0x04
 #define BASE_10 0x00 // Dec
 #define BASE_16 0x01 // Hex
 #define BASE_08 0x02 // Oct
@@ -125,6 +126,33 @@ int getNbDigits(int aNum, int base);
 TCHAR * int2str(TCHAR *str, int strLen, int number, int base, int nbChiffre, bool isZeroLeading);
 
 typedef LRESULT (WINAPI *CallWindowProcFunc) (WNDPROC,HWND,UINT,WPARAM,LPARAM);
+
+const bool L2R = true;
+const bool R2L = false;
+
+struct ColumnModeInfo {
+	int _selLpos;
+	int _selRpos;
+	int _order; // 0 based index
+	bool _direction; // L2R or R2L
+	int _nbVirtualCaretSpc;
+	int _nbVirtualAnchorSpc;
+
+	ColumnModeInfo() : _selLpos(0), _selRpos(0), _order(-1), _direction(L2R), _nbVirtualAnchorSpc(0), _nbVirtualCaretSpc(0){};
+	ColumnModeInfo(int lPos, int rPos, int order, bool dir = L2R, int vAnchorNbSpc = 0, int vCaretNbSpc = 0)
+		: _selLpos(lPos), _selRpos(rPos), _order(order), _direction(dir), _nbVirtualAnchorSpc(vAnchorNbSpc), _nbVirtualCaretSpc(vCaretNbSpc){};
+
+	bool isValid() const {
+		return (_order >= 0 && _selLpos >= 0 && _selRpos >= 0 && _selLpos <= _selRpos);
+	};
+/*
+	bool hasVirtualSpace() const {
+		return (_nbVirtualCaretSpc >= 0 && _nbVirtualAnchorSpc >= 0);
+	};
+	*/
+};
+
+typedef std::vector<ColumnModeInfo> ColumnModeInfos;
 
 struct LanguageName {
 	const TCHAR * lexerName;
@@ -179,23 +207,23 @@ public:
 	int getCurrentDocLen() const;
 	void getSelection(CharacterRange& range) const;
 	void getWordToCurrentPos(TCHAR * str, int strLen) const;
-    void doUserDefineDlg(bool willBeShown = true, bool isRTL = false);
-    static UserDefineDialog * getUserDefineDlg() {return _userDefineDlg;};
-    void setCaretColorWidth(int color, int width = 1) const;
+	void doUserDefineDlg(bool willBeShown = true, bool isRTL = false);
+	static UserDefineDialog * getUserDefineDlg() {return _userDefineDlg;};
+	void setCaretColorWidth(int color, int width = 1) const;
 	void beSwitched();
 
-    //Marge member and method
-    static const int _SC_MARGE_LINENUMBER;
-    static const int _SC_MARGE_SYBOLE;
-    static const int _SC_MARGE_FOLDER;
+	//Marge member and method
+	static const int _SC_MARGE_LINENUMBER;
+	static const int _SC_MARGE_SYBOLE;
+	static const int _SC_MARGE_FOLDER;
 	//static const int _SC_MARGE_MODIFMARKER;
 
-    void showMargin(int whichMarge, bool willBeShowed = true);
-    bool hasMarginShowed(int witchMarge);
-    void marginClick(int position, int modifiers);
-    void setMakerStyle(folderStyle style);
+	void showMargin(int whichMarge, bool willBeShowed = true);
+	bool hasMarginShowed(int witchMarge);
+	void marginClick(int position, int modifiers);
+	void setMakerStyle(folderStyle style);
 
-    folderStyle getFolderStyle() {return _folderStyle;};
+	folderStyle getFolderStyle() {return _folderStyle;};
 	void showWSAndTab(bool willBeShowed = true);
 	void showEOL(bool willBeShowed = true);
 	bool isEolVisible();
@@ -211,10 +239,10 @@ public:
 	bool isMouseWheelZoomEnable() const;
 	void enableMouseWheelZoom(bool enable);
 
-    void wrap(bool willBeWrapped = true);
-    bool isWrap() const;
+	void wrap(bool willBeWrapped = true);
+	bool isWrap() const;
 	bool isWrapSymbolVisible() const;
-    void showWrapSymbol(bool willBeShown = true);
+	void showWrapSymbol(bool willBeShown = true);
 
 	long getCurrentLineNumber()const;
 	long lastZeroBasedLineNumber() const;
@@ -254,8 +282,9 @@ public:
 	void currentLineDown() const;
 
 	void convertSelectedTextTo(bool Case);
-    void convertSelectedTextToLowerCase();
-    void convertSelectedTextToUpperCase();
+	void setMultiSelections(const ColumnModeInfos & cmi);
+	void convertSelectedTextToLowerCase();
+	void convertSelectedTextToUpperCase();
 
 	void collapse(int level2Collapse, bool mode);
 	void foldAll(bool mode);
@@ -266,10 +295,10 @@ public:
 		return _pParameter;
 	};
 
-	ColumnModeInfo getColumnModeSelectInfo();
+	ColumnModeInfos getColumnModeSelectInfo();
 
-	void columnReplace(ColumnModeInfo & cmi, const TCHAR *str);
-	void columnReplace(ColumnModeInfo & cmi, int initial, int incr, UCHAR format);
+	void columnReplace(ColumnModeInfos & cmi, const TCHAR *str);
+	void columnReplace(ColumnModeInfos & cmi, int initial, int incr, UCHAR format);
 
 	void foldChanged(int line, int levelNow, int levelPrev);
 	void clearIndicator(int indicatorNumber);
@@ -294,9 +323,9 @@ protected:
 	static HINSTANCE _hLib;
 	static int _refCount;
 
-    static UserDefineDialog* _userDefineDlg;
+	static UserDefineDialog* _userDefineDlg;
 
-    static const int _markersArray[][NB_FOLDER_STATE];
+	static const int _markersArray[][NB_FOLDER_STATE];
 
 	static LRESULT CALLBACK scintillaStatic_Proc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 
@@ -304,25 +333,18 @@ protected:
 
 	SCINTILLA_FUNC _pScintillaFunc;
 	SCINTILLA_PTR  _pScintillaPtr;
-
 	static WNDPROC _scintillaDefaultProc;
 	CallWindowProcFunc _callWindowProc;
-
 	BufferID attachDefaultDoc();
 
 	//Store the current buffer so it can be retrieved later
 	BufferID _currentBufferID;
 	Buffer * _currentBuffer;
-
 	folderStyle _folderStyle;
-
-    NppParameters *_pParameter;
-
+	NppParameters *_pParameter;
 	int _codepage;
 	int _oemCodepage;
-
 	bool _lineNumbersShown;
-
 	bool _wrapRestoreNeeded;
 
 	typedef std::map<int, Style*> StyleMap;
@@ -356,12 +378,12 @@ protected:
 	void setXmlLexer(LangType type);
 	void setCppLexer(LangType type);
 	void setTclLexer();
-    void setObjCLexer(LangType type);
+	void setObjCLexer(LangType type);
 	void setUserLexer(const TCHAR *userLangName = NULL);
 	void setExternalLexer(LangType typeDoc);
 	void setEmbeddedJSLexer();
-    void setPhpEmbeddedLexer();
-    void setEmbeddedAspLexer();
+	void setPhpEmbeddedLexer();
+	void setEmbeddedAspLexer();
 
 	//Simple lexers
 	void setCssLexer();
@@ -401,13 +423,13 @@ protected:
 	bool isNeededFolderMarge(LangType typeDoc) const;
 //END: Lexers and Styling
 
-    void defineMarker(int marker, int markerType, COLORREF fore, COLORREF back);
+	void defineMarker(int marker, int markerType, COLORREF fore, COLORREF back);
 
 	bool isCJK() const;
 
 	int codepage2CharSet() const;
 
-    void setTabSettings(Lang *lang);
+	void setTabSettings(Lang *lang);
 	bool expandWordSelection();
 
 private:

@@ -33,7 +33,7 @@
 #include <ole2.h>
 
 #if _MSC_VER >= 1300
-#include <BaseTsd.h>
+#include <basetsd.h>
 #endif
 
 // Standard headers.
@@ -47,6 +47,10 @@
 #include <time.h>
 
 // STL
+#include <new>
+#include <map>
+#include <string>
 #include <vector>
-
+#include <algorithm>
 #endif // PRECOMPILED_HEADERS_H
+

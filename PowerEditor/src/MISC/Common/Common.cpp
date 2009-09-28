@@ -642,7 +642,6 @@ BOOL PathCanonicalize(generic_string& path)
 
 }
 
-
 BOOL PathCanonicalize(generic_string& path, generic_string& output)
 {
 	output.assign(path);

@@ -43,7 +43,6 @@ protected:
 	CallTip ct;
 
 	int listType;			///< 0 is an autocomplete list
-	SString listSelected;	///< Receives listbox selected string
 	int maxListWidth;		/// Maximum width of list, in average character widths
 
 	bool performingStyle;	///< Prevent reentrance
@@ -51,7 +50,7 @@ protected:
 #ifdef SCI_LEXER
 	int lexLanguage;
 	const LexerModule *lexCurrent;
-	PropSet props;
+	PropSetSimple props;
 	enum {numWordLists=KEYWORDSET_MAX+1};
 	WordList *keyWordLists[numWordLists+1];
 	void SetLexer(uptr_t wParam);

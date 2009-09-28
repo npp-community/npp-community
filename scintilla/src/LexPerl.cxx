@@ -17,7 +17,9 @@
 
 #include "Platform.h"
 
-#include "PropSet.h"
+// NPPSTART Joce 09/04/09 MergeMobToIncludeRedux
+//#include "PropSet.h"
+// NPPEND
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "KeyWords.h"
@@ -968,6 +970,7 @@ static void ColourisePerlDoc(unsigned int startPos, int length, int initStyle,
 				bool hereDocSpace = false;		// for: SCALAR [whitespace] '<<'
 				unsigned int bk = (sc.currentPos > 0) ? sc.currentPos - 1: 0;
 				unsigned int bkend;
+				sc.Complete();
 				styler.Flush();
 				if (styler.StyleAt(bk) == SCE_PL_DEFAULT)
 					hereDocSpace = true;
@@ -1147,6 +1150,7 @@ static void ColourisePerlDoc(unsigned int startPos, int length, int initStyle,
 				}
 				backFlag = BACK_NONE;
 			} else if (sc.ch == '(' && sc.currentPos > 0) {	// '(' or subroutine prototype
+				sc.Complete();
 				if (styleCheckSubPrototype(styler, sc.currentPos - 1)) {
 					sc.SetState(SCE_PL_SUB_PROTOTYPE);
 					backFlag = BACK_NONE;

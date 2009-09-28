@@ -26,7 +26,7 @@
 using namespace Scintilla;
 #endif
 
-LineVector::LineVector() : starts(256) {
+LineVector::LineVector() : starts(256), perLine(0) {
 	Init();
 }
 
@@ -36,6 +36,9 @@ LineVector::~LineVector() {
 
 void LineVector::Init() {
 	starts.DeleteAll();
+	if (perLine) {
+		perLine->Init();
+	}
 }
 
 void LineVector::SetPerLine(PerLine *pl) {
@@ -64,7 +67,7 @@ void LineVector::RemoveLine(int line) {
 	}
 }
 
-int LineVector::LineFromPosition(int pos) {
+int LineVector::LineFromPosition(int pos) const {
 	return starts.PartitionFromPosition(pos);
 }
 
@@ -152,8 +155,6 @@ void UndoHistory::EnsureUndoRoom() {
 		// Run out of undo nodes so extend the array
 		int lenActionsNew = lenActions * 2;
 		Action *actionsNew = new Action[lenActionsNew];
-		if (!actionsNew)
-			return;
 		for (int act = 0; act <= currentAction; act++)
 			actionsNew[act].Grab(&actions[act]);
 		delete []actions;

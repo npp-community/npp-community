@@ -16,7 +16,9 @@
 
 #include "Platform.h"
 
-#include "PropSet.h"
+// NPPSTART Joce 09/04/09 MergeMobToIncludeRedux
+//#include "PropSet.h"
+// NPPEND
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "KeyWords.h"
@@ -477,6 +479,10 @@ static void FoldCppDoc(unsigned int startPos, int length, int initStyle,
 			lineCurrent++;
 			levelCurrent = levelNext;
 			levelMinCurrent = levelCurrent;
+			if (atEOL && (i == static_cast<unsigned int>(styler.Length()-1))) {
+				// There is an empty line at end of file so give it same level and empty
+				styler.SetLevel(lineCurrent, (levelCurrent | levelCurrent << 16) | SC_FOLDLEVELWHITEFLAG);
+			}
 			visibleChars = 0;
 		}
 	}
