@@ -24,7 +24,6 @@ distribution.
 
 #include "precompiled_headers.h"
 #include "tinyxml.h"
-//#include "tchar.h"
 
 // The goal of the seperate error file is to make the first
 // step towards localization. tinyxml (currently) only supports

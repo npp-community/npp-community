@@ -21,7 +21,6 @@
 #include "ImageListSet.h"
 #include "Buffer.h"
 
-
 bool DocTabView::_hideTabBarStatus = false;
 
 DocTabView::~DocTabView()
@@ -166,7 +165,6 @@ void DocTabView::reSizeTo(RECT & rc)
 	if (_hideTabBarStatus)
 	{
 		RECT rcTmp = rc;
-
 		TabBar::reSizeTo(rcTmp);
 		_pView->reSizeTo(rc);
 	}
@@ -175,4 +173,4 @@ void DocTabView::reSizeTo(RECT & rc)
 		TabBar::reSizeTo(rc);
 		_pView->reSizeTo(rc);
 	}
-};
+}

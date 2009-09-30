@@ -37,10 +37,10 @@ ToolBar::~ToolBar()
 	ToolBar::destroy();
 }
 
-bool ToolBar::init( HINSTANCE hInst, HWND hPere, toolBarStatusType type,
+bool ToolBar::init( HINSTANCE hInst, HWND hParent, toolBarStatusType type,
 					ToolBarButtonUnit *buttonUnitArray, int arraySize)
 {
-	Window::init(hInst, hPere);
+	Window::init(hInst, hParent);
 	_state = type;
 	int iconSize = (_state == TB_LARGE?32:16);
 
@@ -367,9 +367,9 @@ ReBar::~ReBar()
 	ReBar::destroy();
 }
 
-void ReBar::init(HINSTANCE hInst, HWND hPere)
+void ReBar::init(HINSTANCE hInst, HWND hParent)
 {
-	Window::init(hInst, hPere);
+	Window::init(hInst, hParent);
 
 	_hSelf = CreateWindowEx(WS_EX_TOOLWINDOW,
 							REBARCLASSNAME,

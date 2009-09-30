@@ -1,6 +1,6 @@
 /*
-this file is part of notepad++
-Copyright (C)2003 Don HO ( donho@altern.org )
+this file is part of Notepad++
+Copyright (C)2003 Don HO <donho@altern.org>
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -79,7 +79,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 	#define	IDC_CARETBLINKRATE_F_STATIC (IDD_PREFERENCE_MARGEIN_BOX + 21)
 	#define	IDC_CARETBLINKRATE_S_STATIC (IDD_PREFERENCE_MARGEIN_BOX + 22)
 	#define	IDC_CHECK_DOCCHANGESTATEMARGE (IDD_PREFERENCE_MARGEIN_BOX + 23)
-	#define IDC_CHECK_ENABLEWHEELZOOM  (IDD_PREFERENCE_MARGEIN_BOX + 24)
+	#define	IDC_MULTISELECTION_GB_STATIC (IDD_PREFERENCE_MARGEIN_BOX + 24)
+	#define	IDC_CHECK_MULTISELECTION (IDD_PREFERENCE_MARGEIN_BOX + 25)
+	#define IDC_CHECK_ENABLEWHEELZOOM  (IDD_PREFERENCE_MARGEIN_BOX + 26)
 
 #define	IDD_PREFERENCE_SETTING_BOX 6300 //(IDD_PREFERENCE_BOX + 300)
 	#define	IDC_TABSETTING_GB_STATIC (IDD_PREFERENCE_SETTING_BOX + 1)
@@ -216,3 +218,4 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 	#define IDD_FUNC_CHECK         (IDD_PREFERENCE_BACKUP_BOX + 15)
 
 #endif // PREFERENCE_RC_H
+

@@ -19,6 +19,7 @@
 #include "precompiled_headers.h"
 
 #include "Gripper.h"
+#include "Parameters.h"
 
 #include "dockingResource.h"
 #include "DockingManager.h"

@@ -25,3 +25,4 @@
 #define	IDC_BUTTON_SAVE         (IDD_RUN_DLG + 4)
 
 #endif // RUNDLG_H
+

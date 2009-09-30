@@ -30,7 +30,11 @@
 #include "Toolbar.h"
 
 #include "Parameters.h"
-#include "npp_winver.h"
+
+LONG FindReplaceDlg::originalFinderProc = NULL;
+
+// important : to activate all styles
+#define STYLING_MASK 255
 
 
 struct FoundInfo {
@@ -48,8 +52,8 @@ public:
 	static TargetRange t;
 	static int buildSearchFlags(FindOption * option) {
 		return	(option->_isWholeWord ? SCFIND_WHOLEWORD : 0) |
-			(option->_isMatchCase ? SCFIND_MATCHCASE : 0) |
-			(option->_searchType == FindRegex ? SCFIND_REGEXP|SCFIND_POSIX : 0);
+				(option->_isMatchCase ? SCFIND_MATCHCASE : 0) |
+				(option->_searchType == FindRegex ? SCFIND_REGEXP|SCFIND_POSIX : 0);
 	};
 	static void displaySectionCentered(int posStart, int posEnd, ScintillaEditView * pEditView, bool isDownwards = true);
 
@@ -57,7 +61,6 @@ private:
 	static bool readBase(const TCHAR * str, int * value, int base, int size);
 
 };
-
 
 int Searching::convertExtendedToString(const TCHAR * query, TCHAR * result, int length) {	//query may equal to result, since it always gets smaller
 	int i = 0, j = 0;
@@ -184,313 +187,6 @@ void Searching::displaySectionCentered(int posStart, int posEnd, ScintillaEditVi
 	pEditView->execute(SCI_SETANCHOR, posStart);
 }
 
-LONG FindReplaceDlg::originalFinderProc = NULL;
-
-void FindReplaceDlg::destroy()
-{
-	if (_tab)
-	{
-		delete _tab;
-		_tab = NULL;
-	}
-	StaticDialog::destroy();
-}
-
-#ifdef UNICODE
-void FindReplaceDlg::addText2Combo(const TCHAR * txt2add, HWND hCombo, bool /*isUTF8*/)
-{
-	if (!hCombo) return;
-	if (!lstrcmp(txt2add, TEXT(""))) return;
-
-	int i = 0;
-
-	i = ::SendMessage(hCombo, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)txt2add);
-	if (i != CB_ERR) // found
-	{
-		::SendMessage(hCombo, CB_DELETESTRING, i, 0);
-	}
-
-	i = ::SendMessage(hCombo, CB_INSERTSTRING, 0, (LPARAM)txt2add);
-
-	::SendMessage(hCombo, CB_SETCURSEL, i, 0);
-}
-#else
-void FindReplaceDlg::addText2Combo(const TCHAR * txt2add, HWND hCombo, bool isUTF8)
-{
-	if (!hCombo) return;
-	if (!lstrcmp(txt2add, TEXT(""))) return;
-
-	int i = 0;
-
-	TCHAR text[FINDREPLACE_MAXLENGTH];
-	bool isWin9x = getWinVersion() <= WV_ME;
-	wchar_t wchars2Add[FINDREPLACE_MAXLENGTH];
-	wchar_t textW[FINDREPLACE_MAXLENGTH];
-	int count = ::SendMessage(hCombo, CB_GETCOUNT, 0, 0);
-
-	if (isUTF8)
-		::MultiByteToWideChar(CP_UTF8, 0, txt2add, -1, wchars2Add, FINDREPLACE_MAXLENGTH - 1);
-
-	for ( ; i < count ; i++)
-	{
-		if (isUTF8)
-		{
-			if (!isWin9x)
-				::SendMessageW(hCombo, CB_GETLBTEXT, i, (LPARAM)textW);
-
-			else
-			{
-				::SendMessageA(hCombo, CB_GETLBTEXT, i, (LPARAM)text);
-				::MultiByteToWideChar(CP_ACP, 0, text, -1, textW, FINDREPLACE_MAXLENGTH - 1);
-			}
-
-			if (!wcscmp(wchars2Add, textW))
-			{
-				::SendMessage(hCombo, CB_DELETESTRING, i, 0);
-				break;
-			}
-		}
-		else
-		{
-			::SendMessage(hCombo, CB_GETLBTEXT, i, (LPARAM)text);
-			if (!strcmp(txt2add, text))
-			{
-				::SendMessage(hCombo, CB_DELETESTRING, i, 0);
-				break;
-			}
-		}
-	}
-
-	if (!isUTF8)
-		i = ::SendMessage(hCombo, CB_INSERTSTRING, 0, (LPARAM)txt2add);
-
-	else
-	{
-		if (!isWin9x)
-			i = ::SendMessageW(hCombo, CB_INSERTSTRING, 0, (LPARAM)wchars2Add);
-		else
-		{
-			::WideCharToMultiByte(CP_ACP, 0, wchars2Add, -1, text, FINDREPLACE_MAXLENGTH - 1, NULL, NULL);
-			i = ::SendMessageA(hCombo, CB_INSERTSTRING, 0, (LPARAM)text);
-		}
-	}
-	::SendMessage(hCombo, CB_SETCURSEL, i, 0);
-}
-#endif
-
-
-#ifdef UNICODE
-generic_string FindReplaceDlg::getTextFromCombo(HWND hCombo, bool /*isUnicode*/) const
-{
-	TCHAR str[FINDREPLACE_MAXLENGTH];
-	::SendMessage(hCombo, WM_GETTEXT, FINDREPLACE_MAXLENGTH - 1, (LPARAM)str);
-	return generic_string(str);
-}
-#else
-generic_string FindReplaceDlg::getTextFromCombo(HWND hCombo, bool isUnicode) const
-{
-	TCHAR str[FINDREPLACE_MAXLENGTH];
-	bool isWin9x = getWinVersion() <= WV_ME;
-	if (isUnicode)
-	{
-		wchar_t wchars[FINDREPLACE_MAXLENGTH];
-		if ( !isWin9x )
-		{
-			::SendMessageW(hCombo, WM_GETTEXT, FINDREPLACE_MAXLENGTH - 1, (LPARAM)wchars);
-		}
-		else
-		{
-			char achars[FINDREPLACE_MAXLENGTH];
-			::SendMessageA(hCombo, WM_GETTEXT, FINDREPLACE_MAXLENGTH - 1, (LPARAM)achars);
-			::MultiByteToWideChar(CP_ACP, 0, achars, -1, wchars, FINDREPLACE_MAXLENGTH - 1);
-		}
-		::WideCharToMultiByte(CP_UTF8, 0, wchars, -1, str, FINDREPLACE_MAXLENGTH - 1, NULL, NULL);
-	}
-	else
-	{
-		::SendMessage(hCombo, WM_GETTEXT, FINDREPLACE_MAXLENGTH - 1, (LPARAM)str);
-	}
-
-	return generic_string(str);
-}
-#endif
-
-// important : to activate all styles
-const int STYLING_MASK = 255;
-
-void FindReplaceDlg::create(int dialogID, bool isRTL)
-{
-	StaticDialog::create(dialogID, isRTL);
-	fillFindHistory();
-	_currentStatus = REPLACE_DLG;
-	initOptionsFromDlg();
-
-	RECT rect;
-	//::GetWindowRect(_hSelf, &rect);
-	getClientRect(rect);
-
-	if (!_tab)
-	{
-		_tab = new TabBar();
-	}
-
-	_tab->init(_hInst, _hSelf, false, false, true);
-	_tab->setFont(TEXT("Tahoma"), 13);
-
-	const TCHAR *find = TEXT("Find");
-	const TCHAR *replace = TEXT("Replace");
-	const TCHAR *findInFiles = TEXT("Find in Files");
-
-	NppParameters::FindDlgTabTitiles & fdTitles = NppParameters::getInstance()->getFindDlgTabTitiles();
-
-	if (fdTitles.isWellFilled())
-	{
-		find = fdTitles._find.c_str();
-		replace = fdTitles._replace.c_str();
-		findInFiles = fdTitles._findInFiles.c_str();
-	}
-	_tab->insertAtEnd(find);
-	_tab->insertAtEnd(replace);
-	_tab->insertAtEnd(findInFiles);
-
-	_tab->reSizeTo(rect);
-	_tab->display();
-
-	ETDTProc enableDlgTheme = (ETDTProc)::SendMessage(_hParent, NPPM_GETENABLETHEMETEXTUREFUNC, 0, 0);
-	if (enableDlgTheme)
-		enableDlgTheme(_hSelf, ETDT_ENABLETAB);
-
-	goToCenter();
-}
-
-void FindReplaceDlg::fillFindHistory()
-{
-	NppParameters *nppParams = NppParameters::getInstance();
-
-	FindHistory& findHistory = nppParams->getFindHistory();
-
-	fillComboHistory(IDD_FINDINFILES_DIR_COMBO,     findHistory._nbFindHistoryPath,    findHistory._pFindHistoryPath);
-	fillComboHistory(IDD_FINDINFILES_FILTERS_COMBO, findHistory._nbFindHistoryFilter,  findHistory._pFindHistoryFilter);
-	fillComboHistory(IDFINDWHAT,                    findHistory._nbFindHistoryFind,    findHistory._pFindHistoryFind);
-	fillComboHistory(IDREPLACEWITH,                 findHistory._nbFindHistoryReplace, findHistory._pFindHistoryReplace);
-
-	::SendDlgItemMessage(_hSelf, IDWRAP, BM_SETCHECK, findHistory._isWrap, 0);
-	::SendDlgItemMessage(_hSelf, IDWHOLEWORD, BM_SETCHECK, findHistory._isMatchWord, 0);
-	::SendDlgItemMessage(_hSelf, IDMATCHCASE, BM_SETCHECK, findHistory._isMatchCase, 0);
-
-	::SendDlgItemMessage(_hSelf, IDDIRECTIONUP, BM_SETCHECK, !findHistory._isDirectionDown, 0);
-	::SendDlgItemMessage(_hSelf, IDDIRECTIONDOWN, BM_SETCHECK, findHistory._isDirectionDown, 0);
-
-	::SendDlgItemMessage(_hSelf, IDD_FINDINFILES_INHIDDENDIR_CHECK, BM_SETCHECK, findHistory._isFifInHiddenFolder, 0);
-	::SendDlgItemMessage(_hSelf, IDD_FINDINFILES_RECURSIVE_CHECK, BM_SETCHECK, findHistory._isFifRecuisive, 0);
-    ::SendDlgItemMessage(_hSelf, IDD_FINDINFILES_FOLDERFOLLOWSDOC_CHECK, BM_SETCHECK, findHistory._isFolderFollowDoc, 0);
-
-	::SendDlgItemMessage(_hSelf, IDNORMAL, BM_SETCHECK, findHistory._searchMode == FindHistory::normal, 0);
-	::SendDlgItemMessage(_hSelf, IDEXTENDED, BM_SETCHECK, findHistory._searchMode == FindHistory::extended, 0);
-	::SendDlgItemMessage(_hSelf, IDREGEXP, BM_SETCHECK, findHistory._searchMode == FindHistory::regExpr, 0);
-	if (findHistory._searchMode == FindHistory::regExpr)
-	{
-		//regex doesnt allow wholeword
-		::SendDlgItemMessage(_hSelf, IDWHOLEWORD, BM_SETCHECK, BST_UNCHECKED, 0);
-		::EnableWindow(::GetDlgItem(_hSelf, IDWHOLEWORD), (BOOL)false);
-
-		//regex doesnt allow upward search
-		::SendDlgItemMessage(_hSelf, IDDIRECTIONDOWN, BM_SETCHECK, BST_CHECKED, 0);
-		::SendDlgItemMessage(_hSelf, IDDIRECTIONUP, BM_SETCHECK, BST_UNCHECKED, 0);
-		::EnableWindow(::GetDlgItem(_hSelf, IDDIRECTIONUP), (BOOL)false);
-	}
-
-	if (nppParams->isTransparentAvailable())
-	{
-		::ShowWindow(::GetDlgItem(_hSelf, IDC_TRANSPARENT_CHECK), SW_SHOW);
-		::ShowWindow(::GetDlgItem(_hSelf, IDC_TRANSPARENT_GRPBOX), SW_SHOW);
-		::ShowWindow(::GetDlgItem(_hSelf, IDC_TRANSPARENT_LOSSFOCUS_RADIO), SW_SHOW);
-		::ShowWindow(::GetDlgItem(_hSelf, IDC_TRANSPARENT_ALWAYS_RADIO), SW_SHOW);
-		::ShowWindow(::GetDlgItem(_hSelf, IDC_PERCENTAGE_SLIDER), SW_SHOW);
-
-		::SendDlgItemMessage(_hSelf, IDC_PERCENTAGE_SLIDER, TBM_SETRANGE, FALSE, MAKELONG(20, 200));
-		::SendDlgItemMessage(_hSelf, IDC_PERCENTAGE_SLIDER, TBM_SETPOS, TRUE, findHistory._transparency);
-
-		if (findHistory._transparencyMode == FindHistory::none)
-		{
-			::EnableWindow(::GetDlgItem(_hSelf, IDC_TRANSPARENT_GRPBOX), FALSE);
-			::EnableWindow(::GetDlgItem(_hSelf, IDC_TRANSPARENT_LOSSFOCUS_RADIO), FALSE);
-			::EnableWindow(::GetDlgItem(_hSelf, IDC_TRANSPARENT_ALWAYS_RADIO), FALSE);
-			::EnableWindow(::GetDlgItem(_hSelf, IDC_PERCENTAGE_SLIDER), FALSE);
-		}
-		else
-		{
-			::SendDlgItemMessage(_hSelf, IDC_TRANSPARENT_CHECK, BM_SETCHECK, TRUE, 0);
-
-			int id;
-			if (findHistory._transparencyMode == FindHistory::onLossingFocus)
-			{
-				id = IDC_TRANSPARENT_LOSSFOCUS_RADIO;
-			}
-			else
-			{
-				id = IDC_TRANSPARENT_ALWAYS_RADIO;
-				(NppParameters::getInstance())->SetTransparent(_hSelf, findHistory._transparency);
-
-			}
-			::SendDlgItemMessage(_hSelf, id, BM_SETCHECK, TRUE, 0);
-		}
-	}
-}
-
-void FindReplaceDlg::fillComboHistory(int id, int count, generic_string **pStrings)
-{
-	int i;
-	bool isUnicode = false;
-	HWND hCombo;
-
-	hCombo = ::GetDlgItem(_hSelf, id);
-	for (i = count -1 ; i >= 0 ; i--)
-	{
-		addText2Combo(pStrings[i]->c_str(), hCombo, isUnicode);
-	}
-	::SendMessage(hCombo, CB_SETCURSEL, 0, 0); // select first item
-}
-
-
-void FindReplaceDlg::saveFindHistory()
-{
-	if (! isCreated()) return;
-	FindHistory& findHistory = (NppParameters::getInstance())->getFindHistory();
-
-	saveComboHistory(IDD_FINDINFILES_DIR_COMBO,     findHistory._nbMaxFindHistoryPath,    findHistory._nbFindHistoryPath,    findHistory._pFindHistoryPath);
-	saveComboHistory(IDD_FINDINFILES_FILTERS_COMBO, findHistory._nbMaxFindHistoryFilter,  findHistory._nbFindHistoryFilter,  findHistory._pFindHistoryFilter);
-	saveComboHistory(IDFINDWHAT,                    findHistory._nbMaxFindHistoryFind,    findHistory._nbFindHistoryFind,    findHistory._pFindHistoryFind);
-	saveComboHistory(IDREPLACEWITH,                 findHistory._nbMaxFindHistoryReplace, findHistory._nbFindHistoryReplace, findHistory._pFindHistoryReplace);
-}
-
-void FindReplaceDlg::saveComboHistory(int id, int maxcount, int & oldcount, generic_string **pStrings)
-{
-	int i, count;
-	HWND hCombo;
-	TCHAR text[FINDREPLACE_MAXLENGTH];
-
-	hCombo = ::GetDlgItem(_hSelf, id);
-	count = ::SendMessage(hCombo, CB_GETCOUNT, 0, 0);
-	count = min(count, maxcount);
-	for (i = 0; i < count; i++)
-	{
-		::SendMessage(hCombo, CB_GETLBTEXT, i, (LPARAM) text);
-		if (i < oldcount)
-			*pStrings[i] = text;
-		else
-			pStrings[i] = new generic_string(text);
-	}
-	for (; i < oldcount; i++) delete pStrings[i];
-	oldcount = count;
-}
-
-void FindReplaceDlg::updateCombos()
-{
-	updateCombo(IDREPLACEWITH);
-	updateCombo(IDFINDWHAT);
-}
-
 //Finder: Dockable window that contains search results
 class Finder : public DockingDlgInterface {
 	friend class FindReplaceDlg;
@@ -513,126 +209,21 @@ public:
 	}
 	//(Warning -- Member with different signature hides virtual member 'Window::init(struct HINSTANCE__ *, struct HWND__ *)'
 	//lint -e1411
-	void init(HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView) {
-		DockingDlgInterface::init(hInst, hPere);
+	void init(HINSTANCE hInst, HWND hParent, ScintillaEditView **ppEditView) {
+		DockingDlgInterface::init(hInst, hParent);
 		_ppEditView = ppEditView;
 	}
 	//lint +e1411
 
-	void addSearchLine(const TCHAR *searchName) {
-		generic_string str = TEXT("Search \"");
-		str += searchName;
-		str += TEXT("\"\r\n");
-
-		setFinderReadOnly(false);
-		_scintView.addGenericText(str.c_str());
-		setFinderReadOnly(true);
-		_lastSearchHeaderPos = _scintView.execute(SCI_GETCURRENTPOS) - 2;
-
-		_pMainFoundInfos->push_back(EmptyFoundInfo);
-		_pMainMarkings->push_back(EmptySearchResultMarking);
-	}
-
-	void addFileNameTitle(const TCHAR * fileName) {
-		generic_string str = TEXT("  ");
-		str += fileName;
-		str += TEXT("\r\n");
-
-		setFinderReadOnly(false);
-		_scintView.addGenericText(str.c_str());
-		setFinderReadOnly(true);
-		_lastFileHeaderPos = _scintView.execute(SCI_GETCURRENTPOS) - 2;
-
-		_pMainFoundInfos->push_back(EmptyFoundInfo);
-		_pMainMarkings->push_back(EmptySearchResultMarking);
-	}
-
-	void addFileHitCount(int count) {
-		TCHAR text[20];
-		wsprintf(text, TEXT(" (%i hits)"), count);
-		setFinderReadOnly(false);
-		_scintView.insertGenericTextFrom(_lastFileHeaderPos, text);
-		setFinderReadOnly(true);
-		nFoundFiles++;
-	}
-
-	void addSearchHitCount(int count) {
-		TCHAR text[50];
-		wsprintf(text, TEXT(" (%i hits in %i files)"), count, nFoundFiles);
-		setFinderReadOnly(false);
-		_scintView.insertGenericTextFrom(_lastSearchHeaderPos, text);
-		setFinderReadOnly(true);
-	}
-
-
-	void add(FoundInfo fi, SearchResultMarking mi, const TCHAR* foundline, int lineNb) {
-		_pMainFoundInfos->push_back(fi);
-		generic_string str = TEXT("\tLine ");
-
-		TCHAR lnb[16];
-		wsprintf(lnb, TEXT("%d"), lineNb);
-		str += lnb;
-		str += TEXT(": ");
-		mi._start += str.length();
-		mi._end += str.length();
-		str += foundline;
-
-		if (str.length() >= SC_SEARCHRESULT_LINEBUFFERMAXLENGTH)
-		{
-			const TCHAR * endOfLongLine = TEXT("...\r\n");
-			str = str.substr(0, SC_SEARCHRESULT_LINEBUFFERMAXLENGTH - lstrlen(endOfLongLine) - 1);
-			str += endOfLongLine;
-		}
-		setFinderReadOnly(false);
-		_scintView.addGenericText(str.c_str(), &mi._start, &mi._end);
-		setFinderReadOnly(true);
-		_pMainMarkings->push_back(mi);
-	}
-
+	void addSearchLine(const TCHAR *searchName);
+	void addFileNameTitle(const TCHAR * fileName);
+	void addFileHitCount(int count);
+	void addSearchHitCount(int count);
+	void add(FoundInfo fi, SearchResultMarking mi, const TCHAR* foundline, int lineNb);
 	void setFinderStyle();
-
-	void removeAll() {
-		_pMainFoundInfos->clear();
-		_pMainMarkings->clear();
-		setFinderReadOnly(false);
-		_scintView.execute(SCI_CLEARALL);
-		setFinderReadOnly(true);
-	}
-
-	void beginNewFilesSearch() {
-		_scintView.execute(SCI_SETLEXER, SCLEX_NULL);
-
-		_scintView.execute(SCI_SETCURRENTPOS, 0);
-		_pMainFoundInfos = _pMainFoundInfos == &_foundInfos1 ? &_foundInfos2 : &_foundInfos1;
-		_pMainMarkings = _pMainMarkings == &_markings1 ? &_markings2 : &_markings1;
-		nFoundFiles = 0;
-
-		// fold all old searches (1st level only)
-		_scintView.collapse(searchHeaderLevel - SC_FOLDLEVELBASE, fold_collapse);
-	}
-
-	void finishFilesSearch(int count) {
-		std::vector<FoundInfo>* _pOldFoundInfos;
-		std::vector<SearchResultMarking>* _pOldMarkings;
-		_pOldFoundInfos = _pMainFoundInfos == &_foundInfos1 ? &_foundInfos2 : &_foundInfos1;
-		_pOldMarkings = _pMainMarkings == &_markings1 ? &_markings2 : &_markings1;
-
-		_pOldFoundInfos->insert(_pOldFoundInfos->begin(), _pMainFoundInfos->begin(), _pMainFoundInfos->end());
-		_pOldMarkings->insert(_pOldMarkings->begin(), _pMainMarkings->begin(), _pMainMarkings->end());
-		_pMainFoundInfos->clear();
-		_pMainMarkings->clear();
-		_pMainFoundInfos = _pOldFoundInfos;
-		_pMainMarkings = _pOldMarkings;
-
-		_MarkingsStruct._length = _pMainMarkings->size();
-		_MarkingsStruct._markings = &((*_pMainMarkings)[0]);
-
-		addSearchHitCount(count);
-		_scintView.execute(SCI_SETSEL, 0, 0);
-
-		_scintView.execute(SCI_SETLEXER, SCLEX_SEARCHRESULT);
-	}
-
+	void removeAll();
+	void beginNewFilesSearch();
+	void finishFilesSearch(int count);
 
 	void gotoNextFoundResult(int direction);
 	void GotoFoundLine();
@@ -836,6 +427,221 @@ void Finder::gotoNextFoundResult(int direction)
 
 		GotoFoundLine();
 	}
+}
+
+void FindReplaceDlg::destroy()
+{
+	if (_tab)
+	{
+		_tab->destroy();
+		delete _tab;
+		_tab = NULL;
+	}
+	StaticDialog::destroy();
+}
+
+void FindReplaceDlg::addText2Combo(const TCHAR * txt2add, HWND hCombo, bool /*isUTF8*/)
+{
+	if (!hCombo) return;
+	if (!lstrcmp(txt2add, TEXT(""))) return;
+
+	int i = ::SendMessage(hCombo, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)txt2add);
+	if (i != CB_ERR) // found
+	{
+		::SendMessage(hCombo, CB_DELETESTRING, i, 0);
+	}
+
+	i = ::SendMessage(hCombo, CB_INSERTSTRING, 0, (LPARAM)txt2add);
+
+	::SendMessage(hCombo, CB_SETCURSEL, i, 0);
+}
+
+
+generic_string FindReplaceDlg::getTextFromCombo(HWND hCombo, bool /*isUnicode*/) const
+{
+	TCHAR str[FINDREPLACE_MAXLENGTH];
+	::SendMessage(hCombo, WM_GETTEXT, FINDREPLACE_MAXLENGTH - 1, (LPARAM)str);
+	return generic_string(str);
+}
+
+FindReplaceDlg::~FindReplaceDlg()
+{
+	if (_pFinder)
+		delete _pFinder;
+	delete [] _uniFileName;
+}
+
+void FindReplaceDlg::create(int dialogID, bool isRTL)
+{
+	StaticDialog::create(dialogID, isRTL);
+	fillFindHistory();
+	_currentStatus = REPLACE_DLG;
+	initOptionsFromDlg();
+
+	RECT rect;
+	//::GetWindowRect(_hSelf, &rect);
+	getClientRect(rect);
+
+	if (!_tab)
+	{
+		_tab = new TabBar();
+	}
+
+	_tab->init(_hInst, _hSelf, false, false, true);
+	_tab->setFont(TEXT("Tahoma"), 13);
+
+	const TCHAR *find = TEXT("Find");
+	const TCHAR *replace = TEXT("Replace");
+	const TCHAR *findInFiles = TEXT("Find in Files");
+
+	NppParameters::FindDlgTabTitiles & fdTitles = NppParameters::getInstance()->getFindDlgTabTitiles();
+
+	if (fdTitles.isWellFilled())
+	{
+		find = fdTitles._find.c_str();
+		replace = fdTitles._replace.c_str();
+		findInFiles = fdTitles._findInFiles.c_str();
+	}
+	_tab->insertAtEnd(find);
+	_tab->insertAtEnd(replace);
+	_tab->insertAtEnd(findInFiles);
+
+	_tab->reSizeTo(rect);
+	_tab->display();
+
+	ETDTProc enableDlgTheme = (ETDTProc)::SendMessage(_hParent, NPPM_GETENABLETHEMETEXTUREFUNC, 0, 0);
+	if (enableDlgTheme)
+		enableDlgTheme(_hSelf, ETDT_ENABLETAB);
+
+	goToCenter();
+}
+
+void FindReplaceDlg::fillFindHistory()
+{
+	NppParameters *nppParams = NppParameters::getInstance();
+
+	FindHistory& findHistory = nppParams->getFindHistory();
+
+	fillComboHistory(IDD_FINDINFILES_DIR_COMBO,     findHistory._nbFindHistoryPath,    findHistory._pFindHistoryPath);
+	fillComboHistory(IDD_FINDINFILES_FILTERS_COMBO, findHistory._nbFindHistoryFilter,  findHistory._pFindHistoryFilter);
+	fillComboHistory(IDFINDWHAT,                    findHistory._nbFindHistoryFind,    findHistory._pFindHistoryFind);
+	fillComboHistory(IDREPLACEWITH,                 findHistory._nbFindHistoryReplace, findHistory._pFindHistoryReplace);
+
+	::SendDlgItemMessage(_hSelf, IDWRAP, BM_SETCHECK, findHistory._isWrap, 0);
+	::SendDlgItemMessage(_hSelf, IDWHOLEWORD, BM_SETCHECK, findHistory._isMatchWord, 0);
+	::SendDlgItemMessage(_hSelf, IDMATCHCASE, BM_SETCHECK, findHistory._isMatchCase, 0);
+
+	::SendDlgItemMessage(_hSelf, IDDIRECTIONUP, BM_SETCHECK, !findHistory._isDirectionDown, 0);
+	::SendDlgItemMessage(_hSelf, IDDIRECTIONDOWN, BM_SETCHECK, findHistory._isDirectionDown, 0);
+
+	::SendDlgItemMessage(_hSelf, IDD_FINDINFILES_INHIDDENDIR_CHECK, BM_SETCHECK, findHistory._isFifInHiddenFolder, 0);
+	::SendDlgItemMessage(_hSelf, IDD_FINDINFILES_RECURSIVE_CHECK, BM_SETCHECK, findHistory._isFifRecuisive, 0);
+	::SendDlgItemMessage(_hSelf, IDD_FINDINFILES_FOLDERFOLLOWSDOC_CHECK, BM_SETCHECK, findHistory._isFolderFollowDoc, 0);
+
+	::SendDlgItemMessage(_hSelf, IDNORMAL, BM_SETCHECK, findHistory._searchMode == FindHistory::normal, 0);
+	::SendDlgItemMessage(_hSelf, IDEXTENDED, BM_SETCHECK, findHistory._searchMode == FindHistory::extended, 0);
+	::SendDlgItemMessage(_hSelf, IDREGEXP, BM_SETCHECK, findHistory._searchMode == FindHistory::regExpr, 0);
+	if (findHistory._searchMode == FindHistory::regExpr)
+	{
+		//regex doesnt allow wholeword
+		::SendDlgItemMessage(_hSelf, IDWHOLEWORD, BM_SETCHECK, BST_UNCHECKED, 0);
+		::EnableWindow(::GetDlgItem(_hSelf, IDWHOLEWORD), (BOOL)false);
+
+		//regex doesnt allow upward search
+		::SendDlgItemMessage(_hSelf, IDDIRECTIONDOWN, BM_SETCHECK, BST_CHECKED, 0);
+		::SendDlgItemMessage(_hSelf, IDDIRECTIONUP, BM_SETCHECK, BST_UNCHECKED, 0);
+		::EnableWindow(::GetDlgItem(_hSelf, IDDIRECTIONUP), (BOOL)false);
+	}
+
+	if (nppParams->isTransparentAvailable())
+	{
+		::ShowWindow(::GetDlgItem(_hSelf, IDC_TRANSPARENT_CHECK), SW_SHOW);
+		::ShowWindow(::GetDlgItem(_hSelf, IDC_TRANSPARENT_GRPBOX), SW_SHOW);
+		::ShowWindow(::GetDlgItem(_hSelf, IDC_TRANSPARENT_LOSSFOCUS_RADIO), SW_SHOW);
+		::ShowWindow(::GetDlgItem(_hSelf, IDC_TRANSPARENT_ALWAYS_RADIO), SW_SHOW);
+		::ShowWindow(::GetDlgItem(_hSelf, IDC_PERCENTAGE_SLIDER), SW_SHOW);
+
+		::SendDlgItemMessage(_hSelf, IDC_PERCENTAGE_SLIDER, TBM_SETRANGE, FALSE, MAKELONG(20, 200));
+		::SendDlgItemMessage(_hSelf, IDC_PERCENTAGE_SLIDER, TBM_SETPOS, TRUE, findHistory._transparency);
+
+		if (findHistory._transparencyMode == FindHistory::none)
+		{
+			::EnableWindow(::GetDlgItem(_hSelf, IDC_TRANSPARENT_GRPBOX), FALSE);
+			::EnableWindow(::GetDlgItem(_hSelf, IDC_TRANSPARENT_LOSSFOCUS_RADIO), FALSE);
+			::EnableWindow(::GetDlgItem(_hSelf, IDC_TRANSPARENT_ALWAYS_RADIO), FALSE);
+			::EnableWindow(::GetDlgItem(_hSelf, IDC_PERCENTAGE_SLIDER), FALSE);
+		}
+		else
+		{
+			::SendDlgItemMessage(_hSelf, IDC_TRANSPARENT_CHECK, BM_SETCHECK, TRUE, 0);
+
+			int id;
+			if (findHistory._transparencyMode == FindHistory::onLossingFocus)
+			{
+				id = IDC_TRANSPARENT_LOSSFOCUS_RADIO;
+			}
+			else
+			{
+				id = IDC_TRANSPARENT_ALWAYS_RADIO;
+				(NppParameters::getInstance())->SetTransparent(_hSelf, findHistory._transparency);
+
+			}
+			::SendDlgItemMessage(_hSelf, id, BM_SETCHECK, TRUE, 0);
+		}
+	}
+}
+
+void FindReplaceDlg::fillComboHistory(int id, int count, generic_string **pStrings)
+{
+	int i;
+	bool isUnicode = false;
+	HWND hCombo;
+
+	hCombo = ::GetDlgItem(_hSelf, id);
+	for (i = count -1 ; i >= 0 ; i--)
+	{
+		addText2Combo(pStrings[i]->c_str(), hCombo, isUnicode);
+	}
+	::SendMessage(hCombo, CB_SETCURSEL, 0, 0); // select first item
+}
+
+
+void FindReplaceDlg::saveFindHistory()
+{
+	if (! isCreated()) return;
+	FindHistory& findHistory = (NppParameters::getInstance())->getFindHistory();
+
+	saveComboHistory(IDD_FINDINFILES_DIR_COMBO,     findHistory._nbMaxFindHistoryPath,    findHistory._nbFindHistoryPath,    findHistory._pFindHistoryPath);
+	saveComboHistory(IDD_FINDINFILES_FILTERS_COMBO, findHistory._nbMaxFindHistoryFilter,  findHistory._nbFindHistoryFilter,  findHistory._pFindHistoryFilter);
+	saveComboHistory(IDFINDWHAT,                    findHistory._nbMaxFindHistoryFind,    findHistory._nbFindHistoryFind,    findHistory._pFindHistoryFind);
+	saveComboHistory(IDREPLACEWITH,                 findHistory._nbMaxFindHistoryReplace, findHistory._nbFindHistoryReplace, findHistory._pFindHistoryReplace);
+}
+
+void FindReplaceDlg::saveComboHistory(int id, int maxcount, int & oldcount, generic_string **pStrings)
+{
+	int i, count;
+	HWND hCombo;
+	TCHAR text[FINDREPLACE_MAXLENGTH];
+
+	hCombo = ::GetDlgItem(_hSelf, id);
+	count = ::SendMessage(hCombo, CB_GETCOUNT, 0, 0);
+	count = min(count, maxcount);
+	for (i = 0; i < count; i++)
+	{
+		::SendMessage(hCombo, CB_GETLBTEXT, i, (LPARAM) text);
+		if (i < oldcount)
+			*pStrings[i] = text;
+		else
+			pStrings[i] = new generic_string(text);
+	}
+	for (; i < oldcount; i++) delete pStrings[i];
+	oldcount = count;
+}
+
+void FindReplaceDlg::updateCombos()
+{
+	updateCombo(IDREPLACEWITH);
+	updateCombo(IDFINDWHAT);
 }
 
 BOOL CALLBACK FindReplaceDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
@@ -1549,6 +1355,7 @@ int FindReplaceDlg::markAll(const TCHAR *txt2find, int styleID)
 	return nbFound;
 }
 
+/*
 int FindReplaceDlg::markAll2(const TCHAR *txt2find)
 {
 	FindOption opt;
@@ -1557,7 +1364,7 @@ int FindReplaceDlg::markAll2(const TCHAR *txt2find)
 	int nbFound = processAll(ProcessMarkAll_2, txt2find, NULL, true, NULL, &opt);
 	return nbFound;
 }
-
+*/
 
 
 int FindReplaceDlg::markAllInc(const TCHAR *txt2find, FindOption *opt)
@@ -1943,6 +1750,18 @@ void FindReplaceDlg::findAllIn(InWhat op)
 		::SendMessage(_hSelf, WM_NEXTDLGCTL, (WPARAM)::GetDlgItem(_hSelf, IDD_FINDINFILES_DIR_COMBO), TRUE);
 }
 
+
+void FindReplaceDlg::setSearchText(TCHAR * txt2find) {
+	HWND hCombo = ::GetDlgItem(_hSelf, IDFINDWHAT);
+	if (txt2find && txt2find[0])
+	{
+		// We got a valid search string
+		::SendMessage(hCombo, CB_SETCURSEL, (WPARAM)-1, 0); // remove selection - to allow using down arrow to get to last searched word
+		::SetDlgItemText(_hSelf, IDFINDWHAT, txt2find);
+	}
+	::SendMessage(hCombo, CB_SETEDITSEL, 0, MAKELPARAM(0, -1)); // select all text - fast edit
+}
+
 void FindReplaceDlg::enableReplaceFunc(bool isEnable)
 {
 	assert(_tab);
@@ -2033,6 +1852,69 @@ void FindReplaceDlg::getPatterns(std::vector<generic_string> & patternVect)
 	cutString(_filters.c_str(), patternVect);
 }
 
+void FindReplaceDlg::setFindInFilesDirFilter(const TCHAR *dir, const TCHAR *filters)
+{
+	if (dir)
+	{
+		_directory = dir;
+		::SetDlgItemText(_hSelf, IDD_FINDINFILES_DIR_COMBO, dir);
+	}
+	if (filters)
+	{
+		_filters = filters;
+		::SetDlgItemText(_hSelf, IDD_FINDINFILES_FILTERS_COMBO, filters);
+	}
+}
+
+void FindReplaceDlg::initOptionsFromDlg()
+{
+	_options._isWholeWord = isCheckedOrNot(IDWHOLEWORD);
+	_options._isMatchCase = isCheckedOrNot(IDMATCHCASE);
+	_options._searchType = isCheckedOrNot(IDREGEXP)?FindRegex:isCheckedOrNot(IDEXTENDED)?FindExtended:FindNormal;
+	_options._isWrapAround = isCheckedOrNot(IDWRAP);
+	_isInSelection = isCheckedOrNot(IDC_IN_SELECTION_CHECK);
+
+	_doPurge = isCheckedOrNot(IDC_PURGE_CHECK);
+	_doMarkLine = isCheckedOrNot(IDC_MARKLINE_CHECK);
+	_doStyleFoundToken = isCheckedOrNot(IDC_STYLEFOUND_CHECK);
+
+	::EnableWindow(::GetDlgItem(_hSelf, IDCMARKALL), (_doMarkLine || _doStyleFoundToken));
+}
+
+void FindReplaceDlg::doDialog(DIALOG_TYPE whichType, bool isRTL)
+{
+	if (!isCreated())
+	{
+		create(IDD_FIND_REPLACE_DLG, isRTL);
+		_isRTL = isRTL;
+	}
+
+	if (whichType == FINDINFILES_DLG)
+		enableFindInFilesFunc();
+	else
+		enableReplaceFunc(whichType == REPLACE_DLG);
+
+	::SetFocus(::GetDlgItem(_hSelf, IDFINDWHAT));
+	display();
+}
+
+LRESULT FAR PASCAL FindReplaceDlg::finderProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	if (message == WM_KEYDOWN && (wParam == VK_DELETE || wParam == VK_RETURN))
+	{
+		ScintillaEditView *pScint = (ScintillaEditView *)(::GetWindowLongPtr(hwnd, GWL_USERDATA));
+		Finder *pFinder = (Finder *)(::GetWindowLongPtr(pScint->getHParent(), GWL_USERDATA));
+		if (wParam == VK_RETURN)
+			pFinder->GotoFoundLine();
+		else // VK_DELETE
+			pFinder->DeleteResult();
+		return 0;
+	}
+	else
+		// Call default (original) window procedure
+		return CallWindowProc((WNDPROC) originalFinderProc, hwnd, message, wParam, lParam);
+}
+
 void FindReplaceDlg::combo2ExtendedMode(int comboID)
 {
 	HWND hFindCombo = ::GetDlgItem(_hSelf, comboID);
@@ -2082,14 +1964,6 @@ void FindReplaceDlg::combo2ExtendedMode(int comboID)
     }
 }
 
-FindReplaceDlg::~FindReplaceDlg()
-{
-	FindReplaceDlg::destroy();
-	if (_pFinder)
-		delete _pFinder;
-	delete [] _uniFileName;
-}
-
 void FindReplaceDlg::gotoNextFoundResult( int direction /*= 0*/ )
 {
 	if (_pFinder) _pFinder->gotoNextFoundResult(direction);
@@ -2131,23 +2005,6 @@ void FindReplaceDlg::updateFinderScintilla()
 	}
 }
 
-LRESULT FAR PASCAL FindReplaceDlg::finderProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
-{
-	if (message == WM_KEYDOWN && (wParam == VK_DELETE || wParam == VK_RETURN))
-	{
-		ScintillaEditView *pScint = (ScintillaEditView *)(::GetWindowLongPtr(hwnd, GWL_USERDATA));
-		Finder *pFinder = (Finder *)(::GetWindowLongPtr(pScint->getHParent(), GWL_USERDATA));
-		if (wParam == VK_RETURN)
-			pFinder->GotoFoundLine();
-		else // VK_DELETE
-			pFinder->DeleteResult();
-		return 0;
-	}
-	else
-		// Call default (original) window procedure
-		return CallWindowProc((WNDPROC) originalFinderProc, hwnd, message, wParam, lParam);
-}
-
 void FindReplaceDlg::updateCombo( int comboID )
 {
 	bool isUnicode = (*_ppEditView)->getCurrentBuffer()->getUnicodeMode() != uni8Bit;
@@ -2162,7 +2019,8 @@ FindReplaceDlg::FindReplaceDlg() :
 	_doStyleFoundToken(false),
 	_isInSelection(false),
 	_ppEditView(NULL),
-	_pFinder(NULL), _isRTL(false),
+	_pFinder(NULL),
+	_isRTL(false),
 	_findAllResult(0),
 	_isRecursive(true),
 	_isInHiddenDir(false),
@@ -2213,64 +2071,6 @@ void FindReplaceDlg::gotoCorrectTab()
 	}
 }
 
-void FindReplaceDlg::initOptionsFromDlg()
-{
-	_options._isWholeWord = isCheckedOrNot(IDWHOLEWORD);
-	_options._isMatchCase = isCheckedOrNot(IDMATCHCASE);
-	_options._searchType = isCheckedOrNot(IDREGEXP)?FindRegex:isCheckedOrNot(IDEXTENDED)?FindExtended:FindNormal;
-	_options._isWrapAround = isCheckedOrNot(IDWRAP);
-	_isInSelection = isCheckedOrNot(IDC_IN_SELECTION_CHECK);
-
-	_doPurge = isCheckedOrNot(IDC_PURGE_CHECK);
-	_doMarkLine = isCheckedOrNot(IDC_MARKLINE_CHECK);
-	_doStyleFoundToken = isCheckedOrNot(IDC_STYLEFOUND_CHECK);
-
-	::EnableWindow(::GetDlgItem(_hSelf, IDCMARKALL), (_doMarkLine || _doStyleFoundToken));
-}
-
-void FindReplaceDlg::doDialog( DIALOG_TYPE whichType, bool isRTL /*= false*/ )
-{
-	if (!isCreated())
-	{
-		create(IDD_FIND_REPLACE_DLG, isRTL);
-		_isRTL = isRTL;
-	}
-
-	if (whichType == FINDINFILES_DLG)
-		enableFindInFilesFunc();
-	else
-		enableReplaceFunc(whichType == REPLACE_DLG);
-
-	::SetFocus(::GetDlgItem(_hSelf, IDFINDWHAT));
-	display();
-}
-
-void FindReplaceDlg::setSearchText( TCHAR * txt2find )
-{
-	HWND hCombo = ::GetDlgItem(_hSelf, IDFINDWHAT);
-	if (txt2find && txt2find[0])
-	{
-		// We got a valid search string
-		::SendMessage(hCombo, CB_SETCURSEL, (WPARAM)-1, 0); // remove selection - to allow using down arrow to get to last searched word
-		::SetDlgItemText(_hSelf, IDFINDWHAT, txt2find);
-	}
-	::SendMessage(hCombo, CB_SETEDITSEL, 0, MAKELPARAM(0, -1)); // select all text - fast edit
-}
-
-void FindReplaceDlg::setFindInFilesDirFilter( const TCHAR *dir, const TCHAR *filters )
-{
-	if (dir)
-	{
-		_directory = dir;
-		::SetDlgItemText(_hSelf, IDD_FINDINFILES_DIR_COMBO, dir);
-	}
-	if (filters)
-	{
-		_filters = filters;
-		::SetDlgItemText(_hSelf, IDD_FINDINFILES_FILTERS_COMBO, filters);
-	}
-}
-
 generic_string FindReplaceDlg::getText2search() const
 {
 	return getTextFromCombo(::GetDlgItem(_hSelf, IDFINDWHAT));
@@ -2278,46 +2078,137 @@ generic_string FindReplaceDlg::getText2search() const
 
 void FindReplaceDlg::setDefaultButton( int nID )
 {
-#if 0
-	// There is a problem when you:
-	// 1. open the find dialog
-	// 2. press the "close" buttom
-	// 3. open it again
-	// 4. search for a non existing text
-	// 5. when the "Can't find the text:" messagebox appears, hit "OK"
-	// 6. now, the "Close" button looks like the default button. (but it only looks like that)
-	//    if you hit "Enter" the "Find" button will be "pressed".
-	// I thought this code might fix this but it doesn't
-	// See: http://msdn.microsoft.com/en-us/library/ms645413(VS.85).aspx
-
-	HWND pButton;
-	DWORD dwDefInfo = SendMessage(_hSelf, DM_GETDEFID, 0, 0L);
-	if (HIWORD(dwDefInfo) == DC_HASDEFID && (int)LOWORD(dwDefInfo) != nID)
-	{
-		// Reset 'DefButton' style
-		pButton = GetDlgItem(_hSelf, (int)LOWORD(dwDefInfo));
-		if (pButton)
-			SendMessage(pButton, BM_SETSTYLE, LOWORD(BS_PUSHBUTTON | BS_RIGHT ), MAKELPARAM(TRUE, 0));
-	}
-
-	SendMessage(_hSelf, DM_SETDEFID, (WPARAM)nID, 0L);
-	pButton = GetDlgItem(_hSelf, nID);
-	if (pButton)
-	{
-		SendMessage(pButton, BM_SETSTYLE, LOWORD(BS_DEFPUSHBUTTON), MAKELPARAM(TRUE, 0));
-	}
-#endif
 	SendMessage(_hSelf, DM_SETDEFID, (WPARAM)nID, 0L);
 }
 
-void FindReplaceDlg::init( HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView )
+void FindReplaceDlg::init( HINSTANCE hInst, HWND hParent, ScintillaEditView **ppEditView )
 {
-	Window::init(hInst, hPere);
+	Window::init(hInst, hParent);
 	if (!ppEditView)
 	{
 		throw int(9900);
 	}
 	_ppEditView = ppEditView;
+}
+
+void Finder::addSearchLine(const TCHAR *searchName)
+{
+	generic_string str = TEXT("Search \"");
+	str += searchName;
+	str += TEXT("\"\r\n");
+
+	setFinderReadOnly(false);
+	_scintView.addGenericText(str.c_str());
+	setFinderReadOnly(true);
+	_lastSearchHeaderPos = _scintView.execute(SCI_GETCURRENTPOS) - 2;
+
+	_pMainFoundInfos->push_back(EmptyFoundInfo);
+	_pMainMarkings->push_back(EmptySearchResultMarking);
+}
+
+void Finder::addFileNameTitle(const TCHAR * fileName)
+{
+	generic_string str = TEXT("  ");
+	str += fileName;
+	str += TEXT("\r\n");
+
+	setFinderReadOnly(false);
+	_scintView.addGenericText(str.c_str());
+	setFinderReadOnly(true);
+	_lastFileHeaderPos = _scintView.execute(SCI_GETCURRENTPOS) - 2;
+
+	_pMainFoundInfos->push_back(EmptyFoundInfo);
+	_pMainMarkings->push_back(EmptySearchResultMarking);
+}
+
+void Finder::addFileHitCount(int count)
+{
+	TCHAR text[20];
+	wsprintf(text, TEXT(" (%i hits)"), count);
+	setFinderReadOnly(false);
+	_scintView.insertGenericTextFrom(_lastFileHeaderPos, text);
+	setFinderReadOnly(true);
+	nFoundFiles++;
+}
+
+void Finder::addSearchHitCount(int count)
+{
+	TCHAR text[50];
+	wsprintf(text, TEXT(" (%i hits in %i files)"), count, nFoundFiles);
+	setFinderReadOnly(false);
+	_scintView.insertGenericTextFrom(_lastSearchHeaderPos, text);
+	setFinderReadOnly(true);
+}
+
+
+void Finder::add(FoundInfo fi, SearchResultMarking mi, const TCHAR* foundline, int lineNb)
+{
+	_pMainFoundInfos->push_back(fi);
+	generic_string str = TEXT("\tLine ");
+
+	TCHAR lnb[16];
+	wsprintf(lnb, TEXT("%d"), lineNb);
+	str += lnb;
+	str += TEXT(": ");
+	mi._start += str.length();
+	mi._end += str.length();
+	str += foundline;
+
+	if (str.length() >= SC_SEARCHRESULT_LINEBUFFERMAXLENGTH)
+	{
+		const TCHAR * endOfLongLine = TEXT("...\r\n");
+		str = str.substr(0, SC_SEARCHRESULT_LINEBUFFERMAXLENGTH - lstrlen(endOfLongLine) - 1);
+		str += endOfLongLine;
+	}
+	setFinderReadOnly(false);
+	_scintView.addGenericText(str.c_str(), &mi._start, &mi._end);
+	setFinderReadOnly(true);
+	_pMainMarkings->push_back(mi);
+}
+
+void Finder::removeAll()
+{
+	_pMainFoundInfos->clear();
+	_pMainMarkings->clear();
+	setFinderReadOnly(false);
+	_scintView.execute(SCI_CLEARALL);
+	setFinderReadOnly(true);
+}
+
+void Finder::beginNewFilesSearch()
+{
+	_scintView.execute(SCI_SETLEXER, SCLEX_NULL);
+
+	_scintView.execute(SCI_SETCURRENTPOS, 0);
+	_pMainFoundInfos = _pMainFoundInfos == &_foundInfos1 ? &_foundInfos2 : &_foundInfos1;
+	_pMainMarkings = _pMainMarkings == &_markings1 ? &_markings2 : &_markings1;
+	nFoundFiles = 0;
+
+	// fold all old searches (1st level only)
+	_scintView.collapse(searchHeaderLevel - SC_FOLDLEVELBASE, fold_collapse);
+}
+
+void Finder::finishFilesSearch(int count)
+{
+	std::vector<FoundInfo>* _pOldFoundInfos;
+	std::vector<SearchResultMarking>* _pOldMarkings;
+	_pOldFoundInfos = _pMainFoundInfos == &_foundInfos1 ? &_foundInfos2 : &_foundInfos1;
+	_pOldMarkings = _pMainMarkings == &_markings1 ? &_markings2 : &_markings1;
+
+	_pOldFoundInfos->insert(_pOldFoundInfos->begin(), _pMainFoundInfos->begin(), _pMainFoundInfos->end());
+	_pOldMarkings->insert(_pOldMarkings->begin(), _pMainMarkings->begin(), _pMainMarkings->end());
+	_pMainFoundInfos->clear();
+	_pMainMarkings->clear();
+	_pMainFoundInfos = _pOldFoundInfos;
+	_pMainMarkings = _pOldMarkings;
+
+	_MarkingsStruct._length = _pMainMarkings->size();
+	_MarkingsStruct._markings = &((*_pMainMarkings)[0]);
+
+	addSearchHitCount(count);
+	_scintView.execute(SCI_SETSEL, 0, 0);
+
+	_scintView.execute(SCI_SETLEXER, SCLEX_SEARCHRESULT);
 }
 
 void Finder::setFinderStyle()
@@ -2429,29 +2320,19 @@ BOOL CALLBACK Finder::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-void FindIncrementDlg::setSearchText(const TCHAR * txt2find, bool isUTF8 ) {
-#ifdef UNICODE
+void FindIncrementDlg::setSearchText(const TCHAR * txt2find, bool /*isUTF8*/)
+{
 	::SendDlgItemMessage(_hSelf, IDC_INCFINDTEXT, WM_SETTEXT, 0, (LPARAM)txt2find);
-	isUTF8 = isUTF8;
-#else
-	if (!isUTF8)
-	{
-		::SendDlgItemMessage(_hSelf, IDC_INCFINDTEXT, WM_SETTEXT, 0, (LPARAM)txt2find);
-		return;
-	}
-	const int wideBufferSize = 256;
-	WCHAR wchars[wideBufferSize];
-	::MultiByteToWideChar(CP_UTF8, 0, txt2find, -1, wchars, wideBufferSize);
-	winVer winVersion = getWinVersion();
-	if (winVersion <= WV_ME) {
-		//Cannot simply take txt2find since its UTF8
-		char ansiBuffer[wideBufferSize];	//Assuming no more than 2 bytes for each wchar (SBCS or DBCS, no UTF8 and sorts)
-		::WideCharToMultiByte(CP_ACP, 0, wchars, -1, ansiBuffer, wideBufferSize, NULL, NULL);
-		::SendDlgItemMessageA(_hSelf, IDC_INCFINDTEXT, WM_SETTEXT, 0, (LPARAM)ansiBuffer);
-	} else {
-		::SendDlgItemMessageW(_hSelf, IDC_INCFINDTEXT, WM_SETTEXT, 0, (LPARAM)wchars);
-	}
-#endif
+}
+
+void FindIncrementDlg::init(HINSTANCE hInst, HWND hParent, FindReplaceDlg *pFRDlg, bool isRTL)
+{
+	Window::init(hInst, hParent);
+	if (!pFRDlg)
+		throw int(9910);
+	_pFRDlg = pFRDlg;
+	create(IDD_INCREMENT_FIND, isRTL);
+	_isRTL = isRTL;
 }
 
 void FindIncrementDlg::destroy()
@@ -2648,6 +2529,25 @@ void FindIncrementDlg::markSelectedTextInc(bool enable, FindOption *opt)
 	_pFRDlg->markAllInc(text2Find, opt);
 }
 
+void FindIncrementDlg::setFindStatus(FindStatus iStatus)
+{
+	static TCHAR *findStatus[] = { TEXT(""), // FSFound
+	                               TEXT("Phrase not found"), //FSNotFound
+	                               TEXT("Reached top of page, continued from bottom"), // FSTopReached
+	                               TEXT("Reached end of page, continued from top")}; // FSEndReached
+	if (iStatus<0 || iStatus >= sizeof(findStatus)/sizeof(findStatus[0]))
+		return; // out of range
+
+	_FindStatus = iStatus;
+
+	// get the HWND of the editor
+	HWND hEditor = ::GetDlgItem(_hSelf, IDC_INCFINDTEXT);
+
+	// invalidate the editor rect
+	::InvalidateRect(hEditor, NULL, TRUE);
+	::SendDlgItemMessage(_hSelf, IDC_INCFINDSTATUS, WM_SETTEXT, 0, (LPARAM)findStatus[iStatus]);
+}
+
 void FindIncrementDlg::addToRebar(ReBar * rebar)
 {
 	if(_pRebar)
@@ -2676,34 +2576,4 @@ void FindIncrementDlg::addToRebar(ReBar * rebar)
 FindIncrementDlg::~FindIncrementDlg()
 {
 	FindIncrementDlg::destroy();
-}
-
-
-void FindIncrementDlg::init( HINSTANCE hInst, HWND hPere, FindReplaceDlg *pFRDlg, bool isRTL /*= false*/ )
-{
-	Window::init(hInst, hPere);
-	if (!pFRDlg)
-		throw int(9910);
-	_pFRDlg = pFRDlg;
-	create(IDD_INCREMENT_FIND, isRTL);
-	_isRTL = isRTL;
-}
-
-void FindIncrementDlg::setFindStatus( FindStatus iStatus )
-{
-	static TCHAR *findStatus[] =  {
-		TEXT(""), // FSFound
-		TEXT("Phrase not found"), //FSNotFound
-		TEXT("Reached top of page, continued from bottom"), // FSTopReached
-		TEXT("Reached end of page, continued from top")}; // FSEndReached
-	if (iStatus<0 || iStatus >= sizeof(findStatus)/sizeof(findStatus[0]))
-		return; // out of range
-	_FindStatus = iStatus;
-
-	// get the HWND of the editor
-	HWND hEditor = ::GetDlgItem(_hSelf, IDC_INCFINDTEXT);
-
-	// invalidate the editor rect
-	::InvalidateRect(hEditor, NULL, TRUE);
-	::SendDlgItemMessage(_hSelf, IDC_INCFINDSTATUS, WM_SETTEXT, 0, (LPARAM)findStatus[iStatus]);
 }

@@ -60,7 +60,7 @@ class Splitter : public Window
 public:
 	Splitter();
 	void resizeSpliter(RECT *pRect = NULL);
-	void init(HINSTANCE hInst, HWND hPere, int splitterSize,
+	void init(HINSTANCE hInst, HWND hParent, int splitterSize,
 			int iSplitRatio, DWORD dwFlags);
 	void rotate();
 	int getPhisicalSize() const {
@@ -114,4 +114,4 @@ private:
 		return (LOWORD(result) - ((HIWORD(result) == RIGHT_FIX) ? _spiltterSize : 0));
 	};
 };
-#endif // SPLITTER_H
+#endif //SPLITTER_H

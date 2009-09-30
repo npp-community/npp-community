@@ -41,4 +41,4 @@ protected:
 	virtual LRESULT onWinMgr(WPARAM wp, LPARAM lp);
 };
 
-#endif
+#endif // SIZABLE_DLG_H

@@ -19,7 +19,6 @@
 #include "StaticDialog.h"
 #include "Notepad_plus_msgs.h"
 
-
 StaticDialog::~StaticDialog()
 {
 	if (Window::isCreated()) {
@@ -31,7 +30,6 @@ StaticDialog::~StaticDialog()
 		StaticDialog::destroy();
 	}
 }
-
 
 void StaticDialog::goToCenter()
 {
@@ -47,7 +45,6 @@ void StaticDialog::goToCenter()
 
 	::SetWindowPos(_hSelf, HWND_TOP, x, y, _rc.right - _rc.left, _rc.bottom - _rc.top, SWP_SHOWWINDOW);
 }
-
 
 void StaticDialog::display(bool toShow) const
 {
@@ -76,7 +73,6 @@ void StaticDialog::display(bool toShow) const
 
 	Window::display(toShow);
 }
-
 
 HGLOBAL StaticDialog::makeRTLResource(int dialogID, DLGTEMPLATE **ppMyDlgTemplate)
 {

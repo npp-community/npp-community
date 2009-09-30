@@ -47,6 +47,10 @@
 #include "npp_styles.h"  // For StyleArray, etc.
 #endif
 
+#ifndef SCINTILLACTRLS_H
+#include "ScintillaCtrls.h"
+#endif
+
 #define MENU 0x01
 #define TOOLBAR 0x02
 
@@ -366,21 +370,12 @@ private:
 
 	bool _isFileOpening;
 
-	class ScintillaCtrls {
-	public :
-		//ScintillaCtrls();
-		void init(HINSTANCE hInst, HWND hNpp);
-		HWND createSintilla(HWND hParent);
-		bool destroyScintilla(HWND handle2Destroy);
-		void destroy();
-	private:
-		std::vector<ScintillaEditView *> _scintVector;
-		HINSTANCE _hInst;
-		HWND _hParent;
-	} _scintillaCtrls4Plugins;
+	// JOCE: Can be made a ptr, and remove header dependency.
+	ScintillaCtrls _scintillaCtrls4Plugins;
 
 	std::vector<std::pair<int, int> > _hideLinesMarks;
 	StyleArray _hotspotStyles;
+    bool _rememberThisSession; // always true. except -nosession is indicated on the launch time
 
 	static LRESULT CALLBACK Notepad_plus_Proc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 	LRESULT runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
@@ -409,12 +404,15 @@ private:
 	int currentView(){
 		return _activeView;
 	};
+
 	int otherView(){
 		return (_activeView == MAIN_VIEW?SUB_VIEW:MAIN_VIEW);
 	};
+
 	int otherFromView(int whichOne){
 		return (whichOne == MAIN_VIEW?SUB_VIEW:MAIN_VIEW);
 	};
+
 	bool canHideView(int whichOne);	//true if view can safely be hidden (no open docs etc)
 
 	int switchEditViewTo(int gid);	//activate other view (set focus etc)
@@ -446,11 +444,8 @@ private:
 	void checkModifiedDocument();
 
     void getMainClientRect(RECT & rc) const;
-
 	void dynamicCheckMenuAndTB() const;
-
 	void enableConvertMenuItems(formatType f) const;
-
 	void checkUnicodeMenuItems(UniMode um) const;
 
 	generic_string getLangDesc(LangType langType, bool shortDesc = false);
@@ -462,9 +457,7 @@ private:
 	void setUniModeText(UniMode um);
 
 	void checkLangsMenu(int id) const ;
-
     void setLanguage(LangType langType);
-
 	enum LangType menuID2LangType(int cmdID);
 
     int getFolderMarginStyle() const;
@@ -518,9 +511,7 @@ private:
 	bool bin2Cliboard(const UCHAR *uchar2cpy, size_t length);
 
 	bool getIntegralDockingData(tTbData & dockData, int & iCont, bool & isVisible);
-
 	int getLangFromMenuName(const TCHAR * langName);
-
 	generic_string getLangFromMenu(const Buffer * buf);
 
 	void setFileOpenSaveDlgFilters(FileDialog & fDlg);

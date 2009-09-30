@@ -61,7 +61,7 @@ public :
 	void		 toggleActiveTb(DockingCont* pContSrc, DockingCont* pContTgt);
 	void		 toggleVisTb(DockingCont* pContSrc, DockingCont* pContTgt);
 
-	/* get number of container */
+	// get number of container
 	int  GetContainer(DockingCont* pCont);
 
 	/* get all container in vector */
@@ -77,6 +77,8 @@ public :
 	int getDockedContSize(int iCont);
 	void setDockedContSize(int iCont, int iSize);
 
+	virtual void destroy();
+
 private :
 
 	static LRESULT CALLBACK staticWinProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
@@ -85,31 +87,25 @@ private :
 
 	void	toggleTb(DockingCont* pContSrc, DockingCont* pContTgt, tTbData* TbData);
 
-	/* test if container exists */
+	// test if container exists
 	BOOL ContExists(size_t iCont);
 	int	 FindEmptyContainer();
-
 	LRESULT SendNotify(HWND hWnd, UINT message);
 
 private:
-	/* Handles */
 	Window						**_ppWindow;
-
 	RECT						_rcWork;
 	RECT						_rect;
 	Window						**_ppMainWindow;
 
 	/* handles all the icons */
-	std::vector<HWND>				_vImageList;
+	std::vector<HWND>			_vImageList;
 	HIMAGELIST					_hImageList;
-
-	std::vector<DockingCont*>		_vContainer;
+	std::vector<DockingCont*>	_vContainer;
 	tDockMgr*					_dockData;
 
 	static BOOL					_isRegistered;
 	BOOL						_isInitialized;
-
-	/* container map for startup (restore settings) */
 	int							_iContMap[CONT_MAP_MAX];
 
 	/* splitter data */

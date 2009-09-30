@@ -32,7 +32,7 @@ class ColumnEditorDlg : public StaticDialog
 public :
 	ColumnEditorDlg() : StaticDialog() {};
 
-	void init(HINSTANCE hInst, HWND hPere, ScintillaEditView **ppEditView);
+	void init(HINSTANCE hInst, HWND hParent, ScintillaEditView **ppEditView);
 	virtual void create(int dialogID, bool isRTL = false);
 	void doDialog(bool isRTL = false);
     virtual void display(bool toShow = true) const;

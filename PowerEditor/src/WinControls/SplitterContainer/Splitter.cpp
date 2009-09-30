@@ -37,17 +37,17 @@ Splitter::Splitter() :
 	memset(&_clickZone2BR, 0, sizeof(RECT));
 }
 
-void Splitter::init( HINSTANCE hInst, HWND hPere, int splitterSize,
+void Splitter::init( HINSTANCE hInst, HWND hParent, int splitterSize,
 				int iSplitRatio, DWORD dwFlags)
 {
-	Window::init(hInst, hPere);
+	Window::init(hInst, hParent);
 	_spiltterSize = splitterSize;
 
 	WNDCLASSEX wcex;
 	DWORD dwExStyle = 0L;
 	DWORD dwStyle   = WS_CHILD | WS_VISIBLE;
 
-	if (hPere == NULL)
+	if (hParent == NULL)
 	{
 		::MessageBox(NULL, TEXT("pas de pere?"), TEXT("Splitter::init"), MB_OK);
 		throw int(96);
@@ -57,7 +57,7 @@ void Splitter::init( HINSTANCE hInst, HWND hPere, int splitterSize,
 		::MessageBox(NULL, TEXT("it shoulds be 0 < ratio < 100"), TEXT("Splitter::init"), MB_OK);
 		throw int(96);
 	}
-	_hParent = hPere;
+	_hParent = hParent;
 	_dwFlags = dwFlags;
 
 	if (_dwFlags & SV_FIXED)

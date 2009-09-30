@@ -222,7 +222,8 @@ struct NppGUI
 		_rememberLastSession(true), _enableMouseWheelZoom(true),  _doTaskList(true), _maitainIndent(true), _enableSmartHilite(true),
 		_enableTagsMatchHilite(true), _enableTagAttrsHilite(true), _enableHiliteNonHTMLZone(false), _styleMRU(true), _styleURL(0),
 		_isLangMenuCompact(false), _backup(bak_none), _useDir(false), _autocStatus(autoc_none), _autocFromLen(1), _funcParams(false),
-		_doesExistUpdater(false), _caretBlinkRate(250), _caretWidth(1), _shortTitlebar(false), _openSaveDir(dir_followCurrent)
+		_doesExistUpdater(false), _caretBlinkRate(250), _caretWidth(1), _enableMultiSelection(false), _shortTitlebar(false),
+		_openSaveDir(dir_followCurrent)
 	{
 		_appPos.left = 0;
 		_appPos.top = 0;
@@ -307,6 +308,7 @@ struct NppGUI
 	bool _doesExistUpdater;
 	int _caretBlinkRate;
 	int _caretWidth;
+    bool _enableMultiSelection;
 
 	bool _shortTitlebar;
 
@@ -480,6 +482,7 @@ private:
 	bool _isCommentLineSymbol;
 	bool _isCommentSymbol;
 	bool _isPrefix[nbPrefixListAllowed];
+	TCHAR _escapeChar[2];
 };
 
 #define MAX_EXTERNAL_LEXER_NAME_LEN 16

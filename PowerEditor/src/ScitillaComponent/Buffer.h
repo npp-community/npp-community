@@ -230,7 +230,6 @@ public :
 
 	void setUnicodeMode(UniMode mode) {
 		_unicodeMode = mode;
-		//_isDirty = true;	//set to dirty if change unicode mode
 		doNotify(BufferChangeUnicode | BufferChangeDirty);
 	};
 	DocFileStatus getStatus() const {

@@ -38,7 +38,7 @@ public :
 		}
     }
 
-	virtual void init(HINSTANCE hInst, HWND hPere, int nbParts);
+	virtual void init(HINSTANCE hInst, HWND hParent, int nbParts);
 
 	bool setPartWidth(int whichPart, int width) {
 		if (whichPart >= _nbParts)

@@ -15,11 +15,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef COLOR_POPUP_RESOURCE_H
-#define COLOR_POPUP_RESOURCE_H
+#ifndef COLOUR_POPUP_RESOURCE_H
+#define COLOUR_POPUP_RESOURCE_H
 
 #define	IDD_COLOUR_POPUP   2100
-
 #define	IDC_COLOUR_LIST (IDD_COLOUR_POPUP + 1)
 
-#endif // COLOR_POPUP_RESOURCE_H
+#endif // COLOUR_POPUP_RESOURCE_H
+

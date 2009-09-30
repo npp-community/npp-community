@@ -15,13 +15,11 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-//#define INCLUDE_DEPRECATED_FEATURES 1
-
 #include "precompiled_headers.h"
 
 #include "Notepad_plus.h"
 #include "FileDialog.h"
-#include "resource.h"
+//#include "resource.h"
 #include "printer.h"
 #include "FileNameStringSplitter.h"
 #include "ValueDlg.h"
@@ -130,6 +128,7 @@ Notepad_plus::Notepad_plus():
 	_pluginsManager(new PluginsManager()),
 	_isRTL(false),
 	_isFileOpening(false),
+	_rememberThisSession(true),
 	_mainWindowStatus(0),
 	_activeView(MAIN_VIEW)
 {
@@ -234,7 +233,9 @@ Notepad_plus::Notepad_plus():
 		}
 	}
 	else
+	{
 		_toolIcons = NULL;
+	}
 }
 
 // ATTENTION : the order of the destruction is very important
@@ -351,6 +352,7 @@ void Notepad_plus::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLine, CmdL
 		::SendMessage(_hSelf, NPPM_HIDETABBAR, 0, TRUE);
 	}
 
+    _rememberThisSession = !cmdLineParams->_isNoSession;
 	if (nppGUI._rememberLastSession && !cmdLineParams->_isNoSession)
 	{
 		loadLastSession();
@@ -2134,6 +2136,51 @@ void Notepad_plus::filePrint(bool showDialog)
 	printer.doPrint();
 }
 
+int Notepad_plus::doSaveOrNot(const TCHAR *fn)
+{
+	const TCHAR pattern[64] = TEXT("Save file \"%s\" ?");
+	TCHAR phrase[512];
+	wsprintf(phrase, pattern, fn);
+	return doActionOrNot(TEXT("Save"), phrase, MB_YESNOCANCEL | MB_ICONQUESTION | MB_APPLMODAL);
+}
+
+int Notepad_plus::doReloadOrNot(const TCHAR *fn, bool dirty)
+{
+	const TCHAR* pattern = TEXT("%s\r\rThis file has been modified by another program.\rDo you want to reload it%s?");
+	const TCHAR* lose_info_str = dirty ? TEXT(" and lose the changes made in Notepad++") : TEXT("");
+	TCHAR phrase[512];
+	wsprintf(phrase, pattern, fn, lose_info_str);
+	int icon = dirty ? MB_ICONEXCLAMATION : MB_ICONQUESTION;
+	return doActionOrNot(TEXT("Reload"), phrase, MB_YESNO | MB_APPLMODAL | icon);
+}
+
+int Notepad_plus::doCloseOrNot(const TCHAR *fn)
+{
+	const TCHAR pattern[128] = TEXT("The file \"%s\" doesn't exist anymore.\rKeep this file in editor?");
+	TCHAR phrase[512];
+	wsprintf(phrase, pattern, fn);
+	return doActionOrNot(TEXT("Keep non existing file"), phrase, MB_YESNO | MB_ICONQUESTION | MB_APPLMODAL);
+}
+
+int Notepad_plus::doDeleteOrNot(const TCHAR *fn)
+{
+	const TCHAR pattern[128] = TEXT("The file \"%s\"\rwill be deleted from your disk and this document will be closed.\rContinue?");
+	TCHAR phrase[512];
+	wsprintf(phrase, pattern, fn);
+	return doActionOrNot(TEXT("Delete file"), phrase, MB_YESNO | MB_ICONQUESTION | MB_APPLMODAL);
+}
+
+int Notepad_plus::doActionOrNot(const TCHAR *title, const TCHAR *displayText, int type)
+{
+	return ::MessageBox(_hSelf, displayText, title, type);
+}
+
+void Notepad_plus::enableMenu(int cmdID, bool doEnable) const
+{
+	int flag = doEnable?MF_ENABLED | MF_BYCOMMAND:MF_DISABLED | MF_GRAYED | MF_BYCOMMAND;
+	::EnableMenuItem(_mainMenuHandle, cmdID, flag);
+}
+
 void Notepad_plus::enableCommand(int cmdID, bool doEnable, int which) const
 {
 	if (which & MENU)
@@ -2513,509 +2560,643 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 		case SCN_KEY:
 			break;
 
-	case TCN_TABDROPPEDOUTSIDE:
-	case TCN_TABDROPPED:
-	{
-        TabBarPlus *sender = reinterpret_cast<TabBarPlus *>(notification->nmhdr.idFrom);
-        bool isInCtrlStat = (::GetKeyState(VK_LCONTROL) & 0x80000000) != 0;
-        if (notification->nmhdr.code == TCN_TABDROPPEDOUTSIDE)
-        {
-            POINT p = sender->getDraggingPoint();
-
-			//It's the coordinate of screen, so we can call
-			//"WindowFromPoint" function without converting the point
-            HWND hWin = ::WindowFromPoint(p);
-			if (hWin == _pEditView->getHSelf()) // In the same view group
+		case TCN_TABDROPPEDOUTSIDE:
+		case TCN_TABDROPPED:
+		{
+			TabBarPlus *sender = reinterpret_cast<TabBarPlus *>(notification->nmhdr.idFrom);
+			bool isInCtrlStat = (::GetKeyState(VK_LCONTROL) & 0x80000000) != 0;
+			if (notification->nmhdr.code == TCN_TABDROPPEDOUTSIDE)
 			{
-				if (!_tabPopupDropMenu)
-				{
-					_tabPopupDropMenu = new ContextMenu();
-				}
+				POINT p = sender->getDraggingPoint();
 
-				if (!_tabPopupDropMenu->isCreated())
+				//It's the coordinate of screen, so we can call
+				//"WindowFromPoint" function without converting the point
+				HWND hWin = ::WindowFromPoint(p);
+				if (hWin == _pEditView->getHSelf()) // In the same view group
 				{
-					TCHAR goToView[32] = TEXT("Move to other view");
-					TCHAR cloneToView[32] = TEXT("Clone to other View");
-					std::vector<MenuItemUnit> itemUnitArray;
-					itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_GOTO_ANOTHER_VIEW, goToView));
-					itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_CLONE_TO_ANOTHER_VIEW, cloneToView));
-					_tabPopupDropMenu->create(_hSelf, itemUnitArray);
-					changeLangTabDrapContextMenu();
-				}
-				_tabPopupDropMenu->display(p);
-			}
-			else if ((hWin == _pNonDocTab->getHSelf()) ||
-				     (hWin == _pNonEditView->getHSelf())) // In the another view group
-			{
-                docGotoAnotherEditView(isInCtrlStat?TransferClone:TransferMove);
-			}
-
-			else
-			{
-				RECT nppZone;
-				::GetWindowRect(_hSelf, &nppZone);
-				bool isInNppZone = (((p.x >= nppZone.left) && (p.x <= nppZone.right)) && (p.y >= nppZone.top) && (p.y <= nppZone.bottom));
-				if (isInNppZone)
-				{
-					// Do nothing
-					return TRUE;
-				}
-				generic_string quotFileName = TEXT("\"");
-				quotFileName += _pEditView->getCurrentBuffer()->getFullPathName();
-				quotFileName += TEXT("\"");
-				COPYDATASTRUCT fileNamesData;
-				fileNamesData.dwData = COPYDATA_FILENAMES;
-				fileNamesData.lpData = (void *)quotFileName.c_str();
-				fileNamesData.cbData = long(quotFileName.length() + 1)*(sizeof(TCHAR));
-
-				HWND hWinParent = ::GetParent(hWin);
-				TCHAR className[MAX_PATH];
-				::GetClassName(hWinParent,className, sizeof(className));
-				if (lstrcmp(className, _className) == 0 && hWinParent != _hSelf) // another Notepad++
-				{
-					int index = _pDocTab->getCurrentTabIndex();
-					BufferID bufferToClose = notifyDocTab->getBufferByIndex(index);
-					Buffer * buf = MainFileManager->getBufferByID(bufferToClose);
-					int iView = isFromPrimary?MAIN_VIEW:SUB_VIEW;
-					if (buf->isDirty())
+					if (!_tabPopupDropMenu)
 					{
-						::MessageBox(_hSelf, TEXT("Document is modified, save it then try again."), TEXT("Move to new Notepad++ Instance"), MB_OK);
+						_tabPopupDropMenu = new ContextMenu();
 					}
-					else
+
+					if (!_tabPopupDropMenu->isCreated())
 					{
-						::SendMessage(hWinParent, NPPM_INTERNAL_SWITCHVIEWFROMHWND, 0, (LPARAM)hWin);
-						::SendMessage(hWinParent, WM_COPYDATA, (WPARAM)_hInst, (LPARAM)&fileNamesData);
-                        if (!isInCtrlStat)
+						TCHAR goToView[32] = TEXT("Move to other view");
+						TCHAR cloneToView[32] = TEXT("Clone to other View");
+						std::vector<MenuItemUnit> itemUnitArray;
+						itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_GOTO_ANOTHER_VIEW, goToView));
+						itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_CLONE_TO_ANOTHER_VIEW, cloneToView));
+						_tabPopupDropMenu->create(_hSelf, itemUnitArray);
+						changeLangTabDrapContextMenu();
+					}
+					_tabPopupDropMenu->display(p);
+				}
+				else if ((hWin == _pNonDocTab->getHSelf()) ||
+						 (hWin == _pNonEditView->getHSelf())) // In the another view group
+				{
+					docGotoAnotherEditView(isInCtrlStat?TransferClone:TransferMove);
+				}
+
+				else
+				{
+					RECT nppZone;
+					::GetWindowRect(_hSelf, &nppZone);
+					bool isInNppZone = (((p.x >= nppZone.left) && (p.x <= nppZone.right)) && (p.y >= nppZone.top) && (p.y <= nppZone.bottom));
+					if (isInNppZone)
+					{
+						// Do nothing
+						return TRUE;
+					}
+					generic_string quotFileName = TEXT("\"");
+					quotFileName += _pEditView->getCurrentBuffer()->getFullPathName();
+					quotFileName += TEXT("\"");
+					COPYDATASTRUCT fileNamesData;
+					fileNamesData.dwData = COPYDATA_FILENAMES;
+					fileNamesData.lpData = (void *)quotFileName.c_str();
+					fileNamesData.cbData = long(quotFileName.length() + 1)*(sizeof(TCHAR));
+
+					HWND hWinParent = ::GetParent(hWin);
+					TCHAR className[MAX_PATH];
+					::GetClassName(hWinParent,className, sizeof(className));
+					if (lstrcmp(className, _className) == 0 && hWinParent != _hSelf) // another Notepad++
+					{
+						int index = _pDocTab->getCurrentTabIndex();
+						BufferID bufferToClose = notifyDocTab->getBufferByIndex(index);
+						Buffer * buf = MainFileManager->getBufferByID(bufferToClose);
+						int iView = isFromPrimary?MAIN_VIEW:SUB_VIEW;
+						if (buf->isDirty())
 						{
-							fileClose(bufferToClose, iView);
-							if (noOpenedDoc())
-								::SendMessage(_hSelf, WM_CLOSE, 0, 0);
+							::MessageBox(_hSelf, TEXT("Document is modified, save it then try again."), TEXT("Move to new Notepad++ Instance"), MB_OK);
+						}
+						else
+						{
+							::SendMessage(hWinParent, NPPM_INTERNAL_SWITCHVIEWFROMHWND, 0, (LPARAM)hWin);
+							::SendMessage(hWinParent, WM_COPYDATA, (WPARAM)_hInst, (LPARAM)&fileNamesData);
+							if (!isInCtrlStat)
+							{
+								fileClose(bufferToClose, iView);
+								if (noOpenedDoc())
+									::SendMessage(_hSelf, WM_CLOSE, 0, 0);
+							}
 						}
 					}
+					else // Not Notepad++, we open it here
+					{
+						docOpenInNewInstance(isInCtrlStat?TransferClone:TransferMove, p.x, p.y);
+					}
 				}
-                else // Not Notepad++, we open it here
-                {
-					docOpenInNewInstance(isInCtrlStat?TransferClone:TransferMove, p.x, p.y);
-                }
 			}
-        }
-		//break;
-		sender->resetDraggingPoint();
-		return TRUE;
-	}
-
-	case TCN_TABDELETE:
-	{
-		int index = tabNotification->tabOrigin;
-		BufferID bufferToClose = notifyDocTab->getBufferByIndex(index);
-		Buffer * buf = MainFileManager->getBufferByID(bufferToClose);
-		int iView = isFromPrimary?MAIN_VIEW:SUB_VIEW;
-		if (buf->isDirty()) {	//activate and use fileClose() (for save and abort)
-			activateBuffer(bufferToClose, iView);
-			fileClose(bufferToClose, iView);
-			break;
-		}
-		doClose(bufferToClose, iView);
-		break;
-
-	}
-
-	case TCN_SELCHANGE:
-	{
-		int iView = -1;
-		assert(_mainDocTab);
-		assert(_subDocTab);
-        if (notification->nmhdr.hwndFrom == _mainDocTab->getHSelf())
-		{
-			iView = MAIN_VIEW;
-		}
-		else if (notification->nmhdr.hwndFrom == _subDocTab->getHSelf())
-		{
-			iView = SUB_VIEW;
-		}
-		else
-		{
-			break;
-		}
-
-		switchEditViewTo(iView);
-		BufferID bufid = _pDocTab->getBufferByIndex(_pDocTab->getCurrentTabIndex());
-		if (bufid != BUFFER_INVALID)
-			activateBuffer(bufid, iView);
-
-		break;
-	}
-
-	case NM_CLICK :
-    {
-		assert(_statusBar);
-		assert(_mainDocTab);
-		assert(_subDocTab);
-		if (notification->nmhdr.hwndFrom == _statusBar->getHSelf())
-        {
-            LPNMMOUSE lpnm = (LPNMMOUSE)notification;
-			if (lpnm->dwItemSpec == DWORD(STATUSBAR_TYPING_MODE))
-			{
-				bool isOverTypeMode = (_pEditView->execute(SCI_GETOVERTYPE) != 0);
-				_pEditView->execute(SCI_SETOVERTYPE, !isOverTypeMode);
-				_statusBar->setText((_pEditView->execute(SCI_GETOVERTYPE))?TEXT("OVR"):TEXT("INS"), STATUSBAR_TYPING_MODE);
-			}
-        }
-		else if (notification->nmhdr.hwndFrom == _mainDocTab->getHSelf())
-		{
-            switchEditViewTo(MAIN_VIEW);
-		}
-        else if (notification->nmhdr.hwndFrom == _subDocTab->getHSelf())
-        {
-            switchEditViewTo(SUB_VIEW);
-        }
-
-		break;
-	}
-
-	case NM_DBLCLK :
-    {
-		assert(_goToLineDlg);
-		assert(_statusBar);
-		if (notification->nmhdr.hwndFrom == _statusBar->getHSelf())
-        {
-            LPNMMOUSE lpnm = (LPNMMOUSE)notification;
-			if (lpnm->dwItemSpec == DWORD(STATUSBAR_CUR_POS))
-			{
-				bool isFirstTime = !_goToLineDlg->isCreated();
-				_goToLineDlg->doDialog(_isRTL);
-				if (isFirstTime)
-					changeDlgLang(_goToLineDlg->getHSelf(), "GoToLine");
-			}
-        }
-		break;
-	}
-
-    case NM_RCLICK :
-    {
-		assert(_mainDocTab);
-		assert(_subDocTab);
-		if (notification->nmhdr.hwndFrom == _mainDocTab->getHSelf())
-		{
-            switchEditViewTo(MAIN_VIEW);
-		}
-        else if (notification->nmhdr.hwndFrom == _subDocTab->getHSelf())
-        {
-            switchEditViewTo(SUB_VIEW);
-        }
-		else // From tool bar or Status Bar
-			return TRUE;
 			//break;
+			sender->resetDraggingPoint();
+			return TRUE;
+		}
 
-		POINT p;
-		::GetCursorPos(&p);
-
-		if (!_tabPopupMenu)
+		case TCN_TABDELETE:
 		{
-			_tabPopupMenu = new ContextMenu();
-		}
-
-		if (!_tabPopupMenu->isCreated())
-		{
-			std::vector<MenuItemUnit> itemUnitArray;
-			itemUnitArray.push_back(MenuItemUnit(IDM_FILE_CLOSE, TEXT("Close")));
-			itemUnitArray.push_back(MenuItemUnit(IDM_FILE_CLOSEALL_BUT_CURRENT, TEXT("Close All but This")));
-			itemUnitArray.push_back(MenuItemUnit(IDM_FILE_SAVE, TEXT("Save")));
-			itemUnitArray.push_back(MenuItemUnit(IDM_FILE_SAVEAS, TEXT("Save As...")));
-			itemUnitArray.push_back(MenuItemUnit(IDM_FILE_RENAME, TEXT("Rename")));
-			itemUnitArray.push_back(MenuItemUnit(IDM_FILE_DELETE, TEXT("Delete")));
-			itemUnitArray.push_back(MenuItemUnit(IDM_FILE_PRINT, TEXT("Print")));
-			itemUnitArray.push_back(MenuItemUnit(0, NULL));
-			itemUnitArray.push_back(MenuItemUnit(IDM_EDIT_SETREADONLY, TEXT("Read-Only")));
-			itemUnitArray.push_back(MenuItemUnit(IDM_EDIT_CLEARREADONLY, TEXT("Clear Read-Only Flag")));
-			itemUnitArray.push_back(MenuItemUnit(0, NULL));
-			itemUnitArray.push_back(MenuItemUnit(IDM_EDIT_FULLPATHTOCLIP,	TEXT("Full File Path to Clipboard")));
-			itemUnitArray.push_back(MenuItemUnit(IDM_EDIT_FILENAMETOCLIP,   TEXT("Filename to Clipboard")));
-			itemUnitArray.push_back(MenuItemUnit(IDM_EDIT_CURRENTDIRTOCLIP, TEXT("Current Dir. Path to Clipboard")));
-			itemUnitArray.push_back(MenuItemUnit(0, NULL));
-			itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_GOTO_ANOTHER_VIEW, TEXT("Move to Other View")));
-			itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_CLONE_TO_ANOTHER_VIEW, TEXT("Clone to Other View")));
-			itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_GOTO_NEW_INSTANCE, TEXT("Move to New Instance")));
-			itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_LOAD_IN_NEW_INSTANCE, TEXT("Open in New Instance")));
-
-			_tabPopupMenu->create(_hSelf, itemUnitArray);
-			changeLangTabContextMenu();
-		}
-
-		bool isEnable = ((::GetMenuState(_mainMenuHandle, IDM_FILE_SAVE, MF_BYCOMMAND)&MF_DISABLED) == 0);
-		_tabPopupMenu->enableItem(IDM_FILE_SAVE, isEnable);
-
-		Buffer * buf = _pEditView->getCurrentBuffer();
-		bool isUserReadOnly = buf->getUserReadOnly();
-		_tabPopupMenu->checkItem(IDM_EDIT_SETREADONLY, isUserReadOnly);
-
-		bool isSysReadOnly = buf->getFileReadOnly();
-		_tabPopupMenu->enableItem(IDM_EDIT_SETREADONLY, !isSysReadOnly);
-		_tabPopupMenu->enableItem(IDM_EDIT_CLEARREADONLY, isSysReadOnly);
-
-		bool isFileExisting = PathFileExists(buf->getFullPathName()) != FALSE;
-		_tabPopupMenu->enableItem(IDM_FILE_DELETE, isFileExisting);
-		_tabPopupMenu->enableItem(IDM_FILE_RENAME, isFileExisting);
-
-		bool isDirty = buf->isDirty();
-		bool isUntitled = buf->isUntitled();
-		_tabPopupMenu->enableItem(IDM_VIEW_GOTO_NEW_INSTANCE, !(isDirty||isUntitled));
-		_tabPopupMenu->enableItem(IDM_VIEW_LOAD_IN_NEW_INSTANCE, !(isDirty||isUntitled));
-
-		_tabPopupMenu->display(p);
-		return TRUE;
-    }
-
-
-	case SCN_MARGINCLICK:
-    {
-        if (notification->nmhdr.hwndFrom == _mainEditView->getHSelf())
-            switchEditViewTo(MAIN_VIEW);
-
-		else if (notification->nmhdr.hwndFrom == _subEditView->getHSelf())
-            switchEditViewTo(SUB_VIEW);
-
-        if (notification->margin == ScintillaEditView::_SC_MARGE_FOLDER)
-        {
-            _pEditView->marginClick(notification->position, notification->modifiers);
-        }
-        else if ((notification->margin == ScintillaEditView::_SC_MARGE_SYBOLE) && !notification->modifiers)
-        {
-
-            int lineClick = int(_pEditView->execute(SCI_LINEFROMPOSITION, notification->position));
-			if (!_pEditView->markerMarginClick(lineClick))
-				bookmarkToggle(lineClick);
-
-        }
-		break;
-	}
-
-	case SCN_CHARADDED:
-	{
-		assert(_autoCompleteMain);
-		assert(_autoCompleteSub);
-		charAdded(static_cast<TCHAR>(notification->ch));
-
-		AutoCompletion * autoC = isFromPrimary?_autoCompleteMain:_autoCompleteSub;
-
-		autoC->update(notification->ch);
-		break;
-	}
-
-	case SCN_DOUBLECLICK :
-	{
-		if (_isHotspotDblClicked)
-		{
-			int pos = notifyView->execute(SCI_GETCURRENTPOS);
-			notifyView->execute(SCI_SETCURRENTPOS, pos);
-			notifyView->execute(SCI_SETANCHOR, pos);
-			_isHotspotDblClicked = false;
-		}
-	}
-	break;
-
-    case SCN_UPDATEUI:
-	{
-		assert(_autoCompleteMain);
-		assert(_autoCompleteSub);
-		NppParameters *nppParam = NppParameters::getInstance();
-
-		// if it's searching/replacing, then do nothing
-		if (nppParam->_isFindReplacing)
-			break;
-
-		if (notification->nmhdr.hwndFrom != _pEditView->getHSelf())
-			break;
-
-        braceMatch();
-
-		const NppGUI & nppGui = nppParam->getNppGUI();
-
-		if (nppGui._enableTagsMatchHilite)
-		{
-			XmlMatchedTagsHighlighter xmlTagMatchHiliter(_pEditView);
-			xmlTagMatchHiliter.tagMatch(nppGui._enableTagAttrsHilite);
-		}
-
-		if (nppGui._enableSmartHilite && _smartHighlighter)
-			_smartHighlighter->highlightView(notifyView);
-
-		updateStatusBar();
-		AutoCompletion * autoC = isFromPrimary?_autoCompleteMain:_autoCompleteSub;
-		autoC->update(0);
-        break;
-	}
-
-	case SCN_SCROLLED:
-	{
-		const NppGUI & nppGUI = (NppParameters::getInstance())->getNppGUI();
-		if (nppGUI._enableSmartHilite && _smartHighlighter)
-			_smartHighlighter->highlightView(notifyView);
-		break;
-	}
-
-    case TTN_GETDISPINFO:
-    {
-		assert(_rebarTop);
-		assert(_mainDocTab);
-		assert(_subDocTab);
-
-        LPTOOLTIPTEXT lpttt;
-
-        lpttt = (LPTOOLTIPTEXT)notification;
-        lpttt->hinst = NULL;
-
-		POINT p;
-		::GetCursorPos(&p);
-		::ScreenToClient(_hSelf, &p);
-		HWND hWin = ::RealChildWindowFromPoint(_hSelf, p);
-		const int tipMaxLen = 1024;
-		static TCHAR tip[tipMaxLen];
-		tip[0] = '\0';
-		generic_string tipTmp(TEXT(""));
-		int id = int(lpttt->hdr.idFrom);
-
-		if (hWin == _rebarTop->getHSelf())
-		{
-			getNameStrFromCmd(id, tipTmp);
-		}
-		else if (hWin == _mainDocTab->getHSelf())
-		{
-			BufferID idd = _mainDocTab->getBufferByIndex(id);
-			Buffer * buf = MainFileManager->getBufferByID(idd);
-			tipTmp = buf->getFullPathName();
-		}
-		else if (hWin == _subDocTab->getHSelf())
-		{
-			BufferID idd = _subDocTab->getBufferByIndex(id);
-			Buffer * buf = MainFileManager->getBufferByID(idd);
-			tipTmp = buf->getFullPathName();
-		}
-		else
-			break;
-
-		_tcscpy_s(tip, tipMaxLen, tipTmp.c_str());
-
-		lpttt->lpszText = tip;
-    }
-    break;
-
-    case SCN_ZOOM:
-		break;
-
-    case SCN_MACRORECORD:
-        _macro.push_back(recordedMacroStep(notification->message, notification->wParam, notification->lParam));
-		break;
-
-	case SCN_PAINTED:
-	{
-		notifyView->updateLineNumberWidth();
-		if (_syncInfo.doSync())
-			doSynScorll(HWND(notification->nmhdr.hwndFrom));
-
-		NppParameters *nppParam = NppParameters::getInstance();
-
-		// if it's searching/replacing, then do nothing
-		if (/*_linkTriggered &&*/ !nppParam->_isFindReplacing)
-		{
-			int urlAction = (NppParameters::getInstance())->getNppGUI()._styleURL;
-			if ((urlAction == 1) || (urlAction == 2))
-				addHotSpot(_isDocModifing);
-			_linkTriggered = false;
-			_isDocModifing = false;
-		}
-		break;
-	}
-
-	case SCN_HOTSPOTDOUBLECLICK :
-	{
-		notifyView->execute(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-+.:?&@=/%#");
-
-		int pos = notifyView->execute(SCI_GETCURRENTPOS);
-		int startPos = static_cast<int>(notifyView->execute(SCI_WORDSTARTPOSITION, pos, false));
-		int endPos = static_cast<int>(notifyView->execute(SCI_WORDENDPOSITION, pos, false));
-
-		notifyView->execute(SCI_SETTARGETSTART, startPos);
-		notifyView->execute(SCI_SETTARGETEND, endPos);
-
-		int posFound = notifyView->execute(SCI_SEARCHINTARGET, strlen(urlHttpRegExpr), (LPARAM)urlHttpRegExpr);
-		if (posFound != -1)
-		{
-			startPos = int(notifyView->execute(SCI_GETTARGETSTART));
-			endPos = int(notifyView->execute(SCI_GETTARGETEND));
-		}
-
-		TCHAR currentWord[MAX_PATH*2];
-		notifyView->getGenericText(currentWord, startPos, endPos);
-
-		::ShellExecute(_hSelf, TEXT("open"), currentWord, NULL, NULL, SW_SHOW);
-		_isHotspotDblClicked = true;
-		notifyView->execute(SCI_SETCHARSDEFAULT);
-		break;
-	}
-
-	case SCN_NEEDSHOWN :
-	{
-		int begin = notifyView->execute(SCI_LINEFROMPOSITION, notification->position);
-		int end = notifyView->execute(SCI_LINEFROMPOSITION, notification->position + notification->length);
-		int firstLine = begin < end ? begin : end;
-		int lastLine = begin > end ? begin : end;
-		for (int line = firstLine; line <= lastLine; line++) {
-			notifyView->execute(SCI_ENSUREVISIBLE, line, 0);
-		}
-		break;
-	}
-
-	case SCN_CALLTIPCLICK:
-	{
-		assert(_autoCompleteMain);
-		assert(_autoCompleteSub);
-		AutoCompletion * autoC = isFromPrimary?_autoCompleteMain:_autoCompleteSub;
-		autoC->callTipClick(notification->position);
-		break;
-	}
-
-	case RBN_HEIGHTCHANGE:
-	{
-		SendMessage(_hSelf, WM_SIZE, 0, 0);
-		break;
-	}
-	case RBN_CHEVRONPUSHED:
-	{
-		assert(_rebarTop);
-		assert(_rebarBottom);
-		NMREBARCHEVRON * lpnm = (NMREBARCHEVRON*) notification;
-		ReBar * notifRebar = _rebarTop;
-		if (_rebarBottom->getHSelf() == lpnm->hdr.hwndFrom)
-			notifRebar = _rebarBottom;
-		//If N++ ID, use proper object
-		switch(lpnm->wID) {
-			case REBAR_BAR_TOOLBAR: {
-				assert(_toolBar);
-				POINT pt;
-				pt.x = lpnm->rc.left;
-				pt.y = lpnm->rc.bottom;
-				ClientToScreen(notifRebar->getHSelf(), &pt);
-				_toolBar->doPopop(pt);
-				return TRUE;
+			int index = tabNotification->tabOrigin;
+			BufferID bufferToClose = notifyDocTab->getBufferByIndex(index);
+			Buffer * buf = MainFileManager->getBufferByID(bufferToClose);
+			int iView = isFromPrimary?MAIN_VIEW:SUB_VIEW;
+			if (buf->isDirty()) {	//activate and use fileClose() (for save and abort)
+				activateBuffer(bufferToClose, iView);
+				fileClose(bufferToClose, iView);
+				break;
 			}
-			NO_DEFAULT_CASE;
+			doClose(bufferToClose, iView);
+			break;
+
 		}
-		//Else forward notification to window of rebarband
-		REBARBANDINFO rbBand;
-		ZeroMemory(&rbBand, REBARBAND_SIZE);
-		rbBand.cbSize  = REBARBAND_SIZE;
-		rbBand.fMask = RBBIM_CHILD;
-		::SendMessage(notifRebar->getHSelf(), RB_GETBANDINFO, lpnm->uBand, (LPARAM)&rbBand);
-		::SendMessage(rbBand.hwndChild, WM_NOTIFY, 0, (LPARAM)lpnm);
+
+		case TCN_SELCHANGE:
+		{
+			int iView = -1;
+			assert(_mainDocTab);
+			assert(_subDocTab);
+			if (notification->nmhdr.hwndFrom == _mainDocTab->getHSelf())
+			{
+				iView = MAIN_VIEW;
+			}
+			else if (notification->nmhdr.hwndFrom == _subDocTab->getHSelf())
+			{
+				iView = SUB_VIEW;
+			}
+			else
+			{
+				break;
+			}
+
+			switchEditViewTo(iView);
+			BufferID bufid = _pDocTab->getBufferByIndex(_pDocTab->getCurrentTabIndex());
+			if (bufid != BUFFER_INVALID)
+				activateBuffer(bufid, iView);
+
+			break;
+		}
+
+		case NM_CLICK :
+		{
+			assert(_statusBar);
+			assert(_mainDocTab);
+			assert(_subDocTab);
+			if (notification->nmhdr.hwndFrom == _statusBar->getHSelf())
+			{
+				LPNMMOUSE lpnm = (LPNMMOUSE)notification;
+				if (lpnm->dwItemSpec == DWORD(STATUSBAR_TYPING_MODE))
+				{
+					bool isOverTypeMode = (_pEditView->execute(SCI_GETOVERTYPE) != 0);
+					_pEditView->execute(SCI_SETOVERTYPE, !isOverTypeMode);
+					_statusBar->setText((_pEditView->execute(SCI_GETOVERTYPE))?TEXT("OVR"):TEXT("INS"), STATUSBAR_TYPING_MODE);
+				}
+			}
+			else if (notification->nmhdr.hwndFrom == _mainDocTab->getHSelf())
+			{
+				switchEditViewTo(MAIN_VIEW);
+			}
+			else if (notification->nmhdr.hwndFrom == _subDocTab->getHSelf())
+			{
+				switchEditViewTo(SUB_VIEW);
+			}
+
+			break;
+		}
+
+		case NM_DBLCLK :
+		{
+			assert(_goToLineDlg);
+			assert(_statusBar);
+			if (notification->nmhdr.hwndFrom == _statusBar->getHSelf())
+			{
+				LPNMMOUSE lpnm = (LPNMMOUSE)notification;
+				if (lpnm->dwItemSpec == DWORD(STATUSBAR_CUR_POS))
+				{
+					bool isFirstTime = !_goToLineDlg->isCreated();
+					_goToLineDlg->doDialog(_isRTL);
+					if (isFirstTime)
+						changeDlgLang(_goToLineDlg->getHSelf(), "GoToLine");
+				}
+			}
+			break;
+		}
+
+		case NM_RCLICK :
+		{
+			assert(_mainDocTab);
+			assert(_subDocTab);
+			if (notification->nmhdr.hwndFrom == _mainDocTab->getHSelf())
+			{
+				switchEditViewTo(MAIN_VIEW);
+			}
+			else if (notification->nmhdr.hwndFrom == _subDocTab->getHSelf())
+			{
+				switchEditViewTo(SUB_VIEW);
+			}
+			else // From tool bar or Status Bar
+				return TRUE;
+				//break;
+
+			POINT p;
+			::GetCursorPos(&p);
+
+			if (!_tabPopupMenu)
+			{
+				_tabPopupMenu = new ContextMenu();
+			}
+
+			if (!_tabPopupMenu->isCreated())
+			{
+				std::vector<MenuItemUnit> itemUnitArray;
+				itemUnitArray.push_back(MenuItemUnit(IDM_FILE_CLOSE, TEXT("Close")));
+				itemUnitArray.push_back(MenuItemUnit(IDM_FILE_CLOSEALL_BUT_CURRENT, TEXT("Close All but This")));
+				itemUnitArray.push_back(MenuItemUnit(IDM_FILE_SAVE, TEXT("Save")));
+				itemUnitArray.push_back(MenuItemUnit(IDM_FILE_SAVEAS, TEXT("Save As...")));
+				itemUnitArray.push_back(MenuItemUnit(IDM_FILE_RENAME, TEXT("Rename")));
+				itemUnitArray.push_back(MenuItemUnit(IDM_FILE_DELETE, TEXT("Delete")));
+				itemUnitArray.push_back(MenuItemUnit(IDM_FILE_PRINT, TEXT("Print")));
+				itemUnitArray.push_back(MenuItemUnit(0, NULL));
+				itemUnitArray.push_back(MenuItemUnit(IDM_EDIT_SETREADONLY, TEXT("Read-Only")));
+				itemUnitArray.push_back(MenuItemUnit(IDM_EDIT_CLEARREADONLY, TEXT("Clear Read-Only Flag")));
+				itemUnitArray.push_back(MenuItemUnit(0, NULL));
+				itemUnitArray.push_back(MenuItemUnit(IDM_EDIT_FULLPATHTOCLIP,	TEXT("Full File Path to Clipboard")));
+				itemUnitArray.push_back(MenuItemUnit(IDM_EDIT_FILENAMETOCLIP,   TEXT("Filename to Clipboard")));
+				itemUnitArray.push_back(MenuItemUnit(IDM_EDIT_CURRENTDIRTOCLIP, TEXT("Current Dir. Path to Clipboard")));
+				itemUnitArray.push_back(MenuItemUnit(0, NULL));
+				itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_GOTO_ANOTHER_VIEW, TEXT("Move to Other View")));
+				itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_CLONE_TO_ANOTHER_VIEW, TEXT("Clone to Other View")));
+				itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_GOTO_NEW_INSTANCE, TEXT("Move to New Instance")));
+				itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_LOAD_IN_NEW_INSTANCE, TEXT("Open in New Instance")));
+
+				_tabPopupMenu->create(_hSelf, itemUnitArray);
+				changeLangTabContextMenu();
+			}
+
+			bool isEnable = ((::GetMenuState(_mainMenuHandle, IDM_FILE_SAVE, MF_BYCOMMAND)&MF_DISABLED) == 0);
+			_tabPopupMenu->enableItem(IDM_FILE_SAVE, isEnable);
+
+			Buffer * buf = _pEditView->getCurrentBuffer();
+			bool isUserReadOnly = buf->getUserReadOnly();
+			_tabPopupMenu->checkItem(IDM_EDIT_SETREADONLY, isUserReadOnly);
+
+			bool isSysReadOnly = buf->getFileReadOnly();
+			_tabPopupMenu->enableItem(IDM_EDIT_SETREADONLY, !isSysReadOnly);
+			_tabPopupMenu->enableItem(IDM_EDIT_CLEARREADONLY, isSysReadOnly);
+
+			bool isFileExisting = PathFileExists(buf->getFullPathName()) != FALSE;
+			_tabPopupMenu->enableItem(IDM_FILE_DELETE, isFileExisting);
+			_tabPopupMenu->enableItem(IDM_FILE_RENAME, isFileExisting);
+
+			bool isDirty = buf->isDirty();
+			bool isUntitled = buf->isUntitled();
+			_tabPopupMenu->enableItem(IDM_VIEW_GOTO_NEW_INSTANCE, !(isDirty||isUntitled));
+			_tabPopupMenu->enableItem(IDM_VIEW_LOAD_IN_NEW_INSTANCE, !(isDirty||isUntitled));
+
+			_tabPopupMenu->display(p);
+			return TRUE;
+		}
+
+
+		case SCN_MARGINCLICK:
+		{
+			if (notification->nmhdr.hwndFrom == _mainEditView->getHSelf())
+				switchEditViewTo(MAIN_VIEW);
+
+			else if (notification->nmhdr.hwndFrom == _subEditView->getHSelf())
+				switchEditViewTo(SUB_VIEW);
+
+			if (notification->margin == ScintillaEditView::_SC_MARGE_FOLDER)
+			{
+				_pEditView->marginClick(notification->position, notification->modifiers);
+			}
+			else if ((notification->margin == ScintillaEditView::_SC_MARGE_SYBOLE) && !notification->modifiers)
+			{
+
+				int lineClick = int(_pEditView->execute(SCI_LINEFROMPOSITION, notification->position));
+				if (!_pEditView->markerMarginClick(lineClick))
+					bookmarkToggle(lineClick);
+
+			}
+			break;
+		}
+
+		case SCN_CHARADDED:
+		{
+			assert(_autoCompleteMain);
+			assert(_autoCompleteSub);
+			charAdded(static_cast<TCHAR>(notification->ch));
+
+			AutoCompletion * autoC = isFromPrimary?_autoCompleteMain:_autoCompleteSub;
+
+			autoC->update(notification->ch);
+			break;
+		}
+
+		case SCN_DOUBLECLICK :
+		{
+			if (_isHotspotDblClicked)
+			{
+				int pos = notifyView->execute(SCI_GETCURRENTPOS);
+				notifyView->execute(SCI_SETCURRENTPOS, pos);
+				notifyView->execute(SCI_SETANCHOR, pos);
+				_isHotspotDblClicked = false;
+			}
+		}
 		break;
+
+		case SCN_UPDATEUI:
+		{
+			assert(_autoCompleteMain);
+			assert(_autoCompleteSub);
+			NppParameters *nppParam = NppParameters::getInstance();
+
+			// if it's searching/replacing, then do nothing
+			if (nppParam->_isFindReplacing)
+				break;
+
+			if (notification->nmhdr.hwndFrom != _pEditView->getHSelf())
+				break;
+
+			braceMatch();
+
+			const NppGUI & nppGui = nppParam->getNppGUI();
+
+			if (nppGui._enableTagsMatchHilite)
+			{
+				XmlMatchedTagsHighlighter xmlTagMatchHiliter(_pEditView);
+				xmlTagMatchHiliter.tagMatch(nppGui._enableTagAttrsHilite);
+			}
+
+			if (nppGui._enableSmartHilite && _smartHighlighter)
+				_smartHighlighter->highlightView(notifyView);
+
+			updateStatusBar();
+			AutoCompletion * autoC = isFromPrimary?_autoCompleteMain:_autoCompleteSub;
+			autoC->update(0);
+			break;
+		}
+
+		case SCN_SCROLLED:
+		{
+			const NppGUI & nppGUI = (NppParameters::getInstance())->getNppGUI();
+			if (nppGUI._enableSmartHilite && _smartHighlighter)
+				_smartHighlighter->highlightView(notifyView);
+			break;
+		}
+
+		case TTN_GETDISPINFO:
+		{
+			assert(_rebarTop);
+			assert(_mainDocTab);
+			assert(_subDocTab);
+
+			try {
+				// JOCE: Not necessarily incorrect, but to be reviewed nonetheless.
+				LPTOOLTIPTEXT lpttt;
+
+				lpttt = (LPTOOLTIPTEXT)notification;
+				lpttt->hinst = NULL;
+
+				POINT p;
+				::GetCursorPos(&p);
+				::ScreenToClient(_hSelf, &p);
+				HWND hWin = ::RealChildWindowFromPoint(_hSelf, p);
+				const int tipMaxLen = 1024;
+				static TCHAR docTip[tipMaxLen];
+				docTip[0] = '\0';
+
+				generic_string tipTmp(TEXT(""));
+				int id = int(lpttt->hdr.idFrom);
+
+				if (hWin == _rebarTop->getHSelf())
+				{
+					getNameStrFromCmd(id, tipTmp);
+					if (tipTmp.length() >= 80)
+						return FALSE;
+
+					lstrcpy(lpttt->szText, tipTmp.c_str());
+					return TRUE;
+				}
+				else if (hWin == _mainDocTab->getHSelf())
+				{
+					BufferID idd = _mainDocTab->getBufferByIndex(id);
+					Buffer * buf = MainFileManager->getBufferByID(idd);
+					tipTmp = buf->getFullPathName();
+
+					if (tipTmp.length() >= tipMaxLen)
+						return FALSE;
+					lstrcpy(docTip, tipTmp.c_str());
+					lpttt->lpszText = docTip;
+					return TRUE;
+				}
+				else if (hWin == _subDocTab->getHSelf())
+				{
+					BufferID idd = _subDocTab->getBufferByIndex(id);
+					Buffer * buf = MainFileManager->getBufferByID(idd);
+					tipTmp = buf->getFullPathName();
+
+					if (tipTmp.length() >= tipMaxLen)
+						return FALSE;
+					lstrcpy(docTip, tipTmp.c_str());
+					lpttt->lpszText = docTip;
+					return TRUE;
+				}
+				else
+				{
+					return FALSE;
+				}
+			}
+			catch (...) {
+				printStr(TEXT("ToolTip crash is catched!"));
+			}
+		}
+		break;
+
+		case SCN_ZOOM:
+			break;
+
+		case SCN_MACRORECORD:
+			_macro.push_back(recordedMacroStep(notification->message, notification->wParam, notification->lParam));
+			break;
+
+		case SCN_PAINTED:
+		{
+			notifyView->updateLineNumberWidth();
+			if (_syncInfo.doSync())
+				doSynScorll(HWND(notification->nmhdr.hwndFrom));
+
+			NppParameters *nppParam = NppParameters::getInstance();
+
+			// if it's searching/replacing, then do nothing
+			if (/*_linkTriggered &&*/ !nppParam->_isFindReplacing)
+			{
+				int urlAction = (NppParameters::getInstance())->getNppGUI()._styleURL;
+				if ((urlAction == 1) || (urlAction == 2))
+					addHotSpot(_isDocModifing);
+				_linkTriggered = false;
+				_isDocModifing = false;
+			}
+			break;
+		}
+
+		case SCN_HOTSPOTDOUBLECLICK :
+		{
+			notifyView->execute(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-+.:?&@=/%#");
+
+			int pos = notifyView->execute(SCI_GETCURRENTPOS);
+			int startPos = static_cast<int>(notifyView->execute(SCI_WORDSTARTPOSITION, pos, false));
+			int endPos = static_cast<int>(notifyView->execute(SCI_WORDENDPOSITION, pos, false));
+
+			notifyView->execute(SCI_SETTARGETSTART, startPos);
+			notifyView->execute(SCI_SETTARGETEND, endPos);
+
+			int posFound = notifyView->execute(SCI_SEARCHINTARGET, strlen(urlHttpRegExpr), (LPARAM)urlHttpRegExpr);
+			if (posFound != -1)
+			{
+				startPos = int(notifyView->execute(SCI_GETTARGETSTART));
+				endPos = int(notifyView->execute(SCI_GETTARGETEND));
+			}
+
+			TCHAR currentWord[MAX_PATH*2];
+			notifyView->getGenericText(currentWord, startPos, endPos);
+
+			::ShellExecute(_hSelf, TEXT("open"), currentWord, NULL, NULL, SW_SHOW);
+			_isHotspotDblClicked = true;
+			notifyView->execute(SCI_SETCHARSDEFAULT);
+			break;
+		}
+
+		case SCN_NEEDSHOWN :
+		{
+			int begin = notifyView->execute(SCI_LINEFROMPOSITION, notification->position);
+			int end = notifyView->execute(SCI_LINEFROMPOSITION, notification->position + notification->length);
+			int firstLine = begin < end ? begin : end;
+			int lastLine = begin > end ? begin : end;
+			for (int line = firstLine; line <= lastLine; line++) {
+				notifyView->execute(SCI_ENSUREVISIBLE, line, 0);
+			}
+			break;
+		}
+
+		case SCN_CALLTIPCLICK:
+		{
+			assert(_autoCompleteMain);
+			assert(_autoCompleteSub);
+			AutoCompletion * autoC = isFromPrimary?_autoCompleteMain:_autoCompleteSub;
+			autoC->callTipClick(notification->position);
+			break;
+		}
+
+		case RBN_HEIGHTCHANGE:
+		{
+			SendMessage(_hSelf, WM_SIZE, 0, 0);
+			break;
+		}
+		case RBN_CHEVRONPUSHED:
+		{
+			assert(_rebarTop);
+			assert(_rebarBottom);
+			NMREBARCHEVRON * lpnm = (NMREBARCHEVRON*) notification;
+			ReBar * notifRebar = _rebarTop;
+			if (_rebarBottom->getHSelf() == lpnm->hdr.hwndFrom)
+				notifRebar = _rebarBottom;
+			//If N++ ID, use proper object
+			switch(lpnm->wID) {
+				case REBAR_BAR_TOOLBAR: {
+					assert(_toolBar);
+					POINT pt;
+					pt.x = lpnm->rc.left;
+					pt.y = lpnm->rc.bottom;
+					ClientToScreen(notifRebar->getHSelf(), &pt);
+					_toolBar->doPopop(pt);
+					return TRUE;
+				}
+				NO_DEFAULT_CASE;
+			}
+			//Else forward notification to window of rebarband
+			REBARBANDINFO rbBand;
+			ZeroMemory(&rbBand, REBARBAND_SIZE);
+			rbBand.cbSize  = REBARBAND_SIZE;
+			rbBand.fMask = RBBIM_CHILD;
+			::SendMessage(notifRebar->getHSelf(), RB_GETBANDINFO, lpnm->uBand, (LPARAM)&rbBand);
+			::SendMessage(rbBand.hwndChild, WM_NOTIFY, 0, (LPARAM)lpnm);
+			break;
+		}
+
+		default :
+			break;
 	}
+	return FALSE;
+}
 
-	default :
-		break;
+void Notepad_plus::copyMarkedLines()
+{
+	int lastLine = _pEditView->lastZeroBasedLineNumber();
+	generic_string globalStr = TEXT("");
+	for (int i = lastLine ; i >= 0 ; i--)
+	{
+		if (bookmarkPresent(i))
+		{
+			generic_string currentStr = getMarkedLine(i) + globalStr;
+			globalStr = currentStr;
+		}
+	}
+	str2Cliboard(globalStr.c_str());
+}
 
-  }
-  return FALSE;
+void Notepad_plus::cutMarkedLines()
+{
+	int lastLine = _pEditView->lastZeroBasedLineNumber();
+	generic_string globalStr = TEXT("");
+
+	_pEditView->execute(SCI_BEGINUNDOACTION);
+	for (int i = lastLine ; i >= 0 ; i--)
+	{
+		if (bookmarkPresent(i))
+		{
+			generic_string currentStr = getMarkedLine(i) + globalStr;
+			globalStr = currentStr;
+
+			deleteMarkedline(i);
+		}
+	}
+	_pEditView->execute(SCI_ENDUNDOACTION);
+	str2Cliboard(globalStr.c_str());
+}
+
+void Notepad_plus::deleteMarkedLines()
+{
+	int lastLine = _pEditView->lastZeroBasedLineNumber();
+
+	_pEditView->execute(SCI_BEGINUNDOACTION);
+	for (int i = lastLine ; i >= 0 ; i--)
+	{
+		if (bookmarkPresent(i))
+			deleteMarkedline(i);
+	}
+	_pEditView->execute(SCI_ENDUNDOACTION);
+}
+
+void Notepad_plus::pasteToMarkedLines()
+{
+	int clipFormat;
+#ifdef UNICODE
+	clipFormat = CF_UNICODETEXT;
+#else
+	clipFormat = CF_TEXT;
+#endif
+	BOOL canPaste = ::IsClipboardFormatAvailable(clipFormat);
+	if (!canPaste)
+		return;
+	int lastLine = _pEditView->lastZeroBasedLineNumber();
+
+	::OpenClipboard(_hSelf);
+	HANDLE clipboardData = ::GetClipboardData(clipFormat);
+	::GlobalSize(clipboardData);
+	LPVOID clipboardDataPtr = ::GlobalLock(clipboardData);
+
+	generic_string clipboardStr = (const TCHAR *)clipboardDataPtr;
+
+	::GlobalUnlock(clipboardData);
+	::CloseClipboard();
+
+	_pEditView->execute(SCI_BEGINUNDOACTION);
+	for (int i = lastLine ; i >= 0 ; i--)
+	{
+		if (bookmarkPresent(i))
+		{
+			replaceMarkedline(i, clipboardStr.c_str());
+		}
+	}
+	_pEditView->execute(SCI_ENDUNDOACTION);
+}
+
+void Notepad_plus::deleteMarkedline(int ln)
+{
+	int lineLen = _pEditView->execute(SCI_LINELENGTH, ln);
+	int lineBegin = _pEditView->execute(SCI_POSITIONFROMLINE, ln);
+
+	bookmarkDelete(ln);
+	TCHAR emptyString[2] = TEXT("");
+	_pEditView->replaceTarget(emptyString, lineBegin, lineBegin + lineLen);
+}
+
+void Notepad_plus::replaceMarkedline(int ln, const TCHAR *str)
+{
+	int lineBegin = _pEditView->execute(SCI_POSITIONFROMLINE, ln);
+	int lineEnd = _pEditView->execute(SCI_GETLINEENDPOSITION, ln);
+
+	_pEditView->replaceTarget(str, lineBegin, lineEnd);
+}
+
+generic_string Notepad_plus::getMarkedLine(int ln)
+{
+	int lineLen = _pEditView->execute(SCI_LINELENGTH, ln);
+	int lineBegin = _pEditView->execute(SCI_POSITIONFROMLINE, ln);
+
+	TCHAR * buf = new TCHAR[lineLen+1];
+	_pEditView->getGenericText(buf, lineBegin, lineBegin + lineLen);
+	generic_string line = buf;
+	delete [] buf;
+
+	return line;
 }
 
 void Notepad_plus::findMatchingBracePos(int & braceAtCaret, int & braceOpposite)
@@ -3076,6 +3257,78 @@ void Notepad_plus::braceMatch()
 
     enableCommand(IDM_SEARCH_GOTOMATCHINGBRACE, (braceAtCaret != -1) && (braceOpposite != -1), MENU | TOOLBAR);
 }
+
+
+void Notepad_plus::setDisplayFormat(formatType f)
+{
+	generic_string str;
+	switch (f)
+	{
+		case MAC_FORMAT :
+			str = TEXT("MAC");
+			break;
+		case UNIX_FORMAT :
+			str = TEXT("UNIX");
+			break;
+		default :
+			str = TEXT("Dos\\Windows");
+	}
+	_statusBar->setText(str.c_str(), STATUSBAR_EOF_FORMAT);
+}
+
+void Notepad_plus::setUniModeText(UniMode um)
+{
+	assert(_statusBar);
+	const TCHAR *uniModeText;
+	switch (um)
+	{
+		case uniUTF8:
+			uniModeText = TEXT("UTF-8"); break;
+		case uni16BE:
+			uniModeText = TEXT("UCS-2 Big Endian"); break;
+		case uni16LE:
+			uniModeText = TEXT("UCS-2 Little Endian"); break;
+		case uni16BE_NoBOM:
+			uniModeText = TEXT("UCS-2 BE w/o BOM"); break;
+		case uni16LE_NoBOM:
+			uniModeText = TEXT("UCS-2 LE w/o BOM"); break;
+		case uniCookie:
+			uniModeText = TEXT("ANSI as UTF-8"); break;
+		default :
+			uniModeText = TEXT("ANSI");
+	}
+	_statusBar->setText(uniModeText, STATUSBAR_UNICODE_TYPE);
+}
+
+int Notepad_plus::getFolderMarginStyle() const
+{
+    if (::GetMenuState(_mainMenuHandle, IDM_VIEW_FOLDERMAGIN_SIMPLE, MF_BYCOMMAND) == MF_CHECKED)
+        return IDM_VIEW_FOLDERMAGIN_SIMPLE;
+
+    if (::GetMenuState(_mainMenuHandle, IDM_VIEW_FOLDERMAGIN_ARROW, MF_BYCOMMAND) == MF_CHECKED)
+        return IDM_VIEW_FOLDERMAGIN_ARROW;
+
+    if (::GetMenuState(_mainMenuHandle, IDM_VIEW_FOLDERMAGIN_CIRCLE, MF_BYCOMMAND) == MF_CHECKED)
+        return IDM_VIEW_FOLDERMAGIN_CIRCLE;
+
+    if (::GetMenuState(_mainMenuHandle, IDM_VIEW_FOLDERMAGIN_BOX, MF_BYCOMMAND) == MF_CHECKED)
+        return IDM_VIEW_FOLDERMAGIN_BOX;
+
+	return 0;
+}
+
+int Notepad_plus::getFolderMaginStyleIDFrom(folderStyle fStyle) const
+{
+    switch (fStyle)
+    {
+        case FOLDER_STYLE_SIMPLE : return IDM_VIEW_FOLDERMAGIN_SIMPLE;
+        case FOLDER_STYLE_ARROW : return IDM_VIEW_FOLDERMAGIN_ARROW;
+        case FOLDER_STYLE_CIRCLE : return IDM_VIEW_FOLDERMAGIN_CIRCLE;
+        case FOLDER_STYLE_BOX : return IDM_VIEW_FOLDERMAGIN_BOX;
+		default : return FOLDER_TYPE;
+    }
+}
+
 
 void Notepad_plus::charAdded(TCHAR chAdded)
 {
@@ -3656,8 +3909,11 @@ void Notepad_plus::command(int id)
 
 			const int strSize = FINDREPLACE_MAXLENGTH;
 			TCHAR text2Find[strSize];
-			_pEditView->getGenericSelectedText(text2Find, strSize);
-
+			_pEditView->getGenericSelectedText(text2Find, strSize, false);
+            if (text2Find[0] == '\0')
+            {
+                _pEditView->getGenericWordOnCaretPos(text2Find, strSize);
+            }
 			_findReplaceDlg->markAll(text2Find, styleID);
 
 			break;
@@ -3847,11 +4103,11 @@ void Notepad_plus::command(int id)
 			break;
 
 		case IDM_EDIT_LINE_UP:
-			_pEditView->currentLineUp();
+			_pEditView->currentLinesUp();
 			break;
 
 		case IDM_EDIT_LINE_DOWN:
-			_pEditView->currentLineDown();
+			_pEditView->currentLinesDown();
 			break;
 
 		case IDM_EDIT_UPPERCASE:
@@ -5889,6 +6145,13 @@ void Notepad_plus::dynamicCheckMenuAndTB() const
 	//Syncronized scrolling
 }
 
+void Notepad_plus::enableConvertMenuItems(formatType f) const
+{
+	enableCommand(IDM_FORMAT_TODOS, (f != WIN_FORMAT), MENU);
+	enableCommand(IDM_FORMAT_TOUNIX, (f != UNIX_FORMAT), MENU);
+	enableCommand(IDM_FORMAT_TOMAC, (f != MAC_FORMAT), MENU);
+}
+
 void Notepad_plus::checkUnicodeMenuItems(UniMode um) const
 {
 	int id = -1;
@@ -7395,6 +7658,16 @@ void Notepad_plus::getTaskListInfo(TaskListInfo *tli)
 	}
 }
 
+bool Notepad_plus::isDlgsMsg(MSG *msg, bool unicodeSupported) const
+{
+	for (size_t i = 0; i < _hModelessDlgs.size(); i++)
+	{
+		if (unicodeSupported?(::IsDialogMessageW(_hModelessDlgs[i], msg)):(::IsDialogMessageA(_hModelessDlgs[i], msg)))
+			return true;
+	}
+	return false;
+}
+
 LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	LRESULT result = FALSE;
@@ -7609,8 +7882,8 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 			EnableMouseWheelZoom(nppGUI._enableMouseWheelZoom);
 
-			_mainEditView->execute(SCI_SETMULTIPLESELECTION, true);
-			_subEditView->execute(SCI_SETMULTIPLESELECTION, true);
+            ::SendMessage(hwnd, NPPM_INTERNAL_SETMULTISELCTION, 0, 0);
+
 			_mainEditView->execute(SCI_SETADDITIONALSELECTIONTYPING, true);
 			_subEditView->execute(SCI_SETADDITIONALSELECTIONTYPING, true);
 
@@ -8277,7 +8550,9 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			{
 				case COPYDATA_PARAMS :
 				{
-					pNppParam->setCmdlineParam(*((CmdLineParams *)pCopyData->lpData));
+                    CmdLineParams *cmdLineParam = (CmdLineParams *)pCopyData->lpData;
+					pNppParam->setCmdlineParam(*cmdLineParam);
+                    _rememberThisSession = !cmdLineParam->_isNoSession;
 					break;
 				}
 
@@ -8997,6 +9272,14 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			return TRUE;
 		}
 
+        case NPPM_INTERNAL_SETMULTISELCTION :
+        {
+            NppGUI & nppGUI = (NppGUI &)pNppParam->getNppGUI();
+            _mainEditView->execute(SCI_SETMULTIPLESELECTION, nppGUI._enableMultiSelection);
+			_subEditView->execute(SCI_SETMULTIPLESELECTION, nppGUI._enableMultiSelection);
+            return TRUE;
+        }
+
 		case NPPM_INTERNAL_SETCARETBLINKRATE :
 		{
 			NppGUI & nppGUI = (NppGUI &)pNppParam->getNppGUI();
@@ -9233,7 +9516,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			saveGUIParams();
 			saveUserDefineLangs();
 			saveShortcuts();
-			if (nppgui._rememberLastSession)
+			if (nppgui._rememberLastSession && _rememberThisSession)
 				saveSession(currentSession);
 
 			//Sends WM_DESTROY, Notepad++ will end
@@ -10062,13 +10345,6 @@ void Notepad_plus::getCurrentOpenedFiles(Session & session)
 		}
 	}
 
-	//_mainEditView->activateBuffer(mainBuf->getID());	//restore buffer
-	//_subEditView->activateBuffer(subBuf->getID());	//restore buffer
-	//_mainEditView->execute(SCI_SETDOCPOINTER, 0, mainBuf->getDocument());
-	//_mainEditView->restoreCurrentPos();
-	//_subEditView->execute(SCI_SETDOCPOINTER, 0, subBuf->getDocument());
-	//_subEditView->restoreCurrentPos();
-
 	_invisibleEditView->execute(SCI_SETDOCPOINTER, 0, oldDoc);
 }
 
@@ -10112,7 +10388,6 @@ bool Notepad_plus::fileLoadSession(const TCHAR *fn)
 	}
 	return result;
 }
-
 
 const TCHAR * Notepad_plus::fileSaveSession(size_t nbFile, TCHAR ** fileNames, const TCHAR *sessionFile2save)
 {
@@ -10163,11 +10438,7 @@ bool Notepad_plus::str2Cliboard(const TCHAR *str2cpy)
 
 	int len2Allocate = lstrlen(str2cpy) + 1;
 	len2Allocate *= sizeof(TCHAR);
-	unsigned int cilpboardFormat = CF_TEXT;
-
-#ifdef UNICODE
-	cilpboardFormat = CF_UNICODETEXT;
-#endif
+	unsigned int cilpboardFormat = CF_UNICODETEXT;
 
 	HGLOBAL hglbCopy = ::GlobalAlloc(GMEM_MOVEABLE, len2Allocate);
 	if (hglbCopy == NULL)
@@ -10483,16 +10754,6 @@ void Notepad_plus::loadCommandlineParams(const TCHAR * commandLine, CmdLineParam
 	}
 }
 
-bool Notepad_plus::isDlgsMsg(MSG *msg, bool unicodeSupported) const
-{
-	for (size_t i = 0; i < _hModelessDlgs.size(); i++)
-	{
-		if (unicodeSupported?(::IsDialogMessageW(_hModelessDlgs[i], msg)):(::IsDialogMessageA(_hModelessDlgs[i], msg)))
-			return true;
-	}
-	return false;
-}
-
 void Notepad_plus::setFindReplaceFolderFilter(const TCHAR *dir, const TCHAR *filter)
 {
 	assert(_findReplaceDlg);
@@ -10546,130 +10807,6 @@ void Notepad_plus::setFindReplaceFolderFilter(const TCHAR *dir, const TCHAR *fil
 	_findReplaceDlg->setFindInFilesDirFilter(dir, filter);
 }
 
-int Notepad_plus::doSaveOrNot(const TCHAR *fn)
-{
-	const TCHAR* pattern = TEXT("Save file \"%s\" ?");
-	TCHAR phrase[512];
-	wsprintf(phrase, pattern, fn);
-	return doActionOrNot(TEXT("Save"), phrase, MB_YESNOCANCEL | MB_ICONQUESTION | MB_APPLMODAL);
-}
-
-int Notepad_plus::doReloadOrNot(const TCHAR *fn, bool dirty)
-{
-	const TCHAR* pattern = TEXT("%s\r\rThis file has been modified by another program.\rDo you want to reload it%s?");
-	const TCHAR* lose_info_str = dirty ? TEXT(" and lose the changes made in Notepad++") : TEXT("");
-	TCHAR phrase[512];
-	wsprintf(phrase, pattern, fn, lose_info_str);
-	int icon = dirty ? MB_ICONEXCLAMATION : MB_ICONQUESTION;
-	return doActionOrNot(TEXT("Reload"), phrase, MB_YESNO | MB_APPLMODAL | icon);
-}
-
-int Notepad_plus::doCloseOrNot(const TCHAR *fn)
-{
-	const TCHAR* pattern = TEXT("The file \"%s\" doesn't exist anymore.\rKeep this file in editor?");
-	TCHAR phrase[512];
-	wsprintf(phrase, pattern, fn);
-	return doActionOrNot(TEXT("Keep non existing file"), phrase, MB_YESNO | MB_ICONQUESTION | MB_APPLMODAL);
-}
-
-int Notepad_plus::doDeleteOrNot(const TCHAR *fn)
-{
-	const TCHAR* pattern = TEXT("The file \"%s\"\rwill be deleted from your disk and this document will be closed.\rContinue?");
-	TCHAR phrase[512];
-	wsprintf(phrase, pattern, fn);
-	return doActionOrNot(TEXT("Delete file"), phrase, MB_YESNO | MB_ICONQUESTION | MB_APPLMODAL);
-}
-
-int Notepad_plus::doActionOrNot(const TCHAR *title, const TCHAR *displayText, int type)
-{
-	return ::MessageBox(_hSelf, displayText, title, type);
-}
-
-void Notepad_plus::enableMenu(int cmdID, bool doEnable) const
-{
-	int flag = doEnable?MF_ENABLED | MF_BYCOMMAND:MF_DISABLED | MF_GRAYED | MF_BYCOMMAND;
-	::EnableMenuItem(_mainMenuHandle, cmdID, flag);
-}
-
-void Notepad_plus::enableConvertMenuItems(formatType f) const
-{
-	enableCommand(IDM_FORMAT_TODOS, (f != WIN_FORMAT), MENU);
-	enableCommand(IDM_FORMAT_TOUNIX, (f != UNIX_FORMAT), MENU);
-	enableCommand(IDM_FORMAT_TOMAC, (f != MAC_FORMAT), MENU);
-}
-
-void Notepad_plus::setDisplayFormat(formatType f)
-{
-	assert(_statusBar);
-	const TCHAR * str;
-	switch (f)
-	{
-		case MAC_FORMAT :
-			str = TEXT("MAC");
-			break;
-		case UNIX_FORMAT :
-			str = TEXT("UNIX");
-			break;
-		default :
-			str = TEXT("Dos\\Windows");
-	}
-	_statusBar->setText(str, STATUSBAR_EOF_FORMAT);
-};
-
-void Notepad_plus::setUniModeText(UniMode um)
-{
-	assert(_statusBar);
-	const TCHAR *uniModeText;
-	switch (um)
-	{
-		case uniUTF8:
-			uniModeText = TEXT("UTF-8"); break;
-		case uni16BE:
-			uniModeText = TEXT("UCS-2 Big Endian"); break;
-		case uni16LE:
-			uniModeText = TEXT("UCS-2 Little Endian"); break;
-		case uni16BE_NoBOM:
-			uniModeText = TEXT("UCS-2 BE w/o BOM"); break;
-		case uni16LE_NoBOM:
-			uniModeText = TEXT("UCS-2 LE w/o BOM"); break;
-		case uniCookie:
-			uniModeText = TEXT("ANSI as UTF-8"); break;
-		default :
-			uniModeText = TEXT("ANSI");
-	}
-	_statusBar->setText(uniModeText, STATUSBAR_UNICODE_TYPE);
-}
-
-int Notepad_plus::getFolderMarginStyle() const
-{
-	if (::GetMenuState(_mainMenuHandle, IDM_VIEW_FOLDERMAGIN_SIMPLE, MF_BYCOMMAND) == MF_CHECKED)
-		return IDM_VIEW_FOLDERMAGIN_SIMPLE;
-
-	if (::GetMenuState(_mainMenuHandle, IDM_VIEW_FOLDERMAGIN_ARROW, MF_BYCOMMAND) == MF_CHECKED)
-		return IDM_VIEW_FOLDERMAGIN_ARROW;
-
-	if (::GetMenuState(_mainMenuHandle, IDM_VIEW_FOLDERMAGIN_CIRCLE, MF_BYCOMMAND) == MF_CHECKED)
-		return IDM_VIEW_FOLDERMAGIN_CIRCLE;
-
-	if (::GetMenuState(_mainMenuHandle, IDM_VIEW_FOLDERMAGIN_BOX, MF_BYCOMMAND) == MF_CHECKED)
-		return IDM_VIEW_FOLDERMAGIN_BOX;
-
-	return 0;
-}
-
-int Notepad_plus::getFolderMaginStyleIDFrom(folderStyle fStyle) const
-{
-	switch (fStyle)
-	{
-		case FOLDER_STYLE_SIMPLE : return IDM_VIEW_FOLDERMAGIN_SIMPLE;
-		case FOLDER_STYLE_ARROW : return IDM_VIEW_FOLDERMAGIN_ARROW;
-		case FOLDER_STYLE_CIRCLE : return IDM_VIEW_FOLDERMAGIN_CIRCLE;
-		case FOLDER_STYLE_BOX : return IDM_VIEW_FOLDERMAGIN_BOX;
-		default : return FOLDER_TYPE;
-	}
-	//return
-}
-
 void Notepad_plus::bookmarkAdd(int lineno) const
 {
 	if (lineno == -1)
@@ -10703,133 +10840,6 @@ void Notepad_plus::bookmarkToggle(int lineno) const
 		bookmarkDelete(lineno);
 	else
 		bookmarkAdd(lineno);
-}
-
-void Notepad_plus::copyMarkedLines()
-{
-	int lastLine = _pEditView->lastZeroBasedLineNumber();
-	generic_string globalStr = TEXT("");
-	for (int i = lastLine ; i >= 0 ; i--)
-	{
-		if (bookmarkPresent(i))
-		{
-			generic_string currentStr = getMarkedLine(i) + globalStr;
-			globalStr = currentStr;
-		}
-	}
-	str2Cliboard(globalStr.c_str());
-}
-
-void Notepad_plus::cutMarkedLines()
-{
-	int lastLine = _pEditView->lastZeroBasedLineNumber();
-	generic_string globalStr = TEXT("");
-
-	_pEditView->execute(SCI_BEGINUNDOACTION);
-	for (int i = lastLine ; i >= 0 ; i--)
-	{
-		if (bookmarkPresent(i))
-		{
-			generic_string currentStr = getMarkedLine(i) + globalStr;
-			globalStr = currentStr;
-
-			deleteMarkedline(i);
-		}
-	}
-	_pEditView->execute(SCI_ENDUNDOACTION);
-	str2Cliboard(globalStr.c_str());
-}
-
-void Notepad_plus::deleteMarkedLines()
-{
-	int lastLine = _pEditView->lastZeroBasedLineNumber();
-
-	_pEditView->execute(SCI_BEGINUNDOACTION);
-	for (int i = lastLine ; i >= 0 ; i--)
-	{
-		if (bookmarkPresent(i))
-			deleteMarkedline(i);
-	}
-	_pEditView->execute(SCI_ENDUNDOACTION);
-}
-
-void Notepad_plus::pasteToMarkedLines()
-{
-	int clipFormat;
-#ifdef UNICODE
-	clipFormat = CF_UNICODETEXT;
-#else
-	clipFormat = CF_TEXT;
-#endif
-	BOOL canPaste = ::IsClipboardFormatAvailable(clipFormat);
-	if (!canPaste)
-		return;
-	int lastLine = _pEditView->lastZeroBasedLineNumber();
-
-	::OpenClipboard(_hSelf);
-	HANDLE clipboardData = ::GetClipboardData(clipFormat);
-	LPVOID clipboardDataPtr = ::GlobalLock(clipboardData);
-
-	generic_string clipboardStr = (const TCHAR *)clipboardDataPtr;
-
-	::GlobalUnlock(clipboardData);
-	::CloseClipboard();
-
-	_pEditView->execute(SCI_BEGINUNDOACTION);
-	for (int i = lastLine ; i >= 0 ; i--)
-	{
-		if (bookmarkPresent(i))
-		{
-			replaceMarkedline(i, clipboardStr.c_str());
-		}
-	}
-	_pEditView->execute(SCI_ENDUNDOACTION);
-}
-
-void Notepad_plus::deleteMarkedline(int ln)
-{
-	int lineLen = _pEditView->execute(SCI_LINELENGTH, ln);
-	int lineBegin = _pEditView->execute(SCI_POSITIONFROMLINE, ln);
-
-	bookmarkDelete(ln);
-	TCHAR emptyString[2] = TEXT("");
-	_pEditView->replaceTarget(emptyString, lineBegin, lineBegin + lineLen);
-}
-
-void Notepad_plus::replaceMarkedline(int ln, const TCHAR *str)
-{
-	int lineBegin = _pEditView->execute(SCI_POSITIONFROMLINE, ln);
-	int lineEnd = _pEditView->execute(SCI_GETLINEENDPOSITION, ln);
-
-	_pEditView->replaceTarget(str, lineBegin, lineEnd);
-}
-
-generic_string Notepad_plus::getMarkedLine(int ln)
-{
-	int lineLen = _pEditView->execute(SCI_LINELENGTH, ln);
-	int lineBegin = _pEditView->execute(SCI_POSITIONFROMLINE, ln);
-
-	TCHAR * buf = new TCHAR[lineLen+1];
-	_pEditView->getGenericText(buf, lineBegin, lineBegin + lineLen);
-	generic_string line = buf;
-	delete [] buf;
-
-	return line;
-}
-
-void Notepad_plus::setWorkingDir(const TCHAR *dir)
-{
-	NppParameters * params = NppParameters::getInstance();
-	if (params->getNppGUI()._openSaveDir == dir_last)
-		return;
-	if (params->getNppGUI()._openSaveDir == dir_userDef)
-	{
-		params->setWorkingDir(NULL);
-	}
-	else if (dir && PathIsDirectory(dir))
-	{
-		params->setWorkingDir(dir);
-	}
 }
 
 int Notepad_plus::getLangFromMenuName(const TCHAR * langName)
@@ -10936,48 +10946,6 @@ void Notepad_plus::checkMenuItem(int itemID, bool willBeChecked) const
 	::CheckMenuItem(_mainMenuHandle, itemID, MF_BYCOMMAND | (willBeChecked?MF_CHECKED:MF_UNCHECKED));
 }
 
-void Notepad_plus::ScintillaCtrls::init(HINSTANCE hInst, HWND hNpp)
-{
-	_hInst = hInst;
-	_hParent = hNpp;
-}
-
-HWND Notepad_plus::ScintillaCtrls::createSintilla(HWND hParent)
-{
-	_hParent = hParent;
-
-	ScintillaEditView *scint = new ScintillaEditView;
-	scint->init(_hInst, _hParent);
-	_scintVector.push_back(scint);
-	return scint->getHSelf();
-}
-
-bool Notepad_plus::ScintillaCtrls::destroyScintilla(HWND handle2Destroy)
-{
-	for (size_t i = 0 ; i < _scintVector.size() ; i++)
-	{
-		if (_scintVector[i]->getHSelf() == handle2Destroy)
-		{
-			_scintVector[i]->destroy();
-			delete _scintVector[i];
-
-			std::vector<ScintillaEditView *>::iterator it2delete = _scintVector.begin()+ i;
-			_scintVector.erase(it2delete);
-			return true;
-		}
-	}
-	return false;
-}
-
-void Notepad_plus::ScintillaCtrls::destroy()
-{
-	for (size_t i = 0 ; i < _scintVector.size() ; i++)
-	{
-		_scintVector[i]->destroy();
-		delete _scintVector[i];
-	}
-}
-
 std::vector<generic_string> Notepad_plus::addNppComponents(const TCHAR *destDir, const TCHAR *extFilterName, const TCHAR *extFilter)
 {
     FileDialog fDlg(_hSelf, _hInst);
@@ -11014,4 +10982,19 @@ std::vector<generic_string> Notepad_plus::addNppComponents(const TCHAR *destDir,
         }
     }
     return copiedFiles;
+}
+
+void Notepad_plus::setWorkingDir(const TCHAR *dir)
+{
+	NppParameters * params = NppParameters::getInstance();
+	if (params->getNppGUI()._openSaveDir == dir_last)
+		return;
+	if (params->getNppGUI()._openSaveDir == dir_userDef)
+	{
+		params->setWorkingDir(NULL);
+	}
+	else if (dir && PathIsDirectory(dir))
+	{
+		params->setWorkingDir(dir);
+	}
 }
