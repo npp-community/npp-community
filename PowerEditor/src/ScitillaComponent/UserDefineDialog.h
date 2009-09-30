@@ -17,8 +17,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef USER_DEFINE_H
-#define USER_DEFINE_H
+#ifndef USER_DEFINE_DIALOG_H
+#define USER_DEFINE_DIALOG_H
 
 #ifndef STATIC_DIALOG_H
 #include "StaticDialog.h"
@@ -65,7 +65,8 @@ protected :
 	void styleUpdate(const Style & style, ColourPicker *pFgColourPicker, ColourPicker *pBgColourPicker,
 					 int fontComboId, int fontSizeComboId, int boldCheckId, int italicCheckId, int underlineCheckId);
 
-	bool setPropertyByCheck(HWND hwnd, WPARAM id, bool & bool2set);
+	bool getPropertyByCheck(HWND hwnd, WPARAM id);
+
 	virtual void setKeywords2List(int ctrlID) = 0;
 	virtual int getGroupIndexFromCombo(int ctrlID, bool & isFontSize) const = 0;
 	virtual int getStylerIndexFromCP(HWND hWnd, bool & isFG, ColourPicker **ppCP) const = 0;
@@ -118,7 +119,7 @@ protected :
 
 private :
     void convertTo(TCHAR *dest, const TCHAR *toConvert, TCHAR prefix) const;
-	void retrieve(TCHAR *dest, const TCHAR *toRetrieve, TCHAR prefix) const;
+	void retrieve(TCHAR *dest, const generic_string& toRetrieve, TCHAR prefix) const;
 };
 
 class SymbolsStyleDialog : public SharedParametersDialog

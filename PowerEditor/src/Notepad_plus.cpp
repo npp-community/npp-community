@@ -7243,12 +7243,12 @@ bool Notepad_plus::changeDlgLang(HWND hDlg, const char *dlgTagName, char *title,
 	return true;
 }
 
-static generic_string extractSymbol(TCHAR prefix, const TCHAR *str2extract)
+static generic_string extractSymbol(TCHAR prefix, const generic_string& str2extract)
 {
 	bool found = false;
 	TCHAR extracted[128] = TEXT("");
 
-	for (int i = 0, j = 0 ; i < lstrlen(str2extract) ; i++)
+	for (size_t i = 0, j = 0 ; i < str2extract.length() && i < 128 ; i++)
 	{
 		if (found)
 		{
@@ -7284,7 +7284,7 @@ bool Notepad_plus::doBlockComment(comment_mode currCommentMode)
 		if (!userLangContainer)
 			return false;
 
-		symbol = extractSymbol('0', userLangContainer->_keywordLists[4]);
+		symbol = extractSymbol('0', userLangContainer->getKeywordList(KWL_COMMENT_INDEX));
 		commentLineSybol = symbol.c_str();
 	}
 	else
@@ -7392,9 +7392,9 @@ bool Notepad_plus::doStreamComment()
 		if (!userLangContainer)
 			return false;
 
-		symbolStart = extractSymbol('1', userLangContainer->_keywordLists[4]);
+		symbolStart = extractSymbol('1', userLangContainer->getKeywordList(KWL_COMMENT_INDEX));
 		commentStart = symbolStart.c_str();
-		symbolEnd = extractSymbol('2', userLangContainer->_keywordLists[4]);
+		symbolEnd = extractSymbol('2', userLangContainer->getKeywordList(KWL_COMMENT_INDEX));
 		commentEnd = symbolEnd.c_str();
 	}
 	else
@@ -8029,7 +8029,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			for (int i = 0 ; i < pNppParam->getNbUserLang() ; i++)
 			{
 				UserLangContainer & userLangContainer = pNppParam->getULCFromIndex(i);
-				::InsertMenu(hLangMenu, udlpos + i, MF_BYPOSITION, IDM_LANG_USER + i + 1, userLangContainer.getName());
+				::InsertMenu(hLangMenu, udlpos + i, MF_BYPOSITION, IDM_LANG_USER + i + 1, userLangContainer.getName().c_str());
 			}
 
 			//Add recent files
@@ -10772,7 +10772,7 @@ void Notepad_plus::setFindReplaceFolderFilter(const TCHAR *dir, const TCHAR *fil
 	if (!filter && findHistory._isFilterFollowDoc)
 	{
 		// Get current language file extensions
-		const TCHAR *ext = NULL;
+		generic_string ext;
 		LangType lt = _pEditView->getCurrentBuffer()->getLangType();
 
 		if (lt == L_USER)
@@ -10780,14 +10780,14 @@ void Notepad_plus::setFindReplaceFolderFilter(const TCHAR *dir, const TCHAR *fil
 			Buffer * buf = _pEditView->getCurrentBuffer();
 			UserLangContainer * userLangContainer = pNppParam->getULCFromName(buf->getUserDefineLangName());
 			if (userLangContainer)
-				ext = userLangContainer->getExtention();
+				ext = userLangContainer->getExtension();
 		}
 		else
 		{
 			ext = NppParameters::getInstance()->getLangExtFromLangType(lt);
 		}
 
-		if (ext && ext[0])
+		if (ext.length() > 0)
 		{
 			fltr = TEXT("");
 			std::vector<generic_string> vStr;

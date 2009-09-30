@@ -533,10 +533,11 @@ NppParameters::~NppParameters()
 
 	delete _session;
 }
-void cutString(const TCHAR *str2cut, std::vector<generic_string> & patternVect)
+
+void cutString(const generic_string& str2cut, std::vector<generic_string> & patternVect)
 {
 	TCHAR str2scan[MAX_PATH];
-	lstrcpy(str2scan, str2cut);
+	lstrcpy(str2scan, str2cut.c_str());
 	size_t len = lstrlen(str2scan);
 	bool isProcessing = false;
 	TCHAR *pBegin = NULL;
@@ -544,8 +545,8 @@ void cutString(const TCHAR *str2cut, std::vector<generic_string> & patternVect)
 	{
 		switch(str2scan[i])
 		{
-			case ' ':
-			case '\0':
+		case ' ':
+		case '\0':
 			{
 				if (isProcessing)
 				{
@@ -556,12 +557,12 @@ void cutString(const TCHAR *str2cut, std::vector<generic_string> & patternVect)
 				break;
 			}
 
-			default :
-				if (!isProcessing)
-				{
-					isProcessing = true;
-					pBegin = str2scan+i;
-				}
+		default :
+			if (!isProcessing)
+			{
+				isProcessing = true;
+				pBegin = str2scan+i;
+			}
 		}
 	}
 }
@@ -2097,7 +2098,7 @@ int NppParameters::addUserLangToEnd(const UserLangContainer & userLang, const TC
 		return -1;
 	_userLangArray[_nbUserLang] = new UserLangContainer();
 	*(_userLangArray[_nbUserLang]) = userLang;
-	_userLangArray[_nbUserLang]->_name = newName;
+	_userLangArray[_nbUserLang]->setName( newName );
 	_nbUserLang++;
 	return _nbUserLang-1;
 }
@@ -2134,20 +2135,18 @@ void NppParameters::feedUserSettings(TiXmlNode *settingsRoot)
 	{
 		boolStr = (globalSettingNode->ToElement())->Attribute(TEXT("caseIgnored"));
 		if (boolStr)
-			_userLangArray[_nbUserLang - 1]->_isCaseIgnored = !lstrcmp(TEXT("yes"), boolStr);
-		boolStr = (globalSettingNode->ToElement())->Attribute(TEXT("escapeChar"));
-		_userLangArray[_nbUserLang - 1]->_escapeChar[0] = (boolStr) ? boolStr[0] : 0;
+			_userLangArray[_nbUserLang - 1]->setIsCaseIgnored(!lstrcmp(TEXT("yes"), boolStr));
 	}
 	TiXmlNode *treatAsSymbolNode = settingsRoot->FirstChildElement(TEXT("TreatAsSymbol"));
 	if (treatAsSymbolNode)
 	{
 		boolStr = (treatAsSymbolNode->ToElement())->Attribute(TEXT("comment"));
 		if (boolStr)
-			_userLangArray[_nbUserLang - 1]->_isCommentSymbol = !lstrcmp(TEXT("yes"), boolStr);
+			_userLangArray[_nbUserLang - 1]->setIsCommentSymbol(!lstrcmp(TEXT("yes"), boolStr));
 
 		boolStr = (treatAsSymbolNode->ToElement())->Attribute(TEXT("commentLine"));
 		if (boolStr)
-			_userLangArray[_nbUserLang - 1]->_isCommentLineSymbol = !lstrcmp(TEXT("yes"), boolStr);
+			_userLangArray[_nbUserLang - 1]->setIsCommentLineSymbol(!lstrcmp(TEXT("yes"), boolStr));
 	}
 	TiXmlNode *prefixNode = settingsRoot->FirstChildElement(TEXT("Prefix"));
 	if (prefixNode)
@@ -2157,7 +2156,7 @@ void NppParameters::feedUserSettings(TiXmlNode *settingsRoot)
 		{
 			boolStr = (prefixNode->ToElement())->Attribute(names[i]);
 			if (boolStr)
-				_userLangArray[_nbUserLang - 1]->_isPrefix[i] = !lstrcmp(TEXT("yes"), boolStr);
+				_userLangArray[_nbUserLang - 1]->setIsPrefix(i, !lstrcmp(TEXT("yes"), boolStr));
 		}
 	}
 }
@@ -2176,7 +2175,7 @@ void NppParameters::feedUserKeywordList(TiXmlNode *node)
 			if (valueNode)
 			{
 				const TCHAR *kwl = (valueNode)?valueNode->Value():(lstrcmp(keywordsName, TEXT("Delimiters"))?TEXT(""):TEXT("000000"));
-				lstrcpy(_userLangArray[_nbUserLang - 1]->_keywordLists[i], kwl);
+				_userLangArray[_nbUserLang - 1]->setKeywordList(i, kwl);
 			}
 		}
 	}
@@ -4605,23 +4604,21 @@ void NppParameters::insertUserLang2Tree(TiXmlNode *node, UserLangContainer *user
 {
 	TiXmlElement *rootElement = (node->InsertEndChild(TiXmlElement(TEXT("UserLang"))))->ToElement();
 
-	rootElement->SetAttribute(TEXT("name"), userLang->_name);
-	rootElement->SetAttribute(TEXT("ext"), userLang->_ext);
+	rootElement->SetAttribute(TEXT("name"), userLang->getName());
+	rootElement->SetAttribute(TEXT("ext"), userLang->getExtension());
 	TiXmlElement *settingsElement = (rootElement->InsertEndChild(TiXmlElement(TEXT("Settings"))))->ToElement();
 	{
 		TiXmlElement *globalElement = (settingsElement->InsertEndChild(TiXmlElement(TEXT("Global"))))->ToElement();
-		globalElement->SetAttribute(TEXT("caseIgnored"), userLang->_isCaseIgnored?TEXT("yes"):TEXT("no"));
-		if (userLang->_escapeChar[0])
-			globalElement->SetAttribute(TEXT("escapeChar"), userLang->_escapeChar);
+		globalElement->SetAttribute(TEXT("caseIgnored"), userLang->isCaseIgnored()?TEXT("yes"):TEXT("no"));
 
 		TiXmlElement *treatAsSymbolElement = (settingsElement->InsertEndChild(TiXmlElement(TEXT("TreatAsSymbol"))))->ToElement();
-		treatAsSymbolElement->SetAttribute(TEXT("comment"), userLang->_isCommentSymbol?TEXT("yes"):TEXT("no"));
-		treatAsSymbolElement->SetAttribute(TEXT("commentLine"), userLang->_isCommentLineSymbol?TEXT("yes"):TEXT("no"));
+		treatAsSymbolElement->SetAttribute(TEXT("comment"), userLang->isCommentSymbol()?TEXT("yes"):TEXT("no"));
+		treatAsSymbolElement->SetAttribute(TEXT("commentLine"), userLang->isCommentLineSymbol()?TEXT("yes"):TEXT("no"));
 
 		TiXmlElement *prefixElement = (settingsElement->InsertEndChild(TiXmlElement(TEXT("Prefix"))))->ToElement();
 		TCHAR names[nbPrefixListAllowed][7] = {TEXT("words1"), TEXT("words2"), TEXT("words3"), TEXT("words4")};
 		for (int i = 0 ; i < nbPrefixListAllowed ; i++)
-			prefixElement->SetAttribute(names[i], userLang->_isPrefix[i]?TEXT("yes"):TEXT("no"));
+			prefixElement->SetAttribute(names[i], userLang->isPrefix(i)?TEXT("yes"):TEXT("no"));
 	}
 
 	TiXmlElement *kwlElement = (rootElement->InsertEndChild(TiXmlElement(TEXT("KeywordLists"))))->ToElement();
@@ -4632,7 +4629,7 @@ void NppParameters::insertUserLang2Tree(TiXmlNode *node, UserLangContainer *user
 	{
 		TiXmlElement *kwElement = (kwlElement->InsertEndChild(TiXmlElement(TEXT("Keywords"))))->ToElement();
 		kwElement->SetAttribute(TEXT("name"), kwn[i]);
-		kwElement->InsertEndChild(TiXmlText(userLang->_keywordLists[i]));
+		kwElement->InsertEndChild(TiXmlText(userLang->getKeywordList(i)));
 	}
 
 	TiXmlElement *styleRootElement = (rootElement->InsertEndChild(TiXmlElement(TEXT("Styles"))))->ToElement();
@@ -4800,13 +4797,6 @@ UserLangContainer::UserLangContainer():
 	_isCommentLineSymbol(false),
 	_isCommentSymbol(false)
 {
-	// Keywords list of Delimiters (index 0)
-	lstrcpy(_keywordLists[0], TEXT("000000"));
-	for (int i = 1 ; i < nbKeywodList ; i++)
-	{
-		*_keywordLists[i] = '\0';
-	}
-
 	for (int i = 0; i < nbPrefixListAllowed; i++)
 	{
 		_isPrefix[i] = false;
@@ -4823,13 +4813,6 @@ UserLangContainer::UserLangContainer( const TCHAR *name, const TCHAR *ext ) :
 	_isCommentLineSymbol(false),
 	_isCommentSymbol(false)
 {
-	// Keywords list of Delimiters (index 0)
-	lstrcpy(_keywordLists[0], TEXT("000000"));
-	for (int i = 1 ; i < nbKeywodList ; i++)
-	{
-		*_keywordLists[i] = '\0';
-	}
-
 	for (int i = 0; i < nbPrefixListAllowed; i++)
 	{
 		_isPrefix[i] = false;
@@ -4862,9 +4845,9 @@ const UserLangContainer & UserLangContainer::operator=( const UserLangContainer 
 				st._fgColor = black;
 			}
 		}
-		for (int i = 0 ; i < nbKeywodList ; i++)
+		for (int i = 0 ; i < getNbKeywordList() ; i++)
 		{
-			lstrcpy(_keywordLists[i], ulc._keywordLists[i]);
+			_keywordLists[i] = ulc._keywordLists[i];
 		}
 
 		_isCaseIgnored = ulc._isCaseIgnored;
