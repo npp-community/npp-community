@@ -34,7 +34,8 @@
 // initialize the static variable
 HINSTANCE ScintillaEditView::_hLib = ::LoadLibrary(TEXT("SciLexer.DLL"));
 int ScintillaEditView::_refCount = 0;
-UserDefineDialog* ScintillaEditView::_userDefineDlg = new UserDefineDialog();
+
+UserDefineDialog s_userDefineDlg;
 
 const int ScintillaEditView::_SC_MARGE_LINENUMBER = 0;
 const int ScintillaEditView::_SC_MARGE_SYBOLE = 1;
@@ -169,7 +170,7 @@ void ScintillaEditView::init(HINSTANCE hInst, HWND hPere)
 	_pScintillaFunc = (SCINTILLA_FUNC)::SendMessage(_hSelf, SCI_GETDIRECTFUNCTION, 0, 0);
 	_pScintillaPtr = (SCINTILLA_PTR)::SendMessage(_hSelf, SCI_GETDIRECTPOINTER, 0, 0);
 
-    _userDefineDlg->init(_hInst, _hParent, this);
+    s_userDefineDlg.init(_hInst, _hParent, this);
 
 	if (!_pScintillaFunc || !_pScintillaPtr)
 	{
@@ -583,7 +584,7 @@ void ScintillaEditView::setUserLexer(const TCHAR *userLangName)
 {
     execute(SCI_SETLEXER, SCLEX_USER);
 
-	UserLangContainer * userLangContainer = userLangName?NppParameters::getInstance()->getULCFromName(userLangName):_userDefineDlg->_pCurrentUserLang;
+	UserLangContainer * userLangContainer = userLangName?NppParameters::getInstance()->getULCFromName(userLangName):s_userDefineDlg._pCurrentUserLang;
 
 	if (!userLangContainer)
 		return;
@@ -2774,7 +2775,12 @@ void ScintillaEditView::getWordToCurrentPos( TCHAR * str, int strLen ) const
 
 void ScintillaEditView::doUserDefineDlg( bool willBeShown, bool isRTL )
 {
-	_userDefineDlg->doDialog(willBeShown, isRTL);
+	s_userDefineDlg.doDialog(willBeShown, isRTL);
+}
+
+UserDefineDialog * ScintillaEditView::getUserDefineDlg()
+{
+	return &s_userDefineDlg;
 }
 
 void ScintillaEditView::setCaretColorWidth( int color, int width ) const
@@ -2785,7 +2791,7 @@ void ScintillaEditView::setCaretColorWidth( int color, int width ) const
 
 void ScintillaEditView::beSwitched()
 {
-	_userDefineDlg->setScintilla(this);
+	s_userDefineDlg.setScintilla(this);
 }
 
 void ScintillaEditView::showMargin( int whichMarge, bool willBeShowed )

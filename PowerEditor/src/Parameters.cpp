@@ -496,6 +496,41 @@ NppParameters::~NppParameters()
 
 	::RemoveFontResource(LINEDRAW_FONT);
 
+	// JOCE: I don't like that much. But I feel that the deletion should take place at the
+	// same scope as the allocation.
+	// Should revisit FindHistory to handle both itself.
+	for (int i = 0; i < _findHistory._nbFindHistoryPath; i++)
+	{
+		delete _findHistory._pFindHistoryPath[i];
+	}
+
+	for (int i = 0; i < _findHistory._nbFindHistoryFilter; i++)
+	{
+		delete _findHistory._pFindHistoryFilter[i];
+	}
+
+	for (int i = 0; i < _findHistory._nbFindHistoryFind; i++)
+	{
+		delete _findHistory._pFindHistoryFind[i];
+	}
+
+	for (int i = 0; i < _findHistory._nbFindHistoryReplace; i++)
+	{
+		delete _findHistory._pFindHistoryReplace[i];
+	}
+
+	// JOCE: These were NOT allocated here, and should NOT be freed here either...  :-/
+	for (std::vector<TiXmlDocument *>::iterator it = _pXmlExternalLexerDoc.begin(),
+												end = _pXmlExternalLexerDoc.end();
+		it != end;
+		++it )
+	{
+		delete (*it);
+	}
+
+	_pXmlExternalLexerDoc.clear();
+
+
 	delete _session;
 }
 void cutString(const TCHAR *str2cut, std::vector<generic_string> & patternVect)
@@ -876,6 +911,7 @@ bool NppParameters::load()
 		if (_pXmlExternalLexerDoc[i])
 			delete _pXmlExternalLexerDoc[i];
 
+		_pXmlExternalLexerDoc.clear();
 		_pXmlSessionDoc = NULL;
 	}
 	return isAllLaoded;

@@ -208,7 +208,7 @@ public:
 	void getSelection(CharacterRange& range) const;
 	void getWordToCurrentPos(TCHAR * str, int strLen) const;
 	void doUserDefineDlg(bool willBeShown = true, bool isRTL = false);
-	static UserDefineDialog * getUserDefineDlg() {return _userDefineDlg;};
+	static UserDefineDialog * getUserDefineDlg();
 	void setCaretColorWidth(int color, int width = 1) const;
 	void beSwitched();
 
@@ -322,8 +322,6 @@ public:
 protected:
 	static HINSTANCE _hLib;
 	static int _refCount;
-
-	static UserDefineDialog* _userDefineDlg;
 
 	static const int _markersArray[][NB_FOLDER_STATE];
 
