@@ -22,6 +22,7 @@
 #include "TaskListDlg_rc.h"
 #include "resource.h"
 #include "TaskList.h"
+#include "Notepad_plus_msgs.h"
 #include "npp_winver.h"
 #include "colors.h"
 

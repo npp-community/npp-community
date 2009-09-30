@@ -20,6 +20,7 @@
 #include "Shortcut.h"
 #include "npp_winver.h"
 #include "ImageListSet.h"
+#include "Notepad_plus_msgs.h"
 
 
 const int WS_TOOLBARSTYLE = WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | TBSTYLE_TOOLTIPS |TBSTYLE_FLAT | CCS_TOP | BTNS_AUTOSIZE | CCS_NOPARENTALIGN | CCS_NORESIZE | CCS_NODIVIDER;
