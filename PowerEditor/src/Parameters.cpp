@@ -339,21 +339,6 @@ ScintillaKeyDefinition scintKeyDefs[] = {	//array of accelerator keys for all po
 	//
 };
 
-static int strVal(const TCHAR *str, int base) {
-	if (!str) return -1;
-	if (!str[0]) return 0;
-
-	TCHAR *finStr;
-	int result = generic_strtol(str, &finStr, base);
-	if (*finStr != '\0')
-		return -1;
-	return result;
-};
-
-static int decStrVal(const TCHAR *str) {
-	return strVal(str, 10);
-};
-
 static int getKwClassFromName(const TCHAR *str) {
 	if (!lstrcmp(TEXT("instre1"), str)) return LANG_INDEX_INSTR;
 	if (!lstrcmp(TEXT("instre2"), str)) return LANG_INDEX_INSTR2;
