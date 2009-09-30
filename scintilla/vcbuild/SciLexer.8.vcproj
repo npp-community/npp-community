@@ -115,7 +115,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /Y $(TargetPath) ..\..\PowerEditor\bin"
+				CommandLine="xcopy /Y &quot;$(TargetPath)&quot; ..\..\PowerEditor\bin"
 			/>
 		</Configuration>
 		<Configuration
@@ -333,6 +333,10 @@
 			</File>
 			<File
 				RelativePath="..\src\ScintillaBase.cxx"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Selection.cxx"
 				>
 			</File>
 			<File
@@ -836,6 +840,10 @@
 			</File>
 			<File
 				RelativePath="..\src\ScintillaBase.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Selection.h"
 				>
 			</File>
 			<File

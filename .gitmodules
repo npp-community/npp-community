@@ -1,0 +1,6 @@
+[submodule "google_mock"]
+	path = google_mock
+	url = git://github.com/npp-community/nppcr_googlemock.git
+[submodule "google_test"]
+	path = google_test
+	url = git://github.com/npp-community/nppcr_googletest.git

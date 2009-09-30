@@ -29,15 +29,10 @@
 #include <ShellAPI.h>
 #include <dbghelp.h>
 #include <eh.h>
-
-
 #include <exception>		//default C++ exception
-
 #include <shlobj.h>
 #include <shlwapi.h>
-
 #include <Oleacc.h>
-
 #include <uxtheme.h>
 
 // C RunTime Header Files
@@ -71,6 +66,14 @@
 #ifdef TIXMLA_USE_STL
 #include <string>
 #include <sstream>
+#endif
+
+// Google Test
+#ifndef SHIPPING
+	// Sadly, Google Test compiles at /W3 and has /W4 warnings for now.
+	#pragma warning (push, 3)
+	#include "gtest/gtest.h"
+	#pragma warning (pop)
 #endif
 
 // Scintilla

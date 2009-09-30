@@ -21,12 +21,11 @@
 
 #include "precompiled_headers.h"
 
-#ifndef NDEBUG
+#ifndef SHIPPING
 
-void assertPathAppend(TCHAR *path, TCHAR *append)
+bool testPathAppend(TCHAR *path, TCHAR *append)
 {
 	TCHAR cPath[MAX_PATH];
-
 
 	generic_string strPath(path);
 	generic_string strAppend(append);
@@ -36,59 +35,188 @@ void assertPathAppend(TCHAR *path, TCHAR *append)
 	BOOL strRet = PathAppend(strPath, strAppend);
 	BOOL charRet = PathAppend(cPath, append);
 
-	assert(strRet == charRet);
-	assert(strPath == cPath);
+	return ((strRet == charRet) &&
+	        (strPath == cPath));
 }
 
-void testPathAppend()
+TEST(PathAppendTest, TwoEmptyPaths)
 {
-	generic_string strPath;
-	generic_string strAppend;
+	ASSERT_TRUE(testPathAppend(TEXT(""), TEXT("")));
+}
 
+TEST(PathAppendTest, RootAndEmptyPath)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("\\"), TEXT("")));
+}
 
-	// First the blank and backslash only cases
-	assertPathAppend(TEXT(""), TEXT(""));			// "\\"
-	assertPathAppend(TEXT("\\"), TEXT(""));			// "\\"
-	assertPathAppend(TEXT(""), TEXT("\\"));			// "\\"
-	assertPathAppend(TEXT("\\"), TEXT("\\"));   	// "\\"
-	assertPathAppend(TEXT("abc"), TEXT("\\"));  	// "abc"
-	assertPathAppend(TEXT("abc\\"), TEXT("\\"));  	// "abc\\"
-	assertPathAppend(TEXT("abc"), TEXT(""));		// "abc"
-	assertPathAppend(TEXT("abc\\"), TEXT(""));		// "abc\\"
-	assertPathAppend(TEXT(""), TEXT("abc"));		// "abc"
-	assertPathAppend(TEXT("\\"), TEXT("abc"));		// "\\abc"
-	assertPathAppend(TEXT("\\"), TEXT("\\abc"));	// "\\abc"
+TEST(PathAppendTest, EmptyPathAndRoot)
+{
+	ASSERT_TRUE(testPathAppend(TEXT(""), TEXT("\\")));
+}
 
-	// now the normal cases
-	assertPathAppend(TEXT("abc"), TEXT("def"));
-	assertPathAppend(TEXT("abc\\"), TEXT("def"));
-	assertPathAppend(TEXT("abc"), TEXT("\\def"));
-	assertPathAppend(TEXT("abc\\"), TEXT("\\def"));
-	assertPathAppend(TEXT("\\abc\\"), TEXT("def"));
-	assertPathAppend(TEXT("\\abc\\"), TEXT("\\def"));
-	assertPathAppend(TEXT("\\abc\\"), TEXT("\\def\\"));
+TEST(PathAppendTest, RootAndRoot)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("\\"), TEXT("\\")));
+}
 
-	// and lastly the cases that need canonicalizing
-	assertPathAppend(TEXT(".\\abc"), TEXT("def"));
-	assertPathAppend(TEXT(".\\abc\\"), TEXT("def"));
-	assertPathAppend(TEXT("..\\abc"), TEXT("def"));
-	assertPathAppend(TEXT("..\\abc\\"), TEXT("def"));
-	assertPathAppend(TEXT("..\\abc\\"), TEXT("\\def"));
-	assertPathAppend(TEXT("..\\abc"), TEXT("\\def"));
-	assertPathAppend(TEXT("..\\abc\\.."), TEXT("def"));
-	assertPathAppend(TEXT("..\\abc"), TEXT("..\\def"));
-	assertPathAppend(TEXT("..\\abc"), TEXT("\\..\\def"));
-	assertPathAppend(TEXT("\\..\\abc"), TEXT("def"));
-	assertPathAppend(TEXT("\\..\\abc"), TEXT("..\\def"));
-	assertPathAppend(TEXT("\\..\\abc"), TEXT("\\..\\def"));
-	assertPathAppend(TEXT("abc\\def\\ghi"), TEXT("jkl"));
-	assertPathAppend(TEXT("abc\\def\\ghi\\..\\.."), TEXT("jkl"));
-	assertPathAppend(TEXT("..\\abc\\def\\..\\"), TEXT("ghi"));
-	assertPathAppend(TEXT("abc\\def\\ghi"), TEXT("..\\jkl"));
-	assertPathAppend(TEXT("abc\\def\\ghi\\.."), TEXT("..\\jkl"));
+TEST(PathAppendTest, basicNameAndRoot)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("abc"), TEXT("\\")));
+}
 
+TEST(PathAppendTest, basicPathAndRoot)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("abc\\"), TEXT("\\")));
+}
 
+TEST(PathAppendTest, basicNameAndEmptyPath)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("abc"), TEXT("")));
+}
+
+TEST(PathAppendTest, basicPathAndEmptyPath)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("abc\\"), TEXT("")));
+}
+
+TEST(PathAppendTest, EmptyPathAndBasicName)
+{
+	ASSERT_TRUE(testPathAppend(TEXT(""), TEXT("abc")));
+}
+
+TEST(PathAppendTest, RootAndBasicName)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("\\"), TEXT("abc")));
+}
+
+TEST(PathAppendTest, RootAndBasicRootPath)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("\\"), TEXT("\\abc")));
+}
+
+TEST(PathAppendTest, RootAndBasicPath)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("\\"), TEXT("abc\\")));
+}
+
+TEST(PathAppendTest, BasicNameAndBasicName)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("abc"), TEXT("def")));
+}
+
+TEST(PathAppendTest, BasicPathAndBasicName)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("abc\\"), TEXT("def")));
+}
+
+TEST(PathAppendTest, BasicNameAndRootPath)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("abc"), TEXT("\\def")));
+}
+
+TEST(PathAppendTest, BasicPathAndRootPath)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("abc\\"), TEXT("\\def")));
+}
+
+TEST(PathAppendTest, FullRootPathAndBasicName)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("\\abc\\"), TEXT("def")));
+}
+
+TEST(PathAppendTest, FullRootPathAndRootPath)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("\\abc\\"), TEXT("\\def")));
+}
+
+TEST(PathAppendTest, FullRootPathAndFullRootPath)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("\\abc\\"), TEXT("\\def\\")));
+}
+
+TEST(PathAppendTest, CurrentBasedBasicPathAndBasicName)
+{
+	ASSERT_TRUE(testPathAppend(TEXT(".\\abc"), TEXT("def")));
+}
+
+TEST(PathAppendTest, CurrentBasedFullPathAndBasicName)
+{
+	ASSERT_TRUE(testPathAppend(TEXT(".\\abc\\"), TEXT("def")));
+}
+
+TEST(PathAppendTest, ParentBasedBasicPathAndBasicName)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("..\\abc"), TEXT("def")));
+}
+
+TEST(PathAppendTest, ParentBasedFullPathAndBasicName)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("..\\abc\\"), TEXT("def")));
+}
+
+TEST(PathAppendTest, ParentBasedBasicPathAndRootPath)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("..\\abc"), TEXT("\\def")));
+}
+
+TEST(PathAppendTest, ParentBasedFullPathAndRootPath)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("..\\abc\\"), TEXT("\\def")));
+}
+
+TEST(PathAppendTest, ParentBasedBasicPathAndParentBasedBasicPath)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("..\\abc"), TEXT("..\\def")));
+}
+
+TEST(PathAppendTest, ParentOfParentBasedBasicPathAndBasicName)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("..\\abc\\.."), TEXT("def")));
+}
+
+TEST(PathAppendTest, ParentBasedBasicPathAndParentOfRootPath)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("..\\abc"), TEXT("\\..\\def")));
+}
+
+TEST(PathAppendTest, ParentOfRootPathAndBasicName)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("\\..\\abc"), TEXT("def")));
+}
+
+TEST(PathAppendTest, ParentOfRootPathAndParentBasedBasicPath)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("\\..\\abc"), TEXT("..\\def")));
+}
+
+TEST(PathAppendTest, ParentOfRootPathAndParentOfRootPath)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("\\..\\abc"), TEXT("\\..\\def")));
+}
+
+TEST(PathAppendTest, ThreeDeepBasicPathAndBasicName)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("abc\\def\\ghi"), TEXT("jkl")));
+}
+
+TEST(PathAppendTest, ThreeDeepPathBackTwoParentsAndBasicName)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("abc\\def\\ghi\\..\\.."), TEXT("jkl")));
+}
+
+TEST(PathAppendTest, ParentOfTwoDeepPathBackOneParentAndBasicName)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("..\\abc\\def\\..\\"), TEXT("ghi")));
+}
+
+TEST(PathAppendTest, ThreeDeepPathAndParentBasedBasicPath)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("abc\\def\\ghi"), TEXT("..\\jkl")));
+}
+
+TEST(PathAppendTest, ThreeDeepPathBackOneParentAndParentBasedBasicPath)
+{
+	ASSERT_TRUE(testPathAppend(TEXT("abc\\def\\ghi\\.."), TEXT("..\\jkl")));
 }
 
 #endif
-

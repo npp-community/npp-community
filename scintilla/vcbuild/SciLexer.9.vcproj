@@ -98,7 +98,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /Y $(TargetPath) ..\..\PowerEditor\bin"
+				CommandLine="xcopy /Y &quot;$(TargetPath)&quot; ..\..\PowerEditor\bin"
 			/>
 		</Configuration>
 		<Configuration

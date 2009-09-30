@@ -158,11 +158,12 @@ int getPointXFromParam(ParamVector & params) {
 };
 */
 
-const TCHAR FLAG_MULTI_INSTANCE[] = TEXT("-multiInst");
-const TCHAR FLAG_NO_PLUGIN[] = TEXT("-noPlugin");
-const TCHAR FLAG_READONLY[] = TEXT("-ro");
-const TCHAR FLAG_NOSESSION[] = TEXT("-nosession");
-const TCHAR FLAG_NOTABBAR[] = TEXT("-notabbar");
+#define FLAG_MULTI_INSTANCE TEXT("-multiInst")
+#define FLAG_NO_PLUGIN TEXT("-noPlugin")
+#define FLAG_READONLY TEXT("-ro")
+#define FLAG_NOSESSION TEXT("-nosession")
+#define FLAG_NOTABBAR TEXT("-notabbar")
+#define FLAG_RUN_UNITTESTS TEXT("-unittests")
 
 void doException(Notepad_plus & notepad_plus_plus);
 
@@ -171,6 +172,29 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 	LPTSTR cmdLine = ::GetCommandLine();
 	ParamVector params;
 	parseCommandLine(cmdLine, params);
+
+#ifndef SHIPPING
+	if (isInList(FLAG_RUN_UNITTESTS, params))
+	{
+		int argc = params.size();
+
+		TCHAR argv[4096];
+		TCHAR* argvPtr = &argv[0];
+		int spaceLeft = 4096;
+		for (int i = 0; i< argc; i++)
+		{
+			_tcscpy_s(argvPtr, spaceLeft, params[i]);
+			int len = _tcslen(params[i]) + 1;
+			argvPtr += len;
+			spaceLeft -= len;
+		}
+		*argvPtr = '\0';
+		argvPtr = &argv[0];
+		::testing::InitGoogleTest(&argc, &argvPtr);
+		::testing::GTEST_FLAG(print_time) = true;
+		return RUN_ALL_TESTS();
+	}
+#endif
 
 	MiniDumper mdump;	//for debugging purposes.
 
