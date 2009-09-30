@@ -93,14 +93,12 @@ void SmartHighlighter::highlightView(ScintillaEditView * pHighlightView)
 	fo._isMatchCase = false;
 	fo._isWholeWord = true;
 
-#ifdef UNICODE
 	WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
 	unsigned int cp = pHighlightView->execute(SCI_GETCODEPAGE);
 	const TCHAR * text2FindW = wmc->char2wchar(text2Find, cp);
 	const TCHAR * searchText = text2FindW;
-#else
-	const TCHAR * searchText = text2Find;
-#endif
+
+	delete [] text2Find;
 
 	for(; currentLine < lastLine; currentLine++) {
 		int docLine = (int)pHighlightView->execute(SCI_DOCLINEFROMVISIBLE, currentLine);
