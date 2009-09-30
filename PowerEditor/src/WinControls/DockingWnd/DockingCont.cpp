@@ -1117,10 +1117,7 @@ void DockingCont::onSize()
 			width = MIN_TABWIDTH;
 		}
 
-		debugf(TEXT("width = %d, height = %d\n"), width, height);
-
 		TabCtrl_SetItemSize(_hContTab, width, height);
-
 
 		// get active item data
 		UINT	iItemCnt = ::SendMessage(_hContTab, TCM_GETITEMCOUNT, 0, 0);
@@ -1142,37 +1139,52 @@ void DockingCont::onSize()
 
 void DockingCont::doClose()
 {
-	int	iItemOff	= 0;
-	int	iItemCnt	= ::SendMessage(_hContTab, TCM_GETITEMCOUNT, 0, 0);
-
-	for (int iItem = 0; iItem < iItemCnt; iItem++)
+	if (_isFloating)
 	{
-		TCITEM		tcItem		= {0};
+		int	iItemOff	= 0;
+		int	iItemCnt	= ::SendMessage(_hContTab, TCM_GETITEMCOUNT, 0, 0);
 
-		// get item data
-		SelectTab(iItemOff);
-		tcItem.mask	= TCIF_PARAM;
-		::SendMessage(_hContTab, TCM_GETITEM, iItemOff, (LPARAM)&tcItem);
-		if (!tcItem.lParam)
-			continue;
+		for (int iItem = 0; iItem < iItemCnt; iItem++)
+		{
+			TCITEM		tcItem		= {0};
 
-		// notify child windows
+			// get item data
+			SelectTab(iItemOff);
+			tcItem.mask	= TCIF_PARAM;
+			::SendMessage(_hContTab, TCM_GETITEM, iItemOff, (LPARAM)&tcItem);
+			if (!tcItem.lParam)
+				continue;
+
+			// notify child windows
+			if (NotifyParent(DMM_CLOSE) == 0)
+			{
+				// delete tab
+				hideToolbar((tTbData*)tcItem.lParam);
+			}
+			else
+			{
+				iItemOff++;
+			}
+		}
+
+		if (iItemOff == 0)
+		{
+			// hide dialog first
+			this->doDialog(false);
+			::SendMessage(_hParent, WM_SIZE, 0, 0);
+		}
+	}
+	else
+	{
+		TCITEM tcItem = {0};
+		int currentItem = TabCtrl_GetCurSel(_hContTab);
+		tcItem.mask = TCIF_PARAM;
+		::SendMessage(_hContTab, TCM_GETITEM, currentItem, (LPARAM)&tcItem);
 		if (NotifyParent(DMM_CLOSE) == 0)
 		{
 			// delete tab
 			hideToolbar((tTbData*)tcItem.lParam);
 		}
-		else
-		{
-			iItemOff++;
-		}
-	}
-
-	if (iItemOff == 0)
-	{
-		// hide dialog first
-		this->doDialog(false);
-		::SendMessage(_hParent, WM_SIZE, 0, 0);
 	}
 }
 
