@@ -18,7 +18,6 @@
 #include "precompiled_headers.h"
 #include "ToolBar.h"
 #include "Shortcut.h"
-#include "npp_winver.h"
 #include "ImageListSet.h"
 #include "Notepad_plus_msgs.h"
 

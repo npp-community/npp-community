@@ -36,7 +36,6 @@ LONG FindReplaceDlg::originalFinderProc = NULL;
 // important : to activate all styles
 #define STYLING_MASK 255
 
-
 struct FoundInfo {
 	FoundInfo(int start, int end, const TCHAR *fullPath)
 		: _start(start), _end(end), _fullPath(fullPath) {};
@@ -1557,20 +1556,7 @@ int FindReplaceDlg::processRange(ProcessOperation op, const TCHAR *txt2find, con
 
 				(*_ppEditView)->getGenericText(lineBuf, lstart, lend, &start_mark, &end_mark);
 				generic_string line;
-#ifdef UNICODE
 				line = lineBuf;
-#else
-				UINT cp = (*_ppEditView)->execute(SCI_GETCODEPAGE);
-				if (cp != SC_CP_UTF8)
-				{
-					WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
-					const wchar_t *pTextW = wmc->char2wchar(lineBuf, ::GetACP());
-					const char *pTextA = wmc->wchar2char(pTextW, SC_CP_UTF8);
-					line = pTextA;
-				}
-				else
-					line = lineBuf;
-#endif
 				line += TEXT("\r\n");
 				SearchResultMarking srm;
 				srm._start = start_mark;
