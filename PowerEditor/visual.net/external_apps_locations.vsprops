@@ -6,10 +6,10 @@
 	>
 	<UserMacro
 		Name="googleMockDir"
-		Value="$(SolutionDir)..\gmock\"
+		Value="$(SolutionDir)google_mock\"
 	/>
 	<UserMacro
 		Name="GoogleTestDir"
-		Value="$(SolutionDir)..\gtest\"
+		Value="$(SolutionDir)google_test\"
 	/>
 </VisualStudioPropertySheet>
