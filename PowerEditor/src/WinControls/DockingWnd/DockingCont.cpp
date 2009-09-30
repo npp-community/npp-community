@@ -23,6 +23,8 @@
 #include "Tabbar.h"
 #include "npp_winver.h"
 
+#include "Debug/npp_debug.h"
+
 #ifndef WH_MOUSE_LL
 #define WH_MOUSE_LL 14
 #endif
@@ -81,6 +83,7 @@ DockingCont::DockingCont()
 	_bCapTTHover		= FALSE;
 	_hoverMPos			= posClose;
 	_vTbData.clear();
+	_maxTabWidth		= INT_MAX;
 }
 
 DockingCont::~DockingCont()
@@ -892,7 +895,7 @@ void DockingCont::drawTabItem(DRAWITEMSTRUCT *pDrawItemStruct)
 	// draw text
 	rc.top -= ::GetSystemMetrics(SM_CYEDGE);
 	::SelectObject(hDc, _hFont);
-	::DrawText(hDc, text, length, &rc, DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX);
+	::DrawText(hDc, text, length, &rc, DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX | DT_END_ELLIPSIS);
 
 	::RestoreDC(hDc, nSavedDC);
 }
@@ -1044,6 +1047,7 @@ void DockingCont::onSize()
 				::SetWindowPos(_hContTab, NULL,
 								rcTemp.left, rcTemp.top, rcTemp.right, rcTemp.bottom,
 								SWP_NOZORDER | SWP_SHOWWINDOW |  SWP_NOACTIVATE);
+
 			}
 
 			// resize client area for plugin
@@ -1098,6 +1102,24 @@ void DockingCont::onSize()
 							rcTemp.left, rcTemp.top, rcTemp.right, rcTemp.bottom,
 							SWP_NOZORDER | SWP_NOACTIVATE);
 		}
+
+		// Resize the tabs
+		RECT itemRect = {0};
+		TabCtrl_GetItemRect(_hContTab, 0, &itemRect);
+		int width = ((rcTemp.right - rcTemp.left)/ iItemCnt) - 2;
+		int height = itemRect.bottom - itemRect.top;
+		if (width > _maxTabWidth)
+		{
+			width = _maxTabWidth;
+		}
+		else if (width < MIN_TABWIDTH)
+		{
+			width = MIN_TABWIDTH;
+		}
+
+		debugf(TEXT("width = %d, height = %d\n"), width, height);
+
+		TabCtrl_SetItemSize(_hContTab, width, height);
 
 
 		// get active item data
@@ -1335,19 +1357,20 @@ void DockingCont::SelectTab(int iTab)
 				pszMaxTxt	= pszTabTxt;
 			}
 		}
+
+		generic_string szText;
+		// fake here an icon before text ...
+		szText = TEXT("    ");
+		szText += pszMaxTxt;
+
+		SetMaxItemWidth(szText, hDc, tcItem);
+
 		::ReleaseDC(_hSelf, hDc);
 
 		tcItem.mask	= TCIF_TEXT;
 
 		for (int iItem = 0; iItem < iItemCnt; iItem++)
 		{
-			generic_string szText;
-			if (iItem == iTab)
-			{
-				// fake here an icon before text ...
-				szText = TEXT("    ");
-				szText += pszMaxTxt;
-			}
 			tcItem.pszText = (TCHAR *)szText.c_str();
 			tcItem.cchTextMax = szText.size();
 			::SendMessage(_hContTab, TCM_SETITEM, iItem, (LPARAM)&tcItem);
@@ -1459,4 +1482,28 @@ void DockingCont::destroy()
 	}
 	_vTbData.clear();
 	::DestroyWindow(_hSelf);
+}
+
+void DockingCont::SetMaxItemWidth(const generic_string& maxString, const HDC& context, const TCITEM& tcItem)
+{
+	SIZE size = {0};
+
+	GetTextExtentPoint32(context, maxString.c_str(), maxString.length(), &size);
+	_maxTabWidth = size.cx;
+
+	if (((tTbData*)tcItem.lParam)->uMask & DWS_ICONTAB)
+	{
+		HIMAGELIST	hImageList	= (HIMAGELIST)::SendMessage(_hParent, DMM_GETIMAGELIST, 0, 0);
+		int			iPosImage	= ::SendMessage(_hParent, DMM_GETICONPOS, 0, (LPARAM)((tTbData*)tcItem.lParam)->hClient);
+
+		if ((hImageList != NULL) && (iPosImage >= 0))
+		{
+			IMAGEINFO	info		= {0};
+
+			ImageList_GetImageInfo(hImageList, iPosImage, &info);
+			RECT &		imageRect	= info.rcImage;
+
+			_maxTabWidth += imageRect.right - imageRect.left + 5;
+		}
+	}
 }
