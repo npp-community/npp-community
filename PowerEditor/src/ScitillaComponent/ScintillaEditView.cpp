@@ -592,6 +592,9 @@ void ScintillaEditView::setUserLexer(const TCHAR *userLangName)
 	execute(SCI_SETPROPERTY, (WPARAM)"userDefine.ignoreCase", (LPARAM)(userLangContainer->isCaseIgnored()?"1":"0"));
 	execute(SCI_SETPROPERTY, (WPARAM)"userDefine.commentLineSymbol", (LPARAM)(userLangContainer->isCommentLineSymbol()?"1":"0"));
 	execute(SCI_SETPROPERTY, (WPARAM)"userDefine.commentSymbol", (LPARAM)(userLangContainer->isCommentSymbol()?"1":"0"));
+	char buf[4];
+	_itoa_s(userLangContainer->_escapeChar[0],buf,10);
+	execute(SCI_SETPROPERTY, (WPARAM)"userDefine.escapeChar", reinterpret_cast<LPARAM>((userLangContainer->_escapeChar[0]) ? buf : "0"));
 
 	const char strArray[4][20] = {"userDefine.g1Prefix", "userDefine.g2Prefix", "userDefine.g3Prefix", "userDefine.g4Prefix"};
 	for (int i = 0 ; i < 4 ; i++)
