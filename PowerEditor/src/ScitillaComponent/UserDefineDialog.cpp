@@ -1080,6 +1080,10 @@ void SymbolsStyleDialog::updateDlg()
 			}
 		}
 	}
+	bool hasEscape = (_pUserLang->_escapeChar[0] != 0);
+	::SendDlgItemMessage(_hSelf, IDC_HAS_ESCAPE, BM_SETCHECK, (hasEscape) ? BST_CHECKED : BST_UNCHECKED,0);
+	::EnableWindow(::GetDlgItem(_hSelf, IDC_ESCAPE_CHAR), (hasEscape) ? TRUE : FALSE);
+	::SendDlgItemMessage(_hSelf, IDC_ESCAPE_CHAR, WM_SETTEXT, 0, reinterpret_cast<LPARAM>(&_pUserLang->_escapeChar));
 
 	const generic_string& delims = _pUserLang->getKeywordList(KWL_DELIM_INDEX);
 	// Here we fill the 4 combo boxes.
