@@ -350,7 +350,7 @@ struct ScintillaViewParams
 };
 
 #define NB_LIST 20
-// JOCE: There's no longer a reason to keep NB_MAX_LRF_FILE around now that we use std::vectors.
+// JOCE: There's no longer a reason to keep around the NB_MAX_* below now that we use std::vectors.
 #define NB_MAX_LRF_FILE 30
 #define NB_MAX_USER_LANG 30
 #define NB_MAX_EXTERNAL_LANG 30
@@ -478,6 +478,10 @@ public :
 	void setIsCommentLineSymbol(bool commentLineSymbol) { _isCommentLineSymbol = commentLineSymbol; }
 	void setIsCommentSymbol(bool commentSymbol) { _isCommentSymbol = commentSymbol; }
 	void setIsPrefix(int idx, bool prefix ) { assert(idx < nbPrefixListAllowed); _isPrefix[idx] = prefix; }
+
+	bool feedUserSettings(TiXmlNode *settingsRoot);
+	bool feedUserKeywordList(TiXmlNode *node);
+	bool feedUserStyles(TiXmlNode *node);
 
 	// JOCE: get rid of this from the public interface.
 	// Right now, it's just a pain in the but to do, but that should be done sooner or later.
@@ -682,7 +686,7 @@ public:
 	}
 
 	Lang * getLangFromIndex(int i) const {
-		// JOCE check if we can easily make i a site_t
+		// JOCE check if we can easily make i a size_t
 		if (i >= (int)_langList.size())
 		{
 			return NULL;
@@ -717,10 +721,10 @@ public:
 	int getNbLRFile() const {return _LRFileList.size();}
 
 	const generic_string& getLRFile(int index) const {
-		// JOCE check if we can easily make index a site_t
+		// JOCE check if we can easily make index a size_t
 		assert(index < (int)_LRFileList.size());
 		return _LRFileList[index];
-	};
+	}
 
 	void setNbMaxFile(int nb) {
 		_nbMaxFile = nb;
@@ -768,21 +772,21 @@ public:
 	void setFontList(HWND hWnd);
 	const std::vector<generic_string> & getFontList() const {return _fontlist;};
 
-	int getNbUserLang() const {return _nbUserLang;};
-	UserLangContainer & getULCFromIndex(int i) {return *_userLangArray[i];};
+	int getNbUserLang() const {return _userLangArray.size();}
+	UserLangContainer & getULCFromIndex(int i) {return *_userLangArray[i];}
 	UserLangContainer * getULCFromName(const TCHAR *userLangName) {
-		int i;
-		for (i = 0 ; i < _nbUserLang ; i++)
+		std::vector<UserLangContainer *>::iterator it = _userLangArray.begin(), end = _userLangArray.end();
+		for (; it != end; ++it )
 		{
-			if (_userLangArray[i]->getName() == userLangName)
+			if ((*it)->getName() == userLangName)
 			{
-				return _userLangArray[i];
+				return (*it);
 			}
 		}
 		// Should never pass this point.
-		assert(i < _nbUserLang);
+		assert(it != end);
 		return NULL;
-	};
+	}
 
 	int getNbExternalLang() const {return _nbExternalLang;};
 	int getExternalLangIndexFromName(const TCHAR *externalLangName) const {
@@ -812,35 +816,40 @@ public:
 			return true;
 		}
 
-		for (int i = 0 ; i < _nbUserLang ; i++)
+		for (std::vector<UserLangContainer *>::const_iterator it = _userLangArray.begin(), end = _userLangArray.end();
+		     it != end;
+		     ++it )
 		{
-			if (_userLangArray[i]->getName() == newName)
+			if ((*it)->getName() == newName)
 			{
 				return true;
 			}
 		}
+
 		return false;
-	};
+	}
 
 	bool getUserDefinedLangNameFromExt(TCHAR *ext, generic_string& outLangName) {
 		if ((!ext) || (!ext[0]))
 			return false;
 
-		for (int i = 0 ; i < _nbUserLang ; i++)
+		for (std::vector<UserLangContainer *>::iterator it = _userLangArray.begin(), end = _userLangArray.end();
+			it != end;
+			++it )
 		{
 			std::vector<generic_string> extVect;
-			cutString(_userLangArray[i]->getExtension(), extVect);
+			cutString((*it)->getExtension(), extVect);
 			for (size_t j = 0 ; j < extVect.size() ; j++)
 			{
-				if (!generic_stricmp(extVect[j].c_str(), ext))
+				if (extVect[j] == ext)
 				{
-					outLangName = _userLangArray[i]->getName();
+					outLangName = (*it)->getName();
 					return true;
 				}
 			}
 		}
 		return false;
-	};
+	}
 
 	int addUserLangToEnd(const UserLangContainer & userLang, const TCHAR *newName);
 	void removeUserLang(int index);
@@ -955,6 +964,8 @@ public:
 		return _themeSwitcher;
 	};
 
+	int getIndexFromKeywordListName(const TCHAR *name);
+
 private:
     NppParameters();
 	~NppParameters();
@@ -983,11 +994,10 @@ private:
 
 	FindHistory _findHistory;
 
-	// JOCE use a std::vector instead!
-	UserLangContainer *_userLangArray[NB_MAX_USER_LANG];
-	int _nbUserLang;
+	std::vector<UserLangContainer *> _userLangArray;
 
 	generic_string _userDefineLangPath;
+	// JOCE use a std::vector instead!
 	ExternalLangContainer *_externalLangArray[NB_MAX_EXTERNAL_LANG];
 	int _nbExternalLang;
 
@@ -1081,10 +1091,6 @@ private:
     void getAllWordStyles(TCHAR *lexerName, TiXmlNode *lexerNode);
 
 	void feedUserLang(TiXmlNode *node);
-	int getIndexFromKeywordListName(const TCHAR *name);
-	void feedUserStyles(TiXmlNode *node);
-	void feedUserKeywordList(TiXmlNode *node);
-	void feedUserSettings(TiXmlNode *node);
 
 	void feedShortcut(TiXmlNode *node);
 	void feedMacros(TiXmlNode *node);

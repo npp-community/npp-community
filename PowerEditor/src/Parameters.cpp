@@ -424,7 +424,7 @@ NppParameters::NppParameters() :
 	_pXmlDoc(NULL), _pXmlUserDoc(NULL), _pXmlUserStylerDoc(NULL),
 	_pXmlUserLangDoc(NULL), _pXmlToolIconsDoc(NULL), _pXmlShortcutDoc(NULL),
 	_pXmlContextMenuDoc(NULL), _pXmlSessionDoc(NULL), _pXmlNativeLangDocA(NULL),
-	_nbMaxFile(10), _nbUserLang(0), _nbExternalLang(0),
+	_nbMaxFile(10), _nbExternalLang(0),
 	_fileSaveDlgFilterIndex(-1),
 	_hUser32(NULL), _hUXTheme(NULL),
 	_transparentFuncAddr(NULL), _enableThemeDialogTextureFuncAddr(NULL),
@@ -432,7 +432,6 @@ NppParameters::NppParameters() :
 	_pAccelerator(NULL), _pScintAccelerator(NULL),
 	_asNotepadStyle(false)
 {
-	memset(&_userLangArray, 0, NB_MAX_USER_LANG * sizeof(UserLangContainer *));
 	memset(&_externalLangArray, 0, NB_MAX_EXTERNAL_LANG * sizeof(ExternalLangContainer *));
 
 	_findHistory._nbFindHistoryPath = 0;
@@ -472,8 +471,12 @@ NppParameters::~NppParameters()
 	{
 		delete (*it);
 	}
-	for (int i = 0 ; i < _nbUserLang ; i++)
-		delete _userLangArray[i];
+	for (std::vector<UserLangContainer *>::iterator it = _userLangArray.begin(), end = _userLangArray.end();
+		it != end;
+		++it)
+	{
+		delete (*it);
+	}
 	if (_hUser32)
 		FreeLibrary(_hUser32);
 	if (_hUXTheme)
@@ -1804,33 +1807,32 @@ const int missingName = 101;
 void NppParameters::feedUserLang(TiXmlNode *node)
 {
 	for (TiXmlNode *childNode = node->FirstChildElement(TEXT("UserLang"));
-		childNode && (_nbUserLang < NB_MAX_USER_LANG);
+		childNode ;
 		childNode = childNode->NextSibling(TEXT("UserLang")) )
 	{
 		const TCHAR *name = (childNode->ToElement())->Attribute(TEXT("name"));
 		const TCHAR *ext = (childNode->ToElement())->Attribute(TEXT("ext"));
+		UserLangContainer* newLangContainer = new UserLangContainer(name, ext);
 		try {
 			if (!name || !name[0] || !ext) throw int(missingName);
 
-			_userLangArray[_nbUserLang] = new UserLangContainer(name, ext);
-			_nbUserLang++;
-
 			TiXmlNode *settingsRoot = childNode->FirstChildElement(TEXT("Settings"));
 			if (!settingsRoot) throw int(loadFailed);
-			feedUserSettings(settingsRoot);
+			newLangContainer->feedUserSettings(settingsRoot);
 
 			TiXmlNode *keywordListsRoot = childNode->FirstChildElement(TEXT("KeywordLists"));
 			if (!keywordListsRoot) throw int(loadFailed);
-			feedUserKeywordList(keywordListsRoot);
+			newLangContainer->feedUserKeywordList(keywordListsRoot);
 
 			TiXmlNode *stylesRoot = childNode->FirstChildElement(TEXT("Styles"));
 			if (!stylesRoot) throw int(loadFailed);
-			feedUserStyles(stylesRoot);
+			newLangContainer->feedUserStyles(stylesRoot);
 
 		} catch (int e) {
 			if (e == loadFailed)
-				delete _userLangArray[--_nbUserLang];
+				delete newLangContainer;
 		}
+		_userLangArray.push_back(newLangContainer);
 	}
 }
 
@@ -1852,9 +1854,11 @@ void NppParameters::writeUserDefinedLang()
 
 	root = _pXmlUserLangDoc->FirstChild(TEXT("NotepadPlus"));
 
-	for (int i = 0 ; i < _nbUserLang ; i++)
+	for (std::vector<UserLangContainer *>::iterator it = _userLangArray.begin(), end = _userLangArray.end();
+		it != end;
+		++it)
 	{
-		insertUserLang2Tree(root, _userLangArray[i]);
+		insertUserLang2Tree(root, (*it));
 	}
 	_pXmlUserLangDoc->SaveFile();
 }
@@ -2080,21 +2084,21 @@ int NppParameters::addUserLangToEnd(const UserLangContainer & userLang, const TC
 {
 	if (isExistingUserLangName(newName))
 		return -1;
-	_userLangArray[_nbUserLang] = new UserLangContainer();
-	*(_userLangArray[_nbUserLang]) = userLang;
-	_userLangArray[_nbUserLang]->setName( newName );
-	_nbUserLang++;
-	return _nbUserLang-1;
+	UserLangContainer* newLangContainer = new UserLangContainer();
+	(*newLangContainer) = userLang;
+	newLangContainer->setName(newName);
+	_userLangArray.push_back(newLangContainer);
+
+	return _userLangArray.size()-1;
 }
 
 void NppParameters::removeUserLang(int index)
 {
-	if (index >= _nbUserLang )
+	// JOCE Can we possibly move index to a size_t?
+	if (index >= (int)_userLangArray.size() )
 		return;
 	delete _userLangArray[index];
-	for (int i = index ; i < (_nbUserLang - 1) ; i++)
-		_userLangArray[i] = _userLangArray[i+1];
-	_nbUserLang--;
+	_userLangArray.erase(_userLangArray.begin() + index);
 }
 
 int NppParameters::getIndexFromKeywordListName(const TCHAR *name)
@@ -2111,26 +2115,34 @@ int NppParameters::getIndexFromKeywordListName(const TCHAR *name)
 	else if (!lstrcmp(name, TEXT("Delimiters")))	return 0;
 	else return -1;
 }
-void NppParameters::feedUserSettings(TiXmlNode *settingsRoot)
+
+bool UserLangContainer::feedUserSettings(TiXmlNode *settingsRoot)
 {
+	if(!settingsRoot)
+	{
+		return false;
+	}
+
 	const TCHAR *boolStr;
 	TiXmlNode *globalSettingNode = settingsRoot->FirstChildElement(TEXT("Global"));
 	if (globalSettingNode)
 	{
 		boolStr = (globalSettingNode->ToElement())->Attribute(TEXT("caseIgnored"));
 		if (boolStr)
-			_userLangArray[_nbUserLang - 1]->setIsCaseIgnored(!lstrcmp(TEXT("yes"), boolStr));
+			setIsCaseIgnored(lstrcmp(TEXT("yes"), boolStr) == 0);
+		boolStr = (globalSettingNode->ToElement())->Attribute(TEXT("escapeChar"));
+		_escapeChar[0] = (boolStr) ? boolStr[0] : 0;
 	}
 	TiXmlNode *treatAsSymbolNode = settingsRoot->FirstChildElement(TEXT("TreatAsSymbol"));
 	if (treatAsSymbolNode)
 	{
 		boolStr = (treatAsSymbolNode->ToElement())->Attribute(TEXT("comment"));
 		if (boolStr)
-			_userLangArray[_nbUserLang - 1]->setIsCommentSymbol(!lstrcmp(TEXT("yes"), boolStr));
+			setIsCommentSymbol(!lstrcmp(TEXT("yes"), boolStr));
 
 		boolStr = (treatAsSymbolNode->ToElement())->Attribute(TEXT("commentLine"));
 		if (boolStr)
-			_userLangArray[_nbUserLang - 1]->setIsCommentLineSymbol(!lstrcmp(TEXT("yes"), boolStr));
+			setIsCommentLineSymbol(!lstrcmp(TEXT("yes"), boolStr));
 	}
 	TiXmlNode *prefixNode = settingsRoot->FirstChildElement(TEXT("Prefix"));
 	if (prefixNode)
@@ -2140,33 +2152,47 @@ void NppParameters::feedUserSettings(TiXmlNode *settingsRoot)
 		{
 			boolStr = (prefixNode->ToElement())->Attribute(names[i]);
 			if (boolStr)
-				_userLangArray[_nbUserLang - 1]->setIsPrefix(i, !lstrcmp(TEXT("yes"), boolStr));
+				setIsPrefix(i, !lstrcmp(TEXT("yes"), boolStr));
 		}
 	}
+	return true;
 }
 
-void NppParameters::feedUserKeywordList(TiXmlNode *node)
+bool UserLangContainer::feedUserKeywordList(TiXmlNode *node)
 {
+	if (!node)
+	{
+		return false;
+	}
+
+	NppParameters* params = NppParameters::getInstance();
+
 	for (TiXmlNode *childNode = node->FirstChildElement(TEXT("Keywords"));
 		childNode ;
 		childNode = childNode->NextSibling(TEXT("Keywords")))
 	{
 		const TCHAR *keywordsName = (childNode->ToElement())->Attribute(TEXT("name"));
-		int i = getIndexFromKeywordListName(keywordsName);
+		int i = params->getIndexFromKeywordListName(keywordsName);
 		if (i != -1)
 		{
 			TiXmlNode *valueNode = childNode->FirstChild();
 			if (valueNode)
 			{
 				const TCHAR *kwl = (valueNode)?valueNode->Value():(lstrcmp(keywordsName, TEXT("Delimiters"))?TEXT(""):TEXT("000000"));
-				_userLangArray[_nbUserLang - 1]->setKeywordList(i, kwl);
+				setKeywordList(i, kwl);
 			}
 		}
 	}
+	return true;
 }
 
-void NppParameters::feedUserStyles(TiXmlNode *node)
+bool UserLangContainer::feedUserStyles(TiXmlNode *node)
 {
+	if (!node)
+	{
+		return false;
+	}
+
 	for (TiXmlNode *childNode = node->FirstChildElement(TEXT("WordsStyle"));
 		childNode ;
 		childNode = childNode->NextSibling(TEXT("WordsStyle")))
@@ -2175,9 +2201,10 @@ void NppParameters::feedUserStyles(TiXmlNode *node)
 		const TCHAR *styleIDStr = (childNode->ToElement())->Attribute(TEXT("styleID"), &id);
 		if (styleIDStr)
 		{
-			_userLangArray[_nbUserLang - 1]->_styleArray.addStyler(id, childNode);
+			_styleArray.addStyler(id, childNode);
 		}
 	}
+	return true;
 }
 
 bool NppParameters::feedStylerArray(TiXmlNode *node)
@@ -4592,6 +4619,8 @@ void NppParameters::insertUserLang2Tree(TiXmlNode *node, UserLangContainer *user
 	{
 		TiXmlElement *globalElement = (settingsElement->InsertEndChild(TiXmlElement(TEXT("Global"))))->ToElement();
 		globalElement->SetAttribute(TEXT("caseIgnored"), userLang->isCaseIgnored()?TEXT("yes"):TEXT("no"));
+		if (userLang->_escapeChar[0])
+			globalElement->SetAttribute(TEXT("escapeChar"), userLang->_escapeChar);
 
 		TiXmlElement *treatAsSymbolElement = (settingsElement->InsertEndChild(TiXmlElement(TEXT("TreatAsSymbol"))))->ToElement();
 		treatAsSymbolElement->SetAttribute(TEXT("comment"), userLang->isCommentSymbol()?TEXT("yes"):TEXT("no"));
