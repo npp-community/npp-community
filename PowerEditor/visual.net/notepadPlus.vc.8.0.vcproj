@@ -1726,23 +1726,11 @@
 			Name="Tests"
 			>
 			<File
-				RelativePath="..\tests\testCompareNoCase.cpp"
+				RelativePath="..\tests\testCommon.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\tests\testParameters.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\tests\testPathAppend.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\tests\testPathCanonicalize.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\tests\testPathRemoveFileSpec.cpp"
 				>
 			</File>
 		</Filter>
