@@ -8040,10 +8040,10 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			_lastRecentFileList->initMenu(hFileMenu, IDM_FILEMENU_LASTONE + 1, pos);
 			for (int i = 0 ; i < nbLRFile ; i++)
 			{
-				generic_string * stdStr = pNppParam->getLRFile(i);
-				if (!nppGUI._checkHistoryFiles || PathFileExists(stdStr->c_str()))
+				const generic_string& stdStr = pNppParam->getLRFile(i);
+				if (!nppGUI._checkHistoryFiles || PathFileExists(stdStr.c_str()))
 				{
-					_lastRecentFileList->add(stdStr->c_str());
+					_lastRecentFileList->add(stdStr.c_str());
 				}
 			}
 
