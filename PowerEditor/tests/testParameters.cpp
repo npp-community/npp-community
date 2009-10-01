@@ -24,7 +24,23 @@ Hopefully it'll be converted to whatever unit testing framework is in place, at 
 #ifndef SHIPPING
 #include "parameters.h"
 
-TEST(cutStringSTLStringTest, EmptyString)
+//////////////////////////////////////////////////////////////////////////
+//
+// Table of Content:
+// - CutStringSTLStringTest
+// - UserLangContainerTest
+//
+//////////////////////////////////////////////////////////////////////////
+
+
+
+//////////////////////////////////////////////////////////////////////////
+//
+// CutStringSTLStringTest
+//
+//////////////////////////////////////////////////////////////////////////
+
+TEST(CutStringSTLStringTest, EmptyString)
 {
 	std::vector<generic_string> patternVect;
 	generic_string str(TEXT(""));
@@ -32,7 +48,7 @@ TEST(cutStringSTLStringTest, EmptyString)
 	ASSERT_EQ(0, patternVect.size());
 }
 
-TEST(cutStringSTLStringTest, OneToken)
+TEST(CutStringSTLStringTest, OneToken)
 {
 	std::vector<generic_string> patternVect;
 	generic_string str(TEXT("foo"));
@@ -40,13 +56,72 @@ TEST(cutStringSTLStringTest, OneToken)
 	ASSERT_EQ(1, patternVect.size());
 }
 
-TEST(cutStringSTLStringTest, TwoSpaceSeparatedTokens)
+TEST(CutStringSTLStringTest, TwoSpaceSeparatedTokens)
 {
 	std::vector<generic_string> patternVect;
 	generic_string str(TEXT("foo bar"));
 	cutString(str, patternVect);
 	ASSERT_EQ(2, patternVect.size());
 }
+
+
+//////////////////////////////////////////////////////////////////////////
+//
+// UserLangContainerTest
+//
+//////////////////////////////////////////////////////////////////////////
+
+TEST(UserLangContainerTest, FeedUserSettingNull)
+{
+	UserLangContainer container;
+	bool feedUserSetting = container.feedUserSettings(NULL);
+	ASSERT_EQ(false, feedUserSetting);
+	EXPECT_EQ(false, container.isCaseIgnored());
+	EXPECT_EQ(TEXT('\0'), container._escapeChar[0]);
+	EXPECT_EQ(false, container.isCommentSymbol());
+	EXPECT_EQ(false, container.isCommentLineSymbol());
+	for (int i = 0 ; i < nbPrefixListAllowed ; i++)
+	{
+		EXPECT_EQ(false, container.isPrefix(i));
+	}
+}
+
+TEST(UserLangContainerTest, feedUserKeywordListNull)
+{
+	UserLangContainer container;
+	bool feedUserKeywordList = container.feedUserKeywordList(NULL);
+	ASSERT_EQ(false, feedUserKeywordList);
+	for (int i = 0; i < container.getNbKeywordList(); i++)
+	{
+		EXPECT_EQ(TEXT(""), container.getKeywordList(i));
+	}
+}
+
+TEST(UserLangContainerTest, feedUserStylesNull)
+{
+	UserLangContainer container;
+	bool feedUserStyles = container.feedUserStyles(NULL);
+	ASSERT_EQ(false, feedUserStyles);
+	EXPECT_EQ(0, container._styleArray.getNbStyler());
+}
+
+// JOCE Need to include XML snippet to run the following tests.
+//
+//TEST(UserLangContainerTest, FeedUserSettingNormal)
+//{
+//	UserLangContainer container;
+//	container.feedUserSettings(TiXmlNode *settingsRoot);
+//}
+//
+//TEST(UserLangContainerTest, feedUserKeywordListNormal)
+//{
+//	container.feedUserKeywordList(TiXmlNode *node);
+//}
+//
+//TEST(UserLangContainerTest, feedUserStylesNormal)
+//{
+//	container.feedUserStyles(TiXmlNode *node);
+//}
 
 #endif
 // Lint seems flabbergasted with parameters.h because of the #ifndef SHIPPING.
