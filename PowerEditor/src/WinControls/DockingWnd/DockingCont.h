@@ -152,6 +152,8 @@ protected :
 	LPARAM NotifyParent(UINT message);
 
 private:
+	void SetMaxItemWidth(const generic_string& maxString, const HDC& context, const TCITEM& tcItem);
+
 	// handles
 	BOOL					_isActive;
 	bool					_isFloating;
@@ -163,7 +165,7 @@ private:
 
 	// caption params
 	BOOL					_isTopCaption;
-	generic_string				_pszCaption;
+	generic_string			_pszCaption;
 	BOOL					_isMouseDown;
 	BOOL					_isMouseClose;
 	BOOL					_isMouseOver;
@@ -179,19 +181,21 @@ private:
 	WNDPROC					_hDefaultTabProc;
 
 	// for moving and reordering
-	INT					_prevItem;
+	INT						_prevItem;
 	BOOL					_beginDrag;
 
 	// Is tooltip
 	BOOL					_bTabTTHover;
-	INT					_iLastHovered;
+	INT						_iLastHovered;
 
 	BOOL					_bCaptionTT;
 	BOOL					_bCapTTHover;
 	eMousePos				_hoverMPos;
 
 	// data of added windows
-	std::vector<tTbData *>			_vTbData;
+	std::vector<tTbData *>	_vTbData;
+
+	int						_maxTabWidth;
 };
 
 
