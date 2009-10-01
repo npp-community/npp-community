@@ -22,6 +22,7 @@
 #include "tinyxml.h"
 
 struct Token {
+	// JOCE: move to generic_string
 	TCHAR * token;
 	int length;
 	bool isIdentifier;
@@ -35,41 +36,6 @@ struct FunctionValues {
 	int scopeLevel;
 	FunctionValues() : lastIdentifier(-1), lastFunctionIdentifier(-1), param(0), scopeLevel(-1) {};
 };
-
-inline bool lower(TCHAR c) {
-	return (c >= 'a' && c <= 'z');
-}
-
-inline bool match(TCHAR c1, TCHAR c2) {
-	if (c1 == c2)	return true;
-	if (lower(c1))
-		return ((c1-32) == c2);
-	if (lower(c2))
-		return ((c2-32) == c1);
-	return false;
-}
-
-
-// JOCE: could generalize to generic_string and move to common.h
-//test string case insensitive ala Scintilla
-//0 if equal, <0 of before, >0 if after (name1 that is)
-int testNameNoCase(const TCHAR * name1, const TCHAR * name2, int len = -1) {
-	if (len == -1) {
-		len = 1024;	//magic value, but it probably fails way before it reaches this
-	}
-	int i = 0;
-	while(match(name1[i], name2[i])) {
-		if (name1[i] == 0 || i == len) {
-			return 0;	//equal
-		}
-		i++;
-	}
-
-	int subs1 = lower(name1[i])?32:0;
-	int subs2 = lower(name2[i])?32:0;
-
-	return ( (name1[i]-subs1) - (name2[i]-subs2) );
-}
 
 void FunctionCallTip::setLanguageXML(TiXmlElement * pXmlKeyword) {
 	if (isVisible())
@@ -224,7 +190,7 @@ bool FunctionCallTip::getCursorFunction() {
 
 		bool same = false;
 		if(_ignoreCase)
-			same = testNameNoCase(_funcName.c_str(), funcToken.token, _funcName.length()) == 0;
+			same = CompareNoCase(_funcName, funcToken.token) == 0;
 		else
 			same = (_funcName == funcToken.token);
 
@@ -255,7 +221,7 @@ bool FunctionCallTip::loadFunction() {
 			continue;
 		int compVal = 0;
 		if (_ignoreCase)
-			compVal = testNameNoCase(name, _funcName.c_str());	//lstrcmpi doesnt work in this case
+			compVal = CompareNoCase(name, _funcName.c_str());	//lstrcmpi doesnt work in this case
 		else
 			compVal = (_funcName == name);
 

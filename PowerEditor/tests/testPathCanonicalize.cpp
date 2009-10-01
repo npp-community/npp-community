@@ -20,6 +20,7 @@
 
 #ifndef NDEBUG
 
+// JOCE: Should move to testCommon.cpp
 void assertPathCanonicalize(TCHAR *path)
 {
 	generic_string strPath(path);
