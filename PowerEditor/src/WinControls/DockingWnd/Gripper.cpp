@@ -209,6 +209,7 @@ LRESULT Gripper::runProc(UINT message, WPARAM wParam, LPARAM lParam)
 			onButtonUp();
 
 			::DestroyWindow(_hSelf);
+			_hSelf = NULL;
 			return TRUE;
 		}
 		case DMM_CANCEL_MOVE:
@@ -227,6 +228,7 @@ LRESULT Gripper::runProc(UINT message, WPARAM wParam, LPARAM lParam)
 			::UnhookWindowsHookEx(hookKeyboard);
 
 			::DestroyWindow(_hSelf);
+			_hSelf = NULL;
 			return FALSE;
 		}
 		case WM_DESTROY:

@@ -654,10 +654,7 @@ void WindowsDlg::destroy()
 {
 	::GetWindowRect(_hSelf, &_lastKnownLocation);
 
-	HWND hSelf = _hSelf;
-	_hSelf = NULL;
-	::DestroyWindow(hSelf);
-
+	SizeableDlg::destroy();
 }
 
 void WindowsDlg::activateCurrent()
