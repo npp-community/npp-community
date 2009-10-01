@@ -465,8 +465,13 @@ generic_string FindReplaceDlg::getTextFromCombo(HWND hCombo, bool /*isUnicode*/)
 
 FindReplaceDlg::~FindReplaceDlg()
 {
+	FindReplaceDlg::destroy();
+
 	if (_pFinder)
+	{
 		delete _pFinder;
+	}
+
 	delete [] _uniFileName;
 }
 
