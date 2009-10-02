@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="submodule_lib_paths"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		AdditionalIncludeDirectories="&quot;$(smGoogleTestDir)\include&quot;;&quot;$(smGoogleMockDir)\include&quot;"
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		AdditionalLibraryDirectories=""
+	/>
+	<UserMacro
+		Name="smGoogleTestDir"
+		Value="$(SolutionDir)google_test"
+	/>
+	<UserMacro
+		Name="smGoogleMockDir"
+		Value="$(SolutionDir)google_mock"
+	/>
+</VisualStudioPropertySheet>

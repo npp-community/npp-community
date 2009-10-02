@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="environment_lib_paths"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		AdditionalIncludeDirectories="&quot;$(envGoogleTestDir)\include&quot;;&quot;$(envGoogleMockDir)\include&quot;"
+	/>
+	<UserMacro
+		Name="envGoogleTestDir"
+		Value="$(GOOGLE_TEST_DIR)"
+	/>
+	<UserMacro
+		Name="envGoogleMockDir"
+		Value="$(GOOGLE_MOCK_DIR)"
+	/>
+</VisualStudioPropertySheet>
