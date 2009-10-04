@@ -6,18 +6,18 @@
 	>
 	<Tool
 		Name="VCCLCompilerTool"
-		AdditionalIncludeDirectories="&quot;$(smGoogleTestDir)\include&quot;;&quot;$(smGoogleMockDir)\include&quot;"
+		AdditionalIncludeDirectories="&quot;$(smGTEST_DIR)\include&quot;;&quot;$(smGMOCK_DIR)\include&quot;"
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalLibraryDirectories=""
+		AdditionalLibraryDirectories="&quot;$(smGTEST_DIR)\msvc\$(ConfigurationName)&quot;;&quot;$(smGMOCK_DIR)\msvc\$(ConfigurationName)&quot;"
 	/>
 	<UserMacro
-		Name="smGoogleTestDir"
-		Value="$(SolutionDir)google_test"
-	/>
-	<UserMacro
-		Name="smGoogleMockDir"
+		Name="smGMOCK_DIR"
 		Value="$(SolutionDir)google_mock"
+	/>
+	<UserMacro
+		Name="smGTEST_DIR"
+		Value="$(SolutionDir)google_test"
 	/>
 </VisualStudioPropertySheet>
