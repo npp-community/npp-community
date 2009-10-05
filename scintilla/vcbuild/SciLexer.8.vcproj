@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="SciLexer.vc.8"
+	Name="SciLexer"
 	ProjectGUID="{B1BDB077-3ED7-4C69-9A22-5A65E08C201C}"
 	RootNamespace="SciLexer"
 	>

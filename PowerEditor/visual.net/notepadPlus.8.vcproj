@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="notepadPlus.vc.8"
+	Name="notepadPlus"
 	ProjectGUID="{FCF60E65-1B78-4D1D-AB59-4FC00AC8C248}"
 	RootNamespace="Notepad++"
 	Keyword="Win32Proj"
@@ -16,11 +16,11 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Debug Unicode|Win32"
+			Name="Debug|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC70.vsprops;.\submodule_lib_paths.vsprops;.\environment_lib_paths.vsprops"
+			InheritedPropertySheets=".\submodule_lib_paths.vsprops;.\environment_lib_paths.vsprops"
 			CharacterSet="1"
 			>
 			<Tool
@@ -74,7 +74,7 @@
 				OutputFile="../bin/notepad++Debug.exe"
 				Version="1.0"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(envGoogleTestDir)\msvc\Debug&quot;;&quot;$(envGoogleMockDir)\msvc\Debug&quot;;&quot;$(smGoogleTestDir)\msvc\Debug&quot;;&quot;$(smGoogleMockDir)\msvc\Debug&quot;"
+				AdditionalLibraryDirectories=""
 				TypeLibraryFile="/TLBID"
 				TypeLibraryResourceID="5"
 				GenerateDebugInformation="true"
@@ -109,11 +109,11 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release Unicode|Win32"
+			Name="Release|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC70.vsprops;.\submodule_lib_paths.vsprops;.\environment_lib_paths.vsprops"
+			InheritedPropertySheets=".\submodule_lib_paths.vsprops;.\environment_lib_paths.vsprops"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -170,7 +170,7 @@
 				OutputFile="../bin/notepad++Release.exe"
 				Version="1.0"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(envGoogleTestDir)\msvc\Release&quot;;&quot;$(envGoogleMockDir)\msvc\Release&quot;;&quot;$(smGoogleTestDir)\msvc\Release&quot;;&quot;$(smGoogleMockDir)\msvc\Release&quot;"
+				AdditionalLibraryDirectories=""
 				TypeLibraryFile=""
 				TypeLibraryResourceID="1"
 				GenerateDebugInformation="true"
@@ -208,11 +208,10 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Shipping Unicode|Win32"
+			Name="Shipping|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC70.vsprops"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -329,7 +328,7 @@
 				RelativePath="..\src\precompiled_headers.cpp"
 				>
 				<FileConfiguration
-					Name="Debug Unicode|Win32"
+					Name="Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -337,7 +336,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release Unicode|Win32"
+					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -345,7 +344,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Shipping Unicode|Win32"
+					Name="Shipping|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -407,7 +406,7 @@
 						RelativePath="..\src\MISC\Common\npp_session.cpp"
 						>
 						<FileConfiguration
-							Name="Debug Unicode|Win32"
+							Name="Debug|Win32"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -416,7 +415,7 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Release Unicode|Win32"
+							Name="Release|Win32"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -425,7 +424,7 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Shipping Unicode|Win32"
+							Name="Shipping|Win32"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -438,7 +437,7 @@
 						RelativePath="..\src\MISC\Common\npp_styles.cpp"
 						>
 						<FileConfiguration
-							Name="Debug Unicode|Win32"
+							Name="Debug|Win32"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -447,7 +446,7 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Release Unicode|Win32"
+							Name="Release|Win32"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -456,7 +455,7 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Shipping Unicode|Win32"
+							Name="Shipping|Win32"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -469,7 +468,7 @@
 						RelativePath="..\src\MISC\Common\npp_winver.cpp"
 						>
 						<FileConfiguration
-							Name="Debug Unicode|Win32"
+							Name="Debug|Win32"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -478,7 +477,7 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Release Unicode|Win32"
+							Name="Release|Win32"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -487,7 +486,7 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Shipping Unicode|Win32"
+							Name="Shipping|Win32"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
