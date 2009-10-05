@@ -2217,7 +2217,7 @@ bool NppParameters::feedStylerArray(TiXmlNode *node)
 		 childNode ;
 		 childNode = childNode->NextSibling(TEXT("LexerType")) )
     {
-	if (!_lexerStylerArray.hasEnoughSpace()) return false;
+		if (!_lexerStylerArray.hasEnoughSpace()) return false;
 
 	    TiXmlElement *element = childNode->ToElement();
 	    const TCHAR *lexerName = element->Attribute(TEXT("name"));
@@ -2244,7 +2244,7 @@ bool NppParameters::feedStylerArray(TiXmlNode *node)
 		 childNode ;
 		 childNode = childNode->NextSibling(TEXT("WidgetStyle")) )
     {
-	if (!_widgetStyleArray.hasEnoughSpace()) return false;
+		if (!_widgetStyleArray.hasEnoughSpace()) return false;
 
 	    TiXmlElement *element = childNode->ToElement();
 	    const TCHAR *styleIDStr = element->Attribute(TEXT("styleID"));
@@ -2585,13 +2585,13 @@ void NppParameters::feedGUIParameters(TiXmlNode *node)
 					if (!lstrcmp(val, TEXT("yes")))
 						_nppGUI._fileAutoDetection = cdEnabled;
 					else if (!lstrcmp(val, TEXT("auto")))
-				_nppGUI._fileAutoDetection = cdAutoUpdate;
+						_nppGUI._fileAutoDetection = cdAutoUpdate;
 					else if (!lstrcmp(val, TEXT("Update2End")))
-				_nppGUI._fileAutoDetection = cdGo2end;
+						_nppGUI._fileAutoDetection = cdGo2end;
 					else if (!lstrcmp(val, TEXT("autoUpdate2End")))
-				_nppGUI._fileAutoDetection = cdAutoUpdateGo2end;
-				else //(!lstrcmp(val, TEXT("no")))
-				_nppGUI._fileAutoDetection = cdDisabled;
+						_nppGUI._fileAutoDetection = cdAutoUpdateGo2end;
+					else //(!lstrcmp(val, TEXT("no")))
+						_nppGUI._fileAutoDetection = cdDisabled;
 
 					_nppGUI._fileAutoDetectionOriginalValue = _nppGUI._fileAutoDetection;
 				}
