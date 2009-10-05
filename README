@@ -1,0 +1,117 @@
+Notepad++ Community Release
+===========================
+http://github.com/npp-community/npp-community
+irc://irc.freenode.net:6667/notepad++
+
+Overview
+--------
+Notepad++ is one of the leading open-source text editors for the Windows
+platform, this Community Release is based the Notepad++ source with many
+enhancements.  The project is focused on optimizing the code, adding features,
+using unit tests, enhancing the UI, and fostering open collaboration and
+recognition of contributions using distributed version control.  Lastly, this
+project is place where the ideas from Notepad++'s IdeaTorrent, fix and
+enhancement patches, and plugin developers can have a public distribution
+where changes can cook and the public can give feedback.  If the feed-back is
+good and the demand is high, then perhaps it will be added to Notepad++.
+
+Requirements
+------------
+The Community Release source repository tries to minimize the requirements
+for getting started on hacking Notepad++, but there are still dependencies.
+
+	* Microsoft Visual Studio 8 or newer
+	* C++ TR1 implementation
+	* Google Testing Framework
+	* Google Mock
+
+If Microsoft Visual Studio 8 with SP1 or newer is used and the build source
+is a Git clone then there are no additional requirements.
+
+Getting the Source
+------------------
+The primary way of obtaining the source code is by using Git to clone the
+source repository.  To make it easier to contribute any modifications back
+to the project the use of a Github account and a fork of the repository is
+recommended.
+
+### Cloning with a Github Fork ###
+	open http://github.com/npp-community/npp-community
+	Click the 'fork'button next to the repository name
+	Copy the 'Your Clone URL' on your forked repository page
+	git clone $YOUR_CLONE_URL
+
+### Cloning without a Github Fork ###
+	git clone git://github.com/npp-community/npp-community.git
+
+### Downloading the source package ###
+	http://github.com/npp-community/npp-community/downloads
+
+
+Building the Source
+-------------------
+### Google Test and Mock ###
+Google Test and Mock are available as submodules in our source repository or
+they can be used from external installations setting the following environment
+variables to the source paths.
+	GOOGLE_TEST_DIR
+	GOOGLE_MOCK_DIR
+
+To initialize as Git submodules use your Git client to:
+	cd \path\to\repo_base_dir
+	git submodule init
+	git submodule update
+
+Google Test and Google Mock are both automatically executed when Notepad++CR
+is built using the Debug or Release configuration, but not the Shipping.
+
+Open the Google Test .sln for your Visual Sutdio and build both configurations.
+Do the same for Google Mock.
+
+### Notepad++ CR ###
+Open the notepadPlus solution for your Visual Studio edition and build the
+configuration you want to work with.
+
+Contributing
+------------
+Everything except trivial code cleanup needs to have a test included with it
+prior to being merged into the master branch.  Do not worry about creating the
+tests at first.  Code up your solution and make it available for feed-back.
+This is ually done by pushing your modifications branch to your GitHub fork
+and sending a pull request to other members in the network.
+
+We are not setup yet with a public forum/mailing list to directly submit patch
+series.  This will hopefully be available soon.  Until then, if you do not have
+a public repository to push a topic branch to, please visit our irc channel and
+ask for someone to review the patches.
+
+Try to base any new changes off of what is currently the head of the master
+branch.
+
+###  The Repository ###
+We try to follow the Git project's methods to maintain our repository.
+This means that:
+
+	- The master branch is where tagged releases are made.  This branch
+	  should always be a simple 'Git Pull' and fast-forward.  No patches
+	  are directly applied to this branch instead they are merged from
+	  topic branches.
+	  You can easily see a summary of what has been merged using Git's
+	  logging abilities.
+		--first-parent for a list of merges
+		--no-merges for a list of the commits
+
+	- The next branch is also a branch the should fast-forward and be a
+	  simple pull.  It contains the commits that are very likely to be
+	  in the next tagged release.
+
+	- When proposed updates are published by the community a new topic
+	  topic branch is created from the tip of the current master branch
+	  and the update is applied to that, then that branch is merged to
+	  the pu branch for publishing.  The pu branch will not fast-forward.
+	  It is based on the next branch and when proposed updates have had
+	  a chance to get feed-back the may graduate to next for future
+	  merging with master.
+
+Enjoy, and don't forget to visit the irc channel!
+
