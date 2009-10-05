@@ -1493,7 +1493,7 @@ void DockingCont::destroy()
 		delete (*it);
 	}
 	_vTbData.clear();
-	::DestroyWindow(_hSelf);
+	StaticDialog::destroy();
 }
 
 void DockingCont::SetMaxItemWidth(const generic_string& maxString, const HDC& context, const TCITEM& tcItem)

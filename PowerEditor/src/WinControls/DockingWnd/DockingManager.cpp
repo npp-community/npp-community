@@ -86,11 +86,17 @@ DockingManager::DockingManager()
 
 DockingManager::~DockingManager()
 {
-	// delete 4 splitters
-	for (int i = 0; i < DOCKCONT_MAX; i++)
+	for (std::vector<DockingSplitter*>::iterator it = _vSplitter.begin(), end = _vSplitter.end();
+		it != end;
+		++it)
 	{
-		delete _vSplitter[i];
-		delete _vContainer[i];
+		delete (*it);
+	}
+	for (std::vector<DockingCont*>::iterator it = _vContainer.begin(), end = _vContainer.end();
+		it != end;
+		++it)
+	{
+		delete (*it);
 	}
 
 	delete _dockData;
@@ -171,11 +177,6 @@ void DockingManager::init(HINSTANCE hInst, HWND hWnd, Window ** ppWin)
 	_dockData->hWnd = _hSelf;
 
 	_isInitialized = TRUE;
-}
-
-void DockingManager::destroy()
-{
-	::DestroyWindow(_hSelf);
 }
 
 LRESULT CALLBACK DockingManager::staticWinProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
