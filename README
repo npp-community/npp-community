@@ -10,7 +10,7 @@ platform, this Community Release is based the Notepad++ source with many
 enhancements.  The project is focused on optimizing the code, adding features,
 using unit tests, enhancing the UI, and fostering open collaboration and
 recognition of contributions using distributed version control.  Lastly, this
-project is place where the ideas from Notepad++'s IdeaTorrent, fix and
+project is the place where the ideas from Notepad++'s IdeaTorrent, fix and
 enhancement patches, and plugin developers can have a public distribution
 where changes can cook and the public can give feedback.  If the feed-back is
 good and the demand is high, then perhaps it will be added to Notepad++.
@@ -65,7 +65,7 @@ To initialize as Git submodules use your Git client to:
 Google Test and Google Mock are both automatically executed when Notepad++CR
 is built using the Debug or Release configuration, but not the Shipping.
 
-Open the Google Test .sln for your Visual Sutdio and build both configurations.
+Open the Google Test .sln for your Visual Studio and build both configurations.
 Do the same for Google Mock.
 
 ### Notepad++ CR ###
