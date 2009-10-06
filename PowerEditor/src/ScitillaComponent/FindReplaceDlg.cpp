@@ -195,7 +195,7 @@ public:
 		_ppEditView(NULL),
 		_pMainFoundInfos(&_foundInfos1),
 		_pMainMarkings(&_markings1),
-		nFoundFiles(0),
+		_nFoundFiles(0),
 		_lastFileHeaderPos(0),
 		_lastSearchHeaderPos(0)
 	{
@@ -246,7 +246,7 @@ private:
 	SearchResultMarkings _MarkingsStruct;
 
 	ScintillaEditView _scintView;
-	unsigned int nFoundFiles;
+	unsigned int _nFoundFiles;
 
 	int _lastFileHeaderPos;
 	int _lastSearchHeaderPos;
@@ -2119,13 +2119,13 @@ void Finder::addFileHitCount(int count)
 	setFinderReadOnly(false);
 	_scintView.insertGenericTextFrom(_lastFileHeaderPos, text);
 	setFinderReadOnly(true);
-	nFoundFiles++;
+	_nFoundFiles++;
 }
 
 void Finder::addSearchHitCount(int count)
 {
 	TCHAR text[50];
-	wsprintf(text, TEXT(" (%i hits in %i files)"), count, nFoundFiles);
+	wsprintf(text, TEXT(" (%i hits in %i files)"), count, _nFoundFiles);
 	setFinderReadOnly(false);
 	_scintView.insertGenericTextFrom(_lastSearchHeaderPos, text);
 	setFinderReadOnly(true);
@@ -2173,7 +2173,7 @@ void Finder::beginNewFilesSearch()
 	_scintView.execute(SCI_SETCURRENTPOS, 0);
 	_pMainFoundInfos = _pMainFoundInfos == &_foundInfos1 ? &_foundInfos2 : &_foundInfos1;
 	_pMainMarkings = _pMainMarkings == &_markings1 ? &_markings2 : &_markings1;
-	nFoundFiles = 0;
+	_nFoundFiles = 0;
 
 	// fold all old searches (1st level only)
 	_scintView.collapse(searchHeaderLevel - SC_FOLDLEVELBASE, fold_collapse);
