@@ -23,8 +23,6 @@
 #include "Tabbar.h"
 #include "npp_winver.h"
 
-#include "Debug/npp_debug.h"
-
 #ifndef WH_MOUSE_LL
 #define WH_MOUSE_LL 14
 #endif
