@@ -882,7 +882,7 @@ void DockingManager::toggleVisTb(DockingCont* pContSrc, DockingCont* pContTgt)
 
 	for (size_t iTb = 0; iTb < vTbData.size(); iTb++)
 	{
-		/* get data one by another */
+		/* get data one by one */
 		tTbData* TbData = vTbData[iTb];
 		toggleTb(pContSrc, pContTgt, TbData);
 	}
