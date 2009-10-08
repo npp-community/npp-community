@@ -29,9 +29,26 @@ struct tTbData;
 class DockingDlgInterface : public StaticDialog
 {
 public:
-	DockingDlgInterface(): StaticDialog() {};
-	DockingDlgInterface(int dlgID): StaticDialog(),
-		_dlgID(dlgID), _isFloating(TRUE), _iDockedPos(0) {};
+	DockingDlgInterface():
+		StaticDialog(),
+		_HSource(NULL),
+		_data(NULL),
+		_dlgID(-1),
+		_isFloating(TRUE),
+		_iDockedPos(0)
+	{
+		memset(_pluginName, 0, MAX_PATH * sizeof(TCHAR));
+	}
+	DockingDlgInterface(int dlgID):
+		StaticDialog(),
+		_HSource(NULL),
+		_data(NULL),
+		_dlgID(dlgID),
+		_isFloating(TRUE),
+		_iDockedPos(0)
+	{
+		memset(_pluginName, 0, MAX_PATH * sizeof(TCHAR));
+	}
 
 	virtual void init(HINSTANCE hInst, HWND parent);
 

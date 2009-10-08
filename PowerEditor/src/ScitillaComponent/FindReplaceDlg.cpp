@@ -1668,7 +1668,7 @@ void FindReplaceDlg::findAllIn(InWhat op)
 		_pFinder = new Finder();
 		_pFinder->init(_hInst, _hSelf, _ppEditView);
 
-		tTbData	data = {0};
+		tTbData	data;
 		_pFinder->create(&data, false);
 		::SendMessage(_hParent, NPPM_MODELESSDIALOG, MODELESSDIALOGREMOVE, (WPARAM)_pFinder->getHSelf());
 		// define the default docking behaviour
