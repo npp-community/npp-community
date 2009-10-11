@@ -26,7 +26,7 @@ for getting started on hacking Notepad++, but there are still dependencies.
 	* Google Testing Framework
 	* Google Mock
 
-If Microsoft Visual Studio 8 with SP1 or newer is used and the build source
+If Microsoft Visual Studio 9 with SP1 or newer is used and the build source
 is a Git clone then there are no additional requirements.
 
 Getting the Source
