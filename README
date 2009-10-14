@@ -1,7 +1,8 @@
 Notepad++ Community Release
 ===========================
-http://github.com/npp-community/npp-community
-irc://irc.freenode.net:6667/notepad++
+Project page: http://github.com/npp-community/npp-community
+IRC Support: irc://irc.freenode.net:6667/notepad++
+Issue Tracking: http://nppcommunity.lighthouseapp.com
 
 Overview
 --------
@@ -25,7 +26,7 @@ for getting started on hacking Notepad++, but there are still dependencies.
 	* Google Testing Framework
 	* Google Mock
 
-If Microsoft Visual Studio 8 with SP1 or newer is used and the build source
+If Microsoft Visual Studio 9 with SP1 or newer is used and the build source
 is a Git clone then there are no additional requirements.
 
 Getting the Source
