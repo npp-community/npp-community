@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="notepadPlus.vc.9"
+	Name="notepadPlus"
 	ProjectGUID="{FCF60E65-1B78-4D1D-AB59-4FC00AC8C248}"
 	RootNamespace="Notepad++"
 	Keyword="Win32Proj"
@@ -17,11 +17,11 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Debug Unicode|Win32"
+			Name="Debug|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops;.\external_apps_locations.vsprops"
+			InheritedPropertySheets=".\submodule_lib_paths.vsprops;.\environment_lib_paths.vsprops"
 			CharacterSet="1"
 			>
 			<Tool
@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(GoogleMockDir)include&quot;;&quot;$(GoogleTestDir)include&quot;;..\..\scintilla\include;..\src;..\src\MISC;..\src\MISC\Common;..\src\MISC\Exception;..\src\MISC\PluginsManager;..\src\MISC\Process;..\src\MISC\RegExt;..\src\ScitillaComponent;..\src\TinyXml;..\src\TinyXml\tinyXmlA;..\src\WinControls;..\src\WinControls\AboutDlg;..\src\WinControls\ColourPicker;..\src\WinControls\ContextMenu;..\src\WinControls\DockingWnd;..\src\WinControls\Grid;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\Preference;..\src\WinControls\shortcut;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\StaticDialog\RunDlg;..\src\WinControls\StatusBar;..\src\WinControls\TabBar;..\src\WinControls\TaskList;..\src\WinControls\ToolBar;..\src\WinControls\ToolTip;..\src\WinControls\TrayIcon;..\src\WinControls\WindowsDlg"
+				AdditionalIncludeDirectories="..\..\scintilla\include;..\src;..\src\MISC;..\src\MISC\Common;..\src\MISC\Exception;..\src\MISC\PluginsManager;..\src\MISC\Process;..\src\MISC\RegExt;..\src\ScitillaComponent;..\src\TinyXml;..\src\TinyXml\tinyXmlA;..\src\WinControls;..\src\WinControls\AboutDlg;..\src\WinControls\ColourPicker;..\src\WinControls\ContextMenu;..\src\WinControls\DockingWnd;..\src\WinControls\Grid;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\Preference;..\src\WinControls\shortcut;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\StaticDialog\RunDlg;..\src\WinControls\StatusBar;..\src\WinControls\TabBar;..\src\WinControls\TaskList;..\src\WinControls\ToolBar;..\src\WinControls\ToolTip;..\src\WinControls\TrayIcon;..\src\WinControls\WindowsDlg"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;TIXML_USE_STL;TIXMLA_USE_STL"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
@@ -74,7 +74,7 @@
 				OutputFile="../bin/notepad++Debug.exe"
 				Version="1.0"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(GoogleMockDir)msvc\Debug&quot;;&quot;$(GoogleTestDir)msvc\Debug&quot;"
+				AdditionalLibraryDirectories=""
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames=""
 				TypeLibraryFile="/TLBID"
@@ -110,11 +110,11 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release Unicode|Win32"
+			Name="Release|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops;.\external_apps_locations.vsprops"
+			InheritedPropertySheets=".\submodule_lib_paths.vsprops;.\environment_lib_paths.vsprops"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -139,7 +139,7 @@
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="&quot;$(GoogleMockDir)include&quot;;&quot;$(GoogleTestDir)include&quot;;..\..\scintilla\include;..\src;..\src\MISC;..\src\MISC\Common;..\src\MISC\Exception;..\src\MISC\PluginsManager;..\src\MISC\Process;..\src\MISC\RegExt;..\src\ScitillaComponent;..\src\TinyXml;..\src\TinyXml\tinyXmlA;..\src\WinControls;..\src\WinControls\AboutDlg;..\src\WinControls\ColourPicker;..\src\WinControls\ContextMenu;..\src\WinControls\DockingWnd;..\src\WinControls\Grid;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\Preference;..\src\WinControls\shortcut;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\StaticDialog\RunDlg;..\src\WinControls\StatusBar;..\src\WinControls\TabBar;..\src\WinControls\TaskList;..\src\WinControls\ToolBar;..\src\WinControls\ToolTip;..\src\WinControls\TrayIcon;..\src\WinControls\WindowsDlg"
+				AdditionalIncludeDirectories="..\..\scintilla\include;..\src;..\src\MISC;..\src\MISC\Common;..\src\MISC\Exception;..\src\MISC\PluginsManager;..\src\MISC\Process;..\src\MISC\RegExt;..\src\ScitillaComponent;..\src\TinyXml;..\src\TinyXml\tinyXmlA;..\src\WinControls;..\src\WinControls\AboutDlg;..\src\WinControls\ColourPicker;..\src\WinControls\ContextMenu;..\src\WinControls\DockingWnd;..\src\WinControls\Grid;..\src\WinControls\ImageListSet;..\src\WinControls\OpenSaveFileDialog;..\src\WinControls\Preference;..\src\WinControls\shortcut;..\src\WinControls\SplitterContainer;..\src\WinControls\StaticDialog;..\src\WinControls\StaticDialog\RunDlg;..\src\WinControls\StatusBar;..\src\WinControls\TabBar;..\src\WinControls\TaskList;..\src\WinControls\ToolBar;..\src\WinControls\ToolTip;..\src\WinControls\TrayIcon;..\src\WinControls\WindowsDlg"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;TIXMLA_USE_STL"
 				StringPooling="true"
 				ExceptionHandling="2"
@@ -171,7 +171,7 @@
 				OutputFile="../bin/notepad++Release.exe"
 				Version="1.0"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(GoogleMockDir)msvc\Release&quot;;&quot;$(GoogleTestDir)msvc\Release&quot;"
+				AdditionalLibraryDirectories=""
 				TypeLibraryFile=""
 				TypeLibraryResourceID="1"
 				GenerateDebugInformation="false"
@@ -206,11 +206,10 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Shipping Unicode|Win32"
+			Name="Shipping|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops;.\external_apps_locations.vsprops"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -267,6 +266,7 @@
 				OutputFile="../bin/notepad++.exe"
 				Version="1.0"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories=""
 				TypeLibraryFile=""
 				TypeLibraryResourceID="1"
 				GenerateDebugInformation="false"
@@ -1295,7 +1295,7 @@
 				RelativePath="..\src\precompiled_headers.cpp"
 				>
 				<FileConfiguration
-					Name="Debug Unicode|Win32"
+					Name="Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1303,7 +1303,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release Unicode|Win32"
+					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1311,7 +1311,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Shipping Unicode|Win32"
+					Name="Shipping|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1335,7 +1335,7 @@
 				RelativePath="..\src\winmain.cpp"
 				>
 				<FileConfiguration
-					Name="Debug Unicode|Win32"
+					Name="Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
