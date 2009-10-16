@@ -1740,6 +1740,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\tests\testNppDebug.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\tests\testParameters.cpp"
 				>
 			</File>

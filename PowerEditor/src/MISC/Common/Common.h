@@ -131,10 +131,10 @@ private:
 
 #define ERROR_MSG_SIZE 1024
 
-#ifdef DEBUG
+#ifdef _DEBUG
 	#define NO_DEFAULT_CASE default: {\
 		TCHAR errorMsg[ERROR_MSG_SIZE];\
-		sprintf_s(errorMsg, ERROR_MSG_SIZE, "Unhanded default case in %s, line %d", __FILE__, __LINE__ );\
+		_stprintf_s(errorMsg, ERROR_MSG_SIZE, TEXT("Unhanded default case in %s, line %d"), __FILE__, __LINE__ );\
 		::MessageBox(NULL, TEXT("Unhandled default case."), errorMsg, MB_OK|MB_ICONWARNING);\
 		}\
 		break
