@@ -117,7 +117,7 @@ enum LangType {L_TXT, L_PHP , L_C, L_CPP, L_CS, L_OBJC, L_JAVA, L_RC,\
 	//BOOL NPPM_SWITCHTOFILE(0, TCHAR *filePathName2switch)
 
 	#define NPPM_SAVECURRENTFILE (NPPMSG + 38)
-	//BOOL WM_SWITCHTOFILE(0, 0)
+	//NPPM_SAVECURRENTFILE(0, 0)
 
 	#define NPPM_SAVEALLFILES	(NPPMSG + 39)
 	//BOOL NPPM_SAVEALLFILES(0, 0)
@@ -371,7 +371,7 @@ enum LangType {L_TXT, L_PHP , L_C, L_CPP, L_CS, L_OBJC, L_JAVA, L_RC,\
 	//scnNotification->nmhdr.idFrom = BufferID;
 
 	#define NPPN_FILEBEFORESAVE (NPPN_FIRST + 7) // To notify plugins that the current file is about to be saved
-	//scnNotification->nmhdr.code = NPPN_FILEBEFOREOPEN;
+	//scnNotification->nmhdr.code = NPPN_FILEBEFORESAVE;
 	//scnNotification->nmhdr.hwndFrom = hwndNpp;
 	//scnNotification->nmhdr.idFrom = BufferID;
 
@@ -413,7 +413,7 @@ enum LangType {L_TXT, L_PHP , L_C, L_CPP, L_CS, L_OBJC, L_JAVA, L_RC,\
 		//};
 
 	#define NPPN_FILEBEFORELOAD (NPPN_FIRST + 14) // To notify plugins that the current file is about to be loaded
-	//scnNotification->nmhdr.code = NPPN_FILEBEFOREOPEN;
+	//scnNotification->nmhdr.code = NPPN_FILEBEFORELOAD;
 	//scnNotification->nmhdr.hwndFrom = hwndNpp;
 	//scnNotification->nmhdr.idFrom = NULL;
 
