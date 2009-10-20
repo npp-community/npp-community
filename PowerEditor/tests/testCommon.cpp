@@ -49,6 +49,10 @@ bool testPathAppend(TCHAR *path, TCHAR *append)
 	BOOL strRet = PathAppend(strPath, strAppend);
 	BOOL charRet = PathAppend(cPath, append);
 
+	if (strRet != charRet || strPath != cPath)
+	{
+		_tprintf(_T("Testing |%s| append |%s|     String (ours) |%s| returned %d   Char (system) |%s| returned %d\r\n"), path, append, strPath.c_str(), strRet, cPath, charRet);
+	}
 	return ((strRet == charRet) &&
 			(strPath == cPath));
 }
@@ -250,6 +254,10 @@ bool testPathRemoveFileSpec(TCHAR* toTest)
 
 	BOOL strRet = PathRemoveFileSpec(strPath);
 	BOOL charRet = PathRemoveFileSpec(charPath);
+	if (strPath != charPath || strRet != charRet)
+	{
+		_tprintf(_T("Testing |%s|    String(our version) |%s| returned %d     Char(sys version) |%s| returned %d\r\n"), toTest, strPath.c_str(), strRet, charPath, charRet);
+	}
 
 	return ((strPath == charPath) &&
 		(strRet == charRet));
@@ -389,6 +397,11 @@ bool testPathCanonicalize(TCHAR *path)
 	TCHAR output[MAX_PATH];
 	BOOL charRet = PathCanonicalize(output, path);
 	BOOL strRet = PathCanonicalize(strPath);
+
+	if (charRet != strRet || strPath != output)
+	{
+		_tprintf(_T("Testing |%s|    String (ours) |%s| returned %d    Char (system) |%s| returned %d\r\n"), path, strPath.c_str(), strRet, output, charRet);
+	}
 
 	return ((charRet == strRet)
 		   && (strPath == output));
