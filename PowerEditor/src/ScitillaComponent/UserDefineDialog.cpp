@@ -1737,6 +1737,9 @@ BOOL CALLBACK UserDefineDialog::run_dlgProc(UINT message, WPARAM wParam, LPARAM 
 								::PostMessage(_hSelf, WM_COMMAND, IDC_RENAME_BUTTON, 0);
 								return TRUE;
 							}
+
+							bool needMenuSeparator = (pNppParam->getNbUserLang() == 0);
+
 							//add current language in userLangArray at the end as a new lang
 							UserLangContainer & userLang = (wParam == IDC_SAVEAS_BUTTON)?pNppParam->getULCFromIndex(i-1):*_pCurrentUserLang;
 							int newIndex = pNppParam->addUserLangToEnd(userLang, newName);
@@ -1748,6 +1751,11 @@ BOOL CALLBACK UserDefineDialog::run_dlgProc(UINT message, WPARAM wParam, LPARAM 
 
 							//add new language name in langMenu
 							HWND hNpp = ::GetParent(_hSelf);
+							if (needMenuSeparator)
+							{
+								::InsertMenu(::GetSubMenu((HMENU)::SendMessage(hNpp, NPPM_INTERNAL_GETMENU, 0, 0), MENUINDEX_LANGUAGE), IDM_LANG_USER, MF_BYPOSITION|MF_SEPARATOR, 0, TEXT(""));
+							}
+
 							::InsertMenu(::GetSubMenu((HMENU)::SendMessage(hNpp, NPPM_INTERNAL_GETMENU, 0, 0), MENUINDEX_LANGUAGE), IDM_LANG_USER + newIndex /*+ 1*/, MF_BYCOMMAND, IDM_LANG_USER + newIndex + 1, newName);
 							::DrawMenuBar(hNpp);
 						}
