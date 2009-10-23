@@ -21,14 +21,25 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "resource.h"
 #include "menuCmdID.h"
 
+// The following file is generated during pre-build event processing and
+// defines the GEN_VER_ values.
+#include "gen-versioninfo.h"
+
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION    VERSION_DIGITALVALUE
-PRODUCTVERSION    VERSION_DIGITALVALUE
-FILEFLAGSMASK    0x3fL
-FILEFLAGS 0
-FILEOS VOS_NT_WINDOWS32
-FILETYPE VFT_APP
-FILESUBTYPE VFT2_UNKNOWN
+FILEVERSION     GEN_VER_DIGITAL_VERSION
+PRODUCTVERSION  GEN_VER_DIGITAL_VERSION
+FILEFLAGSMASK  	VS_FFI_FILEFLAGSMASK
+
+#ifndef _DEBUG
+	#define VER_DEBUG	0
+#else
+	#define VER_DEBUG VS_FF_DEBUG
+#endif
+
+FILEFLAGS      	(VER_DEBUG|GEN_VER_PATCHED_FLAG|GEN_VER_PRERELEASE_FLAG|GEN_VER_PRIVATE_FLAG)
+FILEOS         	VOS__WINDOWS32
+FILETYPE		VFT_APP
+FILESUBTYPE    	VFT2_UNKNOWN
 BEGIN
     BLOCK    "VarFileInfo"
     BEGIN
@@ -38,14 +49,16 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE    "CompanyName",    "Don HO don.h@free.fr\0"
-            VALUE    "FileDescription",    "Notepad++ : a free (GNU) source code editor\0"
-            VALUE    "FileVersion",    VERSION_VALUE
-            VALUE    "InternalName",    "npp.exe\0"
-            VALUE    "LegalCopyright",    "Copyleft 1998-2006 by Don HO\0"
-            VALUE    "OriginalFilename",    "Notepad++.exe\0"
-            VALUE    "ProductName",    "Notepad++\0"
-            VALUE    "ProductVersion",    VERSION_VALUE
+			VALUE    "Comments",			GEN_VER_COMMENT_STRING
+            VALUE    "CompanyName",			"\0"
+            VALUE    "FileDescription",		"Notepad++: a free (GNU) source code editor\0"
+            VALUE    "FileVersion",			GEN_VER_VERSION_STRING
+            VALUE    "InternalName",		"npp.exe\0"
+            VALUE    "LegalCopyright",		"Copyright 2009 Notepad++ Community\0"
+            VALUE    "OriginalFilename",	"Notepad++.exe\0"
+			VALUE	 "PrivateBuild",		GEN_VER_PRIVATE_STRING
+            VALUE    "ProductName",			"Notepad++ Community Release\0"
+            VALUE    "ProductVersion",		GEN_VER_VERSION_STRING
         END
     END
 END

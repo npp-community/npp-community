@@ -25,6 +25,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="Runtime build and version generation."
+				CommandLine="CALL $(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat &quot;$(IntDir)\&quot; &quot;$(SolutionDir)PowerEditor\src\gen-versioninfo.h&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -62,6 +64,7 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_UNICODE;UNICODE;_DEBUG"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -119,6 +122,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="Runtime build and version generation."
+				CommandLine="CALL $(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat &quot;$(IntDir)\&quot; &quot;$(SolutionDir)PowerEditor\src\gen-versioninfo.h&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -217,6 +222,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="Runtime build and version generation."
+				CommandLine="CALL $(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat &quot;$(IntDir)\&quot; &quot;$(SolutionDir)PowerEditor\src\gen-versioninfo.h&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -758,6 +765,10 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc"
 			>
+			<File
+				RelativePath="..\src\fileversioninfo.h"
+				>
+			</File>
 			<File
 				RelativePath="..\src\keys.h"
 				>
