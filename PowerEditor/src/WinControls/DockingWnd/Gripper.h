@@ -43,7 +43,7 @@ public:
 		_hParent = hParent;
 	};
 
-	void startGrip(DockingCont* pCont, DockingManager* pDockMgr, void* pRes);
+	void startGrip(DockingCont* pCont, DockingManager* pDockMgr);
 
 	~Gripper() {
 		if (_hdc) {
@@ -120,9 +120,6 @@ private:
 	int	_iItem;
 	RECT _rcItem;
 	TCITEM _tcItem;
-
-	// resource pointer of THIS class
-	void *_pRes;
 
 	HDC _hdc;
 	HBITMAP _hbm;

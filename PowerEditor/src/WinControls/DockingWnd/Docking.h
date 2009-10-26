@@ -61,6 +61,24 @@ struct tTbData{
 	RECT		rcFloat;		// floating position
 	int			iPrevCont;		// stores the privious container (toggling between float and dock)
 	const TCHAR*	pszModuleName;	// it's the plugin file name. It's used to identify the plugin
+
+	tTbData():
+		hClient(NULL),
+		pszName(NULL),
+		dlgID(-1),
+		uMask(0),
+		hIconTab(NULL),
+		pszAddInfo(NULL),
+		iPrevCont(-1),
+		pszModuleName(NULL)
+	{
+		memset(&rcFloat, 0, sizeof(RECT));
+	}
+
+	~tTbData()
+	{
+
+	}
 };
 
 
