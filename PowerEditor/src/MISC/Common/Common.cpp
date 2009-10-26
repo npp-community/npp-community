@@ -17,6 +17,8 @@
 
 #include "precompiled_headers.h"
 
+#include "npp_winver.h"
+
 WcharMbcsConvertor * WcharMbcsConvertor::_pSelf = new WcharMbcsConvertor;
 
 // Set a call back with the handle after init to set the path.
@@ -529,7 +531,21 @@ BOOL PathRemoveFileSpec(generic_string & path)
 		else if (lastBackslash == 0 && path.size() > 1)  //   "\foo.exe" becomes "\"
 			path.erase(1);
 		else
+		{
 			path.erase(lastBackslash);
+
+			// For multiple backslashes as the last backslash, windows 7 onwards removes them
+			// The version check is done if and only if the last character is still a backslash
+			// which will only happen in the case of c:\foo\\bar
+			if (path[path.size() - 1] == TEXT('\\') && getWinVersion() >= WV_WIN7)
+			{
+				do
+				{
+					lastBackslash--;
+					path.erase(lastBackslash);
+				} while (path[path.size() - 1] == TEXT('\\'));
+			}
+		}
 	}
 
 	return inLen != path.length();
@@ -565,114 +581,10 @@ BOOL PathAppend(generic_string &path, const generic_string &more)
 
 BOOL PathCanonicalize(generic_string& path)
 {
-	generic_string::size_type position     = path.size();
-	generic_string::size_type lastPosition = position;
-	generic_string::size_type removeFrom   = position;
-	generic_string::size_type stopAt	   = 0;
-
-	int upDirElements   = 0;
-	int sameDirElements = 0;
-
-	/* Note this mirrors a bug with win32 PathCanonicalize not supporting
-	 * relative paths with drive letters (e.g. C:abc\\def)
-	 */
-	if (position >= 3 && path.compare(1, 2, TEXT(":\\")) == 0)
-	{
-		stopAt = 2;
-	}
-
-
-	do
-	{
-		position = path.find_last_of(TEXT('\\'), position);
-		if (generic_string::npos == position)
-			position = 0;
-
-
-		if (path.compare(position, lastPosition - position, TEXT("\\..")) == 0)
-		{
-			if (0 == sameDirElements  && 0 == upDirElements)
-				removeFrom = lastPosition;
-
-			upDirElements++;
-
-		}
-		else if (path.compare(position, lastPosition - position, TEXT("\\.")) == 0)
-		{
-			if (0 == sameDirElements  && 0 == upDirElements)
-				removeFrom = lastPosition;
-
-			sameDirElements++;
-
-		}
-		else if (0 == position && path.compare(position, lastPosition - position, TEXT("..")) == 0)
-		{
-			// Special case for .. at the start of the path
-
-			if (0 == sameDirElements  && 0 == upDirElements)
-				removeFrom = lastPosition;
-
-			upDirElements++;
-		}
-		else if (0 == position && path.compare(position, lastPosition - position, TEXT(".")) == 0)
-		{
-			// Special case for . at the start of the path
-
-			if (0 == sameDirElements  && 0 == upDirElements)
-				removeFrom = lastPosition;
-
-			sameDirElements++;
-		}
-		else
-		{
-			if (upDirElements > 1)
-			{
-				upDirElements--;
-			}
-			else if (1 == upDirElements)
-			{
-				// strip the \.. and the dir that precedes it (or however many there are
-				// e.g. abc\def\ghi\..\..\jkl  becomes abc\jkl
-				path.erase(position, removeFrom - position);
-
-				upDirElements = 0;
-				sameDirElements = 0;
-			}
-			else if (sameDirElements > 0)
-			{
-				path.erase(lastPosition, removeFrom - lastPosition);
-				sameDirElements = 0;
-			}
-
-		}
-
-		lastPosition = position;
-		if (position > 0)
-			position--;
-
-
-	} while (lastPosition > stopAt);
-
-
-
-	if (upDirElements > 0)
-	{
-		// if any .. path elements remain at the beginning of the path, just remove and leave the backslash
-		path.erase(stopAt, removeFrom - stopAt);
-	}
-	else if (sameDirElements > 0)
-	{
-		// if any . path elements remain, remove them, and leave the backslash only if it was there before
-		if (path[stopAt] == TEXT('\\'))
-			path.erase(stopAt, removeFrom - stopAt);
-		else
-			path.erase(stopAt, removeFrom + 1 - stopAt);
-	}
-
-
-
-	return TRUE;
-
+	TCHAR buffer[MAX_PATH];
+	BOOL result = PathCanonicalize(buffer, path.c_str());
+	path = buffer;
+	return result;
 }
 
 BOOL PathCanonicalize(generic_string& path, generic_string& output)
