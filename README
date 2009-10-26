@@ -111,7 +111,7 @@ This means that:
 	  and the update is applied to that, then that branch is merged to
 	  the pu branch for publishing.  The pu branch will not fast-forward.
 	  It is based on the next branch and when proposed updates have had
-	  a chance to get feed-back the may graduate to next for future
+	  a chance to get feed-back they may graduate to next for future
 	  merging with master.
 
 Enjoy, and don't forget to visit the irc channel!
