@@ -20,47 +20,69 @@
 
 #ifndef SHIPPING
 
-#define MAX_DEBUG_INDENT 1024
-namespace NppDebug
-{
-typedef void (__stdcall *outputFunction)(const TCHAR*);
+	#define MAX_DEBUG_INDENT 1024
+	namespace NppDebug
+	{
+	typedef void (__stdcall *outputFunction)(const TCHAR*);
 
-outputFunction setOutputFunction(outputFunction newOutputFunction);
+	outputFunction setOutputFunction(outputFunction newOutputFunction);
 
-void outputF(TCHAR* format, ...);
+	void outputF(TCHAR* format, ...);
 
-// JOCE: Nice to have: configurable indent character (' ', '\t', '_', '+', etc...)
-class FuncGuard
-{
-public:
-	FuncGuard(const TCHAR* funcsig, const TCHAR* funcname, const TCHAR* file, int line);
-	~FuncGuard();
+	// JOCE: Nice to have: configurable indent character (' ', '\t', '_', '+', etc...)
+	class FuncGuard
+	{
+	public:
+		enum State
+		{
+			Disabled,
+			Enabled
+		};
 
-	void outputIndent();
+		FuncGuard(const TCHAR* funcsig, const TCHAR* funcname, const TCHAR* file, int line, State state, const TCHAR* category);
+		~FuncGuard();
 
-private:
-	void indent();
-	void unindent();
-	TCHAR* getIndent();
-	generic_string _funcname;
+		void outputIndent();
 
-	static int _depth;
-	static TCHAR _indent[MAX_DEBUG_INDENT];
-};
+	private:
+		void indent();
+		void unindent();
+		TCHAR* getIndent();
+		generic_string _funcname;
+		generic_string _category;
+		State _state;
 
-} // namespace NppDebug
+		static int _depth;
+		static TCHAR _indent[MAX_DEBUG_INDENT];
+	};
 
-#define debugf(format, ...) NppDebug::outputF(format, __VA_ARGS__)
-// JOCE: modify to make that a single call to OutputF
-#define line_debugf(format, ...) NppDebug::outputF(TEXT("%s(%d): "), TEXT(__FILE__), __LINE__); NppDebug::outputF(format, __VA_ARGS__)
-// JOCE: modify to make that a single call to OutputF
-#define guard_debugf(format, ...) __npp_func_guard__.outputIndent(); NppDebug::outputF(format, __VA_ARGS__)
-#define func_guard() NppDebug::FuncGuard __npp_func_guard__(TEXT(__FUNCSIG__), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__)
+	} // namespace NppDebug
+
+	#define debugf(format, ...) NppDebug::outputF(format, __VA_ARGS__)
+	// JOCE: modify to make that a single call to OutputF
+	#define line_debugf(format, ...) NppDebug::outputF(TEXT("%s(%d): "), TEXT(__FILE__), __LINE__); NppDebug::outputF(format, __VA_ARGS__)
+
+	#define func_guard_declare_cat(cat) extern NppDebug::FuncGuard::State __func_guard_category_##cat
+	#define func_guard_enable_cat(cat) NppDebug::FuncGuard::State __func_guard_category_##cat = NppDebug::FuncGuard::Enabled
+	#define func_guard_disable_cat(cat) NppDebug::FuncGuard::State __func_guard_category_##cat = NppDebug::FuncGuard::Disabled
+
+	#define func_guard(cat) NppDebug::FuncGuard __npp_func_guard__( TEXT(__FUNCSIG__), TEXT(__FUNCTION__), TEXT(__FILE__), __LINE__, __func_guard_category_##cat, TEXT( #cat ))
+
+	// JOCE: modify to make that a single call to OutputF (should make guard_debugf part of the function guard
+	#define guard_debugf(format, ...) __npp_func_guard__.outputIndent(); NppDebug::outputF(format, __VA_ARGS__)
 
 #else // if !SHIPPING
+
 	#define debugf(format, ...) void(0)
-	#define _debugf(format, ...) void(0)
-	#define guard_func() void(0)
+	#define line_debugf(format, ...) void(0)
+
+	#define func_guard_declare_cat(cat) void(0)
+	#define func_guard_enable_cat(cat) void(0)
+	#define func_guard_disable_cat(cat) void(0)
+
+	#define func_guard(cat) void(0)
+
+	#define guard_debugf(format, ...) void(0)
 #endif // SHIPPING
 
 #endif // NPP_DEBUG_H

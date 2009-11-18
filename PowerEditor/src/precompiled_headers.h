@@ -86,6 +86,7 @@
 // Power Editor
 #include "Common.h"
 
+
 #include "Debug/npp_debug.h"
 
 #endif // PRECOMPILED_HEADERS_H

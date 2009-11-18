@@ -33,6 +33,7 @@ outputFunction setOutputFunction(outputFunction newOutputFunction)
 	return currentOutputFunc;
 }
 
+// Joce: We could (should?) make OutputF a functor
 void outputF(TCHAR* format, ...)
 {
 	va_list args;
@@ -50,54 +51,78 @@ void outputF(TCHAR* format, ...)
 int FuncGuard::_depth = 0;
 TCHAR FuncGuard::_indent[MAX_DEBUG_INDENT];
 
-FuncGuard::FuncGuard(const TCHAR* funcsig, const TCHAR* funcname, const TCHAR* file, int line):
-	_funcname(funcname)
+FuncGuard::FuncGuard( const TCHAR* funcsig, const TCHAR* funcname, const TCHAR* file, int line, State state, const TCHAR* category):
+	_state(state)
 {
-	outputF(TEXT("%s%s(%d):\n"),  getIndent(), file, line);
-	outputF(TEXT("%sEntering[ %s ]\n"),  getIndent(), funcsig);
-	indent();
+	if (_state == Enabled)
+	{
+		_funcname = funcname;
+		// JOCE: we currently don't do anything with the category variable. Should it be here at all?
+		_category = category;
+
+		// JOCE Only one call to OutputF.
+		outputF(TEXT("%s%s(%d):\n"),  getIndent(), file, line);
+		outputF(TEXT("%sEntering[ %s ]\n"),  getIndent(), funcsig);
+		indent();
+	}
 }
 
 FuncGuard::~FuncGuard()
 {
-	unindent();
-	outputF(TEXT("%sLeaving[ %s ]\n"), getIndent(), _funcname.c_str());
+	if (_state == Enabled)
+	{
+		unindent();
+		outputF(TEXT("%sLeaving[ %s ]\n"), getIndent(), _funcname.c_str());
+	}
 }
 
 void FuncGuard::outputIndent()
 {
-	outputF(getIndent());
+	if (_state == Enabled)
+	{
+		outputF(getIndent());
+	}
 }
 
 void FuncGuard::indent()
 {
-	_depth++;
-	if (_depth >= MAX_DEBUG_INDENT)
+	if (_state == Enabled)
 	{
-		DebugBreak();
-		_depth = MAX_DEBUG_INDENT-1;
+		_depth++;
+		if (_depth >= MAX_DEBUG_INDENT)
+		{
+			DebugBreak();
+			_depth = MAX_DEBUG_INDENT-1;
+		}
 	}
 }
 
 void FuncGuard::unindent()
 {
-	_depth--;
-	if (_depth < 0)
+	if (_state == Enabled)
 	{
-		DebugBreak();
-		_depth = 0;
+		_depth--;
+		if (_depth < 0)
+		{
+			DebugBreak();
+			_depth = 0;
+		}
 	}
 }
 
 TCHAR* FuncGuard::getIndent()
 {
-	int i = 0;;
-	for (; i < _depth; i++)
+	if (_state == Enabled)
 	{
-		_indent[i] = TEXT('\t');
+		int i = 0;;
+		for (; i < _depth; i++)
+		{
+			_indent[i] = TEXT('\t');
+		}
+		_indent[i] = TEXT('\0');
+		return _indent;
 	}
-	_indent[i] = TEXT('\0');
-	return _indent;
+	return TEXT("");
 }
 
 } // namespace Debug

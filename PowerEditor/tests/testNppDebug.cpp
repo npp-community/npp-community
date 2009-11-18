@@ -65,7 +65,7 @@ public:
 TEST_F(FuncGuardTest, guardSimple)
 {
 	{
-		NppDebug::FuncGuard guard(TEXT("sig"), TEXT("name"), TEXT("file"), 1);
+		NppDebug::FuncGuard guard(TEXT("sig"), TEXT("name"), TEXT("file"), 1, NppDebug::FuncGuard::Enabled, TEXT("test"));
 		ASSERT_EQ(TEXT("file(1):\nEntering[ sig ]\n"), s_outputResult);
 	}
 	ASSERT_EQ(TEXT("file(1):\nEntering[ sig ]\nLeaving[ name ]\n"), s_outputResult);
@@ -74,10 +74,10 @@ TEST_F(FuncGuardTest, guardSimple)
 TEST_F(FuncGuardTest, guardSimpleIndent)
 {
 	{
-		NppDebug::FuncGuard guard1(TEXT("sig"), TEXT("name"), TEXT("file"), 1);
+		NppDebug::FuncGuard guard1(TEXT("sig"), TEXT("name"), TEXT("file"), 1, NppDebug::FuncGuard::Enabled, TEXT("test"));
 		ASSERT_EQ(TEXT("file(1):\nEntering[ sig ]\n"), s_outputResult);
 		{
-			NppDebug::FuncGuard guard2(TEXT("sig2"), TEXT("name2"), TEXT("file2"), 2);
+			NppDebug::FuncGuard guard2(TEXT("sig2"), TEXT("name2"), TEXT("file2"), 2, NppDebug::FuncGuard::Enabled, TEXT("test"));
 			ASSERT_EQ(TEXT("file(1):\nEntering[ sig ]\n\tfile2(2):\n\tEntering[ sig2 ]\n"), s_outputResult);
 		}
 		ASSERT_EQ(TEXT("file(1):\nEntering[ sig ]\n\tfile2(2):\n\tEntering[ sig2 ]\n\tLeaving[ name2 ]\n"), s_outputResult);
@@ -85,17 +85,44 @@ TEST_F(FuncGuardTest, guardSimpleIndent)
 	ASSERT_EQ(TEXT("file(1):\nEntering[ sig ]\n\tfile2(2):\n\tEntering[ sig2 ]\n\tLeaving[ name2 ]\nLeaving[ name ]\n"), s_outputResult);
 }
 
+TEST_F(FuncGuardTest, guardSimpleDisabled)
+{
+	{
+		NppDebug::FuncGuard guard(TEXT("sig"), TEXT("name"), TEXT("file"), 1, NppDebug::FuncGuard::Disabled, TEXT("test"));
+		ASSERT_EQ(TEXT(""), s_outputResult);
+	}
+	ASSERT_EQ(TEXT(""), s_outputResult);
+}
+
+TEST_F(FuncGuardTest, guardSimpleIndentDisabled)
+{
+	{
+		NppDebug::FuncGuard guard1(TEXT("sig"), TEXT("name"), TEXT("file"), 1, NppDebug::FuncGuard::Disabled, TEXT("test"));
+		ASSERT_EQ(TEXT(""), s_outputResult);
+		{
+			NppDebug::FuncGuard guard2(TEXT("sig2"), TEXT("name2"), TEXT("file2"), 2, NppDebug::FuncGuard::Disabled, TEXT("test"));
+			ASSERT_EQ(TEXT(""), s_outputResult);
+		}
+		ASSERT_EQ(TEXT(""), s_outputResult);
+	}
+	ASSERT_EQ(TEXT(""), s_outputResult);
+}
+
+// Enable the 'test' function guard category
+func_guard_enable_cat(test);
+
+
 static TCHAR TestGuardFuncOneGuardLine[8];
 void TestGuardFuncOne()
 {
-	func_guard(); int line = __LINE__; // This declaration needs to be on the same line as func_guard to get the right line number.
+	func_guard(test); int line = __LINE__; // This declaration needs to be on the same line as func_guard to get the right line number.
 	_itot_s(line, TestGuardFuncOneGuardLine, 10);
 }
 
 static TCHAR TestGuardFuncTwoGuardLine[8];
 void TestGuardFuncTwo()
 {
-	func_guard(); int line = __LINE__; // This declaration needs to be on the same line as func_guard to get the right line number.
+	func_guard(test); int line = __LINE__; // This declaration needs to be on the same line as func_guard to get the right line number.
 	_itot_s(line, TestGuardFuncTwoGuardLine, 10);
 	TestGuardFuncOne();
 }
@@ -133,14 +160,14 @@ TEST_F(FuncGuardTest, guardFuncIndent)
 
 void TestGuardFuncWithCommentOne()
 {
-	func_guard(); int line = __LINE__; // This declaration needs to be on the same line as func_guard to get the right line number.
+	func_guard(test); int line = __LINE__; // This declaration needs to be on the same line as func_guard to get the right line number.
 	_itot_s(line, TestGuardFuncOneGuardLine, 10);
 	guard_debugf(TEXT("We print a number: %d\n"), 42);
 }
 
 void TestGuardFuncWithCommentTwo()
 {
-	func_guard(); int line = __LINE__; // This declaration needs to be on the same line as func_guard to get the right line number.
+	func_guard(test); int line = __LINE__; // This declaration needs to be on the same line as func_guard to get the right line number.
 	_itot_s(line, TestGuardFuncTwoGuardLine, 10);
 	TestGuardFuncWithCommentOne();
 }
@@ -162,6 +189,34 @@ TEST_F(FuncGuardTest, guardFuncIndentWithDebugComment)
 	expected += TEXT("\t\tWe print a number: 42\n");
 	expected += TEXT("\tLeaving[ TestGuardFuncWithCommentOne ]\n");
 	expected += TEXT("Leaving[ TestGuardFuncWithCommentTwo ]\n");
+	ASSERT_EQ(expected, s_outputResult);
+}
+
+// Disable the 'test_disable' function guard category
+func_guard_disable_cat(test_disable);
+
+void TestGuardFuncDisabledOne()
+{
+	func_guard(test_disable);
+}
+
+void TestGuardFuncDisabledTwo()
+{
+	func_guard(test_disable);
+	TestGuardFuncDisabledOne();
+}
+
+TEST_F(FuncGuardTest, guardFuncDisabled)
+{
+	TestGuardFuncDisabledOne();
+	generic_string expected = TEXT("");
+	ASSERT_EQ(expected, s_outputResult);
+}
+
+TEST_F(FuncGuardTest, guardFuncIndentDisabled)
+{
+	TestGuardFuncDisabledTwo();
+	generic_string expected = TEXT("");
 	ASSERT_EQ(expected, s_outputResult);
 }
 
