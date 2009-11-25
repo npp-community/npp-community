@@ -55,6 +55,7 @@
 #include "WinControls/SplitterContainer/SplitterContainer.h"
 
 #include "WinControls/ContextMenu/ContextMenu.h"
+#include "WinControls/ContextMenu/ExplorerContextMenu.h"
 #include "ScintillaComponent/ScintillaEditView.h"
 #include "WinControls/ToolBar/Toolbar.h"
 #include "WinControls/StatusBar/StatusBar.h"
@@ -161,8 +162,8 @@ Notepad_plus::Notepad_plus():
 	_subSplitter(NULL),
 	_autoCompleteMain(new AutoCompletion(_mainEditView)),
 	_autoCompleteSub(new AutoCompletion(_subEditView)),
-	_tabPopupMenu(NULL),
 	_tabPopupDropMenu(NULL),
+	_explorerContextMenu(NULL),
 	_toolBar(NULL),
 	_docTabIconList(NULL),
 	_statusBar(NULL),
@@ -936,12 +937,6 @@ void Notepad_plus::killAllChildren()
 	{
 		delete _docTabIconList;
 		_docTabIconList = NULL;
-	}
-
-	if (_tabPopupMenu)
-	{
-		delete _tabPopupMenu;
-		_tabPopupMenu = NULL;
 	}
 
 	if (_tabPopupDropMenu)
@@ -3482,24 +3477,6 @@ void Notepad_plus::showFunctionComp() {
 	autoC->showFunctionComplete();
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 static generic_string extractSymbol(TCHAR prefix, const generic_string& str2extract)
 {
 	bool found = false;
@@ -4987,10 +4964,6 @@ bool Notepad_plus::reloadLang()
 	_scintaccelerator.updateKeys();
 
 
-	if (_tabPopupMenu && _tabPopupMenu->isCreated())
-	{
-		_nativeLangSpeaker->changeLangTabContextMenu(_tabPopupMenu->getMenuHandle());
-	}
 	if (_tabPopupDropMenu && _tabPopupDropMenu->isCreated())
 	{
 		_nativeLangSpeaker->changeLangTabDrapContextMenu(_tabPopupDropMenu->getMenuHandle());

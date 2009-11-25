@@ -18,6 +18,7 @@
 #include "precompiled_headers.h"
 
 #include "WinControls/ContextMenu/ContextMenu.h"
+#include "WinControls/ContextMenu/ExplorerContextMenu.h"
 #include "WinControls/StatusBar/StatusBar.h"
 #include "WinControls/ToolBar/Toolbar.h"
 #include "WinControls/ColourPicker/WordStyleDlg.h"
@@ -448,59 +449,92 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 			POINT p;
 			::GetCursorPos(&p);
 
-			if (!_tabPopupMenu)
+			ContextMenu tabPopupMenu;
+			ExplorerContentMenu explorerMenu;
+
+			bool enableExplorerMenu = NppParameters::getInstance()->getNppGUI()._enableExplorerMenuOnTabs;
+
+			std::vector<MenuItemUnit> itemUnitArray;
+
+			if (enableExplorerMenu)
 			{
-				_tabPopupMenu = new ContextMenu();
+				itemUnitArray.push_back(MenuItemUnit(IDM_CONTEXT_MENU, TEXT("Explorer Menu")));
+				itemUnitArray.push_back(MenuItemUnit(0, NULL));
 			}
 
-			if (!_tabPopupMenu->isCreated())
-			{
-				std::vector<MenuItemUnit> itemUnitArray;
-				itemUnitArray.push_back(MenuItemUnit(IDM_FILE_CLOSE, TEXT("Close")));
-				itemUnitArray.push_back(MenuItemUnit(IDM_FILE_CLOSEALL_BUT_CURRENT, TEXT("Close All but This")));
-				itemUnitArray.push_back(MenuItemUnit(IDM_FILE_SAVE, TEXT("Save")));
-				itemUnitArray.push_back(MenuItemUnit(IDM_FILE_SAVEAS, TEXT("Save As...")));
-				itemUnitArray.push_back(MenuItemUnit(IDM_FILE_RENAME, TEXT("Rename")));
-				itemUnitArray.push_back(MenuItemUnit(IDM_FILE_DELETE, TEXT("Delete")));
-				itemUnitArray.push_back(MenuItemUnit(IDM_FILE_PRINT, TEXT("Print")));
-				itemUnitArray.push_back(MenuItemUnit(0, NULL));
-				itemUnitArray.push_back(MenuItemUnit(IDM_EDIT_SETREADONLY, TEXT("Read-Only")));
-				itemUnitArray.push_back(MenuItemUnit(IDM_EDIT_CLEARREADONLY, TEXT("Clear Read-Only Flag")));
-				itemUnitArray.push_back(MenuItemUnit(0, NULL));
-				itemUnitArray.push_back(MenuItemUnit(IDM_EDIT_FULLPATHTOCLIP,	TEXT("Full File Path to Clipboard")));
-				itemUnitArray.push_back(MenuItemUnit(IDM_EDIT_FILENAMETOCLIP,   TEXT("Filename to Clipboard")));
-				itemUnitArray.push_back(MenuItemUnit(IDM_EDIT_CURRENTDIRTOCLIP, TEXT("Current Dir. Path to Clipboard")));
-				itemUnitArray.push_back(MenuItemUnit(0, NULL));
-				itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_GOTO_ANOTHER_VIEW, TEXT("Move to Other View")));
-				itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_CLONE_TO_ANOTHER_VIEW, TEXT("Clone to Other View")));
-				itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_GOTO_NEW_INSTANCE, TEXT("Move to New Instance")));
-				itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_LOAD_IN_NEW_INSTANCE, TEXT("Open in New Instance")));
+			itemUnitArray.push_back(MenuItemUnit(IDM_FILE_CLOSE, TEXT("Close")));
+			itemUnitArray.push_back(MenuItemUnit(IDM_FILE_CLOSEALL_BUT_CURRENT, TEXT("Close All but This")));
+			itemUnitArray.push_back(MenuItemUnit(IDM_FILE_SAVE, TEXT("Save")));
+			itemUnitArray.push_back(MenuItemUnit(IDM_FILE_SAVEAS, TEXT("Save As...")));
+			itemUnitArray.push_back(MenuItemUnit(IDM_FILE_RENAME, TEXT("Rename")));
+			itemUnitArray.push_back(MenuItemUnit(IDM_FILE_DELETE, TEXT("Delete")));
+			itemUnitArray.push_back(MenuItemUnit(IDM_FILE_PRINT, TEXT("Print")));
+			itemUnitArray.push_back(MenuItemUnit(0, NULL));
+			itemUnitArray.push_back(MenuItemUnit(IDM_EDIT_SETREADONLY, TEXT("Read-Only")));
+			itemUnitArray.push_back(MenuItemUnit(IDM_EDIT_CLEARREADONLY, TEXT("Clear Read-Only Flag")));
+			itemUnitArray.push_back(MenuItemUnit(0, NULL));
+			itemUnitArray.push_back(MenuItemUnit(IDM_EDIT_FULLPATHTOCLIP,	TEXT("Full File Path to Clipboard")));
+			itemUnitArray.push_back(MenuItemUnit(IDM_EDIT_FILENAMETOCLIP,   TEXT("Filename to Clipboard")));
+			itemUnitArray.push_back(MenuItemUnit(IDM_EDIT_CURRENTDIRTOCLIP, TEXT("Current Dir. Path to Clipboard")));
+			itemUnitArray.push_back(MenuItemUnit(0, NULL));
+			itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_GOTO_ANOTHER_VIEW, TEXT("Move to Other View")));
+			itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_CLONE_TO_ANOTHER_VIEW, TEXT("Clone to Other View")));
+			itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_GOTO_NEW_INSTANCE, TEXT("Move to New Instance")));
+			itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_LOAD_IN_NEW_INSTANCE, TEXT("Open in New Instance")));
 
-				_tabPopupMenu->create(_pPublicInterface->getHSelf(), itemUnitArray);
-				_nativeLangSpeaker->changeLangTabContextMenu(_tabPopupMenu->getMenuHandle());
+			tabPopupMenu.create(_pPublicInterface->getHSelf(), itemUnitArray);
+			_nativeLangSpeaker->changeLangTabContextMenu(tabPopupMenu.getMenuHandle());
+
+			if (enableExplorerMenu)
+			{
+				BufferID bufferID = _pEditView->getCurrentBufferID();
+
+				if (Buffer * buf = MainFileManager->getBufferByID(bufferID))
+				{
+					assert(_explorerContextMenu == NULL);
+					explorerMenu.Load(buf->getFullPathName());
+					if (HMENU hStandardMenu = explorerMenu.GetHandle())
+					{
+						MENUITEMINFO contextMenuInfo;
+						contextMenuInfo.cbSize = sizeof(MENUITEMINFO);
+						contextMenuInfo.fMask = MIIM_SUBMENU;
+
+						HMENU popupMenu = tabPopupMenu.getMenuHandle();
+						::GetMenuItemInfo(popupMenu, 0, TRUE, &contextMenuInfo);
+						contextMenuInfo.hSubMenu = hStandardMenu;
+						::SetMenuItemInfo(popupMenu, 0, TRUE, &contextMenuInfo);
+
+						_explorerContextMenu = &explorerMenu;
+					}
+				}
 			}
 
 			bool isEnable = ((::GetMenuState(_mainMenuHandle, IDM_FILE_SAVE, MF_BYCOMMAND)&MF_DISABLED) == 0);
-			_tabPopupMenu->enableItem(IDM_FILE_SAVE, isEnable);
+			tabPopupMenu.enableItem(IDM_FILE_SAVE, isEnable);
 
 			Buffer * buf = _pEditView->getCurrentBuffer();
 			bool isUserReadOnly = buf->getUserReadOnly();
-			_tabPopupMenu->checkItem(IDM_EDIT_SETREADONLY, isUserReadOnly);
+			tabPopupMenu.checkItem(IDM_EDIT_SETREADONLY, isUserReadOnly);
 
 			bool isSysReadOnly = buf->getFileReadOnly();
-			_tabPopupMenu->enableItem(IDM_EDIT_SETREADONLY, !isSysReadOnly);
-			_tabPopupMenu->enableItem(IDM_EDIT_CLEARREADONLY, isSysReadOnly);
+			tabPopupMenu.enableItem(IDM_EDIT_SETREADONLY, !isSysReadOnly);
+			tabPopupMenu.enableItem(IDM_EDIT_CLEARREADONLY, isSysReadOnly);
 
 			bool isFileExisting = PathFileExists(buf->getFullPathName()) != FALSE;
-			_tabPopupMenu->enableItem(IDM_FILE_DELETE, isFileExisting);
-			_tabPopupMenu->enableItem(IDM_FILE_RENAME, isFileExisting);
+			tabPopupMenu.enableItem(IDM_FILE_DELETE, isFileExisting);
+			tabPopupMenu.enableItem(IDM_FILE_RENAME, isFileExisting);
 
 			bool isDirty = buf->isDirty();
 			bool isUntitled = buf->isUntitled();
-			_tabPopupMenu->enableItem(IDM_VIEW_GOTO_NEW_INSTANCE, !(isDirty||isUntitled));
-			_tabPopupMenu->enableItem(IDM_VIEW_LOAD_IN_NEW_INSTANCE, !(isDirty||isUntitled));
+			tabPopupMenu.enableItem(IDM_VIEW_GOTO_NEW_INSTANCE, !(isDirty||isUntitled));
+			tabPopupMenu.enableItem(IDM_VIEW_LOAD_IN_NEW_INSTANCE, !(isDirty||isUntitled));
 
-			_tabPopupMenu->display(p);
+			tabPopupMenu.display(p);
+
+			// _explorerContextMenu is just used as a pointer to a scoped object that is being destroyed next.
+			// That's why we reset it to NULL.
+			_explorerContextMenu = NULL;
+
 			return TRUE;
 		}
 

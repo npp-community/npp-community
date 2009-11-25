@@ -36,7 +36,7 @@ public:
 	void create(HWND hParent, const std::vector<MenuItemUnit> & menuItemArray);
 	bool isCreated() const {return _hMenu != NULL;}
 
-	void display(const POINT & p) const;
+	bool display(const POINT & p) const;
 	void enableItem(int cmdID, bool doEnable) const;
 	void checkItem(int cmdID, bool doCheck) const;
 

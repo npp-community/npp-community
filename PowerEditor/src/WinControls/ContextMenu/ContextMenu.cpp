@@ -85,9 +85,14 @@ void ContextMenu::create( HWND hParent, const std::vector<MenuItemUnit> & menuIt
 	}
 }
 
-void ContextMenu::display( const POINT & p ) const
+bool ContextMenu::display( const POINT & p ) const
 {
-	::TrackPopupMenu(_hMenu, TPM_LEFTALIGN, p.x, p.y, 0, _hParent, NULL);
+	int value = ::TrackPopupMenu(_hMenu, TPM_LEFTALIGN|TPM_RETURNCMD, p.x, p.y, 0, _hParent, NULL);
+	if (value != 0 )
+	{
+		SendMessage(_hParent, WM_COMMAND, value, 0);
+	}
+	return value != 0;
 }
 
 void ContextMenu::enableItem( int cmdID, bool doEnable ) const

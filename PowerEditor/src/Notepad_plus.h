@@ -85,6 +85,7 @@ class RunMacroDlg;
 class ButtonDlg;
 
 class ContextMenu;
+class ExplorerContentMenu;
 class StatusBar;
 class ToolBar;
 class ReBar;
@@ -260,8 +261,8 @@ private:
 	AutoCompletion* _autoCompleteMain;
 	AutoCompletion* _autoCompleteSub;	//each Scintilla has its own autoComplete
 
-    ContextMenu* _tabPopupMenu;
     ContextMenu* _tabPopupDropMenu;
+    ExplorerContentMenu* _explorerContextMenu;
 
 	ToolBar*	_toolBar;
 	IconList* _docTabIconList;
