@@ -134,8 +134,13 @@ private:
 #ifdef DEBUG
 	#define NO_DEFAULT_CASE default: {\
 		TCHAR errorMsg[ERROR_MSG_SIZE];\
-		sprintf_s(errorMsg, ERROR_MSG_SIZE, "Unhanded default case in %s, line %d", __FILE__, __LINE__ );\
-		::MessageBox(NULL, TEXT("Unhandled default case."), errorMsg, MB_OK|MB_ICONWARNING);\
+		_stprintf_s(errorMsg, ERROR_MSG_SIZE, TEXT("Unhanded default case in %s, line %d\n\n\nDo you want to break?"), TEXT(__FILE__), __LINE__ );\
+		int ret = ::MessageBox(NULL, errorMsg, TEXT("Unhandled default case."), MB_YESNO|MB_ICONWARNING);\
+			if (ret == IDYES)\
+			{\
+				/* JOCE: could throw an exception instead and be properly tested. */ \
+				DebugBreak(); \
+			}\
 		}\
 		break
 #else
