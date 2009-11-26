@@ -15,9 +15,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef SCINTILLA_REF_H
-#define SCINTILLA_REF_H
+#ifndef SCINTILLACOMPONENT_SCINTILLAREF_H
+#define SCINTILLACOMPONENT_SCINTILLAREF_H
 
 enum folderStyle {FOLDER_TYPE, FOLDER_STYLE_SIMPLE, FOLDER_STYLE_ARROW, FOLDER_STYLE_CIRCLE, FOLDER_STYLE_BOX};
 
-#endif //SCINTILLA_REF_H
+#endif //SCINTILLACOMPONENT_SCINTILLAREF_H

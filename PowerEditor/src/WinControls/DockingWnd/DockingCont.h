@@ -16,11 +16,11 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-#ifndef DOCKINGCONT
-#define DOCKINGCONT
+#ifndef WINCONTROLS_DOCKINGWND_DOCKINGCONT_H
+#define WINCONTROLS_DOCKINGWND_DOCKINGCONT_H
 
-#ifndef STATIC_DIALOG_H
-#include "StaticDialog.h"
+#ifndef WINCONTROLS_STATICDIALOG_STATICDIALOG_H
+#include "WinControls/StaticDialog/StaticDialog.h"
 #endif
 
 // window styles
@@ -200,4 +200,4 @@ private:
 
 
 
-#endif // DOCKINGCONT
+#endif // WINCONTROLS_DOCKINGWND_DOCKINGCONT_H

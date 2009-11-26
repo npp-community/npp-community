@@ -15,14 +15,14 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef SPLITTER_CONTAINER_H
-#define SPLITTER_CONTAINER_H
+#ifndef WINCONTROLS_SPLITTERCONTAINER_SPLITTERCONTAINER_H
+#define WINCONTROLS_SPLITTERCONTAINER_SPLITTERCONTAINER_H
 
-#ifndef WINDOW_CONTROL_H
-#include "Window.h"
+#ifndef WINCONTROLS_WINDOW_H
+#include "WinControls/Window.h"
 #endif
 
-#ifndef SPLITTER_H
+#ifndef WINCONTROLS_SPLITTERCONTAINER_SPLITTER_H
 #include "Splitter.h"
 #endif
 
@@ -89,4 +89,4 @@ private :
 	void rotateTo(DIRECTION direction);
 };
 
-#endif //SPLITTER_CONTAINER_H
+#endif //WINCONTROLS_SPLITTERCONTAINER_SPLITTERCONTAINER_H

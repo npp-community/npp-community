@@ -16,10 +16,10 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "ToolBar.h"
-#include "Shortcut.h"
-#include "ImageListSet.h"
-#include "Notepad_plus_msgs.h"
+#include "WinControls/ToolBar/Toolbar.h"
+#include "WinControls/shortcut/shortcut.h"
+#include "WinControls/ImageListSet/ImageListSet.h"
+#include "MISC/PluginsManager/Notepad_plus_msgs.h"
 
 
 const int WS_TOOLBARSTYLE = WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | TBSTYLE_TOOLTIPS |TBSTYLE_FLAT | CCS_TOP | BTNS_AUTOSIZE | CCS_NOPARENTALIGN | CCS_NORESIZE | CCS_NODIVIDER;

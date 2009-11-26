@@ -15,11 +15,11 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef AUTOCOMPLETION_H
-#define AUTOCOMPLETION_H
+#ifndef SCINTILLACOMPONENT_AUTOCOMPLETION_H
+#define SCINTILLACOMPONENT_AUTOCOMPLETION_H
 
-#ifndef NOTEPAD_PLUS_MSGS_H
-#include "Notepad_plus_msgs.h"
+#ifndef MISC_PLUGINSMANAGER_NOTEPADPLUSMSGS_H
+#include "MISC/PluginsManager/Notepad_plus_msgs.h"
 #endif
 
 class ScintillaEditView;
@@ -60,4 +60,4 @@ private:
 	const TCHAR * getApiFileName();
 };
 
-#endif //AUTOCOMPLETION_H
+#endif //SCINTILLACOMPONENT_AUTOCOMPLETION_H

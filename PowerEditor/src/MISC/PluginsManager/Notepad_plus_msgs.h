@@ -15,8 +15,8 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef NOTEPAD_PLUS_MSGS_H
-#define NOTEPAD_PLUS_MSGS_H
+#ifndef MISC_PLUGINSMANAGER_NOTEPADPLUSMSGS_H
+#define MISC_PLUGINSMANAGER_NOTEPADPLUSMSGS_H
 
 enum LangType {L_TXT, L_PHP , L_C, L_CPP, L_CS, L_OBJC, L_JAVA, L_RC,\
 			   L_HTML, L_XML, L_MAKEFILE, L_PASCAL, L_BATCH, L_INI, L_NFO, L_USER,\
@@ -437,4 +437,4 @@ enum LangType {L_TXT, L_PHP , L_C, L_CPP, L_CS, L_OBJC, L_JAVA, L_RC,\
 	//scnNotification->nmhdr.hwndFrom = newIndex;
 	//scnNotification->nmhdr.idFrom = BufferID;
 
-#endif //NOTEPAD_PLUS_MSGS_H
+#endif //MISC_PLUGINSMANAGER_NOTEPADPLUSMSGS_H

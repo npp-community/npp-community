@@ -17,7 +17,7 @@
 
 
 #include "precompiled_headers.h"
-#include "Splitter.h"
+#include "WinControls/SplitterContainer/Splitter.h"
 
 bool Splitter::_isHorizontalRegistered = false;
 bool Splitter::_isVerticalRegistered = false;

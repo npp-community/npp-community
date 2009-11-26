@@ -15,11 +15,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef BUFFERID_H
-#define BUFFERID_H
+#ifndef SCINTILLACOMPONENT_BUFFERID_H
+#define SCINTILLACOMPONENT_BUFFERID_H
 
 class Buffer;
 typedef Buffer * BufferID;	//each buffer has unique ID by which it can be retrieved
 #define BUFFER_INVALID	(BufferID)0
 
-#endif // BUFFERID_H
+#endif // SCINTILLACOMPONENT_BUFFERID_H

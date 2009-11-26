@@ -15,8 +15,8 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef USERDEFINE_RC_H
-#define USERDEFINE_RC_H
+#ifndef SCINTILLACOMPONENT_USERDEFINERESOURCE_H
+#define SCINTILLACOMPONENT_USERDEFINERESOURCE_H
 
 #define    IDD_GLOBAL_USERDEFINE_DLG 20000
 	#define	IDC_DOCK_BUTTON 					 (IDD_GLOBAL_USERDEFINE_DLG + 1)
@@ -264,5 +264,5 @@
 #define    IDD_STRING_DLG   25000
     #define    IDC_STRING_STATIC  (IDD_STRING_DLG + 1)
     #define    IDC_STRING_EDIT  (IDD_STRING_DLG + 2)
-#endif //USERDEFIN_RC_H
+#endif // SCINTILLACOMPONENT_USERDEFINERESOURCE_H
 

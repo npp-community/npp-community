@@ -16,7 +16,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "URLCtrl.h"
+#include "WinControls/AboutDlg/URLCtrl.h"
 
 static BYTE XORMask[128] =
 {

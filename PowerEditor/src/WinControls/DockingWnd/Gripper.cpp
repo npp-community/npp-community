@@ -18,13 +18,13 @@
 
 #include "precompiled_headers.h"
 
-#include "Gripper.h"
+#include "WinControls/DockingWnd/Gripper.h"
 #include "Parameters.h"
 
-#include "dockingResource.h"
-#include "DockingManager.h"
-#include "DockingCont.h"
-#include "npp_winver.h"
+#include "WinControls/DockingWnd/dockingResource.h"
+#include "WinControls/DockingWnd/DockingManager.h"
+#include "WinControls/DockingWnd/DockingCont.h"
+#include "MISC/Common/npp_winver.h"
 
 #ifndef WH_MOUSE_LL
 #define WH_MOUSE_LL 14

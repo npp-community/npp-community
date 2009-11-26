@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef PRECOMPILED_HEADERS_H
-#define PRECOMPILED_HEADERS_H
+#ifndef PRECOMPILEDHEADERS_H
+#define PRECOMPILEDHEADERS_H
 
 #include "targetver.h"
 
@@ -84,6 +84,6 @@
 #include "SciLexer.h"
 
 // Power Editor
-#include "Common.h"
+#include "MISC/Common/Common.h"
 
-#endif // PRECOMPILED_HEADERS_H
+#endif // PRECOMPILEDHEADERS_H

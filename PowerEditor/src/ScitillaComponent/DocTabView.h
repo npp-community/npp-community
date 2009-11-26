@@ -15,15 +15,15 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef DOCTABVIEW_H
-#define DOCTABVIEW_H
+#ifndef SCINTILLACOMPONENT_DOCTABVIEW_H
+#define SCINTILLACOMPONENT_DOCTABVIEW_H
 
-#ifndef TAB_BAR_H
-#include "TabBar.h"
+#ifndef WINCONTROLS_TABBAR_TABBAR_H
+#include "WinControls/TabBar/TabBar.h"
 #endif
 
-#ifndef BUFFERID_H
-#include "BufferID.h"
+#ifndef SCINTILLACOMPONENT_BUFFERID_H
+#include "ScitillaComponent/BufferID.h"
 #endif
 
 #define SAVED_IMG_INDEX 0
@@ -72,4 +72,4 @@ private :
 	static bool _hideTabBarStatus;
 };
 
-#endif //DOCTABVIEW_H
+#endif //SCINTILLACOMPONENT_DOCTABVIEW_H

@@ -15,11 +15,11 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef VALUE_DLG_H
-#define VALUE_DLG_H
+#ifndef VALUEDLG_H
+#define VALUEDLG_H
 
-#ifndef WINDOW_CONTROL_H
-#include "StaticDialog.h"
+#ifndef WINCONTROLS_WINDOW_H
+#include "WinControls/StaticDialog/StaticDialog.h"
 #endif
 
 #define DEFAULT_NB_NUMBER 2
@@ -52,4 +52,4 @@ private :
 
 };
 
-#endif //TABSIZE_DLG_H
+#endif // VALUEDLG_H

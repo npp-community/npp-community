@@ -15,8 +15,8 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef SMARTHIGHLIGHTER_H
-#define SMARTHIGHLIGHTER_H
+#ifndef SCINTILLACOMPONENT_SMARTHIGHLIGHTER_H
+#define SCINTILLACOMPONENT_SMARTHIGHLIGHTER_H
 
 // Forward declarations
 class FindReplaceDlg;
@@ -33,4 +33,4 @@ private:
 	bool isWordChar(char ch) const;
 };
 
-#endif //SMARTHIGHLIGHTER_H
+#endif //SCINTILLACOMPONENT_SMARTHIGHLIGHTER_H

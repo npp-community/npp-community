@@ -15,40 +15,40 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef NOTEPAD_PLUS_H
-#define NOTEPAD_PLUS_H
+#ifndef NOTEPADPLUS_H
+#define NOTEPADPLUS_H
 
-#ifndef BUFFERID_H
-#include "BufferID.h"
+#ifndef SCINTILLACOMPONENT_BUFFERID_H
+#include "ScitillaComponent/BufferID.h"
 #endif
 
 #ifndef PARAMETERS_DEF_H
 #include "Parameters_def.h"
 #endif
 
-#ifndef SCINTILLA_REF_H
-#include "ScintillaRef.h"
+#ifndef SCINTILLACOMPONENT_SCINTILLAREF_H
+#include "ScitillaComponent/ScintillaRef.h"
 #endif
 
-#ifndef WINDOW_CONTROL_H
-#include "Window.h"
+#ifndef WINCONTROLS_WINDOW_H
+#include "WinControls/Window.h"
 #endif
 
-#ifndef NOTEPAD_PLUS_MSGS_H
-#include "Notepad_plus_msgs.h"
+#ifndef MISC_PLUGINSMANAGER_NOTEPADPLUSMSGS_H
+#include "MISC/PluginsManager/Notepad_plus_msgs.h"
 #endif
 
 // To be removed later.  Need to be included since Parameters.h was removed from ScintillaEditView.h
-#ifndef SHORTCUTS_H
-#include "shortcut.h"
+#ifndef WINCONTROLS_SHORTCUT_SHORTCUT_H
+#include "WinControls/shortcut/shortcut.h"
 #endif
 
-#ifndef NPP_STYLES
-#include "npp_styles.h"  // For StyleArray, etc.
+#ifndef MISC_COMMON_NPPSTYLES_H
+#include "MISC/Common/npp_styles.h"  // For StyleArray, etc.
 #endif
 
-#ifndef SCINTILLACTRLS_H
-#include "ScintillaCtrls.h"
+#ifndef SCINTILLACOMPONENT_SCINTILLACTRLS_H
+#include "ScitillaComponent/ScintillaCtrls.h"
 #endif
 
 #define MENU 0x01
@@ -528,4 +528,4 @@ private:
 	void EnableMouseWheelZoom(bool enable);
 };
 
-#endif //NOTEPAD_PLUS_H
+#endif //NOTEPADPLUS_H

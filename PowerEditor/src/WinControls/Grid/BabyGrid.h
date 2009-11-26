@@ -5,8 +5,8 @@
 //Printed BABYGRID message reference and tutorial available.
 //email: mudcat@mis.net for more information.
 
-#ifndef BABYGRID_H
-#define BABYGRID_H
+#ifndef WINCONTROLS_GRID_BABYGRID_H
+#define WINCONTROLS_GRID_BABYGRID_H
 
 #ifndef RESOURCE_H
 #include "resource.h"
@@ -104,5 +104,5 @@ LRESULT CALLBACK GridProc(HWND, UINT, WPARAM, LPARAM);
 void SetCell(_BGCELL *cell,int row, int col);
 
 
-#endif // BABYGRID_H
+#endif // WINCONTROLS_GRID_BABYGRID_H
 

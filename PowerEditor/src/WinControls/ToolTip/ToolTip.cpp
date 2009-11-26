@@ -18,7 +18,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "precompiled_headers.h"
-#include "ToolTip.h"
+#include "WinControls/ToolTip/ToolTip.h"
 
 
 void ToolTip::init(HINSTANCE hInst, HWND hParent)

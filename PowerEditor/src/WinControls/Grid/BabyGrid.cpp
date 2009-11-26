@@ -11,7 +11,7 @@ Modified by Don HO <don.h@free.fr>
 */
 
 #include "precompiled_headers.h"
-#include "babygrid.h"
+#include "WinControls/Grid/BabyGrid.h"
 
 // Disable Lint check of the indentation. The coding style in this file totally throws it off.
 //lint -e539 Did not expect positive indentation from Location

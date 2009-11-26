@@ -4,6 +4,9 @@
 //By Bennett
 //Formatting Slightly modified for N++
 
+#ifndef MISC_EXCAPTION_WIN32EXCEPTION_H
+#define MISC_EXCAPTION_WIN32EXCEPTION_H
+
 typedef const void* ExceptionAddress; // OK on Win32 platform
 
 class Win32Exception : public std::exception
@@ -41,3 +44,5 @@ private:
 
     friend void Win32Exception::translate(unsigned code, EXCEPTION_POINTERS* info);
 };
+
+#endif // MISC_EXCAPTION_WIN32EXCEPTION_H

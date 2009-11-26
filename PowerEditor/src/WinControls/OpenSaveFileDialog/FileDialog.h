@@ -15,11 +15,11 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef FILE_DIALOG_H
-#define FILE_DIALOG_H
+#ifndef WINCONTROLS_OPENSAVEFILEDIALOG_FILEDIALOG_H
+#define WINCONTROLS_OPENSAVEFILEDIALOG_FILEDIALOG_H
 
-#ifndef NPP_WINVER_H
-#include "npp_winver.h"
+#ifndef MISC_COMMON_NPPWINVER_H
+#include "MISC/Common/npp_winver.h"
 #endif
 
 typedef std::vector<generic_string> stringVector;
@@ -87,4 +87,4 @@ private:
     static FileDialog *staticThis;
 };
 
-#endif //FILE_DIALOG_H
+#endif //WINCONTROLS_OPENSAVEFILEDIALOG_FILEDIALOG_H

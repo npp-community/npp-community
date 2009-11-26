@@ -17,11 +17,11 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef COLOUR_PICKER_H
-#define COLOUR_PICKER_H
+#ifndef WINCONTROLS_COLOURPICKER_COLOURPICKER_H
+#define WINCONTROLS_COLOURPICKER_COLOURPICKER_H
 
-#ifndef WINDOW_CONTROL_H
-#include "Window.h"
+#ifndef WINCONTROLS_WINDOW_H
+#include "WinControls/Window.h"
 #endif
 
 class ColourPopup;
@@ -58,4 +58,4 @@ private :
 	void drawBackground(HDC hDC);
 };
 
-#endif // COLOUR_PICKER_H
+#endif // WINCONTROLS_COLOURPICKER_COLOURPICKER_H

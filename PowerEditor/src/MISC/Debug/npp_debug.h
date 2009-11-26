@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef NPP_DEBUG_H
-#define NPP_DEBUG_H
+#ifndef MISC_DEBUG_NPPDEBUG_H
+#define MISC_DEBUG_NPPDEBUG_H
 
 #ifndef SHIPPING
 	namespace Debug
@@ -31,4 +31,4 @@
 	#define _debugf(format, ...) void(0)
 #endif
 
-#endif // NPP_DEBUG_H
+#endif // MISC_DEBUG_NPPDEBUG_H

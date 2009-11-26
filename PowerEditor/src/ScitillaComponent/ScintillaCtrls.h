@@ -15,8 +15,8 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef SCINTILLACTRLS_H
-#define SCINTILLACTRLS_H
+#ifndef SCINTILLACOMPONENT_SCINTILLACTRLS_H
+#define SCINTILLACOMPONENT_SCINTILLACTRLS_H
 
 class ScintillaEditView;
 
@@ -37,4 +37,4 @@ private:
 	HWND _hParent;
 };
 
-#endif //SCINTILLACTRLS_H
+#endif //SCINTILLACOMPONENT_SCINTILLACTRLS_H

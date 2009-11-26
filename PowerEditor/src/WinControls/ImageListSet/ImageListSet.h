@@ -15,8 +15,8 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef IMAGE_LIST_H
-#define IMAGE_LIST_H
+#ifndef WINCONTROLS_IMAGELISTSET_IMAGELISTSET_H
+#define WINCONTROLS_IMAGELISTSET_IMAGELISTSET_H
 
 #define NB_MAX_COMMANDS 45
 #define	IDI_SEPARATOR_ICON -1
@@ -132,4 +132,4 @@ private :
 	unsigned int _nbCmd;
 };
 
-#endif //IMAGE_LIST_H
+#endif //WINCONTROLS_IMAGELISTSET_IMAGELISTSET_H

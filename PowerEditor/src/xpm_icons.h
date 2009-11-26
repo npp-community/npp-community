@@ -15,8 +15,8 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef XPM_ICON_H
-#define XPM_ICON_H
+#ifndef XPMICON_H
+#define XPMICON_H
 
 static char * acTop_xpm[] = {
 "12 12 56 1",
@@ -290,4 +290,4 @@ static char * modifSaved_xpm[] = {
 "ozozoz"};
 */
 
-#endif //XPM_ICON_H
+#endif //XPMICON_H

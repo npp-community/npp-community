@@ -17,11 +17,11 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef BABYGRIDWRAPPER
-#define BABYGRIDWRAPPER
+#ifndef WINCONTROLS_GRID_BABYGRIDWRAPPER_H
+#define WINCONTROLS_GRID_BABYGRIDWRAPPER_H
 
-#ifndef WINDOW_CONTROL_H
-#include "Window.h"
+#ifndef WINCONTROLS_WINDOW_H
+#include "WinControls/Window.h"
 #endif
 
 class BabyGridWrapper : public Window
@@ -58,5 +58,5 @@ private :
 	static bool _isRegistered;
 };
 
-#endif //BABYGRIDWRAPPER
+#endif //WINCONTROLS_GRID_BABYGRIDWRAPPER_H
 

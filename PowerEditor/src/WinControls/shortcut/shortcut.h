@@ -15,11 +15,11 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef SHORTCUTS_H
-#define SHORTCUTS_H
+#ifndef WINCONTROLS_SHORTCUT_SHORTCUT_H
+#define WINCONTROLS_SHORTCUT_SHORTCUT_H
 
-#ifndef STATIC_DIALOG_H
-#include "StaticDialog.h"
+#ifndef WINCONTROLS_STATICDIALOG_STATICDIALOG_H
+#include "WinControls/StaticDialog/StaticDialog.h"
 #endif
 
 #define nameLenMax 64
@@ -237,4 +237,4 @@ private:
 	void updateMenuItemByID(ScintillaKeyMap skm, int id);
 };
 
-#endif //SHORTCUTS_H
+#endif //WINCONTROLS_SHORTCUT_SHORTCUT_H

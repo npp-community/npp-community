@@ -16,12 +16,12 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "shortcut.h"
+#include "WinControls/shortcut/shortcut.h"
 #include "Parameters.h"
-#include "ScintillaEditView.h"
+#include "ScitillaComponent/ScintillaEditView.h"
 #include "resource.h"
 #include "Notepad_plus.h"
-#include "shortcutRc.h"
+#include "WinControls/shortcut/shortcutRc.h"
 
 #include "keys.h"
 

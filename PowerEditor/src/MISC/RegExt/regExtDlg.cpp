@@ -17,9 +17,9 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "precompiled_headers.h"
-#include "regExtDlg.h"
+#include "MISC/RegExt/regExtDlg.h"
 #include "resource.h"
-#include "regExtDlgRc.h"
+#include "MISC/RegExt/regExtDlgRc.h"
 
 const TCHAR *nppName = TEXT("Notepad++_file");
 const TCHAR *nppBackup = TEXT("Notepad++_backup");

@@ -18,9 +18,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "precompiled_headers.h"
 
-#include "columnEditor.h"
-#include "columnEditor_rc.h"
-#include "ScintillaEditView.h"
+#include "ScitillaComponent/columnEditor.h"
+#include "ScitillaComponent/columnEditor_rc.h"
+#include "ScitillaComponent/ScintillaEditView.h"
 
 #include "Parameters.h"
 

@@ -17,8 +17,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef DOCKING_H
-#define DOCKING_H
+#ifndef WINCONTROLS_DOCKINGWND_DOCKING_H
+#define WINCONTROLS_DOCKINGWND_DOCKING_H
 
 // ATTENTION : It's a part of interface header, so don't include the others header here
 
@@ -74,4 +74,4 @@ struct  tDockMgr{
 #define SPLITTER_WIDTH			4
 
 
-#endif // DOCKING_H
+#endif // WINCONTROLS_DOCKINGWND_DOCKING_H

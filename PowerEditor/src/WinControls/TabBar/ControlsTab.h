@@ -17,11 +17,11 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CONTROLS_TAB_H
-#define CONTROLS_TAB_H
+#ifndef WINCONTROLS_TABBAR_CONTROLSTAB_H
+#define WINCONTROLS_TABBAR_CONTROLSTAB_H
 
-#ifndef TAB_BAR_H
-#include "TabBar.h"
+#ifndef WINCONTROLS_TABBAR_TABBAR_H
+#include "WinControls/TabBar/TabBar.h"
 #endif
 
 struct DlgInfo {
@@ -73,4 +73,4 @@ private :
 
 
 
-#endif //CONTROLS_TAB_H
+#endif //WINCONTROLS_TABBAR_CONTROLSTAB_H

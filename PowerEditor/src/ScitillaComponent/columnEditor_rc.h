@@ -16,8 +16,8 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef COLUMNEDITOR_RC_H
-#define COLUMNEDITOR_RC_H
+#ifndef SCINTILLACOMPONENT_COLUMNEDITORRC_H
+#define SCINTILLACOMPONENT_COLUMNEDITORRC_H
 
 #define	IDD_COLUMNEDIT   2020
 	#define	IDC_COL_INITNUM_EDIT		(IDD_COLUMNEDIT + 1)
@@ -36,4 +36,4 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 	#define	IDC_COL_TEXT_EDIT			(IDD_COLUMNEDIT + 14)
 	#define	IDC_COL_LEADZERO_CHECK		(IDD_COLUMNEDIT + 15)
 
-#endif// COLUMNEDITOR_RC_H
+#endif// SCINTILLACOMPONENT_COLUMNEDITORRC_H

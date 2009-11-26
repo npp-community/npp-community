@@ -17,10 +17,10 @@
 
 #include "precompiled_headers.h"
 
-#include "DockingDlgInterface.h"
-#include "dockingResource.h"
-#include "Docking.h"
-#include "Notepad_plus_msgs.h"
+#include "WinControls/DockingWnd/DockingDlgInterface.h"
+#include "WinControls/DockingWnd/dockingResource.h"
+#include "WinControls/DockingWnd/Docking.h"
+#include "MISC/PluginsManager/Notepad_plus_msgs.h"
 
 void DockingDlgInterface::init( HINSTANCE hInst, HWND parent )
 {

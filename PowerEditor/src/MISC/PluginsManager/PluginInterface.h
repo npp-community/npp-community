@@ -15,11 +15,11 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef PLUGININTERFACE_H
-#define PLUGININTERFACE_H
+#ifndef MISC_PLUGINSMANAGER_PLUGININTERFACE_H
+#define MISC_PLUGINSMANAGER_PLUGININTERFACE_H
 
-#ifndef NOTEPAD_PLUS_MSGS_H
-#include "Notepad_plus_msgs.h"
+#ifndef MISC_PLUGINSMANAGER_NOTEPADPLUSMSGS_H
+#include "MISC/PluginsManager/Notepad_plus_msgs.h"
 #endif
 
 const int nbChar = 64;
@@ -66,4 +66,4 @@ extern "C" __declspec(dllexport) LRESULT messageProc(UINT Message, WPARAM wParam
 extern "C" __declspec(dllexport) BOOL isUnicode();
 #endif //UNICODE
 
-#endif //PLUGININTERFACE_H
+#endif //MISC_PLUGINSMANAGER_PLUGININTERFACE_H

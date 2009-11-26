@@ -16,17 +16,17 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "UserDefineDialog.h"
-#include "UserDefineResource.h"
-#include "ScintillaEditView.h"
+#include "ScitillaComponent/UserDefineDialog.h"
+#include "ScitillaComponent/UserDefineResource.h"
+#include "ScitillaComponent/ScintillaEditView.h"
 #include "Parameters.h"
 #include "resource.h"
-#include "Notepad_plus_msgs.h"
+#include "MISC/PluginsManager/Notepad_plus_msgs.h"
 #include "menuCmdID.h"
-#include "Buffer.h"
-#include "colors.h"
-#include "UserDefineLangReference.h"
-#include "ColourPicker.h"
+#include "ScitillaComponent/Buffer.h"
+#include "ScitillaComponent/colors.h"
+#include "ScitillaComponent/UserDefineLangReference.h"
+#include "WinControls/ColourPicker/ColourPicker.h"
 
 
 UserLangContainer * SharedParametersDialog::_pUserLang = NULL;

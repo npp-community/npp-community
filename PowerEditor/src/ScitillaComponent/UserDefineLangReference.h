@@ -17,8 +17,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef USER_DEFINE_LANG_REFERENCE_H
-#define USER_DEFINE_LANG_REFERENCE_H
+#ifndef SCINTILLACOMPONENT_USERDEFINELANGREFERENCE_H
+#define SCINTILLACOMPONENT_USERDEFINELANGREFERENCE_H
 
 #define langNameLenMax 16
 #define extsLenMax 256
@@ -59,6 +59,6 @@ enum UDD_Style
 	STYLE_DELIM3_INDEX = 12
 };
 
-#endif //USER_DEFINE_LANG_REFERENCE_H
+#endif //SCINTILLACOMPONENT_USERDEFINELANGREFERENCE_H
 
 

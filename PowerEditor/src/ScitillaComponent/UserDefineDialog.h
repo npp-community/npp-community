@@ -17,15 +17,15 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef USER_DEFINE_DIALOG_H
-#define USER_DEFINE_DIALOG_H
+#ifndef SCINTILLACOMPONENT_USERDEFINEDIALOG_H
+#define SCINTILLACOMPONENT_USERDEFINEDIALOG_H
 
-#ifndef STATIC_DIALOG_H
-#include "StaticDialog.h"
+#ifndef WINCONTROLS_STATICDIALOG_STATICDIALOG_H
+#include "WinControls/StaticDialog/StaticDialog.h"
 #endif
 
-#ifndef CONTROLS_TAB_H
-#include "ControlsTab.h"
+#ifndef WINCONTROLS_TABBAR_CONTROLSTAB_H
+#include "WinControls/TabBar/ControlsTab.h"
 #endif
 
 class ScintillaEditView;
@@ -257,4 +257,4 @@ protected :
 	void updateDlg();
 };
 
-#endif //USER_DEFINE_H
+#endif // SCINTILLACOMPONENT_USERDEFINEDIALOG_H

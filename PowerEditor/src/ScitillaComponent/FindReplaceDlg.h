@@ -15,15 +15,15 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef FIND_REPLACE_DLG_H
-#define FIND_REPLACE_DLG_H
+#ifndef SCINTILLACOMPONENT_FINDREPLACEDLG_H
+#define SCINTILLACOMPONENT_FINDREPLACEDLG_H
 
-#ifndef STATIC_DIALOG_H
-#include "StaticDialog.h"
+#ifndef WINCONTROLS_STATICDIALOG_STATICDIALOG_H
+#include "WinControls/StaticDialog/StaticDialog.h"
 #endif
 
-#ifndef BUFFERID_H
-#include "BufferID.h"
+#ifndef SCINTILLACOMPONENT_BUFFERID_H
+#include "ScitillaComponent/BufferID.h"
 #endif
 
 // Forward declarations
@@ -223,4 +223,4 @@ private :
 	void markSelectedTextInc(bool enable, FindOption *opt = NULL);
 };
 
-#endif //FIND_REPLACE_DLG_H
+#endif //SCINTILLACOMPONENT_FINDREPLACEDLG_H

@@ -17,8 +17,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef PREFERENCE_RC_H
-#define PREFERENCE_RC_H
+#ifndef WINCONTROLS_PREFERENCE_PREFERENCERC_H
+#define WINCONTROLS_PREFERENCE_PREFERENCERC_H
 
 #define	IDD_PREFERENCE_BOX 6000
 	#define	IDC_BUTTON_CLOSE (IDD_PREFERENCE_BOX + 1)
@@ -217,5 +217,5 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 	#define IDD_AUTOC_STATIC_NOTE  (IDD_PREFERENCE_BACKUP_BOX + 14)
 	#define IDD_FUNC_CHECK         (IDD_PREFERENCE_BACKUP_BOX + 15)
 
-#endif // PREFERENCE_RC_H
+#endif // WINCONTROLS_PREFERENCE_PREFERENCERC_H
 

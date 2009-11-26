@@ -16,7 +16,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "trayIconControler.h"
+#include "WinControls/TrayIcon/trayIconControler.h"
 trayIconControler::trayIconControler(HWND hwnd, UINT uID, UINT uCBMsg, HICON hicon, TCHAR *tip)
 {
   _nid.cbSize = sizeof(_nid);

@@ -17,9 +17,9 @@
 
 
 #include "precompiled_headers.h"
-#include "DockingSplitter.h"
-#include "dockingResource.h"
-#include "npp_winver.h"
+#include "WinControls/DockingWnd/DockingSplitter.h"
+#include "WinControls/DockingWnd/dockingResource.h"
+#include "MISC/Common/npp_winver.h"
 
 BOOL DockingSplitter::_isVertReg = FALSE;
 BOOL DockingSplitter::_isHoriReg = FALSE;

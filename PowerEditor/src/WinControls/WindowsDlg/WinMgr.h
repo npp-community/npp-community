@@ -9,8 +9,8 @@
 //
 // Theo - Heavily modified to remove MFC dependencies
 //        Replaced CWnd*/HWND, CRect/RECT, CSize/SIZE, CPoint/POINT
-#ifndef WINMGR_H
-#define WINMGR_H
+#ifndef WINCONTROLS_WINDOWSDLG_WINMGR_H
+#define WINCONTROLS_WINDOWSDLG_WINMGR_H
 
 #pragma once
 
@@ -309,4 +309,4 @@ private:
 };
 
 // Theo - Removed CSizerBar and CSizeableDlg
-#endif
+#endif // WINCONTROLS_WINDOWSDLG_WINMGR_H

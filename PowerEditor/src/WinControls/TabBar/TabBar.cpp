@@ -16,10 +16,10 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "TabBar.h"
+#include "WinControls/TabBar/TabBar.h"
 #include "menuCmdID.h"
 #include "resource.h"
-#include "colors.h"
+#include "ScitillaComponent/colors.h"
 
 #define	IDC_DRAG_TAB     1404
 #define	IDC_DRAG_INTERDIT_TAB 1405

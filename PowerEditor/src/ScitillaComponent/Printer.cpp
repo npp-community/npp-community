@@ -16,10 +16,10 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "Printer.h"
-#include "Buffer.h"
-#include "ScintillaEditView.h"
-#include "RunDlg.h"
+#include "ScitillaComponent/Printer.h"
+#include "ScitillaComponent/Buffer.h"
+#include "ScitillaComponent/ScintillaEditView.h"
+#include "WinControls/StaticDialog/RunDlg/RunDlg.h"
 #include "Parameters.h"
 
 static void replaceStr(generic_string & str, generic_string str2BeReplaced, generic_string replacement)

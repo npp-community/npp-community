@@ -19,7 +19,7 @@
 
 #ifndef SHIPPING
 
-#include "npp_debug.h"
+#include "MISC/Debug/npp_debug.h"
 
 namespace Debug
 {

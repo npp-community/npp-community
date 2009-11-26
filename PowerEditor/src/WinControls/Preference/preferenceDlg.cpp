@@ -17,21 +17,21 @@
 
 #include "precompiled_headers.h"
 
-#include "tinyxml.h"
+#include "TinyXML/tinyxml.h"
 
-#include "preferenceDlg.h"
+#include "WinControls/Preference/preferenceDlg.h"
 #include "ValueDlg.h"
 
-#include "preference_rc.h"
-#include "URLCtrl.h"
-#include "regExtDlg.h"
-#include "regExtDlgRc.h"
-#include "WordStyleDlg.h"
-#include "ControlsTab.h"
+#include "WinControls/Preference/preference_rc.h"
+#include "WinControls/AboutDlg/URLCtrl.h"
+#include "MISC/RegExt/regExtDlg.h"
+#include "MISC/RegExt/regExtDlgRc.h"
+#include "WinControls/ColourPicker/WordStyleDlg.h"
+#include "WinControls/TabBar/ControlsTab.h"
 #include "menuCmdID.h"
 #include "resource.h"
 #include "Parameters.h"
-#include "npp_winver.h"
+#include "MISC/Common/npp_winver.h"
 
 const int BLINKRATE_FASTEST = 50;
 const int BLINKRATE_SLOWEST = 2500;

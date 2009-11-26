@@ -16,10 +16,10 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "FunctionCallTip.h"
-#include "ScintillaEditView.h"
+#include "ScitillaComponent/FunctionCallTip.h"
+#include "ScitillaComponent/ScintillaEditView.h"
 
-#include "tinyxml.h"
+#include "TinyXML/tinyxml.h"
 
 struct Token {
 	// JOCE: move to generic_string

@@ -17,11 +17,11 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef COLUMNEDITOR_H
-#define COLUMNEDITOR_H
+#ifndef SCINTILLACOMPONENT_COLUMNEDITOR_H
+#define SCINTILLACOMPONENT_COLUMNEDITOR_H
 
-#ifndef STATIC_DIALOG_H
-#include "StaticDialog.h"
+#ifndef WINCONTROLS_STATICDIALOG_STATICDIALOG_H
+#include "WinControls/StaticDialog/StaticDialog.h"
 #endif
 
 // Forward declarations
@@ -47,4 +47,4 @@ private :
 
     ScintillaEditView **_ppEditView;
 };
-#endif// COLUMNEDITOR_H
+#endif// SCINTILLACOMPONENT_COLUMNEDITOR_H

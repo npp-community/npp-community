@@ -15,8 +15,8 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef M30_IDE_COMMUN_H
-#define M30_IDE_COMMUN_H
+#ifndef MISC_COMMON_COMMON_H
+#define MISC_COMMON_COMMON_H
 
 #define CP_ANSI_LATIN_1 1252
 #define CP_BIG5 950
@@ -149,4 +149,4 @@ private:
 #define REBARBAND_SIZE sizeof(REBARBANDINFO)
 #endif
 
-#endif //M30_IDE_COMMUN_H
+#endif //MISC_COMMON_COMMON_H

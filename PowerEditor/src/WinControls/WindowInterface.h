@@ -15,11 +15,11 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef WINDOW_INTERFACE_H
-#define WINDOW_INTERFACE_H
+#ifndef WINCONTROLS_WINDOWINTERFACE_H
+#define WINCONTROLS_WINDOWINTERFACE_H
 
-#ifndef WINDOW_CONTROL_H
-#include "Window.h"
+#ifndef WINCONTROLS_WINDOW_H
+#include "WinControls/Window.h"
 #endif
 
 class WindowInterface : public Window
@@ -31,4 +31,4 @@ public :
 	};
 };
 
-#endif // WINDOW_INTERFACE_H
+#endif // WINCONTROLS_WINDOWINTERFACE_H

@@ -16,11 +16,11 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-#ifndef DOCKINGSPLITTER_H
-#define DOCKINGSPLITTER_H
+#ifndef WINCONTROLS_DOCKINGWND_DOCKINGSPLITTER_H
+#define WINCONTROLS_DOCKINGWND_DOCKINGSPLITTER_H
 
-#ifndef WINDOW_CONTROL_H
-#include "window.h"
+#ifndef WINCONTROLS_WINDOW_H
+#include "WinControls/Window.h"
 #endif
 
 #define	DMS_VERTICAL		0x00000001
@@ -57,4 +57,4 @@ private:
 	static BOOL			_isHoriReg;
 };
 
-#endif // DOCKINGSPLITTER_H
+#endif // WINCONTROLS_DOCKINGWND_DOCKINGSPLITTER_H

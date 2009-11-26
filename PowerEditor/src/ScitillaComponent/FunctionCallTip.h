@@ -15,8 +15,8 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef FUNCTIONCALLTIP_H
-#define FUNCTIONCALLTIP_H
+#ifndef SCINTILLACOMPONENT_FUNCTIONCALLTIP_H
+#define SCINTILLACOMPONENT_FUNCTIONCALLTIP_H
 
 typedef std::vector<generic_string> stringVec;
 
@@ -70,4 +70,4 @@ private:
 	void cleanup();					//delete any leftovers
 };
 
-#endif// FUNCTIONCALLTIP_H
+#endif// SCINTILLACOMPONENT_FUNCTIONCALLTIP_H

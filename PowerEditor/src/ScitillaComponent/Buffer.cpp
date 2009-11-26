@@ -16,14 +16,14 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "Buffer.h"
+#include "ScitillaComponent/Buffer.h"
 
 #include "Notepad_plus.h"
-#include "ScintillaEditView.h"
+#include "ScitillaComponent/ScintillaEditView.h"
 #include "Parameters.h"
 #include "Utf8_16.h"
 
-#include "npp_session.h"
+#include "MISC/Common/npp_session.h"
 
 const TCHAR UNTITLED_STR[] = TEXT("new ");
 

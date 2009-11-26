@@ -15,8 +15,8 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef PRINTER_H
-#define PRINTER_H
+#ifndef SCINTILLACOMPONENT_PRINTER_H
+#define SCINTILLACOMPONENT_PRINTER_H
 
 class ScintillaEditView;
 
@@ -49,4 +49,4 @@ private :
 	size_t _nbPageTotal;
 };
 
-#endif //PRINTER_H
+#endif //SCINTILLACOMPONENT_PRINTER_H

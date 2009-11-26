@@ -15,8 +15,8 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef FILENAME_STRING_SPLITTER_H
-#define FILENAME_STRING_SPLITTER_H
+#ifndef MISC_FILENAMESTRINGSPLITTER_H
+#define MISC_FILENAMESTRINGSPLITTER_H
 
 typedef std::vector<generic_string> stringVector;
 
@@ -89,4 +89,4 @@ private :
 	stringVector _fileNames;
 };
 
-#endif //FILENAME_STRING_SPLITTER_H
+#endif //MISC_FILENAMESTRINGSPLITTER_H

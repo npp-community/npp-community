@@ -16,7 +16,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "npp_date.h"
+#include "MISC/Common/npp_date.h"
 
 Date::Date( unsigned long year, unsigned long month, unsigned long day )
 {

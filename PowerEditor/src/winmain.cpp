@@ -18,16 +18,16 @@
 #include "precompiled_headers.h"
 
 #include "Notepad_plus.h"
-#include "Process.h"
+#include "MISC/Process/Process.h"
 
-#include "Win32Exception.h"	//Win32 exception
-#include "MiniDumper.h"			//Write dump files
+#include "MISC/Exception/Win32Exception.h"	//Win32 exception
+#include "MISC/Exception/MiniDumper.h"			//Write dump files
 
 #include "resource.h"
-#include "Buffer.h"
+#include "ScitillaComponent/Buffer.h"
 
 #include "Parameters.h"
-#include "npp_winver.h"
+#include "MISC/Common/npp_winver.h"
 
 typedef std::vector<const TCHAR*> ParamVector;
 

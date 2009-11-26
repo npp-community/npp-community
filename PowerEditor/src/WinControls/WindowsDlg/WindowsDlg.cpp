@@ -17,13 +17,13 @@
 
 #include "precompiled_headers.h"
 
-#include "tinyxmlA.h"
+#include "TinyXML/tinyXmlA/tinystrA.h"
 
-#include "WindowsDlg.h"
-#include "WindowsDlgRc.h"
-#include "DocTabView.h"
-#include "WinMgr.h"
-#include "Buffer.h"
+#include "WinControls/WindowsDlg/WindowsDlg.h"
+#include "WinControls/WindowsDlg/WindowsDlgRc.h"
+#include "ScitillaComponent/DocTabView.h"
+#include "WinControls/WindowsDlg/WinMgr.h"
+#include "ScitillaComponent/Buffer.h"
 #include "Parameters.h"
 
 #ifndef _countof

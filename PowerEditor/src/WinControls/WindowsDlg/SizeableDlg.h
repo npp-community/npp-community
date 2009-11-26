@@ -15,11 +15,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef SIZEABLE_DLG_H
-#define SIZEABLE_DLG_H
+#ifndef WINCONTROLS_WINDOWSDLG_SIZEABLEDLG_H
+#define WINCONTROLS_WINDOWSDLG_SIZEABLEDLG_H
 
-#ifndef STATIC_DIALOG_H
-#include "StaticDialog.h"
+#ifndef WINCONTROLS_STATICDIALOG_STATICDIALOG_H
+#include "WinControls/StaticDialog/StaticDialog.h"
 #endif
 
 class WINRECT;
@@ -41,4 +41,4 @@ protected:
 	virtual LRESULT onWinMgr(WPARAM wp, LPARAM lp);
 };
 
-#endif // SIZABLE_DLG_H
+#endif // WINCONTROLS_WINDOWSDLG_SIZEABLEDLG_H

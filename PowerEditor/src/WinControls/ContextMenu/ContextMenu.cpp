@@ -17,7 +17,7 @@
 
 #include "precompiled_headers.h"
 
-#include "ContextMenu.h"
+#include "WinControls/ContextMenu/ContextMenu.h"
 
 MenuItemUnit::MenuItemUnit() :
 	_cmdID(0), _itemName(TEXT("")), _subMenuName(TEXT(""))

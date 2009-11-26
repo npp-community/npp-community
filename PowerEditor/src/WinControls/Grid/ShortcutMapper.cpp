@@ -18,14 +18,14 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "precompiled_headers.h"
-#include "ShortcutMapper.h"
+#include "WinControls/Grid/ShortcutMapper.h"
 #include "Parameters.h"
-#include "PluginInterface.h"
-#include "BabyGrid.h"
-#include "ShortcutMapper_rc.h"
+#include "MISC/PluginsManager/PluginInterface.h"
+#include "WinControls/Grid/BabyGrid.h"
+#include "WinControls/Grid/ShortcutMapper_rc.h"
 
-#include "BabyGridWrapper.h"
-#include "ContextMenu.h"
+#include "WinControls/Grid/BabyGridWrapper.h"
+#include "WinControls/ContextMenu/ContextMenu.h"
 
 
 ShortcutMapper::ShortcutMapper() :

@@ -15,15 +15,15 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef BUFFER_H
-#define BUFFER_H
+#ifndef SCINTILLACOMPONENT_BUFFER_H
+#define SCINTILLACOMPONENT_BUFFER_H
 
-#ifndef BUFFERID_H
-#include "BufferID.h"
+#ifndef SCINTILLACOMPONENT_BUFFERID_H
+#include "ScitillaComponent/BufferID.h"
 #endif
 
-#ifndef NOTEPAD_PLUS_MSGS_H
-#include "Notepad_plus_msgs.h"
+#ifndef MISC_PLUGINSMANAGER_NOTEPADPLUSMSGS_H
+#include "MISC/PluginsManager/Notepad_plus_msgs.h"
 #endif
 
 #ifndef PARAMETERS_DEF_H
@@ -348,4 +348,4 @@ private :
 	void doNotify(int mask);
 };
 
-#endif //BUFFER_H
+#endif //SCINTILLACOMPONENT_BUFFER_H

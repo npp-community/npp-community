@@ -15,23 +15,23 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef SCINTILLA_EDIT_VIEW_H
-#define SCINTILLA_EDIT_VIEW_H
+#ifndef SCINTILLACOMPONENT_SCINTILLAEDITVIEW_H
+#define SCINTILLACOMPONENT_SCINTILLAEDITVIEW_H
 
-#ifndef WINDOW_CONTROL_H
-#include "Window.h"
+#ifndef WINCONTROLS_WINDOW_H
+#include "WinControls/Window.h"
 #endif
 
-#ifndef BUFFERID_H
-#include "BufferID.h"
+#ifndef SCINTILLACOMPONENT_BUFFERID_H
+#include "ScitillaComponent/BufferID.h"
 #endif
 
-#ifndef NOTEPAD_PLUS_MSGS_H
-#include "Notepad_plus_msgs.h"
+#ifndef MISC_PLUGINSMANAGER_NOTEPADPLUSMSGS_H
+#include "MISC/PluginsManager/Notepad_plus_msgs.h"
 #endif
 
-#ifndef SCINTILLA_REF_H
-#include "ScintillaRef.h"
+#ifndef SCINTILLACOMPONENT_SCINTILLAREF_H
+#include "ScitillaComponent/ScintillaRef.h"
 #endif
 
 // Forward declarations
@@ -457,4 +457,4 @@ private:
 	void reapplyHotspotStyles();
 };
 
-#endif //SCINTILLA_EDIT_VIEW_H
+#endif //SCINTILLACOMPONENT_SCINTILLAEDITVIEW_H

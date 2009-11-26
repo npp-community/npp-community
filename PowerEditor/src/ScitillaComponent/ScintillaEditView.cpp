@@ -17,18 +17,18 @@
 
 
 #include "precompiled_headers.h"
-#include "ScintillaEditView.h"
+#include "ScitillaComponent/ScintillaEditView.h"
 
-#include "ScintillaRef.h"
-#include "UserDefineDialog.h"
+#include "ScitillaComponent/ScintillaRef.h"
+#include "ScitillaComponent/UserDefineDialog.h"
 
 #include "xpm_icons.h"
-#include "Buffer.h"
+#include "ScitillaComponent/Buffer.h"
 
 #include "Parameters.h"
 
-#include "colors.h"
-#include "npp_session.h"
+#include "ScitillaComponent/colors.h"
+#include "MISC/Common/npp_session.h"
 
 
 // initialize the static variable

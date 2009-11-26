@@ -15,8 +15,8 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef XMLMATCHEDTAGSHIGHLIGHTER_H
-#define XMLMATCHEDTAGSHIGHLIGHTER_H
+#ifndef SCINTILLACOMPONENT_XMLMATCHEDTAGSHIGHLIGHTER_H
+#define SCINTILLACOMPONENT_XMLMATCHEDTAGSHIGHLIGHTER_H
 
 class ScintillaEditView;
 
@@ -52,5 +52,5 @@ private:
 	};
 };
 
-#endif //XMLMATCHEDTAGSHIGHLIGHTER_H
+#endif //SCINTILLACOMPONENT_XMLMATCHEDTAGSHIGHLIGHTER_H
 

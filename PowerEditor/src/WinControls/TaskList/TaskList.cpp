@@ -16,9 +16,9 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "TaskList.h"
-#include "TaskListDlg_rc.h"
-#include "colors.h"
+#include "WinControls/TaskList/TaskList.h"
+#include "WinControls/TaskList/TaskListDlg_rc.h"
+#include "ScitillaComponent/colors.h"
 
 TaskList::TaskList() :
 	_defaultProc(NULL), _hFont(NULL), _hFontSelected(NULL),

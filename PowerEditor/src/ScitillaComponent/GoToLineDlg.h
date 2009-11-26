@@ -15,11 +15,11 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef GOTILINE_DLG_H
-#define GOTILINE_DLG_H
+#ifndef SCINTILLACOMPONENT_GOTILINEDLG_H
+#define SCINTILLACOMPONENT_GOTILINEDLG_H
 
-#ifndef STATIC_DIALOG_H
-#include "StaticDialog.h"
+#ifndef WINCONTROLS_STATICDIALOG_STATICDIALOG_H
+#include "WinControls/StaticDialog/StaticDialog.h"
 #endif
 
 class ScintillaEditView;
@@ -53,4 +53,4 @@ private :
     int getLine() const;
 };
 
-#endif //GOTILINE_DLG_H
+#endif //SCINTILLACOMPONENT_GOTILINEDLG_H

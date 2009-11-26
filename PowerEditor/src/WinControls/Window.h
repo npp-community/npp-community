@@ -15,8 +15,8 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef WINDOW_CONTROL_H
-#define WINDOW_CONTROL_H
+#ifndef WINCONTROLS_WINDOW_H
+#define WINCONTROLS_WINDOW_H
 
 class Window
 {
@@ -119,6 +119,6 @@ protected:
 	HWND _hSelf;
 };
 
-#endif //WINDOW_CONTROL_H
+#endif //WINCONTROLS_WINDOW_H
 
 

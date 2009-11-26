@@ -18,11 +18,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "precompiled_headers.h"
-#include "WordStyleDlg.h"
+#include "WinControls/ColourPicker/WordStyleDlg.h"
 
-#include "ColourPicker.h"
-#include "WordStyleDlgRes.h"
-#include "TabBar.h"
+#include "WinControls/ColourPicker/ColourPicker.h"
+#include "WinControls/ColourPicker/WordStyleDlgRes.h"
+#include "WinControls/TabBar/TabBar.h"
 #include "Parameters.h"
 
 

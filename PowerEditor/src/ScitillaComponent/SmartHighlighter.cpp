@@ -16,10 +16,10 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "SmartHighlighter.h"
+#include "ScitillaComponent/SmartHighlighter.h"
 
-#include "ScintillaEditView.h"
-#include "FindReplaceDlg.h"
+#include "ScitillaComponent/ScintillaEditView.h"
+#include "ScitillaComponent/FindReplaceDlg.h"
 
 #define MAXLINEHIGHLIGHT 400	//prevent highlighter from doing too much work when a lot is visible
 

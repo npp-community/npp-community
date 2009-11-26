@@ -17,17 +17,17 @@
 
 #include "precompiled_headers.h"
 
-#include "FindReplaceDlg.h"
-#include "FindReplaceDlg_rc.h"
-#include "ScintillaEditView.h"
+#include "ScitillaComponent/FindReplaceDlg.h"
+#include "ScitillaComponent/FindReplaceDlg_rc.h"
+#include "ScitillaComponent/ScintillaEditView.h"
 #include "UniConversion.h"
-#include "Buffer.h"
-#include "DockingDlgInterface.h"
-#include "Docking.h"
+#include "ScitillaComponent/Buffer.h"
+#include "WinControls/DockingWnd/DockingDlgInterface.h"
+#include "WinControls/DockingWnd/Docking.h"
 #include "resource.h"
 
-#include "TabBar.h"
-#include "Toolbar.h"
+#include "WinControls/TabBar/TabBar.h"
+#include "WinControls/ToolBar/Toolbar.h"
 
 #include "Parameters.h"
 

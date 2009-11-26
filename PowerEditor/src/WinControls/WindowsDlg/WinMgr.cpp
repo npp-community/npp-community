@@ -9,7 +9,7 @@
 //        Replaced CWnd*/HWND, CRect/RECT, CSize/SIZE, CPoint/POINT
 
 #include "precompiled_headers.h"
-#include "WinMgr.h"
+#include "WinControls/WindowsDlg/WinMgr.h"
 
 const SIZE SIZEZERO = {0, 0};
 const SIZE SIZEMAX = {INFINITY,INFINITY};

@@ -17,15 +17,15 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef WORD_STYLE_H
-#define WORD_STYLE_H
+#ifndef WINCONTROLS_COLOURPICKER_WORDSTYLEDLG_H
+#define WINCONTROLS_COLOURPICKER_WORDSTYLEDLG_H
 
-#ifndef STATIC_DIALOG_H
-#include "StaticDialog.h"
+#ifndef WINCONTROLS_STATICDIALOG_STATICDIALOG_H
+#include "WinControls/StaticDialog/StaticDialog.h"
 #endif
 
-#ifndef NPP_STYLES
-#include "npp_styles.h"
+#ifndef MISC_COMMON_NPPSTYLES_H
+#include "MISC/Common/npp_styles.h"
 #endif
 
 #ifndef RESOURCE_H
@@ -128,4 +128,4 @@ private :
 	void showGlobalOverrideCtrls(bool show);
 };
 
-#endif //WORD_STYLE_H
+#endif //WINCONTROLS_COLOURPICKER_WORDSTYLEDLG_H

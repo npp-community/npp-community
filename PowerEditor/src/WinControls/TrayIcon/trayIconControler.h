@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef TRAY_ICON_CONTROLER_H
-#define TRAY_ICON_CONTROLER_H
+#ifndef WINCONTROLS_TRAYICON_TRAYICONCONTROLER_H
+#define WINCONTROLS_TRAYICON_TRAYICONCONTROLER_H
 
 #define ADD     NIM_ADD
 #define REMOVE  NIM_DELETE
@@ -37,4 +37,4 @@ private:
   bool              _isIconShowed;
 };
 
-#endif //TRAY_ICON_CONTROLER_H
+#endif //WINCONTROLS_TRAYICON_TRAYICONCONTROLER_H

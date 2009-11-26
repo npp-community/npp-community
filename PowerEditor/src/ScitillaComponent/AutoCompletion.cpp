@@ -16,11 +16,11 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "AutoCompletion.h"
-#include "FunctionCallTip.h"
-#include "ScintillaEditView.h"
-#include "tinyxml.h"
-#include "Buffer.h"
+#include "ScitillaComponent/AutoCompletion.h"
+#include "ScitillaComponent/FunctionCallTip.h"
+#include "ScitillaComponent/ScintillaEditView.h"
+#include "TinyXML/tinyxml.h"
+#include "ScitillaComponent/Buffer.h"
 #include "Parameters.h"
 
 static bool isInList(generic_string word, const std::vector<generic_string> & wordArray)

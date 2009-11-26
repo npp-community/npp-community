@@ -15,9 +15,10 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef COLORS_H
-#define COLORS_H
+#ifndef SCINTILLACOMPONENT_COLORS_H
+#define SCINTILLACOMPONENT_COLORS_H
 
+// JOCE: Can somebody tell me WTF COLORS.H is doing in Scintilla Component????
 #define red			            (RGB(0xFF,    0,    0))
 #define darkRed                 (RGB(0x80,    0,    0))
 #define offWhite		        (RGB(0xFF, 0xFB, 0xF0))
@@ -57,5 +58,5 @@
 #define RGB2int(color)
     (((((long)color) & 0x0000FF) << 16) | ((((long)color) & 0x00FF00)) | ((((long)color) & 0xFF0000) >> 16))
 */
-#endif //COLORS_H
+#endif //SCINTILLACOMPONENT_COLORS_H
 
