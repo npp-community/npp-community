@@ -16,9 +16,9 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "ScitillaComponent/Printer.h"
-#include "ScitillaComponent/Buffer.h"
-#include "ScitillaComponent/ScintillaEditView.h"
+#include "ScintillaComponent/Printer.h"
+#include "ScintillaComponent/Buffer.h"
+#include "ScintillaComponent/ScintillaEditView.h"
 #include "WinControls/StaticDialog/RunDlg/RunDlg.h"
 #include "Parameters.h"
 

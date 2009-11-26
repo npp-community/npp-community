@@ -20,7 +20,7 @@
 #include "MISC/Common/npp_styles.h"
 #include "TinyXML/tinyxml.h"
 #include "Parameters_def.h"
-#include "ScitillaComponent/colors.h"
+#include "ScintillaComponent/colors.h"
 
 // ***********************************
 //

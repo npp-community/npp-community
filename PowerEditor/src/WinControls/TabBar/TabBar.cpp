@@ -19,7 +19,7 @@
 #include "WinControls/TabBar/TabBar.h"
 #include "menuCmdID.h"
 #include "resource.h"
-#include "ScitillaComponent/colors.h"
+#include "ScintillaComponent/colors.h"
 
 #define	IDC_DRAG_TAB     1404
 #define	IDC_DRAG_INTERDIT_TAB 1405

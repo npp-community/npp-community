@@ -18,7 +18,7 @@
 #include "precompiled_headers.h"
 #include "WinControls/shortcut/shortcut.h"
 #include "Parameters.h"
-#include "ScitillaComponent/ScintillaEditView.h"
+#include "ScintillaComponent/ScintillaEditView.h"
 #include "resource.h"
 #include "Notepad_plus.h"
 #include "WinControls/shortcut/shortcutRc.h"

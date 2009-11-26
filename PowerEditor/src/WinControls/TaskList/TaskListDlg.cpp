@@ -24,7 +24,7 @@
 #include "WinControls/TaskList/TaskList.h"
 #include "MISC/PluginsManager/Notepad_plus_msgs.h"
 #include "MISC/Common/npp_winver.h"
-#include "ScitillaComponent/colors.h"
+#include "ScintillaComponent/colors.h"
 
 static HWND hWndServer = NULL;
 static HHOOK hook = NULL;

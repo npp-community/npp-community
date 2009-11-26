@@ -16,9 +16,9 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "ScitillaComponent/xmlMatchedTagsHighlighter.h"
-#include "ScitillaComponent/ScintillaEditView.h"
-#include "ScitillaComponent/Buffer.h"
+#include "ScintillaComponent/xmlMatchedTagsHighlighter.h"
+#include "ScintillaComponent/ScintillaEditView.h"
+#include "ScintillaComponent/Buffer.h"
 #include "Parameters.h"
 
 int XmlMatchedTagsHighlighter::getFirstTokenPosFrom(int targetStart, int targetEnd, const char *token, std::pair<int, int> & foundPos)

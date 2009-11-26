@@ -16,10 +16,10 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "ScitillaComponent/Buffer.h"
+#include "ScintillaComponent/Buffer.h"
 
 #include "Notepad_plus.h"
-#include "ScitillaComponent/ScintillaEditView.h"
+#include "ScintillaComponent/ScintillaEditView.h"
 #include "Parameters.h"
 #include "Utf8_16.h"
 

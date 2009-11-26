@@ -18,7 +18,7 @@
 #include "precompiled_headers.h"
 #include "WinControls/TaskList/TaskList.h"
 #include "WinControls/TaskList/TaskListDlg_rc.h"
-#include "ScitillaComponent/colors.h"
+#include "ScintillaComponent/colors.h"
 
 TaskList::TaskList() :
 	_defaultProc(NULL), _hFont(NULL), _hFontSelected(NULL),

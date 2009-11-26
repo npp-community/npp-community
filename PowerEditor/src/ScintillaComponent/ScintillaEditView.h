@@ -23,7 +23,7 @@
 #endif
 
 #ifndef SCINTILLACOMPONENT_BUFFERID_H
-#include "ScitillaComponent/BufferID.h"
+#include "ScintillaComponent/BufferID.h"
 #endif
 
 #ifndef MISC_PLUGINSMANAGER_NOTEPADPLUSMSGS_H
@@ -31,7 +31,7 @@
 #endif
 
 #ifndef SCINTILLACOMPONENT_SCINTILLAREF_H
-#include "ScitillaComponent/ScintillaRef.h"
+#include "ScintillaComponent/ScintillaRef.h"
 #endif
 
 // Forward declarations

@@ -21,13 +21,13 @@
 
 #include "Parameters.h"
 #include "WinControls/OpenSaveFileDialog/FileDialog.h"
-#include "ScitillaComponent/ScintillaEditView.h"
+#include "ScintillaComponent/ScintillaEditView.h"
 
 #include "keys.h"
 #include "MenuCmdID.h"
 
 #include "resource.h"
-#include "ScitillaComponent/colors.h"
+#include "ScintillaComponent/colors.h"
 
 #include "MISC/Common/npp_winver.h"
 #include "MISC/Common/npp_session.h"

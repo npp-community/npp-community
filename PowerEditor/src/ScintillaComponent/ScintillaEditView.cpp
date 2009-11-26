@@ -17,17 +17,17 @@
 
 
 #include "precompiled_headers.h"
-#include "ScitillaComponent/ScintillaEditView.h"
+#include "ScintillaComponent/ScintillaEditView.h"
 
-#include "ScitillaComponent/ScintillaRef.h"
-#include "ScitillaComponent/UserDefineDialog.h"
+#include "ScintillaComponent/ScintillaRef.h"
+#include "ScintillaComponent/UserDefineDialog.h"
 
 #include "xpm_icons.h"
-#include "ScitillaComponent/Buffer.h"
+#include "ScintillaComponent/Buffer.h"
 
 #include "Parameters.h"
 
-#include "ScitillaComponent/colors.h"
+#include "ScintillaComponent/colors.h"
 #include "MISC/Common/npp_session.h"
 
 

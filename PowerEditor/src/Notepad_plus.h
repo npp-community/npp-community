@@ -19,7 +19,7 @@
 #define NOTEPADPLUS_H
 
 #ifndef SCINTILLACOMPONENT_BUFFERID_H
-#include "ScitillaComponent/BufferID.h"
+#include "ScintillaComponent/BufferID.h"
 #endif
 
 #ifndef PARAMETERS_DEF_H
@@ -27,7 +27,7 @@
 #endif
 
 #ifndef SCINTILLACOMPONENT_SCINTILLAREF_H
-#include "ScitillaComponent/ScintillaRef.h"
+#include "ScintillaComponent/ScintillaRef.h"
 #endif
 
 #ifndef WINCONTROLS_WINDOW_H
@@ -48,7 +48,7 @@
 #endif
 
 #ifndef SCINTILLACOMPONENT_SCINTILLACTRLS_H
-#include "ScitillaComponent/ScintillaCtrls.h"
+#include "ScintillaComponent/ScintillaCtrls.h"
 #endif
 
 #define MENU 0x01

@@ -16,8 +16,8 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "ScitillaComponent/ScintillaCtrls.h"
-#include "ScitillaComponent/ScintillaEditView.h"
+#include "ScintillaComponent/ScintillaCtrls.h"
+#include "ScintillaComponent/ScintillaEditView.h"
 
 HWND ScintillaCtrls::createSintilla(HWND hParent)
 {

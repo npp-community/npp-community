@@ -16,16 +16,16 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "ScitillaComponent/UserDefineDialog.h"
-#include "ScitillaComponent/UserDefineResource.h"
-#include "ScitillaComponent/ScintillaEditView.h"
+#include "ScintillaComponent/UserDefineDialog.h"
+#include "ScintillaComponent/UserDefineResource.h"
+#include "ScintillaComponent/ScintillaEditView.h"
 #include "Parameters.h"
 #include "resource.h"
 #include "MISC/PluginsManager/Notepad_plus_msgs.h"
 #include "menuCmdID.h"
-#include "ScitillaComponent/Buffer.h"
-#include "ScitillaComponent/colors.h"
-#include "ScitillaComponent/UserDefineLangReference.h"
+#include "ScintillaComponent/Buffer.h"
+#include "ScintillaComponent/colors.h"
+#include "ScintillaComponent/UserDefineLangReference.h"
 #include "WinControls/ColourPicker/ColourPicker.h"
 
 

@@ -19,7 +19,7 @@
 #define SCINTILLACOMPONENT_BUFFER_H
 
 #ifndef SCINTILLACOMPONENT_BUFFERID_H
-#include "ScitillaComponent/BufferID.h"
+#include "ScintillaComponent/BufferID.h"
 #endif
 
 #ifndef MISC_PLUGINSMANAGER_NOTEPADPLUSMSGS_H

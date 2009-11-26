@@ -23,7 +23,7 @@
 #endif
 
 #ifndef SCINTILLACOMPONENT_BUFFERID_H
-#include "ScitillaComponent/BufferID.h"
+#include "ScintillaComponent/BufferID.h"
 #endif
 
 #define SAVED_IMG_INDEX 0

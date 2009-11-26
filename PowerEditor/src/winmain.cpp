@@ -24,7 +24,7 @@
 #include "MISC/Exception/MiniDumper.h"			//Write dump files
 
 #include "resource.h"
-#include "ScitillaComponent/Buffer.h"
+#include "ScintillaComponent/Buffer.h"
 
 #include "Parameters.h"
 #include "MISC/Common/npp_winver.h"

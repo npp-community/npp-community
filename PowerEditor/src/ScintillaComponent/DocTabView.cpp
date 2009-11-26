@@ -16,10 +16,10 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "ScitillaComponent/DocTabView.h"
-#include "ScitillaComponent/ScintillaEditView.h"
+#include "ScintillaComponent/DocTabView.h"
+#include "ScintillaComponent/ScintillaEditView.h"
 #include "WinControls/ImageListSet/ImageListSet.h"
-#include "ScitillaComponent/Buffer.h"
+#include "ScintillaComponent/Buffer.h"
 
 bool DocTabView::_hideTabBarStatus = false;
 

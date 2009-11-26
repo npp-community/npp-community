@@ -19,7 +19,7 @@
 #define PARAMETERS_H
 
 #ifndef SCINTILLACOMPONENT_SCINTILLAREF_H
-#include "ScitillaComponent/ScintillaRef.h"
+#include "ScintillaComponent/ScintillaRef.h"
 #endif
 
 #ifndef WINCONTROLS_TOOLBAR_TOOLBAR_H
@@ -27,7 +27,7 @@
 #endif
 
 #ifndef SCINTILLACOMPONENT_USERDEFINELANGREFERENCE_H
-#include "ScitillaComponent/UserDefineLangReference.h"
+#include "ScintillaComponent/UserDefineLangReference.h"
 #endif
 
 #ifndef WINCONTROLS_SHORTCUT_SHORTCUT_H
@@ -58,7 +58,7 @@
 
 // JOCE: this needs to be taken out at some point...
 #ifndef SCINTILLACOMPONENT_USERDEFINEDIALOG_H
-#include "ScitillaComponent/UserDefineDialog.h"
+#include "ScintillaComponent/UserDefineDialog.h"
 #endif
 
 // Forward declarations

@@ -517,55 +517,55 @@
 				Name="ScintillaComponent"
 				>
 				<File
-					RelativePath="..\src\ScitillaComponent\AutoCompletion.cpp"
+					RelativePath="..\src\ScintillaComponent\AutoCompletion.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\Buffer.cpp"
+					RelativePath="..\src\ScintillaComponent\Buffer.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\columnEditor.cpp"
+					RelativePath="..\src\ScintillaComponent\columnEditor.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\DocTabView.cpp"
+					RelativePath="..\src\ScintillaComponent\DocTabView.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\FindReplaceDlg.cpp"
+					RelativePath="..\src\ScintillaComponent\FindReplaceDlg.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\FunctionCallTip.cpp"
+					RelativePath="..\src\ScintillaComponent\FunctionCallTip.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\GoToLineDlg.cpp"
+					RelativePath="..\src\ScintillaComponent\GoToLineDlg.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\Printer.cpp"
+					RelativePath="..\src\ScintillaComponent\Printer.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\ScintillaCtrls.cpp"
+					RelativePath="..\src\ScintillaComponent\ScintillaCtrls.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\ScintillaEditView.cpp"
+					RelativePath="..\src\ScintillaComponent\ScintillaEditView.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\SmartHighlighter.cpp"
+					RelativePath="..\src\ScintillaComponent\SmartHighlighter.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\UserDefineDialog.cpp"
+					RelativePath="..\src\ScintillaComponent\UserDefineDialog.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\xmlMatchedTagsHighlighter.cpp"
+					RelativePath="..\src\ScintillaComponent\xmlMatchedTagsHighlighter.cpp"
 					>
 				</File>
 			</Filter>
@@ -894,83 +894,83 @@
 				Name="ScintillaComponent"
 				>
 				<File
-					RelativePath="..\src\ScitillaComponent\AutoCompletion.h"
+					RelativePath="..\src\ScintillaComponent\AutoCompletion.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\Buffer.h"
+					RelativePath="..\src\ScintillaComponent\Buffer.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\BufferID.h"
+					RelativePath="..\src\ScintillaComponent\BufferID.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\colors.h"
+					RelativePath="..\src\ScintillaComponent\colors.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\columnEditor.h"
+					RelativePath="..\src\ScintillaComponent\columnEditor.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\columnEditor_rc.h"
+					RelativePath="..\src\ScintillaComponent\columnEditor_rc.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\DocTabView.h"
+					RelativePath="..\src\ScintillaComponent\DocTabView.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\FindReplaceDlg.h"
+					RelativePath="..\src\ScintillaComponent\FindReplaceDlg.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\FindReplaceDlg_rc.h"
+					RelativePath="..\src\ScintillaComponent\FindReplaceDlg_rc.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\FunctionCallTip.h"
+					RelativePath="..\src\ScintillaComponent\FunctionCallTip.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\GoToLineDlg.h"
+					RelativePath="..\src\ScintillaComponent\GoToLineDlg.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\Printer.h"
+					RelativePath="..\src\ScintillaComponent\Printer.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\ScintillaCtrls.h"
+					RelativePath="..\src\ScintillaComponent\ScintillaCtrls.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\ScintillaEditView.h"
+					RelativePath="..\src\ScintillaComponent\ScintillaEditView.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\ScintillaRef.h"
+					RelativePath="..\src\ScintillaComponent\ScintillaRef.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\SmartHighlighter.h"
+					RelativePath="..\src\ScintillaComponent\SmartHighlighter.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\UserDefineDialog.h"
+					RelativePath="..\src\ScintillaComponent\UserDefineDialog.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\UserDefineLangReference.h"
+					RelativePath="..\src\ScintillaComponent\UserDefineLangReference.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\UserDefineResource.h"
+					RelativePath="..\src\ScintillaComponent\UserDefineResource.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\xmlMatchedTagsHighlighter.h"
+					RelativePath="..\src\ScintillaComponent\xmlMatchedTagsHighlighter.h"
 					>
 				</File>
 			</Filter>
@@ -1660,7 +1660,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\columnEditor.rc"
+					RelativePath="..\src\ScintillaComponent\columnEditor.rc"
 					>
 				</File>
 				<File
@@ -1668,7 +1668,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\FindReplaceDlg.rc"
+					RelativePath="..\src\ScintillaComponent\FindReplaceDlg.rc"
 					>
 				</File>
 				<File
@@ -1704,7 +1704,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\ScitillaComponent\UserDefineDialog.rc"
+					RelativePath="..\src\ScintillaComponent\UserDefineDialog.rc"
 					>
 				</File>
 				<File

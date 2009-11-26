@@ -16,8 +16,8 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "ScitillaComponent/FunctionCallTip.h"
-#include "ScitillaComponent/ScintillaEditView.h"
+#include "ScintillaComponent/FunctionCallTip.h"
+#include "ScintillaComponent/ScintillaEditView.h"
 
 #include "TinyXML/tinyxml.h"
 

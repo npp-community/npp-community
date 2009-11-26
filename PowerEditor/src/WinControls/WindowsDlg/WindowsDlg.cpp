@@ -21,9 +21,9 @@
 
 #include "WinControls/WindowsDlg/WindowsDlg.h"
 #include "WinControls/WindowsDlg/WindowsDlgRc.h"
-#include "ScitillaComponent/DocTabView.h"
+#include "ScintillaComponent/DocTabView.h"
 #include "WinControls/WindowsDlg/WinMgr.h"
-#include "ScitillaComponent/Buffer.h"
+#include "ScintillaComponent/Buffer.h"
 #include "Parameters.h"
 
 #ifndef _countof
