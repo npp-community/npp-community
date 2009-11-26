@@ -12,8 +12,6 @@
 #ifndef WINCONTROLS_WINDOWSDLG_WINMGR_H
 #define WINCONTROLS_WINDOWSDLG_WINMGR_H
 
-#pragma once
-
 // when using screen dimensions, this is infinite
 //const LONG INFINITY=0x7fff; // max short
 //change to DEFINE for GCC
