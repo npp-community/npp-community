@@ -372,10 +372,6 @@
 				Name="MISC"
 				>
 				<File
-					RelativePath="..\src\MISC\Common\Common.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\MISC\Exception\MiniDumper.cpp"
 					>
 				</File>
@@ -396,8 +392,12 @@
 					>
 				</File>
 				<Filter
-					Name="Parameters"
+					Name="Common"
 					>
+					<File
+						RelativePath="..\src\MISC\Common\Common.cpp"
+						>
+					</File>
 					<File
 						RelativePath="..\src\MISC\Common\npp_date.cpp"
 						>
@@ -814,10 +814,6 @@
 				Name="MISC"
 				>
 				<File
-					RelativePath="..\src\MISC\Common\Common.h"
-					>
-				</File>
-				<File
 					RelativePath="..\src\MISC\FileNameStringSplitter.h"
 					>
 				</File>
@@ -854,8 +850,12 @@
 					>
 				</File>
 				<Filter
-					Name="Parameters"
+					Name="Common"
 					>
+					<File
+						RelativePath="..\src\MISC\Common\Common.h"
+						>
+					</File>
 					<File
 						RelativePath="..\src\MISC\Common\npp_date.h"
 						>
