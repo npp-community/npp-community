@@ -600,10 +600,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\WinControls\DockingWnd\DropData.h"
-					>
-				</File>
-				<File
 					RelativePath="..\src\WinControls\OpenSaveFileDialog\FileDialog.h"
 					>
 				</File>
