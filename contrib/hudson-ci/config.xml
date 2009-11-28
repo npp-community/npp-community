@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<matrix-project>
+  <actions/>
+  <description>Multiple configuration build testing for Notepad++ Community Release.</description>
+  <logRotator>
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>10</numToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <axes>
+    <axis>
+      <name>NPPCR_BUILD_CONFIGURATION</name>
+      <values>
+        <string>Debug</string>
+        <string>Release</string>
+        <string>Shipping</string>
+      </values>
+    </axis>
+    <axis>
+      <name>NPPCR_BUILD_VC_VER</name>
+      <values>
+        <string>8.0</string>
+        <string>9.0</string>
+      </values>
+    </axis>
+    <axis>
+      <name>NPPCR_GTEST_STYLE</name>
+      <values>
+        <string>ENVIRONMENT</string>
+        <string>SUB_MODULE</string>
+        <string>NONE</string>
+      </values>
+    </axis>
+    <axis>
+      <name>NPPCR_BUILD_ARCH</name>
+      <values>
+        <string>x86</string>
+      </values>
+    </axis>
+  </axes>
+  <combinationFilter>!( (NPPCR_BUILD_CONFIGURATION==&quot;Shipping&quot; &amp;&amp; NPPCR_GTEST_STYLE!=&quot;NONE&quot;) || (NPPCR_BUILD_CONFIGURATION!=&quot;Shipping&quot; &amp;&amp; NPPCR_GTEST_STYLE==&quot;NONE&quot;) )</combinationFilter>
+  <builders>
+    <hudson.tasks.BatchFile>
+      <command>&quot;%NPPCR_ROOT_PATH%contrib\hudson-ci\NPPCR-HUDSON-BUILD-TESTS.bat&quot; &amp;&amp; exit %%ERRORLEVEL%%</command>
+    </hudson.tasks.BatchFile>
+  </builders>
+  <publishers/>
+  <buildWrappers>
+    <hudson.plugins.setenv.SetEnvBuildWrapper>
+      <localVarText>NPPCR_ROOT_PATH=C:\\Users\\almostautomated\\datastore\\repos\\git\\npp-community-setup\\
+MS_DBGTOOLS_PATH=C:\\Program Files\\Debugging Tools for Windows (x86)\\</localVarText>
+    </hudson.plugins.setenv.SetEnvBuildWrapper>
+  </buildWrappers>
+  <runSequentially>true</runSequentially>
+  <touchStoneResultCondition>
+    <name>SUCCESS</name>
+    <ordinal>0</ordinal>
+    <color>BLUE</color>
+  </touchStoneResultCondition>
+</matrix-project>
