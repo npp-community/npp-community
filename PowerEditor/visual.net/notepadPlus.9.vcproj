@@ -26,6 +26,9 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="Runtime build and version generation."
+				CommandLine="CALL $(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat &quot;$(IntDir)\&quot; &quot;$(SolutionDir)PowerEditor\src\gen-versioninfo.h&quot;"
+				ExcludedFromBuild="false"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -63,6 +66,8 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_UNICODE;UNICODE;_DEBUG"
+				ShowProgress="false"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -120,6 +125,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="Runtime build and version generation."
+				CommandLine="CALL $(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat &quot;$(IntDir)\&quot; &quot;$(SolutionDir)PowerEditor\src\gen-versioninfo.h&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -215,6 +222,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="Runtime build and version generation."
+				CommandLine="CALL $(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat &quot;$(IntDir)\&quot; &quot;$(SolutionDir)PowerEditor\src\gen-versioninfo.h&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
