@@ -1668,7 +1668,7 @@ void FindReplaceDlg::findAllIn(InWhat op)
 		_pFinder = new Finder();
 		_pFinder->init(_hInst, _hSelf, _ppEditView);
 
-		tTbData	data = {0};
+		tTbData	data;
 		_pFinder->create(&data, false);
 		::SendMessage(_hParent, NPPM_MODELESSDIALOG, MODELESSDIALOGREMOVE, (WPARAM)_pFinder->getHSelf());
 		// define the default docking behaviour
@@ -1730,15 +1730,12 @@ void FindReplaceDlg::findAllIn(InWhat op)
 	if (::SendMessage(_hParent, cmdid, 0, 0))
 	{
 		wsprintf(_findAllResultStr, TEXT("%d hits"), _findAllResult);
-		if (_findAllResult)
-		{
-			focusOnFinder();
-		}
-		else
-			getFocus(); // no hits
+		focusOnFinder();
 	}
 	else // error - search folder doesn't exist
+	{
 		::SendMessage(_hSelf, WM_NEXTDLGCTL, (WPARAM)::GetDlgItem(_hSelf, IDD_FINDINFILES_DIR_COMBO), TRUE);
+	}
 }
 
 

@@ -95,8 +95,6 @@ Gripper::Gripper()
 	_startMovingFromTab	= FALSE;
 	_iItem				= 0;
 
-	_pRes               = 0;
-
 	_hdc				= NULL;
 	_hbm				= NULL;
 	_hbrush				= NULL;
@@ -108,11 +106,10 @@ Gripper::Gripper()
 }
 
 
-void Gripper::startGrip(DockingCont* pCont, DockingManager* pDockMgr, void* pRes)
+void Gripper::startGrip(DockingCont* pCont, DockingManager* pDockMgr)
 {
 	_pDockMgr   = pDockMgr;
 	_pCont		= pCont;
-	_pRes		= pRes;
 
 	_pDockMgr->getDockInfo(&_dockData);
 
@@ -209,7 +206,6 @@ LRESULT Gripper::runProc(UINT message, WPARAM wParam, LPARAM lParam)
 			onButtonUp();
 
 			::DestroyWindow(_hSelf);
-			_hSelf = NULL;
 			return TRUE;
 		}
 		case DMM_CANCEL_MOVE:
@@ -228,7 +224,6 @@ LRESULT Gripper::runProc(UINT message, WPARAM wParam, LPARAM lParam)
 			::UnhookWindowsHookEx(hookKeyboard);
 
 			::DestroyWindow(_hSelf);
-			_hSelf = NULL;
 			return FALSE;
 		}
 		case WM_DESTROY:
@@ -236,7 +231,7 @@ LRESULT Gripper::runProc(UINT message, WPARAM wParam, LPARAM lParam)
 			mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
 			::SetWindowPos(_hParent, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 			_pCont->focusClient();
-			delete _pRes;
+			delete this;
 			break;
 		}
 		default:

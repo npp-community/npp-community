@@ -260,9 +260,10 @@ LRESULT DockingManager::runProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 		}
 		case DMM_MOVE:
 		{
-			Gripper*	pGripper = new Gripper;
+			// Gripper will self delete on WM_DESTROY
+			Gripper* pGripper = new Gripper;
 			pGripper->init(_hInst, _hParent);
-			pGripper->startGrip((DockingCont*)lParam, this, pGripper);
+			pGripper->startGrip((DockingCont*)lParam, this);
 			break;
 		}
 		case DMM_MOVE_SPLITTER:
@@ -882,7 +883,7 @@ void DockingManager::toggleVisTb(DockingCont* pContSrc, DockingCont* pContTgt)
 
 	for (size_t iTb = 0; iTb < vTbData.size(); iTb++)
 	{
-		/* get data one by another */
+		/* get data one by one */
 		tTbData* TbData = vTbData[iTb];
 		toggleTb(pContSrc, pContTgt, TbData);
 	}
