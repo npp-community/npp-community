@@ -8024,7 +8024,12 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			}
 
 			// Add User Define Languages Entry
-			int udlpos = ::GetMenuItemCount(hLangMenu) - 1;
+			int udlpos = ::GetMenuItemCount(hLangMenu);
+
+			if (pNppParam->getNbUserLang() > 0)
+			{
+				::InsertMenu(hLangMenu, udlpos++, MF_BYPOSITION|MF_SEPARATOR, 0, TEXT(""));
+			}
 
 			for (int i = 0 ; i < pNppParam->getNbUserLang() ; i++)
 			{

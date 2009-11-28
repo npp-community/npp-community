@@ -451,8 +451,6 @@ BEGIN
         MENUITEM "Verilog",    IDM_LANG_VERILOG
         MENUITEM "XML",                IDM_LANG_XML
         MENUITEM "YAML",               IDM_LANG_YAML
-        MENUITEM SEPARATOR
-        MENUITEM "User-Defined",        IDM_LANG_USER
     END
 	POPUP "&Language"
 	BEGIN
@@ -543,8 +541,6 @@ BEGIN
 	END
 	MENUITEM "XML",                IDM_LANG_XML
 	MENUITEM "YAML",               IDM_LANG_YAML
-	MENUITEM SEPARATOR
-	MENUITEM "User-Defined",        IDM_LANG_USER
 	END
 
     POPUP "Se&ttings"
