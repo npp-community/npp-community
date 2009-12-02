@@ -26,6 +26,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="Notepad++ CR Scintilla Version Generation"
+				CommandLine="CALL $(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat &quot;$(IntDir)\&quot; &quot;$(SolutionDir)scintilla\src\gen-versioninfo.h&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -60,6 +62,8 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_VC80_UPGRADE=0x0710, _DEBUG"
+				AdditionalIncludeDirectories="..\src"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -111,6 +115,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="Notepad++ CR Scintilla Version Generation"
+				CommandLine="CALL $(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat &quot;$(IntDir)\&quot; &quot;$(SolutionDir)scintilla\src\gen-versioninfo.h&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -146,6 +152,7 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				AdditionalIncludeDirectories="..\src"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
