@@ -23,29 +23,57 @@
 
 namespace NppDebug
 {
+DebugOutput defaultDebugOutput;
+DebugOutput* g_debugOutput = &defaultDebugOutput;
 
-static outputFunction debugOutput = OutputDebugString;
-
-outputFunction setOutputFunction(outputFunction newOutputFunction)
+DebugOutput::DebugOutput()
 {
-	outputFunction currentOutputFunc = debugOutput;
-	debugOutput = newOutputFunction;
-	return currentOutputFunc;
+	resetValues();
 }
 
-// Joce: We could (should?) make OutputF a functor
-void outputF(TCHAR* format, ...)
+void DebugOutput::printf(const TCHAR* format, ...)
 {
-	va_list args;
-	int len;
-	TCHAR* buffer;
+	if (format)
+	{
+		va_list args;
 
-	va_start( args, format );
-	len = _vsctprintf( format, args ) + 1; // _vscprintf doesn't count terminating '\0'
-	buffer = new TCHAR[len];
-	_vstprintf_s( buffer, len, format, args );
-	debugOutput(buffer);
-	delete [] buffer;
+		va_start( args, format );
+		int nbWrittenChar = _vsntprintf_s( m_currentPtr, MAX_DEBUG_STR - m_currentLen, _TRUNCATE, format, args );
+		if (nbWrittenChar >= 0)
+		{
+			m_currentLen += nbWrittenChar;
+		}
+		else // _vsntprintf_s returned -1, this means we were truncated.
+		{
+			m_currentLen = MAX_DEBUG_STR-1;
+		}
+		m_currentPtr = &m_outputStr[0] + m_currentLen;
+	}
+	else
+	{
+		*m_currentPtr = TEXT('\0');
+	}
+}
+
+void DebugOutput::flush()
+{
+	if (m_outputStr[0] != TEXT('\0'))
+	{
+		output(&m_outputStr[0]);
+		resetValues();
+	}
+}
+
+void DebugOutput::output(const TCHAR* str)
+{
+	OutputDebugString(str);
+}
+
+void DebugOutput::resetValues()
+{
+	m_outputStr[0] = TEXT('\0');
+	m_currentPtr = &m_outputStr[0];
+	m_currentLen = 0;
 }
 
 int FuncGuard::_depth = 0;
@@ -61,9 +89,10 @@ FuncGuard::FuncGuard( const TCHAR* funcsig, const TCHAR* funcname, const TCHAR* 
 		_category = category;
 
 		// JOCE Only one call to OutputF.
-		outputF(TEXT("%s%s(%d):\n"),  getIndent(), file, line);
-		outputF(TEXT("%sEntering[ %s ]\n"),  getIndent(), funcsig);
+		g_debugOutput->printf(TEXT("%s%s(%d):\n"),  getIndent(), file, line);
+		g_debugOutput->printf(TEXT("%sEntering[ %s ]\n"),  getIndent(), funcsig);
 		indent();
+		g_debugOutput->flush();
 	}
 }
 
@@ -72,7 +101,8 @@ FuncGuard::~FuncGuard()
 	if (_state == Enabled)
 	{
 		unindent();
-		outputF(TEXT("%sLeaving[ %s ]\n"), getIndent(), _funcname.c_str());
+		g_debugOutput->printf(TEXT("%sLeaving[ %s ]\n"), getIndent(), _funcname.c_str());
+		g_debugOutput->flush();
 	}
 }
 
@@ -80,7 +110,7 @@ void FuncGuard::outputIndent()
 {
 	if (_state == Enabled)
 	{
-		outputF(getIndent());
+		g_debugOutput->printf(getIndent());
 	}
 }
 

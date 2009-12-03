@@ -20,14 +20,25 @@
 
 #ifndef SHIPPING
 
-#define MAX_DEBUG_INDENT 1024
+#define MAX_DEBUG_INDENT 32
+#define MAX_DEBUG_STR 1024
 namespace NppDebug
 {
-	typedef void (__stdcall *outputFunction)(const TCHAR*);
+	class DebugOutput
+	{
+	public:
+		DebugOutput();
+		void printf(const TCHAR* format, ...);
+		void flush();
+	protected:
+		virtual void output(const TCHAR* str);
+		void resetValues();
+		TCHAR m_outputStr[MAX_DEBUG_STR];
+		TCHAR* m_currentPtr;
+		int m_currentLen;
+	};
 
-	outputFunction setOutputFunction(outputFunction newOutputFunction);
-
-	void outputF(TCHAR* format, ...);
+	extern DebugOutput* g_debugOutput;
 
 	// JOCE: Nice to have: configurable indent character (' ', '\t', '_', '+', etc...)
 	class FuncGuard
@@ -59,7 +70,7 @@ namespace NppDebug
 } // namespace NppDebug
 
 // debugf() works just at printf(), except that it outputs to the debug console in MSVC
-#define debugf(format, ...) NppDebug::outputF(format, __VA_ARGS__)
+#define debugf(format, ...) NppDebug::g_debugOutput->printf(format, __VA_ARGS__); NppDebug::g_debugOutput->flush()
 
 // line_debugf() works just as debugf, but it prefixes the text message with the file name
 // and line number of the call in a way that MSVC recognizes so you can double click on the
@@ -69,9 +80,9 @@ namespace NppDebug
 // source\folder\file.cpp(42): Hello World!!!
 
 #define line_debugf(format, ...) \
-	/* JOCE: modify to make that a single call to OutputF */ \
-	NppDebug::outputF(TEXT("%s(%d): "), TEXT(__FILE__), __LINE__); \
-	NppDebug::outputF(format, __VA_ARGS__)
+	NppDebug::g_debugOutput->printf(TEXT("%s(%d): "), TEXT(__FILE__), __LINE__); \
+	NppDebug::g_debugOutput->printf(format, __VA_ARGS__); \
+	NppDebug::g_debugOutput->flush()
 
 //
 //  Debug Guards
@@ -183,9 +194,9 @@ namespace NppDebug
 // Leaving[ FooTwo ]
 
 #define guard_debugf(format, ...) \
-	/* JOCE: modify to make that a single call to OutputF (should make guard_debugf part of the function guard */ \
 	__npp_func_guard__.outputIndent(); \
-	NppDebug::outputF(format, __VA_ARGS__)
+	NppDebug::g_debugOutput->printf(format, __VA_ARGS__); \
+	NppDebug::g_debugOutput->flush()
 
 #else // if !SHIPPING
 
