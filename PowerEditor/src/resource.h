@@ -232,14 +232,13 @@
 
 // #define	IDD_FIND_REPLACE_DLG		1600
 
-#define	IDD_ABOUTBOX 1700
-#define	IDC_LICENCE_EDIT 1701
-#define	IDC_HOME_ADDR		1702
-#define	IDC_EMAIL_ADDR		1703
-#define	IDC_ONLINEHELP_ADDR 1704
-#define	IDC_AUTHOR_NAME 1705
-#define IDC_BUILD_DATETIME 1706		//LS: CompileDateInAboutDialog: Automatically insert compile date as additional version info in About-dialog!
-//#define	IDD_USER_DEFINE_BOX 				 1800
+#define	IDD_ABOUTBOX					1700
+#define	IDC_HOME_ADDR					1701
+#define	IDC_EMAIL_ADDR					1702
+#define	IDC_IRC_ADDR					1703
+#define	IDC_AUTHOR_NAME					1704
+#define	IDC_BUILD_DATETIME				1705  //LS: CompileDateInAboutDialog: Automatically insert compile date as additional version info in About-dialog!
+//#define	IDD_USER_DEFINE_BOX 				1800
 
 //#define	IDD_RUN_DLG      1900
 

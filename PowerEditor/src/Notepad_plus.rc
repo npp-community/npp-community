@@ -571,38 +571,35 @@ BEGIN
     END
 
     POPUP "&?"
-    BEGIN
-        MENUITEM "Help content",              IDM_HELP
-        MENUITEM SEPARATOR
-        MENUITEM "Notepad++ Home",            IDM_HOMESWEETHOME
-        MENUITEM "Notepad++ Project Page",    IDM_PROJECTPAGE
-        MENUITEM "NpWiki++ (Online Help)",    IDM_ONLINEHELP
-        //MENUITEM "Wiki FAQ",                  IDM_WIKIFAQ
-        MENUITEM "Forum",                     IDM_FORUM
-        MENUITEM "Get More Plugins",          IDM_PLUGINSHOME
-        MENUITEM SEPARATOR
-        MENUITEM "Update Notepad++",          IDM_UPDATE_NPP
-        MENUITEM "About Notepad++",           IDM_ABOUT
-    END
+	BEGIN
+		MENUITEM "Help content",                IDM_HELP
+		MENUITEM SEPARATOR
+		MENUITEM "NpWiki++ (Online Help)",      IDM_ONLINEHELP
+		MENUITEM "Notepad++ Forum",             IDM_FORUM
+		MENUITEM "Get More Plugins",            IDM_PLUGINSHOME
+		MENUITEM SEPARATOR
+		MENUITEM "About Notepad++ CR",          IDM_ABOUT
+	END
 
     MENUITEM "X",            IDM_FILE_CLOSE, HELP
 END
 
-IDD_ABOUTBOX DIALOGEX 0, 0, 271, 240
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_BORDER | WS_SYSMENU
+IDD_ABOUTBOX DIALOGEX 0, 0, 220, 120
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About..."
 FONT 8, TEXT("MS Shell Dlg"), 0, 0, 0x1
 BEGIN
-    LTEXT           NOTEPAD_PLUS_VERSION, IDC_STATIC,50,16,100,11
-    LTEXT           UNICODE_ANSI_MODE, IDC_STATIC,135,16,65,11
-    GROUPBOX        "GNU General Public Licence",IDC_STATIC,19,75,231,131,BS_CENTER
-    DEFPUSHBUTTON   "Ok",IDOK,106,215,50,14,BS_FLAT,WS_EX_STATICEDGE
-    LTEXT           "Author :",IDC_STATIC,21,41,31,8
-    LTEXT           "Notepad++ team",IDC_AUTHOR_NAME,78,41,70,8
-    LTEXT           "Home Page :",IDC_STATIC,21,54,47,8
-    LTEXT           "http://notepad-plus.sourceforge.net/",IDC_HOME_ADDR,78,54,126,8
-    EDITTEXT        IDC_LICENCE_EDIT,31,99,209,96,ES_MULTILINE | ES_AUTOVSCROLL | ES_READONLY | NOT WS_BORDER | WS_VSCROLL
-    EDITTEXT        IDC_BUILD_DATETIME,150,2,150,10, ES_READONLY | NOT WS_BORDER
-    CONTROL         "",IDI_M30ICON,"Static",SS_OWNERDRAW,21,10,32,32
+	CONTROL         "",IDI_M30ICON,"Static",SS_OWNERDRAW,21,8,32,32
+	LTEXT           "Notepad++ Community Release",IDC_STATIC,50,4,110,8
+	LTEXT           GEN_VER_VERSION_STRING, IDC_STATIC,50,14,100,8
+	EDITTEXT        IDC_BUILD_DATETIME,49,24,101,8, ES_READONLY | NOT WS_BORDER
+	LTEXT           "Community:",IDC_STATIC,21,40,55,8
+	LTEXT           "Notepad++ CR Members",IDC_AUTHOR_NAME,78,40,80,8
+	LTEXT           "Project Page:",IDC_STATIC,21,52,55,8
+	LTEXT           "http://github.com/npp-community",IDC_HOME_ADDR,78,52,126,8
+	LTEXT           "IRC:",IDC_STATIC,21,64,55,8
+	LTEXT           "irc://irc.freenode.net/#notepad++",IDC_IRC_ADDR,78,64,126,8
+	DEFPUSHBUTTON   "Close",IDOK,160,86,50,14,WS_EX_STATICEDGE
 END
 
 IDD_GOLINE DIALOGEX 26, 41, 261, 88
