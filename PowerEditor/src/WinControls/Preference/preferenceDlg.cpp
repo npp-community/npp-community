@@ -372,7 +372,7 @@ BOOL CALLBACK BarsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*
 			bool showTool = nppGUI._toolbarShow;
 			bool showStatus = nppGUI._statusBarShow;
 			bool showMenu = nppGUI._menuBarShow;
-			bool explorerMenu = nppGUI._enableExplorerMenuOnTabs;
+			bool useExplorerMenu = nppGUI._enableExplorerMenuOnTabs;
 
 			::SendDlgItemMessage(_hSelf, IDC_CHECK_HIDE, BM_SETCHECK, showTool?BST_UNCHECKED:BST_CHECKED, 0);
 			int ID2Check = 0;
@@ -403,7 +403,7 @@ BOOL CALLBACK BarsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*
 			::SendMessage(_hSelf, WM_COMMAND, IDC_CHECK_TAB_HIDE, 0);
 			::SendDlgItemMessage(_hSelf, IDC_CHECK_SHOWSTATUSBAR, BM_SETCHECK, showStatus, 0);
 			::SendDlgItemMessage(_hSelf, IDC_CHECK_HIDEMENUBAR, BM_SETCHECK, !showMenu, 0);
-			::SendDlgItemMessage(_hSelf, IDC_CHECK_ENABLEEXPLORERMENU, BM_SETCHECK, explorerMenu, 0);
+			::SendDlgItemMessage(_hSelf, IDC_CHECK_ENABLEEXPLORERMENU, BM_SETCHECK, useExplorerMenu, 0);
 
 #ifndef UNICODE
 			::EnableWindow(::GetDlgItem(_hSelf, IDC_LOCALIZATION_GB_STATIC), FALSE);

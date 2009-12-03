@@ -21,11 +21,11 @@
 #define IDM_MIN_EXPLORER_CONTEXT_MENU_ID 10000
 #define IDM_MAX_EXPLORER_CONTEXT_MENU_ID 20000
 
-class ExplorerContentMenu
+class ExplorerContextMenu
 {
 public:
-	ExplorerContentMenu();
-	~ExplorerContentMenu();
+	ExplorerContextMenu();
+	~ExplorerContextMenu();
 
 	void Load(const TCHAR* filename);
 	HMENU GetHandle();

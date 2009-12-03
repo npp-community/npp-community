@@ -27,7 +27,7 @@
 #define DELETE_MENU_ID 18
 #define CREATE_SHORTCUT_MENU_ID 17
 
-ExplorerContentMenu::ExplorerContentMenu() :
+ExplorerContextMenu::ExplorerContextMenu() :
 	m_psfFolder(NULL),
 	m_pShellFolder(NULL),
 	m_pidlArray(NULL),
@@ -37,7 +37,7 @@ ExplorerContentMenu::ExplorerContentMenu() :
 {
 }
 
-ExplorerContentMenu::~ExplorerContentMenu()
+ExplorerContextMenu::~ExplorerContextMenu()
 {
 	if (m_hStandardMenu)
 	{
@@ -67,7 +67,7 @@ ExplorerContentMenu::~ExplorerContentMenu()
 	}
 }
 
-void ExplorerContentMenu::Load(const TCHAR* filename)
+void ExplorerContextMenu::Load(const TCHAR* filename)
 {
 	std::vector<generic_string> vect;
 	vect.push_back(filename);
@@ -88,12 +88,12 @@ void ExplorerContentMenu::Load(const TCHAR* filename)
 	}
 }
 
-HMENU ExplorerContentMenu::GetHandle()
+HMENU ExplorerContextMenu::GetHandle()
 {
 	return m_hStandardMenu;
 }
 
-void ExplorerContentMenu::CleanUpMenu()
+void ExplorerContextMenu::CleanUpMenu()
 {
 	if (m_pidlArray != NULL && m_hStandardMenu != NULL)
 	{
@@ -158,7 +158,7 @@ void ExplorerContentMenu::CleanUpMenu()
 
 }
 
-void ExplorerContentMenu::InvokeCommand(int id)
+void ExplorerContextMenu::InvokeCommand(int id)
 {
 	UINT idCommand = id - IDM_MIN_EXPLORER_CONTEXT_MENU_ID;
 
@@ -171,7 +171,7 @@ void ExplorerContentMenu::InvokeCommand(int id)
 	m_pContextMenu->InvokeCommand ((LPCMINVOKECOMMANDINFO)&cmi);
 }
 
-void ExplorerContentMenu::FreePIDLArray(LPITEMIDLIST *pidlArray)
+void ExplorerContextMenu::FreePIDLArray(LPITEMIDLIST *pidlArray)
 {
 	if (!pidlArray)
 	{
@@ -188,7 +188,7 @@ void ExplorerContentMenu::FreePIDLArray(LPITEMIDLIST *pidlArray)
 }
 
 
-int ExplorerContentMenu::GetPIDLCount (LPCITEMIDLIST pidl)
+int ExplorerContextMenu::GetPIDLCount (LPCITEMIDLIST pidl)
 {
 	if (!pidl)
 	{
@@ -205,7 +205,7 @@ int ExplorerContentMenu::GetPIDLCount (LPCITEMIDLIST pidl)
 	return nCount;
 }
 
-UINT ExplorerContentMenu::GetPIDLSize (LPCITEMIDLIST pidl)
+UINT ExplorerContextMenu::GetPIDLSize (LPCITEMIDLIST pidl)
 {
 	if (!pidl)
 	{
@@ -221,7 +221,7 @@ UINT ExplorerContentMenu::GetPIDLSize (LPCITEMIDLIST pidl)
 	return nSize;
 }
 
-LPITEMIDLIST ExplorerContentMenu::CopyPIDL (LPCITEMIDLIST pidl, int cb)
+LPITEMIDLIST ExplorerContextMenu::CopyPIDL (LPCITEMIDLIST pidl, int cb)
 {
 	if (cb == -1)
 	{
@@ -237,7 +237,7 @@ LPITEMIDLIST ExplorerContentMenu::CopyPIDL (LPCITEMIDLIST pidl, int cb)
 	return (pidlRet);
 }
 
-LPBYTE ExplorerContentMenu::GetPIDLPos (LPCITEMIDLIST pidl, int nPos)
+LPBYTE ExplorerContextMenu::GetPIDLPos (LPCITEMIDLIST pidl, int nPos)
 {
 	if (!pidl)
 	{
@@ -260,7 +260,7 @@ LPBYTE ExplorerContentMenu::GetPIDLPos (LPCITEMIDLIST pidl, int nPos)
 	return NULL;
 }
 
-HRESULT ExplorerContentMenu::SHBindToParentEx (LPCITEMIDLIST pidl, REFIID riid, VOID **ppv, LPCITEMIDLIST *ppidlLast)
+HRESULT ExplorerContextMenu::SHBindToParentEx (LPCITEMIDLIST pidl, REFIID riid, VOID **ppv, LPCITEMIDLIST *ppidlLast)
 {
 	HRESULT hr = 0;
 	if (!pidl || !ppv)
@@ -312,7 +312,7 @@ HRESULT ExplorerContentMenu::SHBindToParentEx (LPCITEMIDLIST pidl, REFIID riid, 
 	return hr;
 }
 
-void ExplorerContentMenu::SetObjects(std::vector<generic_string> strArray)
+void ExplorerContextMenu::SetObjects(std::vector<generic_string> strArray)
 {
 	// store also the string for later menu use
 	m_strArray = strArray;
@@ -394,7 +394,7 @@ void ExplorerContentMenu::SetObjects(std::vector<generic_string> strArray)
 	}
 }
 
-BOOL ExplorerContentMenu::GetContextMenu (void ** ppContextMenu, int & iMenuType)
+BOOL ExplorerContextMenu::GetContextMenu (void ** ppContextMenu, int & iMenuType)
 {
 	*ppContextMenu = NULL;
 	LPCONTEXTMENU icm1 = NULL;

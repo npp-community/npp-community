@@ -450,7 +450,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 			::GetCursorPos(&p);
 
 			ContextMenu tabPopupMenu;
-			ExplorerContentMenu explorerMenu;
+			ExplorerContextMenu explorerContextMenu;
 
 			bool enableExplorerMenu = NppParameters::getInstance()->getNppGUI()._enableExplorerMenuOnTabs;
 
@@ -492,8 +492,8 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 				if (Buffer * buf = MainFileManager->getBufferByID(bufferID))
 				{
 					assert(_explorerContextMenu == NULL);
-					explorerMenu.Load(buf->getFullPathName());
-					if (HMENU hStandardMenu = explorerMenu.GetHandle())
+					explorerContextMenu.Load(buf->getFullPathName());
+					if (HMENU hStandardMenu = explorerContextMenu.GetHandle())
 					{
 						MENUITEMINFO contextMenuInfo;
 						contextMenuInfo.cbSize = sizeof(MENUITEMINFO);
@@ -504,7 +504,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 						contextMenuInfo.hSubMenu = hStandardMenu;
 						::SetMenuItemInfo(popupMenu, 0, TRUE, &contextMenuInfo);
 
-						_explorerContextMenu = &explorerMenu;
+						_explorerContextMenu = &explorerContextMenu;
 					}
 				}
 			}
