@@ -415,7 +415,7 @@ generic_string ThemeSwitcher::getThemeFromXmlFileName(const TCHAR *xmlFullPath) 
 	return themeName;
 }
 
-NppParameters * NppParameters::_pSelf = new NppParameters;
+NppParameters * NppParameters::_pSelf = NULL;
 int FileDialog::_dialogFileBoxId = getWinVersion() < WV_W2K?edt1:cmb13;
 
 NppParameters::NppParameters() :
@@ -465,6 +465,40 @@ NppParameters::NppParameters() :
 
 NppParameters::~NppParameters()
 {
+	if (_pXmlDoc != NULL)
+	{
+		if (_pXmlDoc->isDirty())
+			_pXmlDoc->SaveFile();
+		delete _pXmlDoc;
+	}
+
+	if (_pXmlUserDoc != NULL)
+	{
+		_pXmlUserDoc->SaveFile();
+		delete _pXmlUserDoc;
+	}
+	if (_pXmlUserStylerDoc)
+		delete _pXmlUserStylerDoc;
+
+	if (_pXmlUserLangDoc)
+	{
+		delete _pXmlUserLangDoc;
+	}
+	if (_pXmlNativeLangDocA)
+		delete _pXmlNativeLangDocA;
+
+	if (_pXmlToolIconsDoc)
+		delete _pXmlToolIconsDoc;
+
+	if (_pXmlShortcutDoc)
+		delete _pXmlShortcutDoc;
+
+	if (_pXmlContextMenuDoc)
+		delete _pXmlContextMenuDoc;
+
+	if (_pXmlSessionDoc)
+		delete _pXmlSessionDoc;
+
 	for( std::vector<Lang *>::const_iterator it = _langList.begin(), end = _langList.end();
 		it != end;
 		++it)
@@ -908,41 +942,8 @@ bool NppParameters::load()
 
 void NppParameters::destroyInstance()
 {
-	if (_pXmlDoc != NULL)
-	{
-        if (_pXmlDoc->isDirty())
-            _pXmlDoc->SaveFile();
-		delete _pXmlDoc;
-	}
-
-	if (_pXmlUserDoc != NULL)
-	{
-		_pXmlUserDoc->SaveFile();
-		delete _pXmlUserDoc;
-	}
-	if (_pXmlUserStylerDoc)
-		delete _pXmlUserStylerDoc;
-
-	if (_pXmlUserLangDoc)
-    {
-		delete _pXmlUserLangDoc;
-    }
-	if (_pXmlNativeLangDocA)
-		delete _pXmlNativeLangDocA;
-
-	if (_pXmlToolIconsDoc)
-		delete _pXmlToolIconsDoc;
-
-	if (_pXmlShortcutDoc)
-		delete _pXmlShortcutDoc;
-
-	if (_pXmlContextMenuDoc)
-		delete _pXmlContextMenuDoc;
-
-	if (_pXmlSessionDoc)
-		delete _pXmlSessionDoc;
-
 	delete _pSelf;
+	_pSelf = NULL;
 }
 
 void NppParameters::setFontList(HWND hWnd)
@@ -2331,6 +2332,15 @@ TiXmlNode * NppParameters::getChildElementByAttribut(TiXmlNode *pere, const TCHA
 		}
 	}
 	return NULL;
+}
+
+NppParameters* NppParameters::getInstance()
+{
+	if(!_pSelf)
+	{
+		_pSelf = new NppParameters;
+	}
+	return _pSelf;
 }
 
 // 2 restes : L_H, L_USER

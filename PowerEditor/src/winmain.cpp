@@ -266,7 +266,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
         if (hNotepad_plus)
         {
 			// First of all, destroy static object NppParameters
-			pNppParameters->destroyInstance();
+			NppParameters::destroyInstance();
 			FileManager::destroyInstance();
 
 			int sw;

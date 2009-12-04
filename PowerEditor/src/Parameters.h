@@ -651,12 +651,12 @@ private :
 class NppParameters
 {
 public:
-    static NppParameters * getInstance() {return _pSelf;};
+    static NppParameters * getInstance();
 	static LangType getLangIDFromStr(const TCHAR *langName);
+	static void destroyInstance();
 	bool load();
 	bool reloadLang();
 	bool reloadStylers(TCHAR *stylePath = NULL);
-    void destroyInstance();
 
 	bool _isTaskListRBUTTONUP_Active;
 	int L_END;

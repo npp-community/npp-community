@@ -244,7 +244,7 @@ Notepad_plus::Notepad_plus():
 // its children's windows handle will be destroyed automatically!
 Notepad_plus::~Notepad_plus()
 {
-	(NppParameters::getInstance())->destroyInstance();
+	NppParameters::destroyInstance();
 	FileManager::destroyInstance();
 	WcharMbcsConvertor::destroyInstance();
 	if (_pTrayIco)
