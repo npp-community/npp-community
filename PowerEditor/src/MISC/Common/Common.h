@@ -131,23 +131,6 @@ private:
 
 #define ERROR_MSG_SIZE 1024
 
-#ifdef DEBUG
-	#define NO_DEFAULT_CASE default: {\
-		TCHAR errorMsg[ERROR_MSG_SIZE];\
-		_stprintf_s(errorMsg, ERROR_MSG_SIZE, TEXT("Unhanded default case in %s, line %d\n\n\nDo you want to break?"), TEXT(__FILE__), __LINE__ );\
-		int ret = ::MessageBox(NULL, errorMsg, TEXT("Unhandled default case."), MB_YESNO|MB_ICONWARNING);\
-			if (ret == IDYES)\
-			{\
-				/* JOCE: could throw an exception instead and be properly tested. */ \
-				DebugBreak(); \
-			}\
-		}\
-		break
-#else
-	#define NO_DEFAULT_CASE default: break
-#endif
-
-
 #if _MSC_VER > 1400 // MS Compiler > VS 2005
 #define REBARBAND_SIZE REBARBANDINFO_V3_SIZE
 #else
