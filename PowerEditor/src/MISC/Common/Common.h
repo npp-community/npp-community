@@ -105,8 +105,8 @@ BOOL PathCanonicalize(generic_string& path, generic_string& output);
 class WcharMbcsConvertor
 {
 public:
-	static WcharMbcsConvertor * getInstance() {return _pSelf;};
-	static void destroyInstance() {delete _pSelf;};
+	static WcharMbcsConvertor * getInstance();
+	static void destroyInstance();
 
 	const wchar_t * char2wchar(const char* mbStr, UINT codepage);
 	const wchar_t * char2wchar(const char * mbcs2Convert, UINT codepage, int *mstart, int *mend);

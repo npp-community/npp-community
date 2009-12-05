@@ -19,7 +19,7 @@
 
 #include "npp_winver.h"
 
-WcharMbcsConvertor * WcharMbcsConvertor::_pSelf = new WcharMbcsConvertor;
+WcharMbcsConvertor * WcharMbcsConvertor::_pSelf = NULL;
 
 // Set a call back with the handle after init to set the path.
 // http://msdn.microsoft.com/library/default.asp?url=/library/en-us/shellcc/platform/shell/reference/callbackfunctions/browsecallbackproc.asp
@@ -250,6 +250,20 @@ generic_string purgeMenuItemString(const TCHAR * menuItemStr, bool keepAmpersand
 };
 
 #define initSize 1024
+
+WcharMbcsConvertor * WcharMbcsConvertor::getInstance()
+{
+	if (!_pSelf)
+	{
+		_pSelf = new WcharMbcsConvertor;
+	}
+	return _pSelf;
+}
+void WcharMbcsConvertor::destroyInstance()
+{
+	delete _pSelf;
+	_pSelf = NULL;
+}
 
 WcharMbcsConvertor::WcharMbcsConvertor() :
 	_multiByteStr(NULL),
