@@ -22,29 +22,12 @@
 
 #include "URLCtrl.h"
 
-#define LICENCE_TXT \
-	TEXT("This program is free software; you can redistribute it and/or \
-modify it under the terms of the GNU General Public License \
-as published by the Free Software Foundation; either \
-version 2 of the License, or (at your option) any later version.\r\n\
-\r\n\
-This program is distributed in the hope that it will be useful, \
-but WITHOUT ANY WARRANTY; without even the implied warranty of \
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the \
-GNU General Public License for more details. \r\n\
-\r\n\
-You should have received a copy of the GNU General Public License \
-along with this program; if not, write to the Free Software \
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.")
-
-
-
 
 BOOL CALLBACK AboutDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
-        case WM_INITDIALOG :
+		case WM_INITDIALOG :
 		{
 			HWND compileDateHandle = ::GetDlgItem(_hSelf, IDC_BUILD_DATETIME);
 			generic_string buildTime = TEXT("Build time : ");
@@ -63,21 +46,18 @@ BOOL CALLBACK AboutDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
 			::SendMessage(compileDateHandle, WM_SETTEXT, 0, (LPARAM)buildTime.c_str());
 			::EnableWindow(compileDateHandle, FALSE);
 
-            HWND licenceEditHandle = ::GetDlgItem(_hSelf, IDC_LICENCE_EDIT);
-            ::SendMessage(licenceEditHandle, WM_SETTEXT, 0, (LPARAM)LICENCE_TXT);
-
 			_emailLink = new URLCtrl();
 			_pageLink = new URLCtrl();
+			_ircLink = new URLCtrl();
 
-            _emailLink->init(_hInst, _hSelf);
-			//_emailLink.create(::GetDlgItem(_hSelf, IDC_AUTHOR_NAME), TEXT("mailto:don.h@free.fr"));
-			_emailLink->create(::GetDlgItem(_hSelf, IDC_AUTHOR_NAME), TEXT("http://sourceforge.net/project/memberlist.php?group_id=95717"));
+			_emailLink->init(_hInst, _hSelf);
+			_emailLink->create(::GetDlgItem(_hSelf, IDC_AUTHOR_NAME), TEXT("http://github.com/npp-community/npp-community/network/members"));
 
-            _pageLink->init(_hInst, _hSelf);
-            _pageLink->create(::GetDlgItem(_hSelf, IDC_HOME_ADDR), TEXT("http://notepad-plus.sourceforge.net/"));
+			_pageLink->init(_hInst, _hSelf);
+			_pageLink->create(::GetDlgItem(_hSelf, IDC_HOME_ADDR), TEXT("http://github.com/npp-community/npp-community"));
 
-			//_onLineHelp.init(_hInst, _hSelf);
-            //_onLineHelp.create(::GetDlgItem(_hSelf, IDC_ONLINEHELP_ADDR), TEXT("http://notepad-plus.sourceforge.net/uk/generalFAQ.php"));
+			_ircLink->init(_hInst, _hSelf);
+			_ircLink->create(::GetDlgItem(_hSelf, IDC_IRC_ADDR), TEXT("irc://irc.freenode.net/#notepad++"));
 
 			getClientRect(_rc);
 
@@ -155,5 +135,13 @@ void AboutDlg::destroy()
 		delete _pageLink;
 		_pageLink = NULL;
 	}
+
+	if (_ircLink)
+	{
+		_ircLink->destroy();
+		delete _ircLink;
+		_ircLink = NULL;
+	}
+
 	StaticDialog::destroy();
 }

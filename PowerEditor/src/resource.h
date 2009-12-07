@@ -18,7 +18,7 @@
 #ifndef RESOURCE_H
 #define RESOURCE_H
 
-#define NOTEPAD_PLUS_VERSION TEXT("Notepad++CR v5.5")
+#define NOTEPAD_PLUS_VERSION TEXT("Notepad++ v5.5")
 #define VERSION_VALUE TEXT("5.5")  // should be X.Y : ie. if VERSION_DIGITALVALUE == 4, 7, 1, 0 , then X = 4, Y = 71
 #define VERSION_DIGITALVALUE 5, 5, 0, 0
 
@@ -232,14 +232,13 @@
 
 // #define	IDD_FIND_REPLACE_DLG		1600
 
-#define	IDD_ABOUTBOX 1700
-#define	IDC_LICENCE_EDIT 1701
-#define	IDC_HOME_ADDR		1702
-#define	IDC_EMAIL_ADDR		1703
-#define	IDC_ONLINEHELP_ADDR 1704
-#define	IDC_AUTHOR_NAME 1705
-#define IDC_BUILD_DATETIME 1706		//LS: CompileDateInAboutDialog: Automatically insert compile date as additional version info in About-dialog!
-//#define	IDD_USER_DEFINE_BOX 				 1800
+#define	IDD_ABOUTBOX					1700
+#define	IDC_HOME_ADDR					1701
+#define	IDC_EMAIL_ADDR					1702
+#define	IDC_IRC_ADDR					1703
+#define	IDC_AUTHOR_NAME					1704
+#define	IDC_BUILD_DATETIME				1705  //LS: CompileDateInAboutDialog: Automatically insert compile date as additional version info in About-dialog!
+//#define	IDD_USER_DEFINE_BOX 				1800
 
 //#define	IDD_RUN_DLG      1900
 

@@ -5378,7 +5378,7 @@ void Notepad_plus::setTitle()
 		result += buf->getFullPathName();
 	}
 	result += TEXT(" - ");
-	result += _className;
+	result += TEXT("Notepad++ CR");
 	//::SetWindowText(_hSelf, title);
 	::SendMessage(_hSelf, WM_SETTEXT, 0, (LPARAM)result.c_str());
 

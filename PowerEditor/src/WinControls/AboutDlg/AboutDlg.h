@@ -27,7 +27,7 @@ class URLCtrl;
 class AboutDlg : public StaticDialog
 {
 public :
-	AboutDlg() : StaticDialog(), _emailLink(NULL), _pageLink(NULL) {}
+	AboutDlg() : StaticDialog(), _emailLink(NULL), _pageLink(NULL), _ircLink(NULL) {}
 	~AboutDlg();
 
 	void doDialog();
@@ -37,8 +37,9 @@ protected :
 	virtual BOOL CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
 
 private :
-    URLCtrl* _emailLink;
-    URLCtrl* _pageLink;
+	URLCtrl* _emailLink;
+	URLCtrl* _pageLink;
+	URLCtrl* _ircLink;
 };
 
 #endif //ABOUT_DLG_H
