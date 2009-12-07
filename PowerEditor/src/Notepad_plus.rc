@@ -570,7 +570,7 @@ BEGIN
         MENUITEM "&Run...",                     IDM_EXECUTE
     END
 
-    POPUP "&?"
+    POPUP "&Help"
 	BEGIN
 		MENUITEM "Help content",                IDM_HELP
 		MENUITEM SEPARATOR
@@ -586,7 +586,7 @@ END
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 220, 120
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "About..."
+CAPTION "About"
 FONT 8, TEXT("MS Shell Dlg"), 0, 0, 0x1
 BEGIN
 	CONTROL         "",IDI_M30ICON,"Static",SS_OWNERDRAW,21,8,32,32
