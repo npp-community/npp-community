@@ -27,7 +27,7 @@
 
 const TCHAR UNTITLED_STR[] = TEXT("new ");
 
-FileManager * FileManager::_pSelf = new FileManager();
+FileManager * FileManager::_pSelf = NULL;
 
 const int blockSize = 128 * 1024 + 4;
 
@@ -435,6 +435,22 @@ void Buffer::setLineUndoState(size_t currentLine, size_t undoLevel, bool isSaved
 */
 
 //filemanager
+
+FileManager* FileManager::getInstance()
+{
+	if (!_pSelf)
+	{
+		_pSelf = new FileManager();
+	}
+	return _pSelf;
+}
+
+void FileManager::destroyInstance()
+{
+	delete _pSelf;
+	_pSelf = NULL;
+}
+
 
 FileManager::~FileManager()
 {
