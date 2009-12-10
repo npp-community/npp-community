@@ -27,7 +27,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				Description="Runtime build and version generation."
-				CommandLine="CALL $(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat &quot;$(IntDir)\&quot; &quot;$(SolutionDir)PowerEditor\src\gen-versioninfo.h&quot;"
+				CommandLine="CALL &quot;$(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat&quot; &quot;$(IntDir)\&quot; &quot;$(SolutionDir)PowerEditor\src\gen-versioninfo.h&quot;"
 				ExcludedFromBuild="false"
 			/>
 			<Tool
