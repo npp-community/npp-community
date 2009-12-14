@@ -221,9 +221,9 @@ public:
 	void add(FoundInfo fi, SearchResultMarking mi, const TCHAR* foundline, int lineNb);
 	void setFinderStyle();
 	void removeAll();
+	void openAll();
 	void beginNewFilesSearch();
 	void finishFilesSearch(int count);
-
 	void gotoNextFoundResult(int direction);
 	void GotoFoundLine();
 	void DeleteResult();
@@ -2159,6 +2159,16 @@ void Finder::removeAll()
 	setFinderReadOnly(true);
 }
 
+void Finder::openAll()
+{
+	size_t sz = _pMainFoundInfos->size();
+
+	for (size_t i = 0; i < sz; i++)
+	{
+		::SendMessage(::GetParent(_hParent), WM_DOOPEN, 0, (LPARAM)_pMainFoundInfos->at(i)._fullPath.c_str());
+	}
+}
+
 void Finder::beginNewFilesSearch()
 {
 	_scintView.execute(SCI_SETLEXER, SCLEX_NULL);
@@ -2255,6 +2265,12 @@ BOOL CALLBACK Finder::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
 					return TRUE;
 				}
 
+				case NPPM_INTERNAL_SCINTILLAFINFEROPENALL:
+				{
+					openAll();
+					return TRUE;
+				}
+
 				default :
 				{
 					return FALSE;
@@ -2276,6 +2292,8 @@ BOOL CALLBACK Finder::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
 				tmp.push_back(MenuItemUnit(NPPM_INTERNAL_SCINTILLAFINFERCOPY, TEXT("Copy")));
 				tmp.push_back(MenuItemUnit(NPPM_INTERNAL_SCINTILLAFINFERSELECTALL, TEXT("Select All")));
 				tmp.push_back(MenuItemUnit(NPPM_INTERNAL_SCINTILLAFINFERCLEARALL, TEXT("Clear All")));
+				tmp.push_back(MenuItemUnit(0, TEXT("Separator")));
+				tmp.push_back(MenuItemUnit(NPPM_INTERNAL_SCINTILLAFINFEROPENALL, TEXT("Open All")));
 
 				scintillaContextmenu.create(_hSelf, tmp);
 
