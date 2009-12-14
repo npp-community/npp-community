@@ -51,6 +51,9 @@ struct OPENFILENAMENPP {
 };
 
 
+generic_string changeExt(generic_string fn, generic_string ext, bool forceReplaced = true);
+void goToCenter(HWND hwnd);
+
 class FileDialog
 {
 public:
