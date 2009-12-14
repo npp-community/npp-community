@@ -60,10 +60,28 @@ void ContextMenu::create( HWND hParent, const std::vector<MenuItemUnit> & menuIt
 {
 	_hParent = hParent;
 	_hMenu = ::CreatePopupMenu();
+	bool lastIsSep = false;
 	for (size_t i = 0 ; i < menuItemArray.size() ; i++)
 	{
 		unsigned int flag = MF_BYPOSITION | ((menuItemArray[i]._cmdID == 0)?MF_SEPARATOR:0);
-		::InsertMenu(_hMenu, i, flag, menuItemArray[i]._cmdID, menuItemArray[i]._itemName.c_str());
+		if ((i == 0 || i == menuItemArray.size() - 1) && menuItemArray[i]._cmdID == 0)
+		{
+			lastIsSep = true;
+		}
+		else if (menuItemArray[i]._cmdID != 0)
+		{
+			::InsertMenu(_hMenu, i, flag, menuItemArray[i]._cmdID, menuItemArray[i]._itemName.c_str());
+			lastIsSep = false;
+		}
+		else if (menuItemArray[i]._cmdID == 0 && !lastIsSep)
+		{
+			::InsertMenu(_hMenu, i, flag, menuItemArray[i]._cmdID, menuItemArray[i]._itemName.c_str());
+			lastIsSep = true;
+		}
+		else // last item is separator and current item is separator
+		{
+			lastIsSep = true;
+		}
 	}
 }
 
