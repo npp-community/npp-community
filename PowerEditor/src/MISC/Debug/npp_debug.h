@@ -29,6 +29,7 @@ namespace NppDebug
 	public:
 		DebugOutput();
 		void printf(const TCHAR* format, ...);
+		void vsprintf(const TCHAR* format, va_list args);
 		void flush();
 	protected:
 		virtual void output(const TCHAR* str);
@@ -53,9 +54,10 @@ namespace NppDebug
 		FuncGuard(const TCHAR* funcsig, const TCHAR* funcname, const TCHAR* file, int line, State state, const TCHAR* category);
 		~FuncGuard();
 
-		void outputIndent();
+		void printf(State printfState, const TCHAR* format, ...);
 
 	private:
+
 		void indent();
 		void unindent();
 		TCHAR* getIndent();
@@ -166,7 +168,7 @@ namespace NppDebug
 
 // guard_debugf() acts just like debugf() described above, with the exception that it will indent the comment
 // to match the current indentation of the function guards, if enabled. Otherwise, it will act just as a normal
-// debugf().
+// debugf().  Using guard_debugf_cat() will do the same thing but only when the category is enabled.
 //
 // For example, given this:
 //
@@ -194,9 +196,10 @@ namespace NppDebug
 // Leaving[ FooTwo ]
 
 #define guard_debugf(format, ...) \
-	__npp_func_guard__.outputIndent(); \
-	NppDebug::g_debugOutput->printf(format, __VA_ARGS__); \
-	NppDebug::g_debugOutput->flush()
+	__npp_func_guard__.printf(NppDebug::FuncGuard::Enabled, format, __VA_ARGS__)
+
+#define guard_debugf_cat(cat, format, ...) \
+	__npp_func_guard__.printf(__func_guard_category_##cat, format, __VA_ARGS__)
 
 #else // if !SHIPPING
 
@@ -210,6 +213,7 @@ namespace NppDebug
 #define func_guard(cat) void(0)
 
 #define guard_debugf(format, ...) void(0)
+#define guard_debugf_cat(cat, format, ...) void(0)
 
 #endif // SHIPPING
 

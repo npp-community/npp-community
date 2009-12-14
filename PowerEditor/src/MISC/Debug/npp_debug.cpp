@@ -55,6 +55,27 @@ void DebugOutput::printf(const TCHAR* format, ...)
 	}
 }
 
+void DebugOutput::vsprintf(const TCHAR* format, va_list args)
+{
+	if (format)
+	{
+		int nbWrittenChar = _vsntprintf_s( m_currentPtr, MAX_DEBUG_STR - m_currentLen, _TRUNCATE, format, args );
+		if (nbWrittenChar >= 0)
+		{
+			m_currentLen += nbWrittenChar;
+		}
+		else // _vsntprintf_s returned -1, this means we were truncated.
+		{
+			m_currentLen = MAX_DEBUG_STR-1;
+		}
+		m_currentPtr = &m_outputStr[0] + m_currentLen;
+	}
+	else
+	{
+		*m_currentPtr = TEXT('\0');
+	}
+}
+
 void DebugOutput::flush()
 {
 	if (m_outputStr[0] != TEXT('\0'))
@@ -106,11 +127,20 @@ FuncGuard::~FuncGuard()
 	}
 }
 
-void FuncGuard::outputIndent()
+void FuncGuard::printf(State printfState, const TCHAR* format, ...)
 {
-	if (_state == Enabled)
+	if (printfState == Enabled)
 	{
-		g_debugOutput->printf(getIndent());
+		if (_state == Enabled)
+		{
+			g_debugOutput->printf(getIndent());
+		}
+
+		va_list args;
+		va_start( args, format );
+		g_debugOutput->vsprintf(format, args);
+		g_debugOutput->flush();
+		va_end(args);
 	}
 }
 
