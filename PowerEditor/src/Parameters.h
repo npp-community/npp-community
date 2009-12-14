@@ -527,10 +527,6 @@ struct FindHistory {
 					_isFifRecuisive(true), _isFifInHiddenFolder(false), _searchMode(normal), _transparencyMode(onLossingFocus),
 					_transparency(150), _isDlgAlwaysVisible(false), _isFilterFollowDoc(false), _isFolderFollowDoc(false)
 	{
-		memset(_pFindHistoryPath, 0, NB_MAX_FINDHISTORY_PATH * sizeof(generic_string*));
-		memset(_pFindHistoryFilter, 0, NB_MAX_FINDHISTORY_FILTER * sizeof(generic_string*));
-		memset(_pFindHistoryFind, 0, NB_MAX_FINDHISTORY_FIND * sizeof(generic_string*));
-		memset(_pFindHistoryReplace, 0, NB_MAX_FINDHISTORY_REPLACE * sizeof(generic_string*));
 	}
 
 	int _nbMaxFindHistoryPath;
@@ -538,16 +534,10 @@ struct FindHistory {
 	int _nbMaxFindHistoryFind;
 	int _nbMaxFindHistoryReplace;
 
-	int _nbFindHistoryPath;
-	int _nbFindHistoryFilter;
-	int _nbFindHistoryFind;
-	int _nbFindHistoryReplace;
-
-	// JOCE: Use vectors!
-	generic_string* _pFindHistoryPath[NB_MAX_FINDHISTORY_PATH];
-	generic_string* _pFindHistoryFilter[NB_MAX_FINDHISTORY_FILTER];
-	generic_string* _pFindHistoryFind[NB_MAX_FINDHISTORY_FIND];
-	generic_string* _pFindHistoryReplace[NB_MAX_FINDHISTORY_REPLACE];
+    std::vector<generic_string> _findHistoryPaths;
+	std::vector<generic_string> _findHistoryFilters;
+	std::vector<generic_string> _findHistoryFinds;
+	std::vector<generic_string> _findHistoryReplaces;
 
 	bool _isMatchWord;
 	bool _isMatchCase;
