@@ -902,6 +902,22 @@ bool NppParameters::load()
 		_pXmlExternalLexerDoc.clear();
 		_pXmlSessionDoc = NULL;
 	}
+
+    //------------------------------//
+	// blacklist.xml : for per user //
+	//------------------------------//
+	_blacklistPath = _userPath;
+	PathAppend(_blacklistPath, TEXT("blacklist.xml"));
+
+    if (PathFileExists(_blacklistPath.c_str()))
+	{
+        _pXmlBlacklistDoc = new TiXmlDocument(_blacklistPath);
+        loadOkay = _pXmlBlacklistDoc->LoadFile();
+        if (loadOkay)
+        {
+            getBlackListFromXmlTree();
+        }
+    }
 	return isAllLaoded;
 }
 
@@ -940,6 +956,9 @@ void NppParameters::destroyInstance()
 
 	if (_pXmlSessionDoc)
 		delete _pXmlSessionDoc;
+
+	if (_pXmlBlacklistDoc)
+		delete _pXmlBlacklistDoc;
 
 	delete _pSelf;
 }
@@ -1102,6 +1121,18 @@ bool NppParameters::getScintKeysFromXmlTree()
 
 	feedScintKeys(root);
 	return true;
+}
+
+bool NppParameters::getBlackListFromXmlTree()
+{
+    if (!_pXmlBlacklistDoc)
+		return false;
+
+	TiXmlNode *root = _pXmlBlacklistDoc->FirstChild(TEXT("NotepadPlus"));
+	if (!root)
+		return false;
+
+	return feedBlacklist(root);
 }
 
 void NppParameters::initMenuKeys()
@@ -1765,6 +1796,24 @@ void NppParameters::feedScintKeys(TiXmlNode *node)
 			}
 		}
 	}
+}
+
+bool NppParameters::feedBlacklist(TiXmlNode *node)
+{
+	TiXmlNode *blackListRoot = node->FirstChildElement(TEXT("PluginBlackList"));
+	if (!blackListRoot) return false;
+
+	for (TiXmlNode *childNode = blackListRoot->FirstChildElement(TEXT("Plugin"));
+		childNode ;
+		childNode = childNode->NextSibling(TEXT("Plugin")) )
+	{
+        const TCHAR *name = (childNode->ToElement())->Attribute(TEXT("name"));
+	    if (name)
+        {
+            _blacklist.push_back(name);
+        }
+    }
+    return true;
 }
 
 bool NppParameters::getShortcuts(TiXmlNode *node, Shortcut & sc)
