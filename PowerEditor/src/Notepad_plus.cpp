@@ -129,7 +129,8 @@ Notepad_plus::Notepad_plus():
 	_isFileOpening(false),
 	_rememberThisSession(true),
 	_mainWindowStatus(0),
-	_activeView(MAIN_VIEW)
+	_activeView(MAIN_VIEW),
+	_numSel(0)
 {
 	ZeroMemory(&_prevSelectedRange, sizeof(_prevSelectedRange));
 
@@ -5468,6 +5469,9 @@ size_t Notepad_plus::getSelectedCharNumber(UniMode u)
 				if (stpos != INVALID_POSITION)
 				{
 					size_t endpos = _pEditView->execute(SCI_GETLINESELENDPOSITION, j);
+					// Strange things are happening to the loop index variable, but I'm not touching this parsing code with a 10 foot pole.
+					// for loop index variable ’Symbol’ whose type category is ’String’modified in body of the for loop
+					//lint -e850
 					for (size_t pos = stpos; pos < endpos; pos++)
 					{
 						unsigned char c = 0xf0 & (unsigned char)_pEditView->execute(SCI_GETCHARAT, pos);
@@ -5475,6 +5479,7 @@ size_t Notepad_plus::getSelectedCharNumber(UniMode u)
 							pos += utflen[(c & 0x30) >>  4];
 						result++;
 					}
+					//lint +e850
 				}
 			}
 		}
@@ -5513,12 +5518,16 @@ size_t Notepad_plus::getCurrentDocCharCount(size_t numLines, UniMode u)
 		for (size_t line=0; line<numLines; line++)
 		{
 			size_t endpos = _pEditView->execute(SCI_GETLINEENDPOSITION, line);
+			// Strange things are happening to the loop index variable, but I'm not touching this parsing code with a 10 foot pole.
+			// for loop index variable ’Symbol’ whose type category is ’String’modified in body of the for loop
+			//lint -e850
 			for (size_t pos = _pEditView->execute(SCI_POSITIONFROMLINE, line); pos < endpos; pos++)
 			{
 				unsigned char c = 0xf0 & (unsigned char)_pEditView->execute(SCI_GETCHARAT, pos);
 				if (c >= 0xc0) pos += utflen[(c & 0x30) >>  4];
 				result++;
 			}
+			//lint +e850
 		}
 		return result;
 	}
