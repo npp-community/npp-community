@@ -190,7 +190,7 @@ private :
 	void updateCombo(int comboID);
 	void fillFindHistory();
     void fillComboHistory(int id, const std::vector<generic_string> & strings);
-    int saveComboHistory(int id, int maxcount, vector<generic_string> & strings);
+    int saveComboHistory(int id, int maxcount, std::vector<generic_string> & strings);
 };
 
 //FindIncrementDlg: incremental search dialog, docked in rebar

@@ -522,7 +522,6 @@ struct FindHistory {
 	enum transparencyMode{none, onLossingFocus, persistant};
 
 	FindHistory() : _nbMaxFindHistoryPath(10), _nbMaxFindHistoryFilter(10), _nbMaxFindHistoryFind(10), _nbMaxFindHistoryReplace(10),
-					_nbFindHistoryPath(0), _nbFindHistoryFilter(0),_nbFindHistoryFind(0), _nbFindHistoryReplace(0),
 					_isMatchWord(false), _isMatchCase(false),_isWrap(true),_isDirectionDown(true),
 					_isFifRecuisive(true), _isFifInHiddenFolder(false), _searchMode(normal), _transparencyMode(onLossingFocus),
 					_transparency(150), _isDlgAlwaysVisible(false), _isFilterFollowDoc(false), _isFolderFollowDoc(false)
@@ -641,10 +640,10 @@ private :
 class PluginList {
 public :
     void add(generic_string fn, bool isInBL){
-        _list.push_back(pair<generic_string, bool>(fn, isInBL));
+        _list.push_back(std::pair<generic_string, bool>(fn, isInBL));
     };
 private :
-    vector<pair<generic_string, bool>>_list;
+    std::vector<std::pair<generic_string, bool>>_list;
 };
 
 #define NB_LANG 80
@@ -967,11 +966,9 @@ public:
 		return _themeSwitcher;
 	};
 
-<<<<<<< HEAD
 	int getIndexFromKeywordListName(const TCHAR *name);
-=======
 
-    vector<generic_string> & getBlackList() {return _blacklist;};
+    std::vector<generic_string> & getBlackList() {return _blacklist;};
     bool isInBlackList(TCHAR *fn) {
         for (size_t i = 0 ; i < _blacklist.size() ; i++)
             if (_blacklist[i] == fn)
@@ -980,7 +977,6 @@ public:
     };
 
     PluginList & getPluginList() {return _pluginList;};
->>>>>>> npp_official_svn
 
 private:
     NppParameters();

@@ -618,7 +618,7 @@ void FindReplaceDlg::saveFindHistory()
 	saveComboHistory(IDREPLACEWITH,                 findHistory._nbMaxFindHistoryReplace, findHistory._findHistoryReplaces);
 }
 
-int FindReplaceDlg::saveComboHistory(int id, int maxcount, vector<generic_string> & strings)
+int FindReplaceDlg::saveComboHistory(int id, int maxcount, std::vector<generic_string> & strings)
 {
 	TCHAR text[FINDREPLACE_MAXLENGTH];
 	HWND hCombo = ::GetDlgItem(_hSelf, id);

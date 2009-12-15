@@ -423,8 +423,8 @@ NppParameters::NppParameters() :
 	_isFindReplacing(false),
 	_pXmlDoc(NULL), _pXmlUserDoc(NULL), _pXmlUserStylerDoc(NULL),
 	_pXmlUserLangDoc(NULL), _pXmlToolIconsDoc(NULL), _pXmlShortcutDoc(NULL),
-	_pXmlContextMenuDoc(NULL), _pXmlSessionDoc(NULL), _pXmlBlacklistDoc(NULL), 
-    _pXmlNativeLangDocA(NULL), _nbMaxFile(10), _nbExternalLang(0),
+	_pXmlContextMenuDoc(NULL), _pXmlSessionDoc(NULL), _pXmlBlacklistDoc(NULL),
+	_pXmlNativeLangDocA(NULL), _nbMaxFile(10), _nbExternalLang(0),
 	_fileSaveDlgFilterIndex(-1),
 	_hUser32(NULL), _hUXTheme(NULL),
 	_transparentFuncAddr(NULL), _enableThemeDialogTextureFuncAddr(NULL),
@@ -482,29 +482,6 @@ NppParameters::~NppParameters()
 	_pXmlExternalLexerDoc.clear();
 
 	::RemoveFontResource(LINEDRAW_FONT);
-
-	// JOCE: I don't like that much. But I feel that the deletion should take place at the
-	// same scope as the allocation.
-	// Should revisit FindHistory to handle both itself.
-	for (int i = 0; i < _findHistory._nbFindHistoryPath; i++)
-	{
-		delete _findHistory._pFindHistoryPath[i];
-	}
-
-	for (int i = 0; i < _findHistory._nbFindHistoryFilter; i++)
-	{
-		delete _findHistory._pFindHistoryFilter[i];
-	}
-
-	for (int i = 0; i < _findHistory._nbFindHistoryFind; i++)
-	{
-		delete _findHistory._pFindHistoryFind[i];
-	}
-
-	for (int i = 0; i < _findHistory._nbFindHistoryReplace; i++)
-	{
-		delete _findHistory._pFindHistoryReplace[i];
-	}
 
 	// JOCE: These were NOT allocated here, and should NOT be freed here either...  :-/
 	for (std::vector<TiXmlDocument *>::iterator it = _pXmlExternalLexerDoc.begin(),
