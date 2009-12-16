@@ -589,7 +589,7 @@ bool Notepad_plus::saveGUIParams()
 	assert(_subSplitter);
 
 	NppGUI & nppGUI = (NppGUI &)(NppParameters::getInstance())->getNppGUI();
-	nppGUI._statusBarShow = _statusBar->isVisible();
+	//nppGUI._statusBarShow = _statusBar->isVisible();
 	nppGUI._toolbarShow = _rebarTop->getIDVisible(REBAR_BAR_TOOLBAR);
 	nppGUI._toolBarStatus = _toolBar->getState();
 
@@ -9691,70 +9691,65 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		case WM_QUERYENDSESSION:
 		case WM_CLOSE:
 		{
-			if (!_isPrelaunch)
-			{
-				_pTrayIco->doTrayIcon(REMOVE);
-			}
-
-			const NppGUI & nppgui = pNppParam->getNppGUI();
-
-			Session currentSession;
-			if (nppgui._rememberLastSession)
-			{
-				getCurrentOpenedFiles(currentSession);
-				//Lock the recent file list so it isnt populated with opened files
-				//Causing them to show on restart even though they are loaded by session
-				_lastRecentFileList->setLock(true);	//only lock when the session is remembered
-			}
-
-			bool allClosed = fileCloseAll();	//try closing files before doing anything else
-
-			if (nppgui._rememberLastSession)
-			{
-				_lastRecentFileList->setLock(false);	//only lock when the session is remembered
-			}
-
-			if (!allClosed)
-			{
-				//User cancelled the shutdown
-				return FALSE;
-			}
-
-			if (_beforeSpecialView.isFullScreen)	//closing, return to windowed mode
-				fullScreenToggle();
-			if (_beforeSpecialView.isPostIt)		//closing, return to windowed mode
-				postItToggle();
-
-			if (_configStyleDlg->isCreated() && ::IsWindowVisible(_configStyleDlg->getHSelf()))
-				_configStyleDlg->restoreGlobalOverrideValues();
-
-			SCNotification scnN;
-			scnN.nmhdr.code = NPPN_SHUTDOWN;
-			scnN.nmhdr.hwndFrom = _hSelf;
-			scnN.nmhdr.idFrom = 0;
-			_pluginsManager->notify(&scnN);
-
-			saveFindHistory();
-
-			_lastRecentFileList->saveLRFL();
-			saveScintillaParams(SCIV_PRIMARY);
-			saveScintillaParams(SCIV_SECOND);
-			saveGUIParams();
-			saveUserDefineLangs();
-			saveShortcuts();
-			if (nppgui._rememberLastSession && _rememberThisSession)
-				saveSession(currentSession);
-
-			if (!_isPrelaunch)
-			{
-				//Sends WM_DESTROY, Notepad++ will end
-				::DestroyWindow(hwnd);
-			}
-			else
+			if (_isPrelaunch)
 			{
 				SendMessage(_hSelf, WM_SYSCOMMAND, SC_MINIMIZE, 0);
 			}
+            else
+            {
+                if (_pTrayIco)
+                    _pTrayIco->doTrayIcon(REMOVE);
 
+			    const NppGUI & nppgui = pNppParam->getNppGUI();
+			    Session currentSession;
+			    if (nppgui._rememberLastSession)
+			    {
+				    getCurrentOpenedFiles(currentSession);
+				    //Lock the recent file list so it isnt populated with opened files
+				    //Causing them to show on restart even though they are loaded by session
+				    _lastRecentFileList->setLock(true);	//only lock when the session is remembered
+			    }
+			    bool allClosed = fileCloseAll();	//try closing files before doing anything else
+
+			    if (nppgui._rememberLastSession)
+			    {
+				    _lastRecentFileList->setLock(false);	//only lock when the session is remembered
+			    }
+
+			    if (!allClosed)
+			    {
+				    //User cancelled the shutdown
+				    return FALSE;
+			    }
+
+			    if (_beforeSpecialView.isFullScreen)	//closing, return to windowed mode
+				    fullScreenToggle();
+			    if (_beforeSpecialView.isPostIt)		//closing, return to windowed mode
+				    postItToggle();
+
+			    if (_configStyleDlg->isCreated() && ::IsWindowVisible(_configStyleDlg.getHSelf()))
+				    _configStyleDlg->restoreGlobalOverrideValues();
+
+			    SCNotification scnN;
+			    scnN.nmhdr.code = NPPN_SHUTDOWN;
+			    scnN.nmhdr.hwndFrom = _hSelf;
+			    scnN.nmhdr.idFrom = 0;
+			    _pluginsManager->notify(&scnN);
+
+			    saveFindHistory();
+
+			    _lastRecentFileList->saveLRFL();
+			    saveScintillaParams(SCIV_PRIMARY);
+			    saveScintillaParams(SCIV_SECOND);
+			    saveGUIParams();
+			    saveUserDefineLangs();
+			    saveShortcuts();
+			    if (nppgui._rememberLastSession && _rememberThisSession)
+				    saveSession(currentSession);
+
+                //Sends WM_DESTROY, Notepad++ will end
+			    ::DestroyWindow(hwnd);
+			}
 			return TRUE;
 		}
 
@@ -9769,7 +9764,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		case WM_SYSCOMMAND:
 		{
 			NppGUI & nppgui = (NppGUI &)(pNppParam->getNppGUI());
-			if ((nppgui._isMinimizedToTray) && (wParam == SC_MINIMIZE))
+			if ((nppgui._isMinimizedToTray || _isPrelaunch) && (wParam == SC_MINIMIZE))
 			{
 				if (!_pTrayIco)
 					_pTrayIco = new trayIconControler(_hSelf, IDI_M30ICON, IDC_MINIMIZED_TRAY, ::LoadIcon(_hInst, MAKEINTRESOURCE(IDI_M30ICON)), TEXT(""));
