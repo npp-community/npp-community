@@ -318,6 +318,7 @@ private:
 	HMENU _mainMenuHandle;
 
 	bool _sysMenuEntering;
+	bool _isPrelaunch;
 
 	// For FullScreen/PostIt features
 	VisibleGUIConf	_beforeSpecialView;
