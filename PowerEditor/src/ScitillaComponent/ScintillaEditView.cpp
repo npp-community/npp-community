@@ -3305,6 +3305,7 @@ void ScintillaEditView::setIniLexer()
 
 void ScintillaEditView::setSqlLexer()
 {
+	execute(SCI_SETPROPERTY, (WPARAM)"sql.backslash.escapes", (LPARAM)"1");
 	setLexer(SCLEX_SQL, L_SQL, LIST_0);
 }
 
