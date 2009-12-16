@@ -269,6 +269,8 @@ public:
 
 	void scroll(int column, int line);
 
+    void showWrapSymbol(bool willBeShown = true);
+
 	long getCurrentPointX()const;
 	long getCurrentPointY()const;
 

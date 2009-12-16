@@ -3097,6 +3097,12 @@ void ScintillaEditView::scroll( int column, int line )
 	execute(SCI_LINESCROLL, column, line);
 }
 
+void ScintillaEditView::showWrapSymbol(bool willBeShown)
+{
+	execute(SCI_SETWRAPVISUALFLAGSLOCATION, SC_WRAPVISUALFLAGLOC_DEFAULT);
+	execute(SCI_SETWRAPVISUALFLAGS, willBeShown?SC_WRAPVISUALFLAG_END:SC_WRAPVISUALFLAG_NONE);
+}
+
 long ScintillaEditView::getCurrentPointX() const
 {
 	return long (execute(SCI_POINTXFROMPOSITION, 0, execute(SCI_GETCURRENTPOS)));
