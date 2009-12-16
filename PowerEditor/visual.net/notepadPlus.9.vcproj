@@ -377,6 +377,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\MISC\Common\CommonGenerics.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\MISC\FileNameStringSplitter.h"
 					>
 				</File>
