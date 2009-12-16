@@ -115,6 +115,11 @@ LanguageName ScintillaEditView::langNames[L_EXTERNAL+1] = {
 {TEXT("searchResult"), TEXT("Internal Search"),			TEXT("Internal Search"),										L_SEARCHRESULT,	SCLEX_SEARCHRESULT},
 {TEXT("cmake"),		TEXT("CMAKEFILE"),				TEXT("CMAKEFILE"),											L_CMAKE,		SCLEX_CMAKE},
 {TEXT("yaml"),		TEXT("YAML"),						TEXT("YAML Ain't Markup Language"),							L_YAML,			SCLEX_YAML},
+{TEXT("cobol"),		TEXT("COBOL"),						TEXT("COmmon Business Oriented Language"),							L_COBOL,			SCLEX_COBOL},
+{TEXT("gui4cli"),		TEXT("Gui4Cli"),						TEXT("Gui4Cli file"),							L_GUI4CLI,			SCLEX_GUI4CLI},
+{TEXT("d"),		TEXT("D"),						TEXT("D programming language"),							L_D,			SCLEX_D},
+{TEXT("powershell"),		TEXT("PowerShell"),						TEXT("Windows PowerShell"),							L_POWERSHELL,			SCLEX_POWERSHELL},
+{TEXT("r"),		TEXT("R"),						TEXT("R programming language"),							L_R,			SCLEX_R},
 {TEXT("ext"),			TEXT("External"),					TEXT("External"),												L_EXTERNAL,		SCLEX_NULL}
 };
 
@@ -1258,6 +1263,21 @@ void ScintillaEditView::defineDocType(LangType typeDoc)
 
 		case L_YAML :
 			setYamlLexer(); break;
+
+        case L_COBOL :
+			setCobolLexer(); break;
+
+        case L_GUI4CLI :
+			setGui4CliLexer(); break;
+
+        case L_D :
+			setDLexer(); break;
+
+        case L_POWERSHELL :
+			setPowerShellLexer(); break;
+
+        case L_R :
+			setRLexer(); break;
 
 		case L_TXT :
 		default :
@@ -3431,6 +3451,31 @@ void ScintillaEditView::setYamlLexer()
 	setLexer(SCLEX_YAML, L_YAML, LIST_0);
 }
 
+void ScintillaEditView::setCobolLexer()
+{
+	setLexer(SCLEX_COBOL, L_COBOL, LIST_0 | LIST_1 | LIST_2);
+}
+
+void ScintillaEditView::setGui4CliLexer()
+{
+	setLexer(SCLEX_GUI4CLI, L_GUI4CLI, LIST_0 | LIST_1 | LIST_2 | LIST_3 | LIST_4);
+}
+
+void ScintillaEditView::setDLexer()
+{
+	setLexer(SCLEX_D, L_D, LIST_0 | LIST_1 | LIST_2 | LIST_3 | LIST_4 | LIST_5 | LIST_6);
+}
+
+void ScintillaEditView::setPowerShellLexer()
+{
+	setLexer(SCLEX_POWERSHELL, L_POWERSHELL, LIST_0 | LIST_1 | LIST_2);
+}
+
+void ScintillaEditView::setRLexer()
+{
+	setLexer(SCLEX_R, L_R, LIST_0 | LIST_1 | LIST_2);
+}
+
 void ScintillaEditView::setSearchResultLexer()
 {
 	execute(SCI_STYLESETEOLFILLED, SCE_SEARCHRESULT_FILE_HEADER, true);
@@ -3446,9 +3491,8 @@ bool ScintillaEditView::isNeededFolderMarge( LangType typeDoc ) const
 		case L_BATCH:
 		case L_TXT:
 		case L_MAKEFILE:
-		case L_SQL:
+			//case L_SQL:
 		case L_ASM:
-		//case L_TEX:
 		case L_HASKELL:
 		case L_PROPS:
 		case L_SMALLTALK:

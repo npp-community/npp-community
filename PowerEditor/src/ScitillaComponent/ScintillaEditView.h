@@ -438,6 +438,11 @@ protected:
 	void setInnoLexer();
 	void setCmakeLexer();
 	void setYamlLexer();
+    void setCobolLexer();
+    void setGui4CliLexer();
+    void setDLexer();
+    void setPowerShellLexer();
+    void setRLexer();
 	void setSearchResultLexer();
 	bool isNeededFolderMarge(LangType typeDoc) const;
 //END: Lexers and Styling
