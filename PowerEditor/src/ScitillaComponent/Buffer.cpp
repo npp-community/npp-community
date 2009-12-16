@@ -65,6 +65,26 @@ static bool isInList(const TCHAR *token, const TCHAR *list) {
 	return false;
 };
 
+Buffer::Buffer( FileManager * pManager, BufferID id, Document doc, DocFileStatus type, const TCHAR *fileName ) :
+_pManager(pManager), _canNotify(false), _references(0), _id(id),
+_doc(doc), _lang(L_TXT), _isDirty(false), _encoding(-1),
+_isUserReadOnly(false), _needLexer(false), //new buffers do not need lexing, Scintilla takes care of that
+_currentStatus(type), _timeStamp(0), _isFileReadOnly(false),
+_fileName(NULL), _needReloading(false), _recentTag(-1)
+{
+	NppParameters *pNppParamInst = NppParameters::getInstance();
+	const NewDocDefaultSettings & ndds = (pNppParamInst->getNppGUI()).getNewDocDefaultSettings();
+	_unicodeMode = ndds._encoding;
+	_format = ndds._format;
+
+	setFileName(fileName, ndds._lang);
+	updateTimeStamp();
+	checkFileState();
+
+	_isDirty = false;
+	_canNotify = true;
+}
+
 void Buffer::determinateFormat(const char *data) {
 	_format = WIN_FORMAT;
 	size_t len = strlen(data);
@@ -341,26 +361,6 @@ void Buffer::setDeferredReload() {	//triggers a reload on the next Document acce
 	doNotify(BufferChangeDirty);
 }
 
-Buffer::Buffer( FileManager * pManager, BufferID id, Document doc, DocFileStatus type, const TCHAR *fileName ) :
-	_pManager(pManager), _canNotify(false), _references(0), _id(id),
-	_doc(doc), _lang(L_TXT), _isDirty(false),
-	_isUserReadOnly(false), _needLexer(false), //new buffers do not need lexing, Scintilla takes care of that
-	_currentStatus(type), _timeStamp(0), _isFileReadOnly(false),
-	_fileName(NULL), _needReloading(false), _recentTag(-1)
-{
-	NppParameters *pNppParamInst = NppParameters::getInstance();
-	const NewDocDefaultSettings & ndds = (pNppParamInst->getNppGUI()).getNewDocDefaultSettings();
-	_unicodeMode = ndds._encoding;
-	_format = ndds._format;
-
-	setFileName(fileName, ndds._lang);
-	updateTimeStamp();
-	checkFileState();
-
-	_isDirty = false;
-	_canNotify = true;
-}
-
 void Buffer::setLangType( LangType lang, const TCHAR * userLangName /*= TEXT("")*/ )
 {
 	if (lang == _lang && lang != L_USER)
@@ -631,6 +631,8 @@ bool FileManager::saveBuffer(BufferID id, const TCHAR * filename, bool isCopy) {
 	Utf8_16_Write UnicodeConvertor;
 	UnicodeConvertor.setEncoding(mode);
 
+	int encoding = buffer->getEncoding();
+
 	FILE *fp = UnicodeConvertor.fopen(fullpath, TEXT("wb"));
 	if (fp)
 	{
@@ -645,7 +647,16 @@ bool FileManager::saveBuffer(BufferID id, const TCHAR * filename, bool isCopy) {
 				grabSize = blockSize;
 
 			_pscratchTilla->getText(data, i, i + grabSize);
-			UnicodeConvertor.fwrite(data, grabSize);
+			if (encoding != -1)
+			{
+				WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
+				const char *newData = wmc->encode(SC_CP_UTF8, encoding, data);
+				UnicodeConvertor.fwrite(newData, strlen(newData));
+			}
+			else
+			{
+				UnicodeConvertor.fwrite(data, grabSize);
+			}
 		}
 		UnicodeConvertor.fclose();
 

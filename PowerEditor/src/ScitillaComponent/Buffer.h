@@ -232,6 +232,15 @@ public :
 		_unicodeMode = mode;
 		doNotify(BufferChangeUnicode | BufferChangeDirty);
 	};
+
+	int getEncoding() const {
+		return _encoding;
+	};
+
+	void setEncoding(int encoding) {
+		_encoding = encoding;
+	};
+
 	DocFileStatus getStatus() const {
 		return _currentStatus;
 	};
@@ -315,6 +324,7 @@ private :
 	bool _isDirty;
 	formatType _format;
 	UniMode _unicodeMode;
+	int _encoding;
 	bool _isUserReadOnly;
 	bool _needLexer;	//initially true
 	//these properties have to be duplicated because of multiple references
