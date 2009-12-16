@@ -534,6 +534,9 @@ private:
 
 	bool noOpenedDoc() const;
 	void EnableMouseWheelZoom(bool enable);
+
+	void goToPreviousIndicator(int indicID2Search) const;
+	void goToNextIndicator(int indicID2Search) const;
 };
 
 #endif //NOTEPAD_PLUS_H
