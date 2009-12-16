@@ -3350,12 +3350,12 @@ void ScintillaEditView::setFortranLexer()
 
 void ScintillaEditView::setLispLexer()
 {
-	setLexer(SCLEX_LISP, L_LISP, LIST_0);
+	setLexer(SCLEX_LISP, L_LISP, LIST_0 | LIST_1);
 }
 
 void ScintillaEditView::setSchemeLexer()
 {
-	setLexer(SCLEX_LISP, L_SCHEME, LIST_0);
+	setLexer(SCLEX_LISP, L_SCHEME, LIST_0 | LIST_1);
 }
 
 void ScintillaEditView::setAsmLexer()
@@ -3484,7 +3484,7 @@ bool ScintillaEditView::isNeededFolderMarge( LangType typeDoc ) const
 		case L_BATCH:
 		case L_TXT:
 		case L_MAKEFILE:
-			//case L_SQL:
+		//case L_SQL:
 		case L_ASM:
 		case L_HASKELL:
 		case L_PROPS:
