@@ -321,6 +321,40 @@ TEST_F(FuncGuardTest, guardFuncIndentWithDebugComment)
 	ASSERT_EQ(expected, s_testDebugOutputStr);
 }
 
+void TestGuardFuncWithCategoryCommentOne()
+{
+	func_guard(test); int line = __LINE__; // This declaration needs to be on the same line as func_guard to get the right line number.
+	_itot_s(line, TestGuardFuncOneGuardLine, 10);
+	guard_debugf_cat(test, TEXT("%s %d\n"), TEXT("We print a number:"), 42);
+}
+
+void TestGuardFuncWithCategoryCommentTwo()
+{
+	func_guard(test); int line = __LINE__; // This declaration needs to be on the same line as func_guard to get the right line number.
+	_itot_s(line, TestGuardFuncTwoGuardLine, 10);
+	TestGuardFuncWithCategoryCommentOne();
+}
+
+TEST_F(FuncGuardTest, guardFuncIndentWithCategoryDebugComment)
+{
+	TestGuardFuncWithCategoryCommentTwo();
+	generic_string expected = TEXT(__FILE__);
+	expected += TEXT('(');
+	expected += TestGuardFuncTwoGuardLine;
+	expected += TEXT("):\n");
+	expected += TEXT("Entering[ void __cdecl TestGuardFuncWithCategoryCommentTwo(void) ]\n");
+	expected += TEXT("\t");
+	expected += TEXT(__FILE__);
+	expected += TEXT('(');
+	expected += TestGuardFuncOneGuardLine;
+	expected += TEXT("):\n");
+	expected += TEXT("\tEntering[ void __cdecl TestGuardFuncWithCategoryCommentOne(void) ]\n");
+	expected += TEXT("\t\tWe print a number: 42\n");
+	expected += TEXT("\tLeaving[ TestGuardFuncWithCategoryCommentOne ]\n");
+	expected += TEXT("Leaving[ TestGuardFuncWithCategoryCommentTwo ]\n");
+	ASSERT_EQ(expected, s_testDebugOutputStr);
+}
+
 // Disable the 'test_disable' function guard category
 func_guard_disable_cat(test_disable);
 
@@ -349,5 +383,67 @@ TEST_F(FuncGuardTest, guardFuncIndentDisabled)
 	ASSERT_EQ(expected, s_testDebugOutputStr);
 }
 
+void TestGuardFuncDisabledWithCommentOne()
+{
+	func_guard(test_disable); int line = __LINE__; // This declaration needs to be on the same line as func_guard to get the right line number.
+	_itot_s(line, TestGuardFuncOneGuardLine, 10);
+	guard_debugf(TEXT("%s %d\n"), TEXT("We print a number:"), 42);
+}
+
+void TestGuardFuncDisabledWithCommentTwo()
+{
+	func_guard(test_disable); int line = __LINE__; // This declaration needs to be on the same line as func_guard to get the right line number.
+	_itot_s(line, TestGuardFuncTwoGuardLine, 10);
+	TestGuardFuncDisabledWithCommentOne();
+}
+
+TEST_F(FuncGuardTest, guardFuncDisabledDebugComment)
+{
+	TestGuardFuncDisabledWithCommentTwo();
+	generic_string expected = TEXT("We print a number: 42\n");
+	ASSERT_EQ(expected, s_testDebugOutputStr);
+}
+
+void TestGuardFuncDisabledWithCategoryCommentOne()
+{
+	func_guard(test_disable); int line = __LINE__; // This declaration needs to be on the same line as func_guard to get the right line number.
+	_itot_s(line, TestGuardFuncOneGuardLine, 10);
+	guard_debugf_cat(test_disable, TEXT("%s %d\n"), TEXT("We print a number:"), 42);
+}
+
+void TestGuardFuncDisabledWithCategoryCommentTwo()
+{
+	func_guard(test_disable); int line = __LINE__; // This declaration needs to be on the same line as func_guard to get the right line number.
+	_itot_s(line, TestGuardFuncTwoGuardLine, 10);
+	TestGuardFuncDisabledWithCategoryCommentOne();
+}
+
+TEST_F(FuncGuardTest, guardFuncDisabledDebugCategoryComment)
+{
+	TestGuardFuncDisabledWithCategoryCommentTwo();
+	generic_string expected = TEXT("");
+	ASSERT_EQ(expected, s_testDebugOutputStr);
+}
+
+void TestGuardFuncDisabledWithCategoryCommentEnabledOne()
+{
+	func_guard(test_disable); int line = __LINE__; // This declaration needs to be on the same line as func_guard to get the right line number.
+	_itot_s(line, TestGuardFuncOneGuardLine, 10);
+	guard_debugf_cat(test, TEXT("%s %d\n"), TEXT("We print a number:"), 42);
+}
+
+void TestGuardFuncDisabledWithCategoryCommentEnabledTwo()
+{
+	func_guard(test_disable); int line = __LINE__; // This declaration needs to be on the same line as func_guard to get the right line number.
+	_itot_s(line, TestGuardFuncTwoGuardLine, 10);
+	TestGuardFuncDisabledWithCategoryCommentEnabledOne();
+}
+
+TEST_F(FuncGuardTest, guardFuncDisabledDebugCategoryCommentEnabled)
+{
+	TestGuardFuncDisabledWithCategoryCommentEnabledTwo();
+	generic_string expected = TEXT("We print a number: 42\n");
+	ASSERT_EQ(expected, s_testDebugOutputStr);
+}
 
 #endif // SHIPPING
