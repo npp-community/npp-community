@@ -455,7 +455,7 @@ private:
 
 	void setDisplayFormat(formatType f);
 
-	void setUniModeText(UniMode um);
+	void setUniModeText(/*UniMode um*/);
 
 	void checkLangsMenu(int id) const ;
     void setLanguage(LangType langType);
