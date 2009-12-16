@@ -249,7 +249,6 @@ void ScintillaEditView::init(HINSTANCE hInst, HWND hParent)
 	_pParameter = NppParameters::getInstance();
 
 	_codepage = ::GetACP();
-	_oemCodepage = ::GetOEMCP();
 
 	//Use either Unicode or ANSI setwindowlong, depending on environment
 	if (::IsWindowUnicode(_hSelf))
