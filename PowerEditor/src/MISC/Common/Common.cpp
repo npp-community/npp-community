@@ -184,40 +184,40 @@ int getCpFromStringValue(const char * encodingStr)
 		return CP_ACP;
 
 	if (_stricmp("windows-1250", encodingStr) == 0)
-		return 1250;
+		return NPP_CP_WIN_1250;
 	if (_stricmp("windows-1251", encodingStr) == 0)
-		return 1251;
+		return NPP_CP_WIN_1251;
 	if (_stricmp("windows-1252", encodingStr) == 0)
-		return 1252;
+		return NPP_CP_WIN_1252;
 	if (_stricmp("windows-1253", encodingStr) == 0)
-		return 1253;
+		return NPP_CP_WIN_1253;
 	if (_stricmp("windows-1254", encodingStr) == 0)
-		return 1254;
+		return NPP_CP_WIN_1254;
 	if (_stricmp("windows-1255", encodingStr) == 0)
-		return 1255;
+		return NPP_CP_WIN_1255;
 	if (_stricmp("windows-1256", encodingStr) == 0)
-		return 1256;
+		return NPP_CP_WIN_1256;
 	if (_stricmp("windows-1257", encodingStr) == 0)
-		return 1257;
+		return NPP_CP_WIN_1257;
 	if (_stricmp("windows-1258", encodingStr) == 0)
-		return 1258;
+		return NPP_CP_WIN_1258;
 
 	if (_stricmp("big5", encodingStr) == 0)
-		return 950;
+		return NPP_CP_BIG5;
 	if (_stricmp("gb2312", encodingStr) == 0)
-		return 936;
+		return NPP_CP_GB2312;
 	if (_stricmp("shift_jis", encodingStr) == 0)
-		return 932;
+		return NPP_CP_SHIFT_JIS;
 	if (_stricmp("euc-kr", encodingStr) == 0)
-		return 51949;
+		return NPP_CP_EUC_KR;
 	if (_stricmp("tis-620", encodingStr) == 0)
-		return 874;
+		return NPP_CP_TIS_620;
 
 	if (_stricmp("iso-8859-8", encodingStr) == 0)
-		return 28598;
+		return NPP_CP_ISO_8859_8;
 
 	if (_stricmp("utf-8", encodingStr) == 0)
-		return 65001;
+		return CP_UTF8;
 
 	return CP_ACP;
 }
