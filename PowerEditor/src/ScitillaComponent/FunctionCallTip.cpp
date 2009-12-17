@@ -378,3 +378,16 @@ bool FunctionCallTip::isVisible()
 {
 	return _pEditView?_pEditView->execute(SCI_CALLTIPACTIVE) == TRUE:false;
 }
+
+bool FunctionCallTip::isBasicWordChar(TCHAR ch) const {
+	return (ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' || ch >= '0' && ch <= '9' || ch == '_');
+}
+
+bool FunctionCallTip::isAdditionalWordChar(TCHAR ch) const {
+	const TCHAR *addChars = _additionalWordChar.c_str();
+	size_t len = _additionalWordChar.length();
+	for (size_t i = 0 ; i < len ; i++)
+		if (ch == addChars[i])
+			return true;
+	return false;
+}

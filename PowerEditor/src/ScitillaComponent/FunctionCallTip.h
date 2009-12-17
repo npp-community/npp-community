@@ -30,8 +30,8 @@ public:
 													_curFunction(NULL),
 													_currentNrOverloads(0), _currentOverload(0), _currentParam(0),
 													_start('('), _stop(')'), _param(','), _terminal(';'), _ignoreCase(true)
-													{};
-	~FunctionCallTip() {/* cleanup(); */};
+													{}
+	~FunctionCallTip() {/* cleanup(); */}
 	void setLanguageXML(TiXmlElement * pXmlKeyword);	//set calltip keyword node
 	bool updateCalltip(int ch, bool needShown = false);	//Ch is character typed, or 0 if another event occurred. NeedShown is true if calltip should be attempted to displayed. Return true if calltip was made visible
 	void showNextOverload();							//show next overloaded parameters
@@ -69,17 +69,8 @@ private:
 	void showCalltip();				//display calltip based on current variables
 	void reset();					//reset all vars in case function is invalidated
 	void cleanup();					//delete any leftovers
-    bool isBasicWordChar(TCHAR ch) const {
-        return (ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' || ch >= '0' && ch <= '9' || ch == '_');
-    };
-    bool isAdditionalWordChar(TCHAR ch) const {
-        const TCHAR *addChars = _additionalWordChar.c_str();
-        size_t len = _additionalWordChar.length();
-        for (size_t i = 0 ; i < len ; i++)
-            if (ch == addChars[i])
-                return true;
-        return false;
-    };
+    bool isBasicWordChar(TCHAR ch) const;
+    bool isAdditionalWordChar(TCHAR ch) const;
 };
 
 #endif// FUNCTIONCALLTIP_H
