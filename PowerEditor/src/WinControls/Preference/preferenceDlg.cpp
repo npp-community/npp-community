@@ -613,7 +613,7 @@ void MarginsDlg::changePanelTo(int index)
 BOOL CALLBACK MarginsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	NppParameters *pNppParam = NppParameters::getInstance();
-	NppGUI & nppGUI = (NppGUI &)pNppParam->getNppGUI();
+	NppGUI & nppGUI = pNppParam->getNppGUI();
 	switch (Message)
 	{
 		case WM_INITDIALOG :
@@ -789,7 +789,7 @@ BOOL CALLBACK MarginsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPar
 BOOL CALLBACK SettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	NppParameters *pNppParam = NppParameters::getInstance();
-	NppGUI & nppGUI = (NppGUI &)pNppParam->getNppGUI();
+	NppGUI & nppGUI = pNppParam->getNppGUI();
 	switch (Message)
 	{
 		case WM_INITDIALOG :
@@ -2020,7 +2020,7 @@ BOOL CALLBACK PrintSettings2Dlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM
 BOOL CALLBACK BackupDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	NppParameters *pNppParam = NppParameters::getInstance();
-	NppGUI & nppGUI = (NppGUI &)pNppParam->getNppGUI();
+	NppGUI & nppGUI = pNppParam->getNppGUI();
 	switch (Message)
 	{
 		case WM_INITDIALOG :

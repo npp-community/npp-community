@@ -318,7 +318,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 	pNppParameters->load();
 	Notepad_plus notepad_plus_plus;
 
-	NppGUI & nppGui = (NppGUI &)pNppParameters->getNppGUI();
+	NppGUI & nppGui = pNppParameters->getNppGUI();
 
 	generic_string updaterDir = pNppParameters->getNppPath();
 	updaterDir += TEXT("\\updater\\");

@@ -675,7 +675,7 @@ public:
 	bool _isTaskListRBUTTONUP_Active;
 	int L_END;
 
-	const NppGUI & getNppGUI() const {
+	NppGUI & getNppGUI() {
         return _nppGUI;
     };
 

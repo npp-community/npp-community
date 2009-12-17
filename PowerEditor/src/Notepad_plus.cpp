@@ -607,7 +607,7 @@ bool Notepad_plus::saveGUIParams()
 	assert(_toolBar);
 	assert(_subSplitter);
 
-	NppGUI & nppGUI = (NppGUI &)(NppParameters::getInstance())->getNppGUI();
+	NppGUI & nppGUI = (NppParameters::getInstance())->getNppGUI();
 	nppGUI._toolbarShow = _rebarTop->getIDVisible(REBAR_BAR_TOOLBAR);
 	nppGUI._toolBarStatus = _toolBar->getState();
 
@@ -647,7 +647,7 @@ void Notepad_plus::saveDockingParams()
 {
 	assert(_dockingManager);
 
-	NppGUI & nppGUI = (NppGUI &)(NppParameters::getInstance())->getNppGUI();
+	NppGUI & nppGUI = (NppParameters::getInstance())->getNppGUI();
 
 	// Save the docking information
 	nppGUI._dockingData._leftWidth		= _dockingManager->getDockedContSize(CONT_LEFT);
@@ -3042,7 +3042,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
     
             braceMatch();
     
-		    NppGUI & nppGui = (NppGUI &)nppParam->getNppGUI();
+		    NppGUI & nppGui = nppParam->getNppGUI();
     
 		    if (nppGui._enableTagsMatchHilite)
 		    {
@@ -5065,7 +5065,7 @@ void Notepad_plus::command(int id)
 			const int NB_MAX_CHAR = 9;
 
 			ValueDlg valDlg;
-			NppGUI & nppGUI = (NppGUI &)((NppParameters::getInstance())->getNppGUI());
+			NppGUI & nppGUI = (NppParameters::getInstance())->getNppGUI();
 			valDlg.init(_hInst, _preferenceDlg->getHSelf(), nppGUI._autocFromLen, TEXT("Nb char : "));
 			POINT p;
 			::GetCursorPos(&p);
@@ -5461,7 +5461,7 @@ void Notepad_plus::command(int id)
 
 		case IDM_SYSTRAYPOPUP_NEWDOC:
 		{
-			NppGUI & nppGUI = (NppGUI &)((NppParameters::getInstance())->getNppGUI());
+			NppGUI & nppGUI = (NppParameters::getInstance())->getNppGUI();
 			::ShowWindow(_hSelf, nppGUI._isMaximized?SW_MAXIMIZE:SW_SHOW);
 			fileNew();
 		}
@@ -5469,14 +5469,14 @@ void Notepad_plus::command(int id)
 
 		case IDM_SYSTRAYPOPUP_ACTIVATE :
 		{
-			NppGUI & nppGUI = (NppGUI &)((NppParameters::getInstance())->getNppGUI());
+			NppGUI & nppGUI = (NppParameters::getInstance())->getNppGUI();
 			::ShowWindow(_hSelf, nppGUI._isMaximized?SW_MAXIMIZE:SW_SHOW);
 		}
 		break;
 
 		case IDM_SYSTRAYPOPUP_NEW_AND_PASTE:
 		{
-			NppGUI & nppGUI = (NppGUI &)((NppParameters::getInstance())->getNppGUI());
+			NppGUI & nppGUI = (NppParameters::getInstance())->getNppGUI();
 			::ShowWindow(_hSelf, nppGUI._isMaximized?SW_MAXIMIZE:SW_SHOW);
 			BufferID bufferID = _pEditView->getCurrentBufferID();
 			Buffer * buf = MainFileManager->getBufferByID(bufferID);
@@ -5490,7 +5490,7 @@ void Notepad_plus::command(int id)
 
 		case IDM_SYSTRAYPOPUP_OPENFILE:
 		{
-			NppGUI & nppGUI = (NppGUI &)((NppParameters::getInstance())->getNppGUI());
+			NppGUI & nppGUI = (NppParameters::getInstance())->getNppGUI();
 			::ShowWindow(_hSelf, nppGUI._isMaximized?SW_MAXIMIZE:SW_SHOW);
 			fileOpen();
 		}
@@ -8335,7 +8335,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		}
 		case WM_CREATE:
 		{
-			NppGUI & nppGUI = (NppGUI &)pNppParam->getNppGUI();
+			NppGUI & nppGUI = pNppParam->getNppGUI();
 
 			if (!_dockingManager)
 			{
@@ -9908,7 +9908,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 		case NPPM_INTERNAL_SETCARETWIDTH :
 		{
-			NppGUI & nppGUI = (NppGUI &)pNppParam->getNppGUI();
+			NppGUI & nppGUI = pNppParam->getNppGUI();
 
 			if (nppGUI._caretWidth < 4)
 			{
@@ -9929,7 +9929,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
         case NPPM_INTERNAL_SETMULTISELCTION :
         {
-            NppGUI & nppGUI = (NppGUI &)pNppParam->getNppGUI();
+            NppGUI & nppGUI = pNppParam->getNppGUI();
             _mainEditView->execute(SCI_SETMULTIPLESELECTION, nppGUI._enableMultiSelection);
 			_subEditView->execute(SCI_SETMULTIPLESELECTION, nppGUI._enableMultiSelection);
             return TRUE;
@@ -9937,7 +9937,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 		case NPPM_INTERNAL_SETCARETBLINKRATE :
 		{
-			NppGUI & nppGUI = (NppGUI &)pNppParam->getNppGUI();
+			NppGUI & nppGUI = pNppParam->getNppGUI();
 			_mainEditView->execute(SCI_SETCARETPERIOD, nppGUI._caretBlinkRate);
 			_subEditView->execute(SCI_SETCARETPERIOD, nppGUI._caretBlinkRate);
 			return TRUE;
@@ -10039,14 +10039,14 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 		case NPPM_INTERNAL_GETCHECKDOCOPT :
 		{
-			return (LRESULT)((NppGUI &)(pNppParam->getNppGUI()))._fileAutoDetection;
+			return (LRESULT)(pNppParam->getNppGUI())._fileAutoDetection;
 		}
 
 		case NPPM_INTERNAL_SETCHECKDOCOPT :
 		{
 			// If nothing is changed by user, then we allow to set this value
-			if (((NppGUI &)(pNppParam->getNppGUI()))._fileAutoDetection == ((NppGUI &)(pNppParam->getNppGUI()))._fileAutoDetectionOriginalValue)
-				((NppGUI &)(pNppParam->getNppGUI()))._fileAutoDetection = (ChangeDetect)wParam;
+			if ((pNppParam->getNppGUI())._fileAutoDetection == (pNppParam->getNppGUI())._fileAutoDetectionOriginalValue)
+				(pNppParam->getNppGUI())._fileAutoDetection = (ChangeDetect)wParam;
 			return TRUE;
 		}
 
@@ -10078,7 +10078,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 		case NPPM_INTERNAL_ENABLECHECKDOCOPT:
 		{
-			NppGUI & nppgui = (NppGUI &)(pNppParam->getNppGUI());
+			NppGUI & nppgui = pNppParam->getNppGUI();
 			if (wParam == CHECKDOCOPT_NONE)
 				nppgui._fileAutoDetection = cdDisabled;
 			else if (wParam == CHECKDOCOPT_UPDATESILENTLY)
@@ -10197,7 +10197,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 		case WM_SYSCOMMAND:
 		{
-			NppGUI & nppgui = (NppGUI &)(pNppParam->getNppGUI());
+			NppGUI & nppgui = pNppParam->getNppGUI();
 			if ((nppgui._isMinimizedToTray || _isPrelaunch) && (wParam == SC_MINIMIZE))
 			{
 				if (!_pTrayIco)
@@ -10401,7 +10401,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			DocTabView::setHideTabBarStatus(hide);
 			::SendMessage(_hSelf, WM_SIZE, 0, 0);
 
-			NppGUI & nppGUI = (NppGUI &)((NppParameters::getInstance())->getNppGUI());
+			NppGUI & nppGUI = (NppParameters::getInstance())->getNppGUI();
 			if (hide)
 				nppGUI._tabStatus |= TAB_HIDE;
 			else
@@ -10436,7 +10436,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			if (hide == isHidden)
 				return isHidden;
 
-			NppGUI & nppGUI = (NppGUI &)pNppParam->getNppGUI();
+			NppGUI & nppGUI = pNppParam->getNppGUI();
 			nppGUI._menuBarShow = !hide;
 			if (nppGUI._menuBarShow)
 				::SetMenu(_hSelf, _mainMenuHandle);
@@ -10454,7 +10454,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		{
 			assert(_statusBar);
 			bool show = (lParam != TRUE);
-			NppGUI & nppGUI = (NppGUI &)pNppParam->getNppGUI();
+			NppGUI & nppGUI = pNppParam->getNppGUI();
 			bool oldVal = nppGUI._statusBarShow;
 			if (show == oldVal)
 			{
@@ -10471,7 +10471,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 		case NPPM_ISSTATUSBARHIDDEN :
 		{
-			NppGUI & nppGUI = (NppGUI &)pNppParam->getNppGUI();
+			NppGUI & nppGUI = pNppParam->getNppGUI();
 			return !nppGUI._statusBarShow;
 		}
 
@@ -10564,7 +10564,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 		case WM_ENTERMENULOOP:
 		{
-			NppGUI & nppgui = (NppGUI &)(pNppParam->getNppGUI());
+			NppGUI & nppgui = pNppParam->getNppGUI();
 			if (!nppgui._menuBarShow && !wParam && !_sysMenuEntering)
 				::SetMenu(_hSelf, _mainMenuHandle);
 
@@ -10573,7 +10573,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 		case WM_EXITMENULOOP:
 		{
-			NppGUI & nppgui = (NppGUI &)(pNppParam->getNppGUI());
+			NppGUI & nppgui = pNppParam->getNppGUI();
 			if (!nppgui._menuBarShow && !wParam && !_sysMenuEntering)
 				::SetMenu(_hSelf, NULL);
 			_sysMenuEntering = false;
@@ -10681,7 +10681,7 @@ bool Notepad_plus::goToPreviousIndicator(int indicID2Search, bool isWrap) const
 	// found
 	if (_pEditView->execute(SCI_INDICATORVALUEAT, indicID2Search, posStart))
 	{
-		NppGUI & nppGUI = (NppGUI &)((NppParameters::getInstance())->getNppGUI());
+		NppGUI & nppGUI = (NppParameters::getInstance())->getNppGUI();
 		nppGUI._disableSmartHiliteTmp = true;
 
         int currentline = _pEditView->execute(SCI_LINEFROMPOSITION, posEnd);
@@ -10734,7 +10734,7 @@ bool Notepad_plus::goToNextIndicator(int indicID2Search, bool isWrap) const
 	// found
 	if (_pEditView->execute(SCI_INDICATORVALUEAT, indicID2Search, posStart))
 	{
-		NppGUI & nppGUI = (NppGUI &)((NppParameters::getInstance())->getNppGUI());
+		NppGUI & nppGUI = (NppParameters::getInstance())->getNppGUI();
 		nppGUI._disableSmartHiliteTmp = true;
 
         int currentline = _pEditView->execute(SCI_LINEFROMPOSITION, posEnd);
@@ -10887,7 +10887,7 @@ void Notepad_plus::postItToggle()
 	NppParameters * pNppParam = NppParameters::getInstance();
 	if (!_beforeSpecialView.isPostIt)	// PostIt disabled, enable it
 	{
-		NppGUI & nppGUI = (NppGUI &)pNppParam->getNppGUI();
+		NppGUI & nppGUI = pNppParam->getNppGUI();
 		// get current status before switch to postIt
 		//check these always
 		{
