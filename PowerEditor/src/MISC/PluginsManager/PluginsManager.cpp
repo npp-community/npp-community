@@ -386,7 +386,7 @@ void PluginsManager::runPluginCommand(size_t i)
 				_pluginsCommands[i]._pFunc();
 			} catch (...) {
 				TCHAR funcInfo[128];
-				generic_sprintf(funcInfo, TEXT("runPluginCommand(size_t i : %d)"), i);
+				generic_sprintf(funcInfo, 128, TEXT("runPluginCommand(size_t i : %d)"), i);
 				pluginCrashAlert(_pluginsCommands[i]._pluginName.c_str(), funcInfo);
 			}
 		}
@@ -406,7 +406,7 @@ void PluginsManager::runPluginCommand(const TCHAR *pluginName, int commandID)
 					_pluginsCommands[i]._pFunc();
 				} catch (...) {
 					TCHAR funcInfo[128];
-					generic_sprintf(funcInfo, TEXT("runPluginCommand(const TCHAR *pluginName : %s, int commandID : %d)"), pluginName, commandID);
+					generic_sprintf(funcInfo, 128, TEXT("runPluginCommand(const TCHAR *pluginName : %s, int commandID : %d)"), pluginName, commandID);
 					pluginCrashAlert(_pluginsCommands[i]._pluginName.c_str(), funcInfo);
 				}
 			}
@@ -427,7 +427,7 @@ void PluginsManager::notify(SCNotification *notification)
 				_pluginInfos[i]->_pBeNotified(&scNotif);
 			} catch (...) {
 				TCHAR funcInfo[128];
-				generic_sprintf(funcInfo, TEXT("notify(SCNotification *notification) : \r notification->nmhdr.code == %d\r notification->nmhdr.hwndFrom == %d\r notification->nmhdr.idFrom == %d"),\
+				generic_sprintf(funcInfo, 128, TEXT("notify(SCNotification *notification) : \r notification->nmhdr.code == %d\r notification->nmhdr.hwndFrom == %d\r notification->nmhdr.idFrom == %d"),\
 					scNotif.nmhdr.code, scNotif.nmhdr.hwndFrom, scNotif.nmhdr.idFrom);
 				pluginCrashAlert(_pluginsCommands[i]._pluginName.c_str(), funcInfo);
 			}
@@ -445,7 +445,7 @@ void PluginsManager::relayNppMessages(UINT Message, WPARAM wParam, LPARAM lParam
 				_pluginInfos[i]->_pMessageProc(Message, wParam, lParam);
 			} catch (...) {
 				TCHAR funcInfo[128];
-				generic_sprintf(funcInfo, TEXT("relayNppMessages(UINT Message : %d, WPARAM wParam : %d, LPARAM lParam : %d)"), Message, wParam, lParam);
+				generic_sprintf(funcInfo, 128, TEXT("relayNppMessages(UINT Message : %d, WPARAM wParam : %d, LPARAM lParam : %d)"), Message, wParam, lParam);
 				pluginCrashAlert(_pluginsCommands[i]._pluginName.c_str(), TEXT(""));
 			}
 		}
@@ -468,7 +468,7 @@ bool PluginsManager::relayPluginMessages(UINT Message, WPARAM wParam, LPARAM lPa
 					_pluginInfos[i]->_pMessageProc(Message, wParam, lParam);
 				} catch (...) {
 					TCHAR funcInfo[128];
-					generic_sprintf(funcInfo, TEXT("relayPluginMessages(UINT Message : %d, WPARAM wParam : %d, LPARAM lParam : %d)"), Message, wParam, lParam);
+					generic_sprintf(funcInfo, 128, TEXT("relayPluginMessages(UINT Message : %d, WPARAM wParam : %d, LPARAM lParam : %d)"), Message, wParam, lParam);
 					pluginCrashAlert(_pluginsCommands[i]._pluginName.c_str(), funcInfo);
 				}
 				return true;
