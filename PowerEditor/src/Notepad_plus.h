@@ -448,7 +448,7 @@ private:
     void getMainClientRect(RECT & rc) const;
 	void dynamicCheckMenuAndTB() const;
 	void enableConvertMenuItems(formatType f) const;
-	void checkUnicodeMenuItems(/*UniMode um*/) const;
+	void checkUnicodeMenuItems() const;
 
 	generic_string getLangDesc(LangType langType, bool shortDesc = false);
 
@@ -488,7 +488,7 @@ private:
 	generic_string getMarkedLine(int ln);
 
     void findMatchingBracePos(int & braceAtCaret, int & braceOpposite);
-    void braceMatch();
+    bool braceMatch();
 
     void activateNextDoc(bool direction);
 	void activateDoc(int pos);
