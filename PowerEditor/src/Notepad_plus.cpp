@@ -160,7 +160,7 @@ Notepad_plus::Notepad_plus():
                     localizationSwitcher.setFileName(fn);
                 }
 #endif
-				if (fn && stricmp("english.xml", fn) == 0)
+				if (fn && _stricmp("english.xml", fn) == 0)
                 {
 					_nativeLangA = NULL;
 					_toolIcons = NULL;
@@ -1144,19 +1144,19 @@ int Notepad_plus::getHtmlXmlEncoding(const TCHAR *fileName) const
 
 		if (posFound == -1)
 		{
-			posFound = _invisibleEditView.execute(SCI_SEARCHINTARGET, strlen(htmlHeaderRegExpr2), (LPARAM)htmlHeaderRegExpr2);
+			posFound = _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(htmlHeaderRegExpr2), (LPARAM)htmlHeaderRegExpr2);
 			if (posFound == -1)
 				return -1;
 		}
-		posFound = _invisibleEditView.execute(SCI_SEARCHINTARGET, strlen(charsetBlock), (LPARAM)charsetBlock);
-		posFound = _invisibleEditView.execute(SCI_SEARCHINTARGET, strlen(intermediaire), (LPARAM)intermediaire);
-		posFound = _invisibleEditView.execute(SCI_SEARCHINTARGET, strlen(encodingStrRE), (LPARAM)encodingStrRE);
+		posFound = _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(charsetBlock), (LPARAM)charsetBlock);
+		posFound = _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(intermediaire), (LPARAM)intermediaire);
+		posFound = _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(encodingStrRE), (LPARAM)encodingStrRE);
 
-        startPos = int(_invisibleEditView.execute(SCI_GETTARGETSTART));
-		endPos = int(_invisibleEditView.execute(SCI_GETTARGETEND));
+        startPos = int(_invisibleEditView->execute(SCI_GETTARGETSTART));
+		endPos = int(_invisibleEditView->execute(SCI_GETTARGETEND));
 
         char encodingStr[128];
-        _invisibleEditView.getText(encodingStr, startPos, endPos);
+        _invisibleEditView->getText(encodingStr, startPos, endPos);
 
 		EncodingMapper *em = EncodingMapper::getInstance();
 		int enc = em->getEncodingFromString(encodingStr);

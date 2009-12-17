@@ -408,10 +408,10 @@ BOOL CALLBACK BarsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*
 				std::pair<std::wstring, std::wstring> localizationInfo = localizationSwitcher.getElementFromIndex(i);
 				::SendDlgItemMessage(_hSelf, IDC_COMBO_LOCALIZATION, CB_ADDSTRING, 0, (LPARAM)localizationInfo.first.c_str());
 			}
-            string fn = localizationSwitcher.getFileName();
-            wstring fnW(fn.begin(), fn.end());
+            std::string fn = localizationSwitcher.getFileName();
+            std::wstring fnW(fn.begin(), fn.end());
             fnW.assign(fn.begin(), fn.end());
-            wstring lang = localizationSwitcher.getLangFromXmlFileName(fnW.c_str());
+            std::wstring lang = localizationSwitcher.getLangFromXmlFileName(fnW.c_str());
             int index = ::SendDlgItemMessage(_hSelf, IDC_COMBO_LOCALIZATION, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)lang.c_str());
 			if (index != CB_ERR)
                 ::SendDlgItemMessage(_hSelf, IDC_COMBO_LOCALIZATION, CB_SETCURSEL, index, 0);

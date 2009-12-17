@@ -591,7 +591,7 @@ public :
             _fileName = fn;
     };
 
-    string getFileName() const {
+    std::string getFileName() const {
         return _fileName;
     };
 
