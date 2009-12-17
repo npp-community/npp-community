@@ -4105,19 +4105,19 @@ void Notepad_plus::command(int id)
 		}
 		break;
 
-		case NPPM_INTERNAL_SEARCH_GOTONEXTFOUND:
+		case IDM_SEARCH_GOTONEXTFOUND:
 		{
 			assert(_findReplaceDlg);
 			_findReplaceDlg->gotoNextFoundResult();
 			break;
 		}
-		case NPPM_INTERNAL_SEARCH_GOTOPREVFOUND:
+		case IDM_SEARCH_GOTOPREVFOUND:
 		{
 			assert(_findReplaceDlg);
 			_findReplaceDlg->gotoNextFoundResult(-1);
 			break;
 		}
-		case NPPM_INTERNAL_FOCUS_ON_FOUND_RESULTS:
+		case IDM_FOCUS_ON_FOUND_RESULTS:
 		{
 			assert(_findReplaceDlg);
 			if (GetFocus() == _findReplaceDlg->getHFindResults())
@@ -4127,6 +4127,7 @@ void Notepad_plus::command(int id)
 				_findReplaceDlg->focusOnFinder();
 			break;
 		}
+
 		case IDM_SEARCH_VOLATILE_FINDNEXT :
 		case IDM_SEARCH_VOLATILE_FINDPREV :
 		{
@@ -4887,15 +4888,15 @@ void Notepad_plus::command(int id)
 			break;
 		}
 
-        case IDM_FORMAT_WIN1250 :
-        case IDM_FORMAT_WIN1251 :
-        case IDM_FORMAT_WIN1252 :
-        case IDM_FORMAT_WIN1253 :
-        case IDM_FORMAT_WIN1254 :
-        case IDM_FORMAT_WIN1255 :
-        case IDM_FORMAT_WIN1256 :
-        case IDM_FORMAT_WIN1257 :
-        case IDM_FORMAT_WIN1258 :
+        case IDM_FORMAT_WIN_1250 :
+        case IDM_FORMAT_WIN_1251 :
+        case IDM_FORMAT_WIN_1252 :
+        case IDM_FORMAT_WIN_1253 :
+        case IDM_FORMAT_WIN_1254 :
+        case IDM_FORMAT_WIN_1255 :
+        case IDM_FORMAT_WIN_1256 :
+        case IDM_FORMAT_WIN_1257 :
+        case IDM_FORMAT_WIN_1258 :
         case IDM_FORMAT_ISO_8859_1  :
         case IDM_FORMAT_ISO_8859_2  :
         case IDM_FORMAT_ISO_8859_3  :
@@ -4911,19 +4912,32 @@ void Notepad_plus::command(int id)
         case IDM_FORMAT_ISO_8859_14 :
         case IDM_FORMAT_ISO_8859_15 :
         case IDM_FORMAT_ISO_8859_16 :
+        case IDM_FORMAT_DOS_437 :
+        case IDM_FORMAT_DOS_720 :
+        case IDM_FORMAT_DOS_737 :
+        case IDM_FORMAT_DOS_775 :
+        case IDM_FORMAT_DOS_850 :
+        case IDM_FORMAT_DOS_852 :
+        case IDM_FORMAT_DOS_855 :
+        case IDM_FORMAT_DOS_857 :
+        case IDM_FORMAT_DOS_858 :
+        case IDM_FORMAT_DOS_860 :
+        case IDM_FORMAT_DOS_861 :
+        case IDM_FORMAT_DOS_862 :
+        case IDM_FORMAT_DOS_863 :
+        case IDM_FORMAT_DOS_865 :
+        case IDM_FORMAT_DOS_866 :
+        case IDM_FORMAT_DOS_869 :
         case IDM_FORMAT_BIG5 :
         case IDM_FORMAT_GB2312 :
         case IDM_FORMAT_SHIFT_JIS :
         case IDM_FORMAT_KOREAN_WIN :
         case IDM_FORMAT_EUC_KR :
         case IDM_FORMAT_TIS_620 :
-        case IDM_FORMAT_CP855 :
         case IDM_FORMAT_MAC_CYRILLIC :
-        case IDM_FORMAT_KIO8U_CYRILLIC :
-        case IDM_FORMAT_KIO8R_CYRILLIC :
-        case IDM_FORMAT_DOS437 :
-        case IDM_FORMAT_US_ASCII :
-		{
+        case IDM_FORMAT_KOI8U_CYRILLIC :
+        case IDM_FORMAT_KOI8R_CYRILLIC :
+        {
 			int index = id - IDM_FORMAT_ENCODE;
 
 			EncodingMapper *em = EncodingMapper::getInstance();
@@ -8573,10 +8587,10 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
             //--Status Bar Section--//
 			bool willBeShown = nppGUI._statusBarShow;
             _statusBar->init(_hInst, hwnd, 6);
-			_statusBar->setPartWidth(STATUSBAR_DOC_SIZE, 200);
-			_statusBar->setPartWidth(STATUSBAR_CUR_POS, 250);
+			_statusBar->setPartWidth(STATUSBAR_DOC_SIZE, 250);
+			_statusBar->setPartWidth(STATUSBAR_CUR_POS, 300);
 			_statusBar->setPartWidth(STATUSBAR_EOF_FORMAT, 80);
-			_statusBar->setPartWidth(STATUSBAR_UNICODE_TYPE, 150);
+			_statusBar->setPartWidth(STATUSBAR_UNICODE_TYPE, 80);
 			_statusBar->setPartWidth(STATUSBAR_TYPING_MODE, 30);
             _statusBar->display(willBeShown);
 
