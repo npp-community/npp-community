@@ -120,6 +120,7 @@ Notepad_plus::Notepad_plus():
 	_lastRecentFileList(new LastRecentFileList()),
 	_windowsMenu(NULL), _mainMenuHandle(NULL),
 	_sysMenuEntering(false),
+	_isPrelaunch(false),
 	_recordingMacro(false), _runMacroDlg(NULL),
 	_linkTriggered(true), _isDocModifing(false), _isHotspotDblClicked(false),
 	_isUDDocked(false),
@@ -1090,12 +1091,12 @@ int Notepad_plus::getHtmlXmlEncoding(const TCHAR *fileName) const
 		if (posFound != -1)
 		{
             const char *encodingBlockRegExpr = "encoding[ \\t]*=[ \\t]*\"[^\".]+\"";
-            posFound = _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(encodingBlockRegExpr), (LPARAM)encodingBlockRegExpr);
+            _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(encodingBlockRegExpr), (LPARAM)encodingBlockRegExpr);
 
             const char *encodingRegExpr = "\".+\"";
-            posFound = _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(encodingRegExpr), (LPARAM)encodingRegExpr);
+            _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(encodingRegExpr), (LPARAM)encodingRegExpr);
 
-			posFound = _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(encodingAliasRegExpr), (LPARAM)encodingAliasRegExpr);
+			_invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(encodingAliasRegExpr), (LPARAM)encodingAliasRegExpr);
 
             startPos = int(_invisibleEditView->execute(SCI_GETTARGETSTART));
 			endPos = int(_invisibleEditView->execute(SCI_GETTARGETEND));
@@ -1126,12 +1127,12 @@ int Notepad_plus::getHtmlXmlEncoding(const TCHAR *fileName) const
 		if (posFound != -1)
 		{
             const char *charsetBlockRegExpr = "charset[ \\t]*=[ \\t]*.+[\"]";
-            posFound = _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(charsetBlockRegExpr), (LPARAM)charsetBlockRegExpr);
+            _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(charsetBlockRegExpr), (LPARAM)charsetBlockRegExpr);
 
             const char *charsetRegExpr = "=[ \\t]*[^\"]+";
-            posFound = _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(charsetRegExpr), (LPARAM)charsetRegExpr);
+            _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(charsetRegExpr), (LPARAM)charsetRegExpr);
 
-            posFound = _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(encodingAliasRegExpr), (LPARAM)encodingAliasRegExpr);
+            _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(encodingAliasRegExpr), (LPARAM)encodingAliasRegExpr);
 
             startPos = int(_invisibleEditView->execute(SCI_GETTARGETSTART));
 			endPos = int(_invisibleEditView->execute(SCI_GETTARGETEND));
@@ -5879,6 +5880,9 @@ size_t Notepad_plus::getSelectedCharNumber(UniMode u)
 	if (u == uniUTF8 || u == uniCookie)
 	{
 		int numSel = _pEditView->execute(SCI_GETSELECTIONS);
+		// Strange things are happening to the loop index variable, but I'm not touching this parsing code with a 10 foot pole.
+		// for loop index variable ’Symbol’ whose type category is ’String’modified in body of the for loop
+		//lint -e850
 		for (int i=0; i < numSel; i++)
 		{
 			size_t line1 = _pEditView->execute(SCI_LINEFROMPOSITION, _pEditView->execute(SCI_GETSELECTIONNSTART, i));
@@ -5889,9 +5893,6 @@ size_t Notepad_plus::getSelectedCharNumber(UniMode u)
 				if (stpos != INVALID_POSITION)
 				{
 					size_t endpos = _pEditView->execute(SCI_GETLINESELENDPOSITION, j);
-					// Strange things are happening to the loop index variable, but I'm not touching this parsing code with a 10 foot pole.
-					// for loop index variable ’Symbol’ whose type category is ’String’modified in body of the for loop
-					//lint -e850
 					for (size_t pos = stpos; pos < endpos; pos++)
 					{
 						unsigned char c = 0xf0 & (unsigned char)_pEditView->execute(SCI_GETCHARAT, pos);
@@ -5899,10 +5900,10 @@ size_t Notepad_plus::getSelectedCharNumber(UniMode u)
 							pos += utflen[(c & 0x30) >>  4];
 						result++;
 					}
-					//lint +e850
 				}
 			}
 		}
+		//lint +e850
 	}
 	else
 	{
@@ -5935,20 +5936,20 @@ size_t Notepad_plus::getCurrentDocCharCount(size_t numLines, UniMode u)
 	else
 	{
 		size_t result = 0;
+		// Strange things are happening to the loop index variable, but I'm not touching this parsing code with a 10 foot pole.
+		// for loop index variable ’Symbol’ whose type category is ’String’modified in body of the for loop
+		//lint -e850
 		for (size_t line=0; line<numLines; line++)
 		{
 			size_t endpos = _pEditView->execute(SCI_GETLINEENDPOSITION, line);
-			// Strange things are happening to the loop index variable, but I'm not touching this parsing code with a 10 foot pole.
-			// for loop index variable ’Symbol’ whose type category is ’String’modified in body of the for loop
-			//lint -e850
 			for (size_t pos = _pEditView->execute(SCI_POSITIONFROMLINE, line); pos < endpos; pos++)
 			{
 				unsigned char c = 0xf0 & (unsigned char)_pEditView->execute(SCI_GETCHARAT, pos);
 				if (c >= 0xc0) pos += utflen[(c & 0x30) >>  4];
 				result++;
 			}
-			//lint +e850
 		}
+		//lint +e850
 		return result;
 	}
 }
