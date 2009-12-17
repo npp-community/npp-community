@@ -388,33 +388,6 @@ ScintillaKeyDefinition scintKeyDefs[] = {	//array of accelerator keys for all po
 	//
 };
 
-static bool isInList(const TCHAR *token, const TCHAR *list) {
-	if ((!token) || (!list))
-		return false;
-	TCHAR word[64];
-	int i = 0;
-	int j = 0;
-	for (; i <= int(lstrlen(list)) ; i++)
-	{
-		if ((list[i] == ' ')||(list[i] == '\0'))
-		{
-			if (j != 0)
-			{
-				word[j] = '\0';
-				j = 0;
-
-				if (!generic_stricmp(token, word))
-					return true;
-			}
-		}
-		else
-		{
-			word[j] = list[i];
-			j++;
-		}
-	}
-	return false;
-};
 
 static int getKwClassFromName(const TCHAR *str) {
 	if (!lstrcmp(TEXT("instre1"), str)) return LANG_INDEX_INSTR;
@@ -1503,25 +1476,30 @@ bool NppParameters::getSessionFromXmlTree(TiXmlDocument *pSessionDoc, Session *p
 }
 void NppParameters::feedFileListParameters(TiXmlNode *node)
 {
-	_nbMaxFile = 10;
-
 	TiXmlNode *historyRoot = node->FirstChildElement(TEXT("History"));
 	if (!historyRoot) return;
 
-	(historyRoot->ToElement())->Attribute(TEXT("nbMaxFile"), &_nbMaxFile);
-	if ((_nbMaxFile < 0) || (_nbMaxFile > NB_MAX_LRF_FILE))
+	int nbMaxFile;
+	(historyRoot->ToElement())->Attribute(TEXT("nbMaxFile"), &nbMaxFile);
+
+	if ((nbMaxFile < 0) || (nbMaxFile > NB_MAX_LRF_FILE))
 		return;
 
+	if (nbMaxFileStr)
+		_nbMaxFile = nbMaxFile;
+
 	for (TiXmlNode *childNode = historyRoot->FirstChildElement(TEXT("File"));
-		childNode && (getNbLRFile() < NB_MAX_LRF_FILE);
+		childNode && (_nbFile < NB_MAX_LRF_FILE);
 		childNode = childNode->NextSibling(TEXT("File")) )
 	{
 		const TCHAR *filePath = (childNode->ToElement())->Attribute(TEXT("filename"));
 		if (filePath)
 		{
-			_LRFileList.push_back(filePath);
+			_LRFileList[_nbFile] = new generic_string(filePath);
+			_nbFile++;
 		}
 	}
+
 }
 
 void NppParameters::feedFindHistoryParameters(TiXmlNode *node)

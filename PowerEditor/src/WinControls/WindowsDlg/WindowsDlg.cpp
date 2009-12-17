@@ -22,9 +22,7 @@
 #include "WindowsDlg.h"
 #include "WindowsDlgRc.h"
 #include "DocTabView.h"
-#include "WinMgr.h"
-#include "Buffer.h"
-#include "Parameters.h"
+#include "EncodingMapper.h"
 
 #ifndef _countof
 #define _countof(x) (sizeof(x)/sizeof((x)[0]))
@@ -430,7 +428,8 @@ bool WindowsDlg::changeDlgLang()
 	if (declaration)
 	{
 		const char * encodingStr = declaration->Encoding();
-		nativeLangEncoding = getCpFromStringValue(encodingStr);
+		EncodingMapper *em = EncodingMapper::getInstance();
+		nativeLangEncoding = em->getEncodingFromString(encodingStr);
 	}
 #endif
 
