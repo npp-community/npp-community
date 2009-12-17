@@ -5165,7 +5165,7 @@ void Notepad_plus::command(int id)
 			break;
 		}
 
-		case IDM_SETTING_PREFERECE :
+		case IDM_SETTING_PREFERENCE :
 		{
 			assert(_preferenceDlg);
 			bool isFirstTime = !_preferenceDlg->isCreated();

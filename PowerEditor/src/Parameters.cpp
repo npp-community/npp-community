@@ -251,7 +251,7 @@ WinMenuKeyDefinition winKeyDefs[] = {
     {VK_NULL,   IDM_FORMAT_ISO_8859_1,              false, false, false, NULL},
     {VK_NULL,   IDM_FORMAT_WIN_1258,                false, false, false, NULL},
 
-	{VK_NULL, 	IDM_SETTING_PREFERECE,				false, false, false, NULL},
+	{VK_NULL, 	IDM_SETTING_PREFERENCE,				false, false, false, NULL},
 	{VK_NULL, 	IDM_LANGSTYLE_CONFIG_DLG,			false, false, false, NULL},
 	{VK_NULL, 	IDM_SETTING_SHORTCUT_MAPPER,		false, false, false, NULL},
 
