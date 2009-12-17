@@ -3025,10 +3025,51 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 		    if (notification->nmhdr.hwndFrom != _pEditView->getHSelf())
 			    break;
     
-            NppGUI & nppGui = (NppGUI &)nppParam->getNppGUI();
+            braceMatch();
     
-            static int originalColour = _pEditView->execute(SCI_STYLEGETFORE, STYLE_BRACELIGHT);
-            _pEditView->execute(SCI_STYLESETFORE, STYLE_BRACELIGHT, originalColour);
+		    NppGUI & nppGui = (NppGUI &)nppParam->getNppGUI();
+    
+		    if (nppGui._enableTagsMatchHilite)
+		    {
+			    XmlMatchedTagsHighlighter xmlTagMatchHiliter(_pEditView);
+			    xmlTagMatchHiliter.tagMatch(nppGui._enableTagAttrsHilite);
+		    }
+    
+		    if (nppGui._enableSmartHilite)
+		    {
+			    if (nppGui._disableSmartHiliteTmp)
+				    nppGui._disableSmartHiliteTmp = false;
+			    else
+				    _smartHighlighter->highlightView(notifyView);
+		    }
+    
+		    updateStatusBar();
+		    AutoCompletion * autoC = isFromPrimary?_autoCompleteMain:_autoCompleteSub;
+		    autoC->update(0);
+            break;
+		}
+
+/*
+        case SCN_UPDATEUI:
+	    {
+    
+		    NppParameters *nppParam = NppParameters::getInstance();
+    
+		    // if it's searching/replacing, then do nothing
+		    if (nppParam->_isFindReplacing)
+			    break;
+    
+		    if (notification->nmhdr.hwndFrom != _pEditView->getHSelf())
+			    break;
+    
+            static NppGUI & nppGui = (NppGUI &)nppParam->getNppGUI();
+            static StyleArray & stylers = nppParam->getMiscStylerArray();
+		    static int iBraceStyle = stylers.getStylerIndexByID(STYLE_BRACELIGHT);
+	        if (iBraceStyle != -1)
+	        {
+			    Style *pBraceStyle = &(stylers.getStyler(iBraceStyle));
+			    _pEditView->execute(SCI_STYLESETFORE, STYLE_BRACELIGHT, pBraceStyle->_fgColor);
+		    }
     
             if (braceMatch())
             {
@@ -3040,7 +3081,8 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 		        if (nppGui._enableTagsMatchHilite)
 		        {
 			        XmlMatchedTagsHighlighter xmlTagMatchHiliter(_pEditView);
-			        std::pair<int, int> tagPos = xmlTagMatchHiliter.tagMatch(nppGui._enableTagAttrsHilite);
+			        pair<int, int> tagPos = xmlTagMatchHiliter.tagMatch(nppGui._enableTagAttrsHilite);
+    
     
 			        int braceAtCaret = tagPos.first;
 			        int braceOpposite = tagPos.second;
@@ -3049,6 +3091,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 			        {
 				        _pEditView->execute(SCI_SETHIGHLIGHTGUIDE, 0);
 			        }
+    
 			        else if (_pEditView->isShownIndentGuide())
 			        {
 				        int columnAtCaret = int(_pEditView->execute(SCI_GETCOLUMN, braceAtCaret));
@@ -3058,19 +3101,18 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 				        int lineOpposite = int(_pEditView->execute(SCI_LINEFROMPOSITION, braceOpposite));
                         if (lineAtCaret != lineOpposite)
                         {
-    
-					        StyleArray & stylers = nppParam->getMiscStylerArray();
-					        int iFind = stylers.getStylerIndexByID(SCE_UNIVERSAL_TAGMATCH);
-					        if (iFind)
+					        static int iTagMatchStyle = stylers.getStylerIndexByID(SCE_UNIVERSAL_TAGMATCH);
+					        if (iTagMatchStyle != -1)
 					        {
-						        Style *pStyle = &(stylers.getStyler(iFind));
-						        _pEditView->execute(SCI_STYLESETFORE, STYLE_BRACELIGHT, pStyle->_bgColor);
+						        Style *pTagStyle = &(stylers.getStyler(iTagMatchStyle));
+						        _pEditView->execute(SCI_STYLESETFORE, STYLE_BRACELIGHT, pTagStyle->_bgColor);
 					        }
                             // braceAtCaret - 1, braceOpposite-1 : walk around to not highlight the '<'
 				            _pEditView->execute(SCI_BRACEHIGHLIGHT, braceAtCaret-1, braceOpposite-1);
 				            _pEditView->execute(SCI_SETHIGHLIGHTGUIDE, (columnAtCaret < columnOpposite)?columnAtCaret:columnOpposite);
                         }
 			        }
+    
 		        }
             }
     
@@ -3080,13 +3122,14 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 			    if (nppGui._disableSmartHiliteTmp)
 				    nppGui._disableSmartHiliteTmp = false;
 			    else
-				    _smartHighlighter->highlightView(notifyView);
+				    _smartHighlighter.highlightView(notifyView);
 		    }
 		    updateStatusBar();
-		    AutoCompletion * autoC = isFromPrimary?_autoCompleteMain:_autoCompleteSub;
+		    AutoCompletion * autoC = isFromPrimary?&_autoCompleteMain:&_autoCompleteSub;
 		    autoC->update(0);
             break;
-		}
+	    }
+*/
 
 		case SCN_SCROLLED:
 		{
