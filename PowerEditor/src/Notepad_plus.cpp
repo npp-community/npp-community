@@ -151,6 +151,22 @@ Notepad_plus::Notepad_plus():
 				if (rtl)
 					_isRTL = (strcmp(rtl, "yes") == 0);
 
+                // get original file name (defined by Notpad++) from the attribute
+                LocalizationSwitcher & localizationSwitcher = (NppParameters::getInstance())->getLocalizationSwitcher();
+                const char *fn = element->Attribute("fileName");
+#ifdef UNICODE
+                if (fn)
+                {
+                    localizationSwitcher.setFileName(fn);
+                }
+#endif
+                if (stricmp("english.xml", fn) == 0)
+                {
+                    _nativeLangA = NULL;
+                    _toolIcons = NULL;
+                    return;
+                }
+
 				// get encoding
 				TiXmlDeclarationA *declaration =  _nativeLangA->GetDocument()->FirstChild()->ToDeclaration();
 				if (declaration)
@@ -161,7 +177,7 @@ Notepad_plus::Notepad_plus():
 				}
 			}
 		}
-	}
+    }
 	else
 		_nativeLangA = NULL;
 
