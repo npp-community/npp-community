@@ -38,10 +38,10 @@ int ScintillaEditView::_refCount = 0;
 
 UserDefineDialog s_userDefineDlg;
 
-const int ScintillaEditView::_SC_MARGE_LINENUMBER = 0;
-const int ScintillaEditView::_SC_MARGE_SYBOLE = 1;
-const int ScintillaEditView::_SC_MARGE_FOLDER = 2;
-//const int ScintillaEditView::_SC_MARGE_MODIFMARKER = 3;
+const int ScintillaEditView::_SC_MARGIN_LINENUMBER = 0;
+const int ScintillaEditView::_SC_MARGIN_SYMBOL = 1;
+const int ScintillaEditView::_SC_MARGIN_FOLDER = 2;
+//const int ScintillaEditView::_SC_MARGIN_MODIFMARKER = 3;
 
 WNDPROC ScintillaEditView::_scintillaDefaultProc = NULL;
 /*
@@ -184,14 +184,14 @@ void ScintillaEditView::init(HINSTANCE hInst, HWND hParent)
 		throw int(106901);
 	}
 
-    execute(SCI_SETMARGINMASKN, _SC_MARGE_FOLDER, SC_MASK_FOLDERS);
-    showMargin(_SC_MARGE_FOLDER, true);
+    execute(SCI_SETMARGINMASKN, _SC_MARGIN_FOLDER, SC_MASK_FOLDERS);
+    showMargin(_SC_MARGIN_FOLDER, true);
 
-    execute(SCI_SETMARGINMASKN, _SC_MARGE_SYBOLE, (1<<MARK_BOOKMARK) | (1<<MARK_HIDELINESBEGIN) | (1<<MARK_HIDELINESEND));
+    execute(SCI_SETMARGINMASKN, _SC_MARGIN_SYMBOL, (1<<MARK_BOOKMARK) | (1<<MARK_HIDELINESBEGIN) | (1<<MARK_HIDELINESEND));
 /*
-	execute(SCI_SETMARGINMASKN, _SC_MARGE_MODIFMARKER, (1<<MARK_LINEMODIFIEDUNSAVED)|(1<<MARK_LINEMODIFIEDSAVED));
-	execute(SCI_SETMARGINTYPEN, _SC_MARGE_MODIFMARKER, SC_MARGIN_BACK);
-	showMargin(_SC_MARGE_MODIFMARKER, true);
+	execute(SCI_SETMARGINMASKN, _SC_MARGIN_MODIFMARKER, (1<<MARK_LINEMODIFIEDUNSAVED)|(1<<MARK_LINEMODIFIEDSAVED));
+	execute(SCI_SETMARGINTYPEN, _SC_MARGIN_MODIFMARKER, SC_MARGIN_BACK);
+	showMargin(_SC_MARGIN_MODIFMARKER, true);
 
 	execute(SCI_MARKERDEFINE, MARK_LINEMODIFIEDSAVED, SCI_MARKERDEFINE);
 	execute(SCI_MARKERDEFINE, MARK_LINEMODIFIEDUNSAVED, SCI_MARKERDEFINE);
@@ -201,8 +201,8 @@ void ScintillaEditView::init(HINSTANCE hInst, HWND hParent)
 	execute(SCI_MARKERDEFINEPIXMAP, MARK_HIDELINESBEGIN, (LPARAM)acTop_xpm);
 	execute(SCI_MARKERDEFINEPIXMAP, MARK_HIDELINESEND, (LPARAM)acBottom_xpm);
 
-    execute(SCI_SETMARGINSENSITIVEN, _SC_MARGE_FOLDER, true);
-    execute(SCI_SETMARGINSENSITIVEN, _SC_MARGE_SYBOLE, true);
+    execute(SCI_SETMARGINSENSITIVEN, _SC_MARGIN_FOLDER, true);
+    execute(SCI_SETMARGINSENSITIVEN, _SC_MARGIN_SYMBOL, true);
 
     execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("fold"), reinterpret_cast<LPARAM>("1"));
     execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("fold.compact"), reinterpret_cast<LPARAM>("0"));
@@ -1100,7 +1100,7 @@ void ScintillaEditView::defineDocType(LangType typeDoc)
 		}
 	}
 
-	showMargin(_SC_MARGE_FOLDER, isNeededFolderMarge(typeDoc));
+	showMargin(_SC_MARGIN_FOLDER, isNeededFolderMarge(typeDoc));
 	switch (typeDoc)
 	{
 		case L_C :
@@ -2994,12 +2994,12 @@ void ScintillaEditView::beSwitched()
 
 void ScintillaEditView::showMargin( int whichMarge, bool willBeShowed )
 {
-	if (whichMarge == _SC_MARGE_LINENUMBER)
+	if (whichMarge == _SC_MARGIN_LINENUMBER)
 		showLineNumbersMargin(willBeShowed);
 	else
 	{
 		int width = 3;
-		if (whichMarge == _SC_MARGE_SYBOLE || whichMarge == _SC_MARGE_FOLDER)
+		if (whichMarge == _SC_MARGIN_SYMBOL || whichMarge == _SC_MARGIN_FOLDER)
 			width = 14;
 		execute(SCI_SETMARGINWIDTHN, whichMarge, willBeShowed?width:0);
 	}
@@ -3159,7 +3159,7 @@ void ScintillaEditView::showLineNumbersMargin( bool show )
 	}
 	else
 	{
-		execute(SCI_SETMARGINWIDTHN, _SC_MARGE_LINENUMBER, 0);
+		execute(SCI_SETMARGINWIDTHN, _SC_MARGIN_LINENUMBER, 0);
 	}
 }
 
@@ -3181,7 +3181,7 @@ void ScintillaEditView::updateLineNumberWidth()
 			i = max(i, 3);
 			{
 				int pixelWidth = int(8 + i * execute(SCI_TEXTWIDTH, STYLE_LINENUMBER, (LPARAM)"8"));
-				execute(SCI_SETMARGINWIDTHN, _SC_MARGE_LINENUMBER, pixelWidth);
+				execute(SCI_SETMARGINWIDTHN, _SC_MARGIN_LINENUMBER, pixelWidth);
 			}
 		}
 	}

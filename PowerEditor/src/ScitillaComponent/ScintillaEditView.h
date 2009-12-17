@@ -230,10 +230,10 @@ public:
 	void beSwitched();
 
 	//Marge member and method
-	static const int _SC_MARGE_LINENUMBER;
-	static const int _SC_MARGE_SYBOLE;
-	static const int _SC_MARGE_FOLDER;
-	//static const int _SC_MARGE_MODIFMARKER;
+	static const int _SC_MARGIN_LINENUMBER;
+	static const int _SC_MARGIN_SYMBOL;
+	static const int _SC_MARGIN_FOLDER;
+	//static const int _SC_MARGIN_MODIFMARKER;
 
 	void showMargin(int whichMarge, bool willBeShowed = true);
 	bool hasMarginShowed(int witchMarge);

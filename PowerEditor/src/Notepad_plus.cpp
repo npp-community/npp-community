@@ -2556,7 +2556,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 				prevWasEdit = false;
 			}
 /*
-			if (!_isFileOpening && (isFromPrimary || isFromSecondary) && _pEditView->hasMarginShowed(ScintillaEditView::_SC_MARGE_MODIFMARKER))
+			if (!_isFileOpening && (isFromPrimary || isFromSecondary) && _pEditView->hasMarginShowed(ScintillaEditView::_SC_MARGIN_MODIFMARKER))
 			{
 				bool isProcessed = false;
 
@@ -2990,11 +2990,11 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 			else if (notification->nmhdr.hwndFrom == _subEditView->getHSelf())
 				switchEditViewTo(SUB_VIEW);
 
-			if (notification->margin == ScintillaEditView::_SC_MARGE_FOLDER)
+			if (notification->margin == ScintillaEditView::_SC_MARGIN_FOLDER)
 			{
 				_pEditView->marginClick(notification->position, notification->modifiers);
 			}
-			else if ((notification->margin == ScintillaEditView::_SC_MARGE_SYBOLE) && !notification->modifiers)
+			else if ((notification->margin == ScintillaEditView::_SC_MARGIN_SYMBOL) && !notification->modifiers)
 			{
 
 				int lineClick = int(_pEditView->execute(SCI_LINEFROMPOSITION, notification->position));
@@ -3693,17 +3693,17 @@ void Notepad_plus::specialCmd(int id, int param)
         {
             int margin;
             if (id == IDM_VIEW_LINENUMBER)
-                margin = ScintillaEditView::_SC_MARGE_LINENUMBER;
+                margin = ScintillaEditView::_SC_MARGIN_LINENUMBER;
             else if (id == IDM_VIEW_SYMBOLMARGIN)
-                margin = ScintillaEditView::_SC_MARGE_SYBOLE;
+                margin = ScintillaEditView::_SC_MARGIN_SYMBOL;
 			/*
             else if (id == IDM_VIEW_DOCCHANGEMARGIN)
 			{
-				margin = ScintillaEditView::_SC_MARGE_MODIFMARKER;
+				margin = ScintillaEditView::_SC_MARGIN_MODIFMARKER;
 			}
 			*/
 			else
-				margin = ScintillaEditView::_SC_MARGE_FOLDER;
+				margin = ScintillaEditView::_SC_MARGIN_FOLDER;
 
             if (pEditView->hasMarginShowed(margin))
                 pEditView->showMargin(margin, false);
@@ -6679,9 +6679,9 @@ void Notepad_plus::dynamicCheckMenuAndTB() const
 	assert(_toolBar);
 
 	// Visibility of 3 margins
-    checkMenuItem(IDM_VIEW_LINENUMBER, _pEditView->hasMarginShowed(ScintillaEditView::_SC_MARGE_LINENUMBER));
-    checkMenuItem(IDM_VIEW_SYMBOLMARGIN, _pEditView->hasMarginShowed(ScintillaEditView::_SC_MARGE_SYBOLE));
-    checkMenuItem(IDM_VIEW_FOLDERMAGIN, _pEditView->hasMarginShowed(ScintillaEditView::_SC_MARGE_FOLDER));
+    checkMenuItem(IDM_VIEW_LINENUMBER, _pEditView->hasMarginShowed(ScintillaEditView::_SC_MARGIN_LINENUMBER));
+    checkMenuItem(IDM_VIEW_SYMBOLMARGIN, _pEditView->hasMarginShowed(ScintillaEditView::_SC_MARGIN_SYMBOL));
+    checkMenuItem(IDM_VIEW_FOLDERMAGIN, _pEditView->hasMarginShowed(ScintillaEditView::_SC_MARGIN_FOLDER));
 
 	// Folder margin style
 	checkFolderMarginStyleMenu(getFolderMaginStyleIDFrom(_pEditView->getFolderStyle()));
@@ -8132,9 +8132,9 @@ bool Notepad_plus::saveScintillaParams(bool whichOne)
 	ScintillaViewParams svp;
 	ScintillaEditView *pView = (whichOne == SCIV_PRIMARY)?_mainEditView:_subEditView;
 
-	svp._lineNumberMarginShow = pView->hasMarginShowed(ScintillaEditView::_SC_MARGE_LINENUMBER);
-	svp._bookMarkMarginShow = pView->hasMarginShowed(ScintillaEditView::_SC_MARGE_SYBOLE);
-	//svp._docChangeStateMarginShow = pView->hasMarginShowed(ScintillaEditView::_SC_MARGE_MODIFMARKER);
+	svp._lineNumberMarginShow = pView->hasMarginShowed(ScintillaEditView::_SC_MARGIN_LINENUMBER);
+	svp._bookMarkMarginShow = pView->hasMarginShowed(ScintillaEditView::_SC_MARGIN_SYMBOL);
+	//svp._docChangeStateMarginShow = pView->hasMarginShowed(ScintillaEditView::_SC_MARGIN_MODIFMARKER);
 	svp._indentGuideLineShow = pView->isShownIndentGuide();
 	svp._folderStyle = pView->getFolderStyle();
 	svp._currentLineHilitingShow = pView->isCurrentLineHiLiting();
@@ -8481,10 +8481,10 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			_invisibleEditView->wrap(false); // Make sure no slow down
 
 			// Configuration of 2 scintilla views
-            _mainEditView->showMargin(ScintillaEditView::_SC_MARGE_LINENUMBER, svp1._lineNumberMarginShow);
-			_subEditView->showMargin(ScintillaEditView::_SC_MARGE_LINENUMBER, svp2._lineNumberMarginShow);
-            _mainEditView->showMargin(ScintillaEditView::_SC_MARGE_SYBOLE, svp1._bookMarkMarginShow);
-			_subEditView->showMargin(ScintillaEditView::_SC_MARGE_SYBOLE, svp2._bookMarkMarginShow);
+            _mainEditView->showMargin(ScintillaEditView::_SC_MARGIN_LINENUMBER, svp1._lineNumberMarginShow);
+			_subEditView->showMargin(ScintillaEditView::_SC_MARGIN_LINENUMBER, svp2._lineNumberMarginShow);
+            _mainEditView->showMargin(ScintillaEditView::_SC_MARGIN_SYMBOL, svp1._bookMarkMarginShow);
+			_subEditView->showMargin(ScintillaEditView::_SC_MARGIN_SYMBOL, svp2._bookMarkMarginShow);
 
             _mainEditView->showIndentGuideLine(svp1._indentGuideLineShow);
             _subEditView->showIndentGuideLine(svp2._indentGuideLineShow);

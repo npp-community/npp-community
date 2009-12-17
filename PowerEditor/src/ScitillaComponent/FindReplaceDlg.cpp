@@ -269,7 +269,7 @@ bool Finder::notify(SCNotification *notification)
 	switch (notification->nmhdr.code)
 	{
 		case SCN_MARGINCLICK:
-			if (notification->margin == ScintillaEditView::_SC_MARGE_FOLDER)
+			if (notification->margin == ScintillaEditView::_SC_MARGIN_FOLDER)
 			{
 				_scintView.marginClick(notification->position, notification->modifiers);
 			}
@@ -1690,7 +1690,7 @@ void FindReplaceDlg::findAllIn(InWhat op)
 		_pFinder->_scintView.execute(SCI_SETUNDOCOLLECTION, false);	//dont store any undo information
 		_pFinder->_scintView.execute(SCI_SETCARETLINEVISIBLE, 1);
 		_pFinder->_scintView.execute(SCI_SETCARETWIDTH, 0);
-		_pFinder->_scintView.showMargin(ScintillaEditView::_SC_MARGE_FOLDER, true);
+		_pFinder->_scintView.showMargin(ScintillaEditView::_SC_MARGIN_FOLDER, true);
 		//_pFinder->_scintView.execute(SCI_SETEOLMODE, SC_EOL_CRLF); // yniq - needed?
 
 		// Send the address of _MarkingsStruct to the lexer
@@ -1703,7 +1703,7 @@ void FindReplaceDlg::findAllIn(InWhat op)
 		::GetWindowRect(_pFinder->getHSelf(), &findRect);
 
 		// overwrite some default settings
-		_pFinder->_scintView.showMargin(ScintillaEditView::_SC_MARGE_SYBOLE, false);
+		_pFinder->_scintView.showMargin(ScintillaEditView::_SC_MARGIN_SYMBOL, false);
 		_pFinder->_scintView.setMakerStyle(FOLDER_STYLE_SIMPLE);
 
 		_pFinder->_scintView.display();

@@ -325,9 +325,9 @@ size_t Printer::doPrint(bool justDoIt)
 	}
 
 
-	bool isShown = _pSEView->hasMarginShowed(ScintillaEditView::_SC_MARGE_LINENUMBER);
+	bool isShown = _pSEView->hasMarginShowed(ScintillaEditView::_SC_MARGIN_LINENUMBER);
 	if (!nppGUI._printSettings._printLineNumber)
-		_pSEView->showMargin(ScintillaEditView::_SC_MARGE_LINENUMBER, false);
+		_pSEView->showMargin(ScintillaEditView::_SC_MARGIN_LINENUMBER, false);
 
 	size_t pageNum = 1;
 	bool printPage;
@@ -489,7 +489,7 @@ size_t Printer::doPrint(bool justDoIt)
 	//TCHAR toto[10];
 	//::MessageBox(NULL, itoa(pageNum, toto, 10), TEXT("page total"), MB_OK);
 	if (!nppGUI._printSettings._printLineNumber)
-		_pSEView->showMargin(ScintillaEditView::_SC_MARGE_LINENUMBER, isShown);
+		_pSEView->showMargin(ScintillaEditView::_SC_MARGIN_LINENUMBER, isShown);
 
 	_pSEView->execute(SCI_FORMATRANGE, FALSE, 0);
 	::EndDoc(_pdlg.hDC);
