@@ -1148,9 +1148,9 @@ int Notepad_plus::getHtmlXmlEncoding(const TCHAR *fileName) const
 			if (posFound == -1)
 				return -1;
 		}
-		posFound = _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(charsetBlock), (LPARAM)charsetBlock);
-		posFound = _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(intermediaire), (LPARAM)intermediaire);
-		posFound = _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(encodingStrRE), (LPARAM)encodingStrRE);
+		_invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(charsetBlock), (LPARAM)charsetBlock);
+		_invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(intermediaire), (LPARAM)intermediaire);
+		_invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(encodingStrRE), (LPARAM)encodingStrRE);
 
         startPos = int(_invisibleEditView->execute(SCI_GETTARGETSTART));
 		endPos = int(_invisibleEditView->execute(SCI_GETTARGETEND));

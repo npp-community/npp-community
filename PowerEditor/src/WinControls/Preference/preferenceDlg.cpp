@@ -409,7 +409,9 @@ BOOL CALLBACK BarsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*
 				::SendDlgItemMessage(_hSelf, IDC_COMBO_LOCALIZATION, CB_ADDSTRING, 0, (LPARAM)localizationInfo.first.c_str());
 			}
             std::string fn = localizationSwitcher.getFileName();
+			//lint -e864 (Info -- Expression involving variable 'fn' possibly depends on order of evaluation)
             std::wstring fnW(fn.begin(), fn.end());
+            //line -e864
             fnW.assign(fn.begin(), fn.end());
             std::wstring lang = localizationSwitcher.getLangFromXmlFileName(fnW.c_str());
             int index = ::SendDlgItemMessage(_hSelf, IDC_COMBO_LOCALIZATION, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)lang.c_str());
