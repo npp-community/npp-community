@@ -703,6 +703,8 @@ public:
 
 	int getNbLang() const {return _langList.size();}
 
+	LangType getLangFromExt(const TCHAR *ext);
+
 	const TCHAR * getLangExtFromName(const TCHAR *langName) const {
 		for( std::vector<Lang *>::const_iterator it = _langList.begin(), end = _langList.end();
 			it != end;

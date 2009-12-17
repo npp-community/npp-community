@@ -37,34 +37,6 @@ const int blockSize = 128 * 1024 + 4;
 const int CR = 0x0D;
 const int LF = 0x0A;
 
-static bool isInList(const TCHAR *token, const TCHAR *list) {
-	if ((!token) || (!list))
-		return false;
-	TCHAR word[64];
-	int i = 0;
-	int j = 0;
-	for (; i <= int(lstrlen(list)) ; i++)
-	{
-		if ((list[i] == ' ')||(list[i] == '\0'))
-		{
-			if (j != 0)
-			{
-				word[j] = '\0';
-				j = 0;
-
-				if (!generic_stricmp(token, word))
-					return true;
-			}
-		}
-		else
-		{
-			word[j] = list[i];
-			j++;
-		}
-	}
-	return false;
-};
-
 Buffer::Buffer( FileManager * pManager, BufferID id, Document doc, DocFileStatus type, const TCHAR *fileName ) :
 _pManager(pManager), _canNotify(false), _references(0), _id(id),
 _doc(doc), _lang(L_TXT), _isDirty(false), _encoding(-1),
@@ -156,7 +128,8 @@ void Buffer::setFileName(const TCHAR *fn, LangType defaultLang)
 		}
 		else // if it's not user lang, then check if it's supported lang
 		{
-			newLang = getLangFromExt(ext);
+			_userLangExt[0] = '\0';
+			newLang = pNppParamInst->getLangFromExt(ext);
 		}
 	}
 
@@ -263,39 +236,6 @@ void Buffer::setHeaderLineState(const std::vector<HeaderLineState> & folds, Scin
 std::vector<HeaderLineState> & Buffer::getHeaderLineState(ScintillaEditView * identifier) {
 	int index = indexOfReference(identifier);
 	return _foldStates.at(index);
-}
-
-LangType Buffer::getLangFromExt(const TCHAR *ext)
-{
-	NppParameters *pNppParam = NppParameters::getInstance();
-	int i = pNppParam->getNbLang();
-	i--;
-	while (i >= 0)
-	{
-		Lang *l = pNppParam->getLangFromIndex(i--);
-
-		const TCHAR *defList = l->getDefaultExtList();
-		const TCHAR *userList = NULL;
-
-		LexerStylerArray &lsa = pNppParam->getLStylerArray();
-		const TCHAR *lName = l->getLangName();
-		LexerStyler *pLS = lsa.getLexerStylerByName(lName);
-
-		if (pLS)
-			userList = pLS->getLexerUserExt();
-
-		generic_string list(TEXT(""));
-		if (defList)
-			list += defList;
-		if (userList)
-		{
-			list += TEXT(" ");
-			list += userList;
-		}
-		if (isInList(ext, list.c_str()))
-			return l->getLangID();
-	}
-	return L_TXT;
 }
 
 Lang * Buffer::getCurrentLang() const {

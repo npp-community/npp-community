@@ -388,6 +388,34 @@ ScintillaKeyDefinition scintKeyDefs[] = {	//array of accelerator keys for all po
 	//
 };
 
+static bool isInList(const TCHAR *token, const TCHAR *list) {
+	if ((!token) || (!list))
+		return false;
+	TCHAR word[64];
+	int i = 0;
+	int j = 0;
+	for (; i <= int(lstrlen(list)) ; i++)
+	{
+		if ((list[i] == ' ')||(list[i] == '\0'))
+		{
+			if (j != 0)
+			{
+				word[j] = '\0';
+				j = 0;
+
+				if (!generic_stricmp(token, word))
+					return true;
+			}
+		}
+		else
+		{
+			word[j] = list[i];
+			j++;
+		}
+	}
+	return false;
+};
+
 static int getKwClassFromName(const TCHAR *str) {
 	if (!lstrcmp(TEXT("instre1"), str)) return LANG_INDEX_INSTR;
 	if (!lstrcmp(TEXT("instre2"), str)) return LANG_INDEX_INSTR2;
@@ -1903,6 +1931,38 @@ void NppParameters::feedUserLang(TiXmlNode *node)
 		}
 		_userLangArray.push_back(newLangContainer);
 	}
+}
+
+LangType NppParameters::getLangFromExt(const TCHAR *ext)
+{
+	int i = getNbLang();
+	i--;
+	while (i >= 0)
+	{
+		Lang *l = getLangFromIndex(i--);
+
+		const TCHAR *defList = l->getDefaultExtList();
+		const TCHAR *userList = NULL;
+
+		LexerStylerArray &lsa = getLStylerArray();
+		const TCHAR *lName = l->getLangName();
+		LexerStyler *pLS = lsa.getLexerStylerByName(lName);
+
+		if (pLS)
+			userList = pLS->getLexerUserExt();
+
+		generic_string list(TEXT(""));
+		if (defList)
+			list += defList;
+		if (userList)
+		{
+			list += TEXT(" ");
+			list += userList;
+		}
+		if (isInList(ext, list.c_str()))
+			return l->getLangID();
+	}
+	return L_TXT;
 }
 
 void NppParameters::writeUserDefinedLang()
