@@ -467,7 +467,6 @@ NppParameters::NppParameters() :
 	PathAppend(notepadStylePath, notepadStyleFile);
 
 	_asNotepadStyle = (PathFileExists(notepadStylePath.c_str()) == TRUE);
-	::AddFontResource(LINEDRAW_FONT);
 
 	//Load initial accelerator key definitions
 	initMenuKeys();
@@ -493,14 +492,6 @@ NppParameters::~NppParameters()
 	if (_hUXTheme)
 		FreeLibrary(_hUXTheme);
 
-	for (std::vector<TiXmlDocument *>::iterator it = _pXmlExternalLexerDoc.begin(), end = _pXmlExternalLexerDoc.end(); it != end; ++it )
-	{
-		delete (*it);
-	}
-	_pXmlExternalLexerDoc.clear();
-
-	::RemoveFontResource(LINEDRAW_FONT);
-
 	// JOCE: These were NOT allocated here, and should NOT be freed here either...  :-/
 	for (std::vector<TiXmlDocument *>::iterator it = _pXmlExternalLexerDoc.begin(),
 												end = _pXmlExternalLexerDoc.end();
@@ -511,7 +502,6 @@ NppParameters::~NppParameters()
 	}
 
 	_pXmlExternalLexerDoc.clear();
-
 
 	delete _session;
 }
