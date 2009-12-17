@@ -22,6 +22,9 @@
 #include "WindowsDlg.h"
 #include "WindowsDlgRc.h"
 #include "DocTabView.h"
+#include "Buffer.h"
+#include "WinMgr.h"
+#include "Parameters.h"
 #include "EncodingMapper.h"
 
 #ifndef _countof

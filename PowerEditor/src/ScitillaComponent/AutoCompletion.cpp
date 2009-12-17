@@ -264,7 +264,6 @@ bool AutoCompletion::setLanguage(LangType language) {
     {
 		//setup defaults
 		_ignoreCase = true;
-<<<<<<< HEAD
 		_funcCalltip->_start = '(';
 		_funcCalltip->_stop = ')';
 		_funcCalltip->_param = ',';

@@ -238,7 +238,7 @@ bool FunctionCallTip::loadFunction() {
 			const TCHAR* attrib = funcNode->Attribute(TEXT("func"));
 			generic_string val = attrib ? attrib : TEXT("");
 			if (val == TEXT("yes"))
-			{{
+			{
 				//what we've been looking for
 				_curFunction = funcNode;
 				break;

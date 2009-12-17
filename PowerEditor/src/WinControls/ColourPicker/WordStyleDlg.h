@@ -39,36 +39,9 @@ enum fontStyleType {BOLD_STATUS, ITALIC_STATUS, UNDERLINE_STATUS};
 #define C_FOREGROUND false
 #define C_BACKGROUND true
 
-<<<<<<< HEAD
 // Forward declarations
 class ColourStaticTextHooker;
 class ColourPicker;
-=======
-
-class ColourStaticTextHooker {
-public :
-	ColourStaticTextHooker() : _colour(RGB(0x00, 0x00, 0x00)) {};
-
-	COLORREF setColour(COLORREF colour2Set) {
-		COLORREF oldColour = _colour;
-		_colour = colour2Set;
-		return oldColour;
-	};
-	void hookOn(HWND staticHandle) {
-		::SetWindowLongPtr(staticHandle, GWLP_USERDATA, (LONG_PTR)this);
-		_oldProc = (WNDPROC)::SetWindowLongPtr(staticHandle, GWLP_WNDPROC, (LONG_PTR)staticProc);
-	};
-private :
-	COLORREF _colour;
-	WNDPROC _oldProc;
-
-	static BOOL CALLBACK staticProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam){
-		ColourStaticTextHooker *pColourStaticTextHooker = reinterpret_cast<ColourStaticTextHooker *>(::GetWindowLongPtr(hwnd, GWL_USERDATA));
-		return pColourStaticTextHooker->colourStaticProc(hwnd, message, wParam, lParam);
-	};
-	BOOL CALLBACK colourStaticProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
-};
->>>>>>> npp_official_svn
 
 class WordStyleDlg : public StaticDialog
 {

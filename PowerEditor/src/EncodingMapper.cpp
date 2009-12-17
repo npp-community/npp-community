@@ -15,7 +15,7 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#include "precompiledHeaders.h"
+#include "precompiled_headers.h"
 #include "EncodingMapper.h"
 
 // Don't change the order
@@ -75,7 +75,7 @@ bool isInListA(const char *token, const char *list) {
 				word[j] = '\0';
 				j = 0;
 
-				if (!stricmp(token, word))
+				if (!_stricmp(token, word))
 					return true;
 			}
 		}

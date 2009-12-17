@@ -320,6 +320,10 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm"
 			>
 			<File
+				RelativePath="..\src\EncodingMapper.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\lastRecentFileList.cpp"
 				>
 			</File>
@@ -765,6 +769,10 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc"
 			>
+			<File
+				RelativePath="..\src\EncodingMapper.h"
+				>
+			</File>
 			<File
 				RelativePath="..\src\fileversioninfo.h"
 				>

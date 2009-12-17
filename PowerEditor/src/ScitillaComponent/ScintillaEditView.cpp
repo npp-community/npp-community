@@ -30,6 +30,7 @@
 #include "colors.h"
 #include "npp_session.h"
 
+#include "menuCmdID.h"
 
 // initialize the static variable
 HINSTANCE ScintillaEditView::_hLib = ::LoadLibrary(TEXT("SciLexer.DLL"));
@@ -2910,9 +2911,8 @@ void ScintillaEditView::reapplyHotspotStyles()
 ScintillaEditView::ScintillaEditView() :
 	_pScintillaFunc(NULL),_pScintillaPtr(NULL),_callWindowProc(NULL),
 	_currentBufferID(BUFFER_INVALID), _currentBuffer(NULL),
-	_folderStyle(FOLDER_STYLE_BOX), _pParameter(NULL),
-	_codepage(CP_ACP), _oemCodepage(CP_ACP),
-	 _lineNumbersShown(false), _wrapRestoreNeeded(false),
+	_folderStyle(FOLDER_STYLE_BOX), _pParameter(NULL), _codepage(CP_ACP), 
+	_lineNumbersShown(false), _wrapRestoreNeeded(false),
 	_currentHotspotStyleMap(NULL), _currentHotspotOriginMap(NULL)
 {
 	++_refCount;
@@ -3076,7 +3076,7 @@ bool ScintillaEditView::isWrapSymbolVisible() const
 
 void ScintillaEditView::showWrapSymbol( bool willBeShown )
 {
-	execute(SCI_SETWRAPVISUALFLAGSLOCATION, SC_WRAPVISUALFLAGLOC_END_BY_TEXT);
+	execute(SCI_SETWRAPVISUALFLAGSLOCATION, SC_WRAPVISUALFLAGLOC_DEFAULT);
 	execute(SCI_SETWRAPVISUALFLAGS, willBeShown?SC_WRAPVISUALFLAG_END:SC_WRAPVISUALFLAG_NONE);
 }
 
@@ -3104,12 +3104,6 @@ void ScintillaEditView::setCurrentXOffset( long xOffset )
 void ScintillaEditView::scroll( int column, int line )
 {
 	execute(SCI_LINESCROLL, column, line);
-}
-
-void ScintillaEditView::showWrapSymbol(bool willBeShown)
-{
-	execute(SCI_SETWRAPVISUALFLAGSLOCATION, SC_WRAPVISUALFLAGLOC_DEFAULT);
-	execute(SCI_SETWRAPVISUALFLAGS, willBeShown?SC_WRAPVISUALFLAG_END:SC_WRAPVISUALFLAG_NONE);
 }
 
 long ScintillaEditView::getCurrentPointX() const

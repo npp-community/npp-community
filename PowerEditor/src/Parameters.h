@@ -68,9 +68,6 @@ class TiXmlElement;
 
 struct Session;
 
-const TCHAR localConfFile[] = TEXT("doLocalConf.xml");
-const TCHAR notepadStyleFile[] = TEXT("asNotepad.xml");
-
 void cutString(const generic_string& str2cut, std::vector<generic_string> & patternVect);
 /*
 struct HeaderLineState {

@@ -286,18 +286,6 @@ void Buffer::setDeferredReload() {	//triggers a reload on the next Document acce
 	doNotify(BufferChangeDirty);
 }
 
-void Buffer::setLangType( LangType lang, const TCHAR * userLangName /*= TEXT("")*/ )
-{
-	if (lang == _lang && lang != L_USER)
-		return;
-	_lang = lang;
-	if (_lang == L_USER) {
-		_userLangExt = userLangName;
-	}
-	_needLexer = true;	//change of lang means lexern eeds updating
-	doNotify(BufferChangeLanguage|BufferChangeLexing);
-}
-
 const TCHAR * Buffer::getCommentLineSymbol() const
 {
 	Lang *l = getCurrentLang();
@@ -682,7 +670,8 @@ bool FileManager::loadFileData(Document doc, const TCHAR * filename, Utf8_16_Rea
 {
 	const int blockSize = 128 * 1024;	//128 kB
 	char data[blockSize+1];
-	FILE *fp = generic_fopen(filename, TEXT("rb"));
+	FILE *fp = NULL;
+	generic_fopen(fp,filename, TEXT("rb"));
 	if (!fp)
 		return false;
 

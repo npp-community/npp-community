@@ -440,7 +440,7 @@ std::vector< std::pair<int, int> > XmlMatchedTagsHighlighter::getAttributesPos(i
 
 
 
-pair<int, int> XmlMatchedTagsHighlighter::tagMatch(bool doHiliteAttr)
+std::pair<int, int> XmlMatchedTagsHighlighter::tagMatch(bool doHiliteAttr)
 {
 	// Clean up all marks of previous action
 	_pEditView->clearIndicator(SCE_UNIVERSAL_TAGMATCH);
@@ -450,7 +450,7 @@ pair<int, int> XmlMatchedTagsHighlighter::tagMatch(bool doHiliteAttr)
 	LangType lang = (_pEditView->getCurrentBuffer())->getLangType();
 
 	if (lang != L_XML && lang != L_HTML && lang != L_PHP && lang != L_ASP)
-		return pair<int, int>(-1, -1);
+		return std::pair<int, int>(-1, -1);
 
 	// Get the original targets and search options to restore after tag matching operation
 	int originalStartPos = _pEditView->execute(SCI_GETTARGETSTART);
@@ -492,5 +492,5 @@ pair<int, int> XmlMatchedTagsHighlighter::tagMatch(bool doHiliteAttr)
 	_pEditView->execute(SCI_SETTARGETEND, originalEndPos);
 	_pEditView->execute(SCI_SETSEARCHFLAGS, originalSearchFlags);
 
-	return pair<int, int>(xmlTags.tagOpenStart, xmlTags.tagCloseStart);
+	return std::pair<int, int>(xmlTags.tagOpenStart, xmlTags.tagCloseStart);
 }

@@ -749,7 +749,7 @@ bool Notepad_plus::loadSession(Session* session)
 			continue;	//skip session files, not supporting recursive sessions
 		}
 		if (PathFileExists(pFn)) {
-			lastOpened = doOpen(pFn, false, session._mainViewFiles[i]._encoding);
+			lastOpened = doOpen(pFn, false, session->_mainViewFiles[i]._encoding);
 		} else {
 			lastOpened = BUFFER_INVALID;
 		}
@@ -767,8 +767,8 @@ bool Notepad_plus::loadSession(Session* session)
 			Buffer * buf = MainFileManager->getBufferByID(lastOpened);
 			buf->setPosition(session->_mainViewFiles[i], _mainEditView);
 			buf->setLangType(typeToSet, pLn);
-			if (session._mainViewFiles[i]._encoding != -1)
-				buf->setEncoding(session._mainViewFiles[i]._encoding);
+			if (session->_mainViewFiles[i]._encoding != -1)
+				buf->setEncoding(session->_mainViewFiles[i]._encoding);
 
 			//Force in the document so we can add the markers
 			//Dont use default methods because of performance
@@ -801,7 +801,7 @@ bool Notepad_plus::loadSession(Session* session)
 			continue;	//skip session files, not supporting recursive sessions
 		}
 		if (PathFileExists(pFn)) {
-			lastOpened = doOpen(pFn, false, session._subViewFiles[k]._encoding);
+			lastOpened = doOpen(pFn, false, session->_subViewFiles[k]._encoding);
 			//check if already open in main. If so, clone
 			if (_mainDocTab->getIndexByBuffer(lastOpened) != -1) {
 				loadBufferIntoView(lastOpened, SUB_VIEW);
@@ -830,7 +830,7 @@ bool Notepad_plus::loadSession(Session* session)
 				}
 			}
 			buf->setLangType(typeToSet, pLn);
-			buf->setEncoding(session._subViewFiles[k]._encoding);
+			buf->setEncoding(session->_subViewFiles[k]._encoding);
 
 			//Force in the document so we can add the markers
 			//Dont use default methods because of performance
@@ -1058,7 +1058,8 @@ int Notepad_plus::getHtmlXmlEncoding(const TCHAR *fileName) const
 		return -1;
 
 	// Get the begining of file data
-	FILE *f = generic_fopen(fileName, TEXT("rb"));
+	FILE *f = NULL;
+	generic_fopen(f, fileName, TEXT("rb"));
 	if (!f)
 		return -1;
 	const int blockSize = 1024; // To ensure that length is long enough to capture the encoding in html
@@ -1067,8 +1068,8 @@ int Notepad_plus::getHtmlXmlEncoding(const TCHAR *fileName) const
 	fclose(f);
 
 	// Put data in _invisibleEditView
-	_invisibleEditView.execute(SCI_CLEARALL);
-    _invisibleEditView.execute(SCI_APPENDTEXT, lenFile, (LPARAM)data);
+	_invisibleEditView->execute(SCI_CLEARALL);
+    _invisibleEditView->execute(SCI_APPENDTEXT, lenFile, (LPARAM)data);
 
 	const char *encodingAliasRegExpr = "[a-zA-Z0-9_-]+";
 
@@ -1080,27 +1081,27 @@ int Notepad_plus::getHtmlXmlEncoding(const TCHAR *fileName) const
 
         int startPos = 0;
 		int endPos = lenFile-1;
-		_invisibleEditView.execute(SCI_SETSEARCHFLAGS, SCFIND_REGEXP|SCFIND_POSIX);
+		_invisibleEditView->execute(SCI_SETSEARCHFLAGS, SCFIND_REGEXP|SCFIND_POSIX);
 
-		_invisibleEditView.execute(SCI_SETTARGETSTART, startPos);
-		_invisibleEditView.execute(SCI_SETTARGETEND, endPos);
+		_invisibleEditView->execute(SCI_SETTARGETSTART, startPos);
+		_invisibleEditView->execute(SCI_SETTARGETEND, endPos);
 
-		int posFound = _invisibleEditView.execute(SCI_SEARCHINTARGET, strlen(xmlHeaderRegExpr), (LPARAM)xmlHeaderRegExpr);
+		int posFound = _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(xmlHeaderRegExpr), (LPARAM)xmlHeaderRegExpr);
 		if (posFound != -1)
 		{
             const char *encodingBlockRegExpr = "encoding[ \\t]*=[ \\t]*\"[^\".]+\"";
-            posFound = _invisibleEditView.execute(SCI_SEARCHINTARGET, strlen(encodingBlockRegExpr), (LPARAM)encodingBlockRegExpr);
+            posFound = _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(encodingBlockRegExpr), (LPARAM)encodingBlockRegExpr);
 
             const char *encodingRegExpr = "\".+\"";
-            posFound = _invisibleEditView.execute(SCI_SEARCHINTARGET, strlen(encodingRegExpr), (LPARAM)encodingRegExpr);
+            posFound = _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(encodingRegExpr), (LPARAM)encodingRegExpr);
 
-			posFound = _invisibleEditView.execute(SCI_SEARCHINTARGET, strlen(encodingAliasRegExpr), (LPARAM)encodingAliasRegExpr);
+			posFound = _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(encodingAliasRegExpr), (LPARAM)encodingAliasRegExpr);
 
-            startPos = int(_invisibleEditView.execute(SCI_GETTARGETSTART));
-			endPos = int(_invisibleEditView.execute(SCI_GETTARGETEND));
+            startPos = int(_invisibleEditView->execute(SCI_GETTARGETSTART));
+			endPos = int(_invisibleEditView->execute(SCI_GETTARGETEND));
 
             char encodingStr[128];
-            _invisibleEditView.getText(encodingStr, startPos, endPos);
+            _invisibleEditView->getText(encodingStr, startPos, endPos);
 
 			EncodingMapper *em = EncodingMapper::getInstance();
             int enc = em->getEncodingFromString(encodingStr);
@@ -1115,28 +1116,28 @@ int Notepad_plus::getHtmlXmlEncoding(const TCHAR *fileName) const
 
         int startPos = 0;
 		int endPos = lenFile-1;
-		_invisibleEditView.execute(SCI_SETSEARCHFLAGS, SCFIND_REGEXP|SCFIND_POSIX);
+		_invisibleEditView->execute(SCI_SETSEARCHFLAGS, SCFIND_REGEXP|SCFIND_POSIX);
 
-		_invisibleEditView.execute(SCI_SETTARGETSTART, startPos);
-		_invisibleEditView.execute(SCI_SETTARGETEND, endPos);
+		_invisibleEditView->execute(SCI_SETTARGETSTART, startPos);
+		_invisibleEditView->execute(SCI_SETTARGETEND, endPos);
 
-		int posFound = _invisibleEditView.execute(SCI_SEARCHINTARGET, strlen(htmlHeaderRegExpr), (LPARAM)htmlHeaderRegExpr);
+		int posFound = _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(htmlHeaderRegExpr), (LPARAM)htmlHeaderRegExpr);
 
 		if (posFound != -1)
 		{
             const char *charsetBlockRegExpr = "charset[ \\t]*=[ \\t]*.+[\"]";
-            posFound = _invisibleEditView.execute(SCI_SEARCHINTARGET, strlen(charsetBlockRegExpr), (LPARAM)charsetBlockRegExpr);
+            posFound = _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(charsetBlockRegExpr), (LPARAM)charsetBlockRegExpr);
 
             const char *charsetRegExpr = "=[ \\t]*[^\"]+";
-            posFound = _invisibleEditView.execute(SCI_SEARCHINTARGET, strlen(charsetRegExpr), (LPARAM)charsetRegExpr);
+            posFound = _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(charsetRegExpr), (LPARAM)charsetRegExpr);
 
-            posFound = _invisibleEditView.execute(SCI_SEARCHINTARGET, strlen(encodingAliasRegExpr), (LPARAM)encodingAliasRegExpr);
+            posFound = _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(encodingAliasRegExpr), (LPARAM)encodingAliasRegExpr);
 
-            startPos = int(_invisibleEditView.execute(SCI_GETTARGETSTART));
-			endPos = int(_invisibleEditView.execute(SCI_GETTARGETEND));
+            startPos = int(_invisibleEditView->execute(SCI_GETTARGETSTART));
+			endPos = int(_invisibleEditView->execute(SCI_GETTARGETEND));
 
             char encodingStr[128];
-            _invisibleEditView.getText(encodingStr, startPos, endPos);
+            _invisibleEditView->getText(encodingStr, startPos, endPos);
 
 			EncodingMapper *em = EncodingMapper::getInstance();
 			int enc = em->getEncodingFromString(encodingStr);
@@ -1145,7 +1146,7 @@ int Notepad_plus::getHtmlXmlEncoding(const TCHAR *fileName) const
 		else
 		{
 			const char *htmlHeaderRegExpr2 = "<meta[ \\t]+content[ \\t]*=[ \\t]*\"text/html;[ \\t]+charset[ \\t]*=[ \\t]*.+\"[ \\t]*http-equiv[ \\t]*=[ \\t]*\"Content-Type\"[ \\t]+/*>";
-			posFound = _invisibleEditView.execute(SCI_SEARCHINTARGET, strlen(htmlHeaderRegExpr2), (LPARAM)htmlHeaderRegExpr2);
+			posFound = _invisibleEditView->execute(SCI_SEARCHINTARGET, strlen(htmlHeaderRegExpr2), (LPARAM)htmlHeaderRegExpr2);
 			if (posFound == -1)
 				return -1;
 			//TODO
@@ -3511,7 +3512,7 @@ void Notepad_plus::setUniModeText()
 		::GetMenuString(_mainMenuHandle, cmdID, uniModeText, itemSize, MF_BYCOMMAND);
 		uniModeTextString = uniModeText;
 	}
-	_statusBar.setText(uniModeTextString.c_str(), STATUSBAR_UNICODE_TYPE);
+	_statusBar->setText(uniModeTextString.c_str(), STATUSBAR_UNICODE_TYPE);
 }
 
 int Notepad_plus::getFolderMarginStyle() const
@@ -5169,7 +5170,7 @@ void Notepad_plus::command(int id)
 			break;
 		}
 
-		case IDM_SETTING_PREFERENCE :
+		case IDM_SETTING_PREFERECE :
 		{
 			assert(_preferenceDlg);
 			bool isFirstTime = !_preferenceDlg->isCreated();
@@ -8643,7 +8644,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			int pos = IDM_FILEMENU_LASTONE - IDM_FILE + 2;
 
 			_lastRecentFileList->initMenu(hFileMenu, IDM_FILEMENU_LASTONE + 1, pos);
-			_lastRecentFileList.setLangEncoding(_nativeLangEncoding);
+			_lastRecentFileList->setLangEncoding(_nativeLangEncoding);
 			for (int i = 0 ; i < nbLRFile ; i++)
 			{
 				const generic_string& stdStr = pNppParam->getLRFile(i);
@@ -10112,7 +10113,7 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			    if (_beforeSpecialView.isPostIt)		//closing, return to windowed mode
 				    postItToggle();
 
-			    if (_configStyleDlg->isCreated() && ::IsWindowVisible(_configStyleDlg.getHSelf()))
+			    if (_configStyleDlg->isCreated() && ::IsWindowVisible(_configStyleDlg->getHSelf()))
 				    _configStyleDlg->restoreGlobalOverrideValues();
 
 			    SCNotification scnN;
@@ -11006,15 +11007,15 @@ bool Notepad_plus::getIntegralDockingData(tTbData & dockData, int & iCont, bool 
 }
 
 
-void Notepad_plus::getCurrentOpenedFiles(Session & session)
+void Notepad_plus::getCurrentOpenedFiles(Session & in_session)
 {
 	assert(_mainDocTab);
 	assert(_subDocTab);
 	_mainEditView->saveCurrentPos();	//save position so itll be correct in the session
 	_subEditView->saveCurrentPos();	//both views
-	session._activeView = currentView();
-	session._activeMainIndex = _mainDocTab->getCurrentTabIndex();
-	session._activeSubIndex = _subDocTab->getCurrentTabIndex();
+	in_session._activeView = currentView();
+	in_session._activeMainIndex = _mainDocTab->getCurrentTabIndex();
+	in_session._activeSubIndex = _subDocTab->getCurrentTabIndex();
 
 	//Use _invisibleEditView to temporarily open documents to retrieve markers
 	//Buffer * mainBuf = _mainEditView->getCurrentBuffer();
@@ -11033,12 +11034,9 @@ void Notepad_plus::getCurrentOpenedFiles(Session & session)
 			sessionFileInfo sfi(buf->getFullPathName(), langName, buf->getEncoding(), buf->getPosition(_mainEditView));
 
 			//_mainEditView.activateBuffer(buf->getID());
-			_invisibleEditView.execute(SCI_SETDOCPOINTER, 0, buf->getDocument());
-			int maxLine = _invisibleEditView.execute(SCI_GETLINECOUNT);
-
-			//_mainEditView->activateBuffer(buf->getID());
 			_invisibleEditView->execute(SCI_SETDOCPOINTER, 0, buf->getDocument());
 			int maxLine = _invisibleEditView->execute(SCI_GETLINECOUNT);
+
 			for (int j = 0 ; j < maxLine ; j++)
 			{
 				if ((_invisibleEditView->execute(SCI_MARKERGET, j)&(1 << MARK_BOOKMARK)) != 0)
@@ -11046,7 +11044,7 @@ void Notepad_plus::getCurrentOpenedFiles(Session & session)
 					sfi.marks.push_back(j);
 				}
 			}
-			session._mainViewFiles.push_back(sfi);
+			in_session._mainViewFiles.push_back(sfi);
 		}
 	}
 
@@ -11070,7 +11068,7 @@ void Notepad_plus::getCurrentOpenedFiles(Session & session)
 					sfi.marks.push_back(j);
 				}
 			}
-			session._subViewFiles.push_back(sfi);
+			in_session._subViewFiles.push_back(sfi);
 		}
 	}
 
