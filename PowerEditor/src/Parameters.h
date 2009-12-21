@@ -658,10 +658,6 @@ private :
     std::vector<std::pair<generic_string, bool>>_list;
 };
 
-#define NB_LANG 80
-#define DUP true
-#define FREE false
-
 class NppParameters
 {
 public:
