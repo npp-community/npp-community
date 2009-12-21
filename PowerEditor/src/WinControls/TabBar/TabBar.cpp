@@ -839,7 +839,7 @@ void TabBarPlus::drawItem(DRAWITEMSTRUCT *pDrawItemStruct)
 	{
 		IMAGEINFO info;
 		int yPos = 0, xPos = 0;
-		int marge = 0;
+		int margin = 0;
 
 		ImageList_GetImageInfo(hImgLst, tci.iImage, &info);
 
@@ -851,19 +851,19 @@ void TabBarPlus::drawItem(DRAWITEMSTRUCT *pDrawItemStruct)
 			yPos = (rect.top + (rect.bottom - rect.top)/2 + (isSelected?0:2)) - (imageRect.bottom - imageRect.top)/2;
 
 		if (isSelected)
-			marge = spaceUnit*2;
+			margin = spaceUnit*2;
 		else
-			marge = spaceUnit;
+			margin = spaceUnit;
 
 		if (_isVertical)
 		{
 			rect.bottom -= imageRect.bottom - imageRect.top;
-			ImageList_Draw(hImgLst, tci.iImage, hDC, xPos, rect.bottom - marge, isSelected?ILD_TRANSPARENT:ILD_SELECTED);
-			rect.bottom += marge;
+			ImageList_Draw(hImgLst, tci.iImage, hDC, xPos, rect.bottom - margin, isSelected?ILD_TRANSPARENT:ILD_SELECTED);
+			rect.bottom += margin;
 		}
 		else
 		{
-			rect.left += marge;
+			rect.left += margin;
 			ImageList_Draw(hImgLst, tci.iImage, hDC, rect.left, yPos, isSelected?ILD_TRANSPARENT:ILD_SELECTED);
 			rect.left += imageRect.right - imageRect.left;
 		}

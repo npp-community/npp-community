@@ -3186,18 +3186,18 @@ void NppParameters::feedGUIParameters(TiXmlNode *node)
 			if (element->Attribute(TEXT("footerFontSize"), &i))
 				_nppGUI._printSettings._footerFontSize = i;
 
-
+			// JOCE: I can't rename the "marge" attributes to "margin" just yet. How annoying.
 			if (element->Attribute(TEXT("margeLeft"), &i))
-				_nppGUI._printSettings._marge.left = i;
+				_nppGUI._printSettings._margin.left = i;
 
 			if (element->Attribute(TEXT("margeTop"), &i))
-				_nppGUI._printSettings._marge.top = i;
+				_nppGUI._printSettings._margin.top = i;
 
 			if (element->Attribute(TEXT("margeRight"), &i))
-				_nppGUI._printSettings._marge.right = i;
+				_nppGUI._printSettings._margin.right = i;
 
 			if (element->Attribute(TEXT("margeBottom"), &i))
-				_nppGUI._printSettings._marge.bottom = i;
+				_nppGUI._printSettings._margin.bottom = i;
 		}
 
 		else if (!lstrcmp(nm, TEXT("ScintillaPrimaryView")))
@@ -4359,10 +4359,11 @@ void NppParameters::writePrintSetting(TiXmlElement *element)
 	element->SetAttribute(TEXT("footerFontStyle"), _nppGUI._printSettings._footerFontStyle);
 	element->SetAttribute(TEXT("footerFontSize"), _nppGUI._printSettings._footerFontSize);
 
-	element->SetAttribute(TEXT("margeLeft"), _nppGUI._printSettings._marge.left);
-	element->SetAttribute(TEXT("margeRight"), _nppGUI._printSettings._marge.right);
-	element->SetAttribute(TEXT("margeTop"), _nppGUI._printSettings._marge.top);
-	element->SetAttribute(TEXT("margeBottom"), _nppGUI._printSettings._marge.bottom);
+	// JOCE: I can't rename the "marge" attributes to "margin" just yet. How annoying.
+	element->SetAttribute(TEXT("margeLeft"), _nppGUI._printSettings._margin.left);
+	element->SetAttribute(TEXT("margeRight"), _nppGUI._printSettings._margin.right);
+	element->SetAttribute(TEXT("margeTop"), _nppGUI._printSettings._margin.top);
+	element->SetAttribute(TEXT("margeBottom"), _nppGUI._printSettings._margin.bottom);
 }
 
 void NppParameters::writeExcludedLangList(TiXmlElement *element)

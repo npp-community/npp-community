@@ -197,12 +197,12 @@ struct PrintSettings {
 	int _footerFontStyle;
 	int _footerFontSize;
 
-	RECT _marge;
+	RECT _margin;
 
 	PrintSettings() : _printLineNumber(true), _printOption(SC_PRINT_NORMAL), _headerLeft(TEXT("")), _headerMiddle(TEXT("")), _headerRight(TEXT("")),\
 		_headerFontName(TEXT("")), _headerFontStyle(0), _headerFontSize(0),  _footerLeft(TEXT("")), _footerMiddle(TEXT("")), _footerRight(TEXT("")),\
 		_footerFontName(TEXT("")), _footerFontStyle(0), _footerFontSize(0) {
-			_marge.left = 0; _marge.top = 0; _marge.right = 0; _marge.bottom = 0;
+			_margin.left = 0; _margin.top = 0; _margin.right = 0; _margin.bottom = 0;
 		};
 
 	bool isHeaderPresent() const {
@@ -213,8 +213,8 @@ struct PrintSettings {
 		return ((_footerLeft != TEXT("")) || (_footerMiddle != TEXT("")) || (_footerRight != TEXT("")));
 	};
 
-	bool isUserMargePresent() const {
-		return ((_marge.left != 0) || (_marge.top != 0) || (_marge.right != 0) || (_marge.bottom != 0));
+	bool isUserMarginPresent() const {
+		return ((_margin.left != 0) || (_margin.top != 0) || (_margin.right != 0) || (_margin.bottom != 0));
 	};
 };
 

@@ -259,7 +259,7 @@ BOOL CALLBACK PreferenceDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPa
 			_barsDlg->display();
 
 			_marginsDlg->init(_hInst, _hSelf);
-			_marginsDlg->create(IDD_PREFERENCE_MARGEIN_BOX);
+			_marginsDlg->create(IDD_PREFERENCE_MARGIN_BOX);
 
 			_settingsDlg->init(_hInst, _hSelf);
 			_settingsDlg->create(IDD_PREFERENCE_SETTING_BOX);
@@ -591,8 +591,8 @@ void MarginsDlg::changePanelTo(int index)
 	}
 	::SendDlgItemMessage(_hSelf, id, BM_SETCHECK, TRUE, 0);
 
-	::SendDlgItemMessage(_hSelf, IDC_CHECK_LINENUMBERMARGE, BM_SETCHECK, svp._lineNumberMarginShow, 0);
-	::SendDlgItemMessage(_hSelf, IDC_CHECK_BOOKMARKMARGE, BM_SETCHECK, svp._bookMarkMarginShow, 0);
+	::SendDlgItemMessage(_hSelf, IDC_CHECK_LINENUMBERMARGIN, BM_SETCHECK, svp._lineNumberMarginShow, 0);
+	::SendDlgItemMessage(_hSelf, IDC_CHECK_BOOKMARKMARGIN, BM_SETCHECK, svp._bookMarkMarginShow, 0);
 	::SendDlgItemMessage(_hSelf, IDC_CHECK_CURRENTLINEHILITE, BM_SETCHECK, svp._currentLineHilitingShow, 0);
 
 	bool isEnable = !(svp._edgeMode == EDGE_NONE);
@@ -668,13 +668,13 @@ BOOL CALLBACK MarginsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPar
 			int iView = i + 1;
 			switch (wParam)
 			{
-				case IDC_CHECK_LINENUMBERMARGE:
-					svp._lineNumberMarginShow = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_CHECK_LINENUMBERMARGE, BM_GETCHECK, 0, 0));
+				case IDC_CHECK_LINENUMBERMARGIN:
+					svp._lineNumberMarginShow = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_CHECK_LINENUMBERMARGIN, BM_GETCHECK, 0, 0));
 					::SendMessage(_hParent, WM_COMMAND, IDM_VIEW_LINENUMBER, iView);
 					return TRUE;
 
-				case IDC_CHECK_BOOKMARKMARGE:
-					svp._bookMarkMarginShow = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_CHECK_BOOKMARKMARGE, BM_GETCHECK, 0, 0));
+				case IDC_CHECK_BOOKMARKMARGIN:
+					svp._bookMarkMarginShow = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_CHECK_BOOKMARKMARGIN, BM_GETCHECK, 0, 0));
 					::SendMessage(_hParent, WM_COMMAND, IDM_VIEW_SYMBOLMARGIN, iView);
 					return TRUE;
 
@@ -1686,16 +1686,16 @@ BOOL CALLBACK PrintSettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM)
 			::SendDlgItemMessage(_hSelf, ID2Check, BM_SETCHECK, BST_CHECKED, 0);
 
 			TCHAR valStrL[10];
-			wsprintf(valStrL, TEXT("%d"), nppGUI._printSettings._marge.left);
+			wsprintf(valStrL, TEXT("%d"), nppGUI._printSettings._margin.left);
 
 			TCHAR valStrR[10];
-			wsprintf(valStrR, TEXT("%d"), nppGUI._printSettings._marge.right);
+			wsprintf(valStrR, TEXT("%d"), nppGUI._printSettings._margin.right);
 
 			TCHAR valStrT[10];
-			wsprintf(valStrT, TEXT("%d"), nppGUI._printSettings._marge.top);
+			wsprintf(valStrT, TEXT("%d"), nppGUI._printSettings._margin.top);
 
 			TCHAR valStrB[10];
-			wsprintf(valStrB, TEXT("%d"), nppGUI._printSettings._marge.bottom);
+			wsprintf(valStrB, TEXT("%d"), nppGUI._printSettings._margin.bottom);
 
 			::SendDlgItemMessage(_hSelf, IDC_EDIT_ML, WM_SETTEXT, 0, (LPARAM)valStrL);
 			::SendDlgItemMessage(_hSelf, IDC_EDIT_MR, WM_SETTEXT, 0, (LPARAM)valStrR);
@@ -1773,19 +1773,19 @@ BOOL CALLBACK PrintSettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM)
 				switch (LOWORD(wParam))
 				{
 					case  IDC_EDIT_ML:
-						nppGUI._printSettings._marge.left = ::GetDlgItemInt(_hSelf, IDC_EDIT_ML, NULL, FALSE);
+						nppGUI._printSettings._margin.left = ::GetDlgItemInt(_hSelf, IDC_EDIT_ML, NULL, FALSE);
 						return TRUE;
 
 					case  IDC_EDIT_MR:
-						nppGUI._printSettings._marge.right = ::GetDlgItemInt(_hSelf, IDC_EDIT_MR, NULL, FALSE);
+						nppGUI._printSettings._margin.right = ::GetDlgItemInt(_hSelf, IDC_EDIT_MR, NULL, FALSE);
 						return TRUE;
 
 					case IDC_EDIT_MT :
-						nppGUI._printSettings._marge.top = ::GetDlgItemInt(_hSelf, IDC_EDIT_MT, NULL, FALSE);
+						nppGUI._printSettings._margin.top = ::GetDlgItemInt(_hSelf, IDC_EDIT_MT, NULL, FALSE);
 						return TRUE;
 
 					case IDC_EDIT_MB :
-						nppGUI._printSettings._marge.bottom = ::GetDlgItemInt(_hSelf, IDC_EDIT_MB, NULL, FALSE);
+						nppGUI._printSettings._margin.bottom = ::GetDlgItemInt(_hSelf, IDC_EDIT_MB, NULL, FALSE);
 						return TRUE;
 
 					default :

@@ -1100,7 +1100,7 @@ void ScintillaEditView::defineDocType(LangType typeDoc)
 		}
 	}
 
-	showMargin(_SC_MARGIN_FOLDER, isNeededFolderMarge(typeDoc));
+	showMargin(_SC_MARGIN_FOLDER, isNeededFolderMargin(typeDoc));
 	switch (typeDoc)
 	{
 		case L_C :
@@ -2992,22 +2992,22 @@ void ScintillaEditView::beSwitched()
 	s_userDefineDlg.setScintilla(this);
 }
 
-void ScintillaEditView::showMargin( int whichMarge, bool willBeShowed )
+void ScintillaEditView::showMargin( int whichMargin, bool willBeShowed )
 {
-	if (whichMarge == _SC_MARGIN_LINENUMBER)
+	if (whichMargin == _SC_MARGIN_LINENUMBER)
 		showLineNumbersMargin(willBeShowed);
 	else
 	{
 		int width = 3;
-		if (whichMarge == _SC_MARGIN_SYMBOL || whichMarge == _SC_MARGIN_FOLDER)
+		if (whichMargin == _SC_MARGIN_SYMBOL || whichMargin == _SC_MARGIN_FOLDER)
 			width = 14;
-		execute(SCI_SETMARGINWIDTHN, whichMarge, willBeShowed?width:0);
+		execute(SCI_SETMARGINWIDTHN, whichMargin, willBeShowed?width:0);
 	}
 }
 
-bool ScintillaEditView::hasMarginShowed( int witchMarge )
+bool ScintillaEditView::hasMarginShowed( int whichMargin )
 {
-	return (execute(SCI_GETMARGINWIDTHN, witchMarge, 0) != 0);
+	return (execute(SCI_GETMARGINWIDTHN, whichMargin, 0) != 0);
 }
 
 void ScintillaEditView::setMakerStyle( folderStyle style )
@@ -3485,7 +3485,7 @@ void ScintillaEditView::setSearchResultLexer()
 	setLexer(SCLEX_SEARCHRESULT, L_SEARCHRESULT, 0);
 }
 
-bool ScintillaEditView::isNeededFolderMarge( LangType typeDoc ) const
+bool ScintillaEditView::isNeededFolderMargin( LangType typeDoc ) const
 {
 	switch (typeDoc)
 	{
