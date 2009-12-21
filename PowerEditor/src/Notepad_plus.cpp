@@ -3031,37 +3031,37 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 		{
 			assert(_autoCompleteMain);
 			assert(_autoCompleteSub);
-		    NppParameters *nppParam = NppParameters::getInstance();
-    
-		    // if it's searching/replacing, then do nothing
-		    if (nppParam->_isFindReplacing)
-			    break;
-    
-		    if (notification->nmhdr.hwndFrom != _pEditView->getHSelf())
-			    break;
-    
-            braceMatch();
-    
-		    NppGUI & nppGui = nppParam->getNppGUI();
-    
-		    if (nppGui._enableTagsMatchHilite)
-		    {
-			    XmlMatchedTagsHighlighter xmlTagMatchHiliter(_pEditView);
-			    xmlTagMatchHiliter.tagMatch(nppGui._enableTagAttrsHilite);
-		    }
-    
-		    if (nppGui._enableSmartHilite)
-		    {
-			    if (nppGui._disableSmartHiliteTmp)
-				    nppGui._disableSmartHiliteTmp = false;
-			    else
-				    _smartHighlighter->highlightView(notifyView);
-		    }
-    
-		    updateStatusBar();
-		    AutoCompletion * autoC = isFromPrimary?_autoCompleteMain:_autoCompleteSub;
-		    autoC->update(0);
-            break;
+			NppParameters *nppParam = NppParameters::getInstance();
+
+			// if it's searching/replacing, then do nothing
+			if (nppParam->_isFindReplacing)
+				break;
+
+			if (notification->nmhdr.hwndFrom != _pEditView->getHSelf())
+				break;
+
+			braceMatch();
+
+			NppGUI & nppGui = nppParam->getNppGUI();
+
+			if (nppGui._enableTagsMatchHilite)
+			{
+				XmlMatchedTagsHighlighter xmlTagMatchHiliter(_pEditView);
+				xmlTagMatchHiliter.tagMatch(nppGui._enableTagAttrsHilite);
+			}
+
+			if (nppGui._enableSmartHilite)
+			{
+				if (nppGui._disableSmartHiliteTmp)
+					nppGui._disableSmartHiliteTmp = false;
+				else
+					_smartHighlighter->highlightView(notifyView);
+			}
+
+			updateStatusBar();
+			AutoCompletion * autoC = isFromPrimary?_autoCompleteMain:_autoCompleteSub;
+			autoC->update(0);
+			break;
 		}
 
 		case SCN_SCROLLED:

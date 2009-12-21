@@ -226,8 +226,8 @@ struct NppGUI
 		_userDefineDlgStatus(UDD_DOCKED), _tabSize(8), _tabReplacedBySpace(false), _fileAutoDetection(cdEnabled),
 		_fileAutoDetectionOriginalValue(_fileAutoDetection), _checkHistoryFiles(true), _isMaximized(false), _isMinimizedToTray(false),
 		_rememberLastSession(true), _enableMouseWheelZoom(true),  _doTaskList(true), _maitainIndent(true), _enableSmartHilite(true),
-		_disableSmartHiliteTmp(false),_enableTagsMatchHilite(true), _enableTagAttrsHilite(true), _enableHiliteNonHTMLZone(false), 
-		_styleMRU(true), _styleURL(0), _isLangMenuCompact(false), _backup(bak_none), _useDir(false), _autocStatus(autoc_none), 
+		_disableSmartHiliteTmp(false),_enableTagsMatchHilite(true), _enableTagAttrsHilite(true), _enableHiliteNonHTMLZone(false),
+		_styleMRU(true), _styleURL(0), _isLangMenuCompact(false), _backup(bak_none), _useDir(false), _autocStatus(autoc_none),
 		_autocFromLen(1), _funcParams(false), _doesExistUpdater(false), _caretBlinkRate(250), _caretWidth(1),
 		_enableMultiSelection(false), _shortTitlebar(false), _openSaveDir(dir_followCurrent)
 	{

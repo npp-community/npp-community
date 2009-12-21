@@ -19,7 +19,7 @@
 #include "npp_session.h"
 
 
-sessionFileInfo::sessionFileInfo( const TCHAR *fn ):
+sessionFileInfo::sessionFileInfo( const TCHAR *fn ) :
 	_encoding(-1)
 {
 	if (fn) _fileName = fn;
@@ -38,8 +38,8 @@ sessionFileInfo::sessionFileInfo(generic_string fn) :
 	_encoding(-1)
 {}
 
-sessionFileInfo::sessionFileInfo(generic_string fn, int encoding, Position pos) : 
-	Position(pos), 
+sessionFileInfo::sessionFileInfo(generic_string fn, int encoding, Position pos) :
+	Position(pos),
 	_fileName(fn),
 	_encoding(encoding)
 {}

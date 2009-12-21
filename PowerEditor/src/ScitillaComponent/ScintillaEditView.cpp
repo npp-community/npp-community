@@ -2911,7 +2911,7 @@ void ScintillaEditView::reapplyHotspotStyles()
 ScintillaEditView::ScintillaEditView() :
 	_pScintillaFunc(NULL),_pScintillaPtr(NULL),_callWindowProc(NULL),
 	_currentBufferID(BUFFER_INVALID), _currentBuffer(NULL),
-	_folderStyle(FOLDER_STYLE_BOX), _pParameter(NULL), _codepage(CP_ACP), 
+	_folderStyle(FOLDER_STYLE_BOX), _pParameter(NULL), _codepage(CP_ACP),
 	_lineNumbersShown(false), _wrapRestoreNeeded(false),
 	_currentHotspotStyleMap(NULL), _currentHotspotOriginMap(NULL)
 {
