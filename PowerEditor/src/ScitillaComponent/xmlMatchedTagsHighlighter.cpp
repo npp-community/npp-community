@@ -478,7 +478,7 @@ void XmlMatchedTagsHighlighter::tagMatch(bool doHiliteAttr)
 		_pEditView->execute(SCI_INDICATORFILLRANGE,  xmlTags.tagOpenEnd - openTagTailLen, openTagTailLen);
 
 
-        // Colouising its attributs
+        // Colourising its attributes
         if (doHiliteAttr)
 		{
 			std::vector< std::pair<int, int> > attributes = getAttributesPos(xmlTags.tagNameEnd, xmlTags.tagOpenEnd - openTagTailLen);
@@ -489,7 +489,7 @@ void XmlMatchedTagsHighlighter::tagMatch(bool doHiliteAttr)
 			}
         }
 
-        // Colouising indent guide line position
+        // Colourising indent guide line position
 		if (_pEditView->isShownIndentGuide())
 		{
 			int columnAtCaret  = int(_pEditView->execute(SCI_GETCOLUMN, xmlTags.tagOpenStart));
