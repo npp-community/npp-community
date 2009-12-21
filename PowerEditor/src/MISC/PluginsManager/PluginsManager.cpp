@@ -27,6 +27,30 @@
 const TCHAR * USERMSG = TEXT("This plugin is not compatible with current version of Notepad++.\n\n\
 Do you want to remove this plugin from plugins directory to prevent this message from the next launch time?");
 
+PluginInfo::PluginInfo() :
+	_hLib(NULL),
+	_pluginMenu(NULL),
+	_pFuncSetInfo(NULL),
+	_pFuncGetName(NULL),
+	_pBeNotified(NULL),
+	_pFuncGetFuncsArray(NULL),
+	_pMessageProc(NULL),
+	_pFuncIsUnicode(NULL),
+	_funcItems(NULL),
+	_nbFuncItem(0)
+{}
+
+PluginInfo::~PluginInfo()
+{
+	if (_pluginMenu)
+		::DestroyMenu(_pluginMenu);
+
+	if (_hLib)
+		::FreeLibrary(_hLib);
+}
+
+
+
 PluginsManager::~PluginsManager() {
 
 	for (size_t i = 0 ; i < _pluginInfos.size() ; i++)
@@ -476,4 +500,12 @@ bool PluginsManager::relayPluginMessages(UINT Message, WPARAM wParam, LPARAM lPa
 		}
 	}
 	return false;
+}
+
+void PluginsManager::pluginCrashAlert(const TCHAR *pluginName, const TCHAR *funcSignature)
+{
+	generic_string msg = pluginName;
+	msg += TEXT(" just crash in\r");
+	msg += funcSignature;
+	::MessageBox(NULL, msg.c_str(), TEXT(" just crash in\r"), MB_OK|MB_ICONSTOP);
 }

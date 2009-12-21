@@ -32,16 +32,8 @@ struct PluginCommand {
 };
 
 struct PluginInfo {
-	PluginInfo() :_hLib(NULL), _pluginMenu(NULL), _pFuncSetInfo(NULL),\
-		_pFuncGetFuncsArray(NULL), _pFuncGetName(NULL), _funcItems(NULL),\
-		_nbFuncItem(0){};
-	~PluginInfo(){
-		if (_pluginMenu)
-			::DestroyMenu(_pluginMenu);
-
-		if (_hLib)
-			::FreeLibrary(_hLib);
-	};
+	PluginInfo();
+	~PluginInfo();
 
 	HINSTANCE _hLib;
 	HMENU _pluginMenu;
@@ -97,12 +89,7 @@ private:
 	std::vector<PluginCommand> _pluginsCommands;
 	bool _isDisabled;
 
-	void pluginCrashAlert(const TCHAR *pluginName, const TCHAR *funcSignature) {
-		generic_string msg = pluginName;
-		msg += TEXT(" just crash in\r");
-		msg += funcSignature;
-		::MessageBox(NULL, msg.c_str(), TEXT(" just crash in\r"), MB_OK|MB_ICONSTOP);
-	};
+	void pluginCrashAlert(const TCHAR *pluginName, const TCHAR *funcSignature);
 };
 
 #define EXT_LEXER_DECL __stdcall
