@@ -293,6 +293,8 @@
     #define    IDM_FORMAT_KOI8R_CYRILLIC    (IDM_FORMAT_ENCODE + 48)
     #define    IDM_FORMAT_ENCODE_END        IDM_FORMAT_KOI8R_CYRILLIC
 
+    //#define    IDM_FORMAT_CONVERT           200
+
 #define    IDM_LANG    (IDM + 6000)
     #define    IDM_LANGSTYLE_CONFIG_DLG    (IDM_LANG + 1)
     #define    IDM_LANG_C                  (IDM_LANG + 2)
