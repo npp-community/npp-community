@@ -27,6 +27,30 @@
 const TCHAR * USERMSG = TEXT("This plugin is not compatible with current version of Notepad++.\n\n\
 Do you want to remove this plugin from plugins directory to prevent this message from the next launch time?");
 
+PluginInfo::PluginInfo() :
+	_hLib(NULL),
+	_pluginMenu(NULL),
+	_pFuncSetInfo(NULL),
+	_pFuncGetName(NULL),
+	_pBeNotified(NULL),
+	_pFuncGetFuncsArray(NULL),
+	_pMessageProc(NULL),
+	_pFuncIsUnicode(NULL),
+	_funcItems(NULL),
+	_nbFuncItem(0)
+{}
+
+PluginInfo::~PluginInfo()
+{
+	if (_pluginMenu)
+		::DestroyMenu(_pluginMenu);
+
+	if (_hLib)
+		::FreeLibrary(_hLib);
+}
+
+
+
 PluginsManager::~PluginsManager() {
 
 	for (size_t i = 0 ; i < _pluginInfos.size() ; i++)
@@ -246,12 +270,21 @@ bool PluginsManager::loadPlugins(const TCHAR *dir)
 		plugins1stFullPath += foundData.cFileName;
 		dllNames.push_back(plugins1stFullPath);
 
+        NppParameters * nppParams = NppParameters::getInstance();
+
 		while (::FindNextFile(hFindFile, &foundData))
 		{
-			generic_string fullPath = (dir && dir[0])?dir:nppPath;
-			fullPath += TEXT("\\plugins\\");
-			fullPath += foundData.cFileName;
-			dllNames.push_back(fullPath);
+            bool isInBlackList = nppParams->isInBlackList(foundData.cFileName);
+            if (!isInBlackList)
+            {
+			    generic_string fullPath = (dir && dir[0])?dir:nppPath;
+			    fullPath += TEXT("\\plugins\\");
+
+			    fullPath += foundData.cFileName;
+			    dllNames.push_back(fullPath);
+            }
+            PluginList & pl = nppParams->getPluginList();
+            pl.add(foundData.cFileName, isInBlackList);
 		}
 		::FindClose(hFindFile);
 
@@ -356,9 +389,123 @@ void PluginsManager::setMenu(HMENU hMenu, const TCHAR *menuName)
 		    ::InsertMenu(hMenu, 9, MF_BYPOSITION | MF_POPUP, (UINT_PTR)_hPluginsMenu, nom_menu);
         }
 
-		for (size_t i = 0 ; i < _pluginInfos.size() ; i++)
+        size_t i = 0;
+		for ( ; i < _pluginInfos.size() ; i++)
 		{
             addInMenuFromPMIndex(i);
 		}
+        //::InsertMenu(_hPluginsMenu, i++, MF_BYPOSITION, (unsigned int)-1, 0);
+        //::InsertMenu(_hPluginsMenu, i++, MF_BYPOSITION, (UINT_PTR)_hPluginsMenu, TEXT("BlackList"));
 	}
+}
+
+
+void PluginsManager::runPluginCommand(size_t i)
+{
+	if (i < _pluginsCommands.size())
+	{
+		if (_pluginsCommands[i]._pFunc != NULL)
+		{
+			try {
+				_pluginsCommands[i]._pFunc();
+			} catch (...) {
+				TCHAR funcInfo[128];
+				generic_sprintf(funcInfo, 128, TEXT("runPluginCommand(size_t i : %d)"), i);
+				pluginCrashAlert(_pluginsCommands[i]._pluginName.c_str(), funcInfo);
+			}
+		}
+	}
+}
+
+
+void PluginsManager::runPluginCommand(const TCHAR *pluginName, int commandID)
+{
+	for (size_t i = 0 ; i < _pluginsCommands.size() ; i++)
+	{
+		if (!generic_stricmp(_pluginsCommands[i]._pluginName.c_str(), pluginName))
+		{
+			if (_pluginsCommands[i]._funcID == commandID)
+			{
+				try {
+					_pluginsCommands[i]._pFunc();
+				} catch (...) {
+					TCHAR funcInfo[128];
+					generic_sprintf(funcInfo, 128, TEXT("runPluginCommand(const TCHAR *pluginName : %s, int commandID : %d)"), pluginName, commandID);
+					pluginCrashAlert(_pluginsCommands[i]._pluginName.c_str(), funcInfo);
+				}
+			}
+		}
+	}
+}
+
+void PluginsManager::notify(SCNotification *notification)
+{
+	for (size_t i = 0 ; i < _pluginInfos.size() ; i++)
+	{
+        if (_pluginInfos[i]->_hLib)
+        {
+			// To avoid the plugin change the data in SCNotification
+			// Each notification to pass to a plugin is a copy of SCNotification instance
+			SCNotification scNotif = *notification;
+			try {
+				_pluginInfos[i]->_pBeNotified(&scNotif);
+			} catch (...) {
+				TCHAR funcInfo[128];
+				generic_sprintf(funcInfo, 128, TEXT("notify(SCNotification *notification) : \r notification->nmhdr.code == %d\r notification->nmhdr.hwndFrom == %d\r notification->nmhdr.idFrom == %d"),\
+					scNotif.nmhdr.code, scNotif.nmhdr.hwndFrom, scNotif.nmhdr.idFrom);
+				pluginCrashAlert(_pluginsCommands[i]._pluginName.c_str(), funcInfo);
+			}
+		}
+	}
+}
+
+void PluginsManager::relayNppMessages(UINT Message, WPARAM wParam, LPARAM lParam)
+{
+	for (size_t i = 0 ; i < _pluginInfos.size() ; i++)
+	{
+        if (_pluginInfos[i]->_hLib)
+		{
+			try {
+				_pluginInfos[i]->_pMessageProc(Message, wParam, lParam);
+			} catch (...) {
+				TCHAR funcInfo[128];
+				generic_sprintf(funcInfo, 128, TEXT("relayNppMessages(UINT Message : %d, WPARAM wParam : %d, LPARAM lParam : %d)"), Message, wParam, lParam);
+				pluginCrashAlert(_pluginsCommands[i]._pluginName.c_str(), TEXT(""));
+			}
+		}
+	}
+}
+
+bool PluginsManager::relayPluginMessages(UINT Message, WPARAM wParam, LPARAM lParam)
+{
+	const TCHAR * moduleName = (const TCHAR *)wParam;
+	if (!moduleName || !moduleName[0] || !lParam)
+		return false;
+
+	for (size_t i = 0 ; i < _pluginInfos.size() ; i++)
+	{
+        if (_pluginInfos[i]->_moduleName == moduleName)
+		{
+            if (_pluginInfos[i]->_hLib)
+			{
+				try {
+					_pluginInfos[i]->_pMessageProc(Message, wParam, lParam);
+				} catch (...) {
+					TCHAR funcInfo[128];
+					generic_sprintf(funcInfo, 128, TEXT("relayPluginMessages(UINT Message : %d, WPARAM wParam : %d, LPARAM lParam : %d)"), Message, wParam, lParam);
+					pluginCrashAlert(_pluginsCommands[i]._pluginName.c_str(), funcInfo);
+				}
+				return true;
+            }
+		}
+	}
+	return false;
+}
+
+void PluginsManager::pluginCrashAlert(const TCHAR *pluginName, const TCHAR *funcSignature)
+{
+	generic_string msg = pluginName;
+	msg += TEXT(" just crash in\r");
+	msg += funcSignature;
+	::MessageBox(NULL, msg.c_str(), TEXT(" just crash in\r"), MB_OK|MB_ICONSTOP);
 }

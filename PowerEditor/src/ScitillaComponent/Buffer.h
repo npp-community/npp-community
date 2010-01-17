@@ -71,7 +71,6 @@ struct HeaderLineState {
 extern const TCHAR UNTITLED_STR[];
 
 //File manager class maintains all buffers
-class Buffer;
 class FileManager {
 public:
 	void init(Notepad_plus * pNotepadPlus, ScintillaEditView * pscratchTilla);
@@ -90,7 +89,7 @@ public:
 
 	void addBufferReference(BufferID id, ScintillaEditView * identifer);	//called by Scintilla etc indirectly
 
-	BufferID loadFile(const TCHAR * filename, Document doc = NULL);	//ID == BUFFER_INVALID on failure. If Doc == NULL, a new file is created, otherwise data is loaded in given document
+	BufferID loadFile(const TCHAR * filename, Document doc = NULL, int encoding = -1);	//ID == BUFFER_INVALID on failure. If Doc == NULL, a new file is created, otherwise data is loaded in given document
 	BufferID newEmptyDocument();
 	//create Buffer from existing Scintilla, used from new Scintillas. If dontIncrease = true, then the new document number isnt increased afterwards.
 	//usefull for temporary but neccesary docs
@@ -118,6 +117,8 @@ public:
 
 	int docLength(Buffer * buffer) const;
 
+	int getEOLFormatForm(const char *data) const;
+
 private:
 	FileManager() : _nextNewNumber(1), _nextBufferID(0), _pNotepadPlus(NULL), _nrBufs(0), _pscratchTilla(NULL){};
 	~FileManager();
@@ -133,7 +134,7 @@ private:
 	BufferID _nextBufferID;
 	size_t _nrBufs;
 
-	bool loadFileData(Document doc, const TCHAR * filename, Utf8_16_Read * UnicodeConvertor, LangType language);
+	bool loadFileData(Document doc, const TCHAR * filename, Utf8_16_Read * UnicodeConvertor, LangType language, int encoding = -1, formatType *pFormat = NULL);
 };
 
 #define MainFileManager FileManager::getInstance()
@@ -150,8 +151,6 @@ public :
 	//The entire lifetime if the buffer, the Document has reference count of _atleast_ one
 	//Destructor makes sure its purged
 	Buffer(FileManager * pManager, BufferID id, Document doc, DocFileStatus type, const TCHAR *fileName);	//type must be either DOC_REGULAR or DOC_UNNAMED
-
-	LangType getLangFromExt(const TCHAR *ext);
 
 	// this method 1. copies the file name
 	//             2. determinates the language from the ext of file name
@@ -232,6 +231,15 @@ public :
 		_unicodeMode = mode;
 		doNotify(BufferChangeUnicode | BufferChangeDirty);
 	};
+
+	int getEncoding() const {
+		return _encoding;
+	};
+
+	void setEncoding(int encoding) {
+		_encoding = encoding;
+	};
+
 	DocFileStatus getStatus() const {
 		return _currentStatus;
 	};
@@ -250,8 +258,6 @@ public :
 
 	void setHeaderLineState(const std::vector<HeaderLineState> & folds, ScintillaEditView * identifier);
 	std::vector<HeaderLineState> & getHeaderLineState(ScintillaEditView * identifier);
-
-	void determinateFormat(const char *data);
 
 	bool isUserDefineLangExt() const {
 		return (_userLangExt[0] != '\0');
@@ -315,6 +321,7 @@ private :
 	bool _isDirty;
 	formatType _format;
 	UniMode _unicodeMode;
+	int _encoding;
 	bool _isUserReadOnly;
 	bool _needLexer;	//initially true
 	//these properties have to be duplicated because of multiple references

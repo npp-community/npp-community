@@ -227,9 +227,9 @@ void TaskListDlg::drawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	SIZE charPixel;
 	::GetTextExtentPoint(hDC, TEXT(" "), 1, &charPixel);
 	int spaceUnit = charPixel.cx;
-	int marge = spaceUnit;
+	int margin = spaceUnit;
 
-	rect.left += marge;
+	rect.left += margin;
 	ImageList_Draw(hImgLst, iImage, hDC, rect.left, rect.top, imgStyle);
 	rect.left += imageRect.right - imageRect.left + spaceUnit * 2;
 

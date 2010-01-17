@@ -18,8 +18,9 @@
 #ifndef M30_IDE_COMMUN_H
 #define M30_IDE_COMMUN_H
 
-#define CP_ANSI_LATIN_1 1252
-#define CP_BIG5 950
+#define NPP_CP_WIN_1252           1252
+#define NPP_CP_DOS_437            437
+#define NPP_CP_BIG5               950
 
 #ifdef UNICODE
 	#define NppMainEntry wWinMain
@@ -76,7 +77,7 @@ void printStr(const TCHAR *str2print);
 
 void writeLog(const TCHAR *logFileName, const char *log2write);
 int filter(unsigned int code);
-int getCpFromStringValue(const char * encodingStr);
+//int getCpFromStringValue(const char * encodingStr);
 generic_string purgeMenuItemString(const TCHAR * menuItemStr, bool keepAmpersand = false);
 std::vector<generic_string> tokenizeString(const generic_string & tokenString, const char delim);
 
@@ -85,7 +86,7 @@ void ScreenRectToClientRect(HWND hWnd, RECT* rect);
 
 std::wstring string2wstring(const std::string & rString, UINT codepage);
 std::string wstring2string(const std::wstring & rwString, UINT codepage);
-
+bool isInList(const TCHAR *token, const TCHAR *list);
 TCHAR *BuildMenuFileName(TCHAR *buffer, int len, int pos, const TCHAR *filename);
 
 int strVal(const TCHAR *str, int base);
@@ -108,10 +109,15 @@ public:
 	static WcharMbcsConvertor * getInstance() {return _pSelf;};
 	static void destroyInstance() {delete _pSelf;};
 
-	const wchar_t * char2wchar(const char* mbStr, UINT codepage);
-	const wchar_t * char2wchar(const char * mbcs2Convert, UINT codepage, int *mstart, int *mend);
-	const char * wchar2char(const wchar_t* wcStr, UINT codepage);
-	const char * wchar2char(const wchar_t * wcStr, UINT codepage, long *mstart, long *mend);
+	const wchar_t * char2wchar(const char *mbStr, UINT codepage);
+	const wchar_t * char2wchar(const char *mbcs2Convert, UINT codepage, int *mstart, int *mend);
+	const char * wchar2char(const wchar_t *wcStr, UINT codepage);
+	const char * wchar2char(const wchar_t *wcStr, UINT codepage, long *mstart, long *mend);
+
+	const char * encode(UINT fromCodepage, UINT toCodepage, const char *txt2Encode) {
+        const wchar_t * strW = char2wchar(txt2Encode, fromCodepage);
+        return wchar2char(strW, toCodepage);
+    };
 
 protected:
 	WcharMbcsConvertor();

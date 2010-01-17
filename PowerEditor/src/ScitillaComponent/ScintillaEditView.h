@@ -229,14 +229,14 @@ public:
 	void setCaretColorWidth(int color, int width = 1) const;
 	void beSwitched();
 
-	//Marge member and method
-	static const int _SC_MARGE_LINENUMBER;
-	static const int _SC_MARGE_SYBOLE;
-	static const int _SC_MARGE_FOLDER;
-	//static const int _SC_MARGE_MODIFMARKER;
+	//Margin members and methods
+	static const int _SC_MARGIN_LINENUMBER;
+	static const int _SC_MARGIN_SYMBOL;
+	static const int _SC_MARGIN_FOLDER;
+	//static const int _SC_MARGIN_MODIFMARKER;
 
-	void showMargin(int whichMarge, bool willBeShowed = true);
-	bool hasMarginShowed(int witchMarge);
+	void showMargin(int whichMargin, bool willBeShowed = true);
+	bool hasMarginShowed(int whichMargin);
 	void marginClick(int position, int modifiers);
 	void setMakerStyle(folderStyle style);
 
@@ -362,7 +362,6 @@ protected:
 	folderStyle _folderStyle;
 	NppParameters *_pParameter;
 	int _codepage;
-	int _oemCodepage;
 	bool _lineNumbersShown;
 	bool _wrapRestoreNeeded;
 
@@ -438,8 +437,13 @@ protected:
 	void setInnoLexer();
 	void setCmakeLexer();
 	void setYamlLexer();
+    void setCobolLexer();
+    void setGui4CliLexer();
+    void setDLexer();
+    void setPowerShellLexer();
+    void setRLexer();
 	void setSearchResultLexer();
-	bool isNeededFolderMarge(LangType typeDoc) const;
+	bool isNeededFolderMargin(LangType typeDoc) const;
 //END: Lexers and Styling
 
 	void defineMarker(int marker, int markerType, COLORREF fore, COLORREF back);

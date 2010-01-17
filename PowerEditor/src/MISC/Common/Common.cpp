@@ -178,49 +178,34 @@ int filter(unsigned int code)
    return EXCEPTION_CONTINUE_SEARCH;
 }
 
-int getCpFromStringValue(const char * encodingStr)
-{
-	if (!encodingStr)
-		return CP_ACP;
+bool isInList(const TCHAR *token, const TCHAR *list) {
+	if ((!token) || (!list))
+		return false;
+	TCHAR word[64];
+	int i = 0;
+	int j = 0;
+	for (; i <= int(lstrlen(list)) ; i++)
+	{
+		if ((list[i] == ' ')||(list[i] == '\0'))
+		{
+			if (j != 0)
+			{
+				word[j] = '\0';
+				j = 0;
 
-	if (_stricmp("windows-1250", encodingStr) == 0)
-		return 1250;
-	if (_stricmp("windows-1251", encodingStr) == 0)
-		return 1251;
-	if (_stricmp("windows-1252", encodingStr) == 0)
-		return 1252;
-	if (_stricmp("windows-1253", encodingStr) == 0)
-		return 1253;
-	if (_stricmp("windows-1254", encodingStr) == 0)
-		return 1254;
-	if (_stricmp("windows-1255", encodingStr) == 0)
-		return 1255;
-	if (_stricmp("windows-1256", encodingStr) == 0)
-		return 1256;
-	if (_stricmp("windows-1257", encodingStr) == 0)
-		return 1257;
-	if (_stricmp("windows-1258", encodingStr) == 0)
-		return 1258;
-
-	if (_stricmp("big5", encodingStr) == 0)
-		return 950;
-	if (_stricmp("gb2312", encodingStr) == 0)
-		return 936;
-	if (_stricmp("shift_jis", encodingStr) == 0)
-		return 932;
-	if (_stricmp("euc-kr", encodingStr) == 0)
-		return 51949;
-	if (_stricmp("tis-620", encodingStr) == 0)
-		return 874;
-
-	if (_stricmp("iso-8859-8", encodingStr) == 0)
-		return 28598;
-
-	if (_stricmp("utf-8", encodingStr) == 0)
-		return 65001;
-
-	return CP_ACP;
+				if (!generic_stricmp(token, word))
+					return true;
+			}
+		}
+		else
+		{
+			word[j] = list[i];
+			j++;
+		}
+	}
+	return false;
 }
+
 
 generic_string purgeMenuItemString(const TCHAR * menuItemStr, bool keepAmpersand)
 {

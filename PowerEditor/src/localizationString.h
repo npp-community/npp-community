@@ -71,6 +71,8 @@ LocalizationSwitcher::LocalizationDefinition localizationDefs[] = {
 	{TEXT("Afrikaans"), TEXT("afrikaans.xml")},
 	{TEXT("Қазақша"), TEXT("kazakh.xml")},
 	{TEXT("O‘zbekcha"), TEXT("uzbek.xml")},
-	{TEXT("Ўзбекча"), TEXT("uzbekCyrillic.xml")}
+	{TEXT("Ўзбекча"), TEXT("uzbekCyrillic.xml")},
+	{TEXT("Кыргыз тили"), TEXT("kyrgyz.xml")},
+	{TEXT("Македонски јазик"), TEXT("macedonian.xml")}
 };
 #endif LOCALIZATIONSTRING_H

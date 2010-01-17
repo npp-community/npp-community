@@ -31,19 +31,20 @@ struct Position
 
 struct sessionFileInfo : public Position {
 	sessionFileInfo(const TCHAR *fn);
-	sessionFileInfo(const TCHAR *fn, const TCHAR *ln, Position pos);
+	sessionFileInfo(const TCHAR *fn, const TCHAR *ln, int encoding, Position pos);
 
-	sessionFileInfo(generic_string fn) : _fileName(fn){};
-	sessionFileInfo(generic_string fn, Position pos) : Position(pos), _fileName(fn){};
+	sessionFileInfo(generic_string fn);
+	sessionFileInfo(generic_string fn, int encoding, Position pos);
 
 	generic_string _fileName;
 	generic_string	_langName;
 	std::vector<size_t> marks;
+	int	_encoding;
 };
 
 struct Session {
-	size_t nbMainFiles() const {return _mainViewFiles.size();};
-	size_t nbSubFiles() const {return _subViewFiles.size();};
+	size_t nbMainFiles() const {return _mainViewFiles.size();}
+	size_t nbSubFiles() const {return _subViewFiles.size();}
 	size_t _activeView;
 	size_t _activeMainIndex;
 	size_t _activeSubIndex;

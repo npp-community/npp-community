@@ -260,7 +260,8 @@ bool AutoCompletion::setLanguage(LangType language) {
 		_funcCompletionActive = true;
 	}
 
-	if(_funcCompletionActive) {	//try setting up environment
+	if(_funcCompletionActive) //try setting up environment
+    {
 		//setup defaults
 		_ignoreCase = true;
 		_funcCalltip->_start = '(';
@@ -268,6 +269,7 @@ bool AutoCompletion::setLanguage(LangType language) {
 		_funcCalltip->_param = ',';
 		_funcCalltip->_terminal = ';';
 		_funcCalltip->_ignoreCase = true;
+        _funcCalltip->_additionalWordChar = TEXT("");
 
 		TiXmlElement * pElem = pAutoNode->FirstChildElement(TEXT("Environment"));
 		if (pElem) {
@@ -289,6 +291,9 @@ bool AutoCompletion::setLanguage(LangType language) {
 			val = pElem->Attribute(TEXT("terminal"));
 			if (val && val[0])
 				_funcCalltip->_terminal = val[0];
+			val = pElem->Attribute(TEXT("additionalWordChar"));
+			if (val && val[0])
+                _funcCalltip->_additionalWordChar = val;
 		}
 	}
 

@@ -53,7 +53,11 @@ struct ScintillaKeyDefinition {
 	int redirFunctionId;	//this gets set  when a function is being redirected through Notepad++ if Scintilla doesnt do it properly :)
 };
 
-WinMenuKeyDefinition winKeyDefs[] = {	//array of accelerator keys for all std menu items, values can be 0 for vKey, which means its unused
+WinMenuKeyDefinition winKeyDefs[] = {
+//array of accelerator keys for all std menu items, values can be 0 for vKey, which means its unused
+//================================================================================
+//  {V_KEY,		COMMAND_ID,				 			Ctrl,  Alt,   Shift, cmdName},
+//================================================================================
 	{VK_N,		IDM_FILE_NEW,			 			true,  false, false, NULL},
 	{VK_O,		IDM_FILE_OPEN,						true,  false, false, NULL},
 	{VK_NULL,	IDM_FILE_RELOAD,					false, false, false, NULL},
@@ -112,8 +116,9 @@ WinMenuKeyDefinition winKeyDefs[] = {	//array of accelerator keys for all std me
 	{VK_F3,		IDM_SEARCH_FINDPREV,				false, false, true,  NULL},
 	{VK_F3,		IDM_SEARCH_VOLATILE_FINDNEXT,		true,  false, false, NULL},
 	{VK_F3,		IDM_SEARCH_VOLATILE_FINDPREV,		true,  false, true,  NULL},
-	{VK_F4,		NPPM_INTERNAL_SEARCH_GOTONEXTFOUND,	false, false, false, TEXT("Goto next found result")},
-	{VK_F4,		NPPM_INTERNAL_SEARCH_GOTOPREVFOUND,	false, false, true,  TEXT("Goto previous found result")},
+	{VK_F4,		IDM_SEARCH_GOTONEXTFOUND,           false, false, false, NULL},
+	{VK_F4,		IDM_SEARCH_GOTOPREVFOUND,           false, false, true,  NULL},
+	{VK_F7,		IDM_FOCUS_ON_FOUND_RESULTS,         false, false, false, NULL},
 	{VK_H,		IDM_SEARCH_REPLACE,					true,  false, false, NULL},
 	{VK_I,		IDM_SEARCH_FINDINCREMENT,			true,  true,  false, NULL},
 	{VK_G,		IDM_SEARCH_GOTOLINE,		 		true,  false, false, NULL},
@@ -126,7 +131,23 @@ WinMenuKeyDefinition winKeyDefs[] = {	//array of accelerator keys for all std me
 	{VK_NULL,	IDM_SEARCH_COPYMARKEDLINES, 		false, false, false, NULL},
 	{VK_NULL,	IDM_SEARCH_PASTEMARKEDLINES, 		false, false, false, NULL},
 	{VK_NULL,	IDM_SEARCH_DELETEMARKEDLINES, 		false, false, false, NULL},
-	{VK_F7,		NPPM_INTERNAL_FOCUS_ON_FOUND_RESULTS,false, false, false, TEXT("Switch to found results window")},
+	{VK_NULL,	IDM_SEARCH_MARKALLEXT1,			    false, false, false, NULL},
+	{VK_NULL,	IDM_SEARCH_MARKALLEXT2,		    	false, false, false, NULL},
+	{VK_NULL,	IDM_SEARCH_MARKALLEXT3,			    false, false, false, NULL},
+	{VK_NULL,	IDM_SEARCH_MARKALLEXT4, 			false, false, false, NULL},
+	{VK_NULL,	IDM_SEARCH_MARKALLEXT5,	    		false, false, false, NULL},
+	{VK_NULL,	IDM_SEARCH_UNMARKALLEXT1,	    	false, false, false, NULL},
+	{VK_NULL,	IDM_SEARCH_UNMARKALLEXT2,			false, false, false, NULL},
+	{VK_NULL,	IDM_SEARCH_UNMARKALLEXT3,			false, false, false, NULL},
+	{VK_NULL,	IDM_SEARCH_UNMARKALLEXT4,			false, false, false, NULL},
+	{VK_NULL,	IDM_SEARCH_UNMARKALLEXT5,			false, false, false, NULL},
+	{VK_NULL,	IDM_SEARCH_CLEARALLMARKS,			false, false, false, NULL},
+	{VK_1,		IDM_SEARCH_GOPREVMARKER1,			true,  false, true,  NULL},
+	{VK_2,		IDM_SEARCH_GOPREVMARKER2,			true,  false, true,  NULL},
+	{VK_3,		IDM_SEARCH_GOPREVMARKER3,			true,  false, true,  NULL},
+	{VK_4,		IDM_SEARCH_GOPREVMARKER4,			true,  false, true,  NULL},
+	{VK_5,		IDM_SEARCH_GOPREVMARKER5,			true,  false, true,  NULL},
+	{VK_0,		IDM_SEARCH_GOPREVMARKER_DEF,		true,  false, true,  NULL},
 
 	{VK_F11,	IDM_VIEW_FULLSCREENTOGGLE,			false, false, false, NULL},
 	{VK_NULL,	IDM_VIEW_ALWAYSONTOP,				false, false, false, NULL},
@@ -181,6 +202,54 @@ WinMenuKeyDefinition winKeyDefs[] = {	//array of accelerator keys for all std me
 	{VK_NULL, 	IDM_FORMAT_CONV2_UTF_8,				false, false, false, NULL},
 	{VK_NULL, 	IDM_FORMAT_CONV2_UCS_2BE,			false, false, false, NULL},
 	{VK_NULL, 	IDM_FORMAT_CONV2_UCS_2LE,			false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_ISO_8859_6,              false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_WIN_1256,                false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_ISO_8859_13,             false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_WIN_1257,                false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_ISO_8859_14,             false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_ISO_8859_5,              false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_MAC_CYRILLIC,            false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_KOI8R_CYRILLIC,          false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_KOI8U_CYRILLIC,          false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_WIN_1251,                false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_WIN_1250,                false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_DOS_437,                 false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_DOS_720,                 false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_DOS_737,                 false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_DOS_775,                 false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_DOS_850,                 false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_DOS_852,                 false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_DOS_855,                 false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_DOS_857,                 false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_DOS_858,                 false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_DOS_860,                 false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_DOS_861,                 false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_DOS_862,                 false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_DOS_863,                 false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_DOS_865,                 false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_DOS_866,                 false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_DOS_869,                 false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_BIG5,                    false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_GB2312,                  false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_ISO_8859_2,              false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_ISO_8859_7,              false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_WIN_1253,                false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_ISO_8859_8,              false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_WIN_1255,                false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_SHIFT_JIS,               false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_EUC_KR,                  false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_ISO_8859_10,             false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_ISO_8859_15,             false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_ISO_8859_4,              false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_ISO_8859_16,             false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_ISO_8859_3,              false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_ISO_8859_11,             false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_TIS_620,                 false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_ISO_8859_9,              false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_WIN_1254,                false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_WIN_1252,                false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_ISO_8859_1,              false, false, false, NULL},
+    {VK_NULL,   IDM_FORMAT_WIN_1258,                false, false, false, NULL},
 
 	{VK_NULL, 	IDM_SETTING_PREFERENCE,				false, false, false, NULL},
 	{VK_NULL, 	IDM_LANGSTYLE_CONFIG_DLG,			false, false, false, NULL},
@@ -199,15 +268,23 @@ WinMenuKeyDefinition winKeyDefs[] = {	//array of accelerator keys for all std me
 	{VK_NULL,	IDM_FORUM, 							false, false, false, NULL},
 	{VK_NULL,	IDM_PLUGINSHOME, 					false, false, false, NULL},
 	{VK_F1,		IDM_ABOUT, 							false, false, false, NULL},
-	{VK_F1,		IDM_HELP, 							false, false, true, NULL},
+	{VK_F1,		IDM_HELP, 							false, false, true,  NULL},
 
 	{VK_TAB,	IDC_PREV_DOC,						true,  false, true, TEXT("Switch to previous document")},
 	{VK_TAB,	IDC_NEXT_DOC,						true,  false, false, TEXT("Switch to next document")},
+
+	{VK_1,		IDM_SEARCH_GONEXTMARKER1,			true,  false, false, NULL},
+	{VK_2,		IDM_SEARCH_GONEXTMARKER2,			true,  false, false, NULL},
+	{VK_3,		IDM_SEARCH_GONEXTMARKER3,			true,  false, false, NULL},
+	{VK_4,		IDM_SEARCH_GONEXTMARKER4,			true,  false, false, NULL},
+	{VK_5,		IDM_SEARCH_GONEXTMARKER5,			true,  false, false, NULL},
+	{VK_0,		IDM_SEARCH_GONEXTMARKER_DEF,		true,  false, false, NULL}
+
 };
 
 
 ScintillaKeyDefinition scintKeyDefs[] = {	//array of accelerator keys for all possible scintilla functions, values can be 0 for vKey, which means its unused
-	{TEXT("SCI_CUT"),						SCI_CUT,					true,  false, false, VK_X, 		IDM_EDIT_CUT},
+	{TEXT("SCI_CUT"),					SCI_CUT,					true,  false, false, VK_X, 		IDM_EDIT_CUT},
 	{TEXT(""),							SCI_CUT,					false, false, true,  VK_DELETE, 0},
 	{TEXT("SCI_COPY"),					SCI_COPY,					true,  false, false, VK_C, 		IDM_EDIT_COPY},
 	{TEXT(""),							SCI_COPY,					true,  false, false, VK_INSERT, 0},
@@ -307,7 +384,10 @@ ScintillaKeyDefinition scintKeyDefs[] = {	//array of accelerator keys for all po
 	{TEXT("SCI_LINECOPY"),				SCI_LINECOPY,				true,  false, true,  VK_T, 		0},
 	{TEXT("SCI_LINETRANSPOSE"),			SCI_LINETRANSPOSE,			true,  false, false, VK_T, 		0},
 	{TEXT("SCI_LINEDUPLICATE"),			SCI_LINEDUPLICATE,			false, false, false, 0,			0},
-	{TEXT("SCI_CANCEL"),					SCI_CANCEL,					false, false, false, VK_ESCAPE, 0}
+	{TEXT("SCI_CANCEL"),					SCI_CANCEL,					false, false, false, VK_ESCAPE, 0},
+	{TEXT("SCI_SWAPMAINANCHORCARET"),	SCI_SWAPMAINANCHORCARET,			false, false, false, 0,	0},
+	{TEXT("SCI_ROTATESELECTION"),		SCI_ROTATESELECTION,					false, false, false, 0, 0}
+
 	//{TEXT("SCI_EMPTYUNDOBUFFER"),		SCI_EMPTYUNDOBUFFER,		false, false, false, 0,			0},
 	//{TEXT("SCI_TOGGLECARETSTICKY"),		SCI_TOGGLECARETSTICKY,		false, false, false, 0,			0},
 	//{TEXT("SCI_CALLTIPCANCEL"),			SCI_CALLTIPCANCEL,			false, false, false, 0,			0},
@@ -339,6 +419,7 @@ ScintillaKeyDefinition scintKeyDefs[] = {	//array of accelerator keys for all po
 	//
 };
 
+
 static int getKwClassFromName(const TCHAR *str) {
 	if (!lstrcmp(TEXT("instre1"), str)) return LANG_INDEX_INSTR;
 	if (!lstrcmp(TEXT("instre2"), str)) return LANG_INDEX_INSTR2;
@@ -357,7 +438,7 @@ static int getKwClassFromName(const TCHAR *str) {
 #ifdef UNICODE
 #include "localizationString.h"
 
-std::wstring LocalizationSwitcher::getLangFromXmlFileName(wchar_t *fn) const
+std::wstring LocalizationSwitcher::getLangFromXmlFileName(const wchar_t *fn) const
 {
 	size_t nbItem = sizeof(localizationDefs)/sizeof(LocalizationSwitcher::LocalizationDefinition);
 	for (size_t i = 0 ; i < nbItem ; i++)
@@ -368,7 +449,7 @@ std::wstring LocalizationSwitcher::getLangFromXmlFileName(wchar_t *fn) const
 	return TEXT("");
 }
 
-std::wstring LocalizationSwitcher::getXmlFilePathFromLangName(wchar_t *langName) const
+std::wstring LocalizationSwitcher::getXmlFilePathFromLangName(const wchar_t *langName) const
 {
 	for (size_t i = 0 ; i < _localizationList.size() ; i++)
 	{
@@ -423,8 +504,8 @@ NppParameters::NppParameters() :
 	_isFindReplacing(false),
 	_pXmlDoc(NULL), _pXmlUserDoc(NULL), _pXmlUserStylerDoc(NULL),
 	_pXmlUserLangDoc(NULL), _pXmlToolIconsDoc(NULL), _pXmlShortcutDoc(NULL),
-	_pXmlContextMenuDoc(NULL), _pXmlSessionDoc(NULL), _pXmlNativeLangDocA(NULL),
-	_nbMaxFile(10), _nbExternalLang(0),
+	_pXmlContextMenuDoc(NULL), _pXmlSessionDoc(NULL), _pXmlBlacklistDoc(NULL),
+	_pXmlNativeLangDocA(NULL), _nbMaxFile(10), _nbExternalLang(0),
 	_fileSaveDlgFilterIndex(-1),
 	_hUser32(NULL), _hUXTheme(NULL),
 	_transparentFuncAddr(NULL), _enableThemeDialogTextureFuncAddr(NULL),
@@ -432,13 +513,6 @@ NppParameters::NppParameters() :
 	_pAccelerator(NULL), _pScintAccelerator(NULL),
 	_asNotepadStyle(false)
 {
-	memset(&_externalLangArray, 0, NB_MAX_EXTERNAL_LANG * sizeof(ExternalLangContainer *));
-
-	_findHistory._nbFindHistoryPath = 0;
-	_findHistory._nbFindHistoryFilter = 0;
-	_findHistory._nbFindHistoryFind = 0;
-	_findHistory._nbFindHistoryReplace = 0;
-
 	// Prepare for default path
 	TCHAR nppPath[MAX_PATH];
 	::GetModuleFileName(NULL, nppPath, MAX_PATH);
@@ -456,7 +530,6 @@ NppParameters::NppParameters() :
 	PathAppend(notepadStylePath, notepadStyleFile);
 
 	_asNotepadStyle = (PathFileExists(notepadStylePath.c_str()) == TRUE);
-	::AddFontResource(LINEDRAW_FONT);
 
 	//Load initial accelerator key definitions
 	initMenuKeys();
@@ -482,31 +555,6 @@ NppParameters::~NppParameters()
 	if (_hUXTheme)
 		FreeLibrary(_hUXTheme);
 
-	::RemoveFontResource(LINEDRAW_FONT);
-
-	// JOCE: I don't like that much. But I feel that the deletion should take place at the
-	// same scope as the allocation.
-	// Should revisit FindHistory to handle both itself.
-	for (int i = 0; i < _findHistory._nbFindHistoryPath; i++)
-	{
-		delete _findHistory._pFindHistoryPath[i];
-	}
-
-	for (int i = 0; i < _findHistory._nbFindHistoryFilter; i++)
-	{
-		delete _findHistory._pFindHistoryFilter[i];
-	}
-
-	for (int i = 0; i < _findHistory._nbFindHistoryFind; i++)
-	{
-		delete _findHistory._pFindHistoryFind[i];
-	}
-
-	for (int i = 0; i < _findHistory._nbFindHistoryReplace; i++)
-	{
-		delete _findHistory._pFindHistoryReplace[i];
-	}
-
 	// JOCE: These were NOT allocated here, and should NOT be freed here either...  :-/
 	for (std::vector<TiXmlDocument *>::iterator it = _pXmlExternalLexerDoc.begin(),
 												end = _pXmlExternalLexerDoc.end();
@@ -517,7 +565,6 @@ NppParameters::~NppParameters()
 	}
 
 	_pXmlExternalLexerDoc.clear();
-
 
 	delete _session;
 }
@@ -897,12 +944,28 @@ bool NppParameters::load()
 
 		delete _pXmlSessionDoc;
 		for (size_t i = 0 ; i < _pXmlExternalLexerDoc.size() ; i++)
-		if (_pXmlExternalLexerDoc[i])
-			delete _pXmlExternalLexerDoc[i];
+			if (_pXmlExternalLexerDoc[i])
+				delete _pXmlExternalLexerDoc[i];
 
 		_pXmlExternalLexerDoc.clear();
 		_pXmlSessionDoc = NULL;
 	}
+
+    //------------------------------//
+	// blacklist.xml : for per user //
+	//------------------------------//
+	_blacklistPath = _userPath;
+	PathAppend(_blacklistPath, TEXT("blacklist.xml"));
+
+    if (PathFileExists(_blacklistPath.c_str()))
+	{
+        _pXmlBlacklistDoc = new TiXmlDocument(_blacklistPath);
+        loadOkay = _pXmlBlacklistDoc->LoadFile();
+        if (loadOkay)
+        {
+            getBlackListFromXmlTree();
+        }
+    }
 	return isAllLaoded;
 }
 
@@ -941,6 +1004,9 @@ void NppParameters::destroyInstance()
 
 	if (_pXmlSessionDoc)
 		delete _pXmlSessionDoc;
+
+	if (_pXmlBlacklistDoc)
+		delete _pXmlBlacklistDoc;
 
 	delete _pSelf;
 }
@@ -1103,6 +1169,18 @@ bool NppParameters::getScintKeysFromXmlTree()
 
 	feedScintKeys(root);
 	return true;
+}
+
+bool NppParameters::getBlackListFromXmlTree()
+{
+    if (!_pXmlBlacklistDoc)
+		return false;
+
+	TiXmlNode *root = _pXmlBlacklistDoc->FirstChild(TEXT("NotepadPlus"));
+	if (!root)
+		return false;
+
+	return feedBlacklist(root);
 }
 
 void NppParameters::initMenuKeys()
@@ -1356,7 +1434,9 @@ bool NppParameters::getSessionFromXmlTree(TiXmlDocument *pSessionDoc, Session *p
 
 				const TCHAR *langName;
 				langName = (childNode->ToElement())->Attribute(TEXT("lang"));
-				sessionFileInfo sfi( fileName, langName, position );
+				int encoding = -1;
+				const TCHAR *encStr = (childNode->ToElement())->Attribute(TEXT("encoding"), &encoding);
+				sessionFileInfo sfi(fileName, langName, encStr?encoding:-1, position);
 
 				for (TiXmlNode *markNode = childNode->FirstChildElement(TEXT("Mark"));
 					markNode ;
@@ -1401,7 +1481,10 @@ bool NppParameters::getSessionFromXmlTree(TiXmlDocument *pSessionDoc, Session *p
 
 				const TCHAR *langName;
 				langName = (childNode->ToElement())->Attribute(TEXT("lang"));
-				sessionFileInfo sfi( fileName, langName, position );
+				int encoding = -1;
+				(childNode->ToElement())->Attribute(TEXT("encoding"), &encoding);
+
+				sessionFileInfo sfi(fileName, langName, encoding, position);
 
 				for (TiXmlNode *markNode = childNode->FirstChildElement(TEXT("Mark"));
 					markNode ;
@@ -1454,13 +1537,13 @@ void NppParameters::feedFindHistoryParameters(TiXmlNode *node)
 	if ((_findHistory._nbMaxFindHistoryPath > 0) && (_findHistory._nbMaxFindHistoryPath <= NB_MAX_FINDHISTORY_PATH))
 	{
 		for (TiXmlNode *childNode = findHistoryRoot->FirstChildElement(TEXT("Path"));
-			childNode && (_findHistory._nbFindHistoryPath < NB_MAX_FINDHISTORY_PATH);
+            childNode && (_findHistory._findHistoryPaths.size() < NB_MAX_FINDHISTORY_PATH);
 			childNode = childNode->NextSibling(TEXT("Path")) )
 		{
 			const TCHAR *filePath = (childNode->ToElement())->Attribute(TEXT("name"));
 			if (filePath)
 			{
-				_findHistory._pFindHistoryPath[_findHistory._nbFindHistoryPath++] = new generic_string(filePath);
+                _findHistory._findHistoryPaths.push_back(generic_string(filePath));
 			}
 		}
 	}
@@ -1469,13 +1552,13 @@ void NppParameters::feedFindHistoryParameters(TiXmlNode *node)
 	if ((_findHistory._nbMaxFindHistoryFilter > 0) && (_findHistory._nbMaxFindHistoryFilter <= NB_MAX_FINDHISTORY_FILTER))
 	{
 		for (TiXmlNode *childNode = findHistoryRoot->FirstChildElement(TEXT("Filter"));
-			childNode && (_findHistory._nbFindHistoryFilter < NB_MAX_FINDHISTORY_FILTER);
+			childNode && (_findHistory._findHistoryFilters.size() < NB_MAX_FINDHISTORY_FILTER);
 			childNode = childNode->NextSibling(TEXT("Filter")))
 		{
 			const TCHAR *fileFilter = (childNode->ToElement())->Attribute(TEXT("name"));
 			if (fileFilter)
 			{
-				_findHistory._pFindHistoryFilter[_findHistory._nbFindHistoryFilter++] = new generic_string(fileFilter);
+				_findHistory._findHistoryFilters.push_back(generic_string(fileFilter));
 			}
 		}
 	}
@@ -1484,13 +1567,13 @@ void NppParameters::feedFindHistoryParameters(TiXmlNode *node)
 	if ((_findHistory._nbMaxFindHistoryFind > 0) && (_findHistory._nbMaxFindHistoryFind <= NB_MAX_FINDHISTORY_FIND))
 	{
 		for (TiXmlNode *childNode = findHistoryRoot->FirstChildElement(TEXT("Find"));
-			childNode && (_findHistory._nbFindHistoryFind < NB_MAX_FINDHISTORY_FIND);
+			childNode && (_findHistory._findHistoryFinds.size() < NB_MAX_FINDHISTORY_FIND);
 			childNode = childNode->NextSibling(TEXT("Find")))
 		{
 			const TCHAR *fileFind = (childNode->ToElement())->Attribute(TEXT("name"));
 			if (fileFind)
 			{
-				_findHistory._pFindHistoryFind[_findHistory._nbFindHistoryFind++] = new generic_string(fileFind);
+				_findHistory._findHistoryFinds.push_back(generic_string(fileFind));
 			}
 		}
 	}
@@ -1499,13 +1582,13 @@ void NppParameters::feedFindHistoryParameters(TiXmlNode *node)
 	if ((_findHistory._nbMaxFindHistoryReplace > 0) && (_findHistory._nbMaxFindHistoryReplace <= NB_MAX_FINDHISTORY_REPLACE))
 	{
 		for (TiXmlNode *childNode = findHistoryRoot->FirstChildElement(TEXT("Replace"));
-			childNode && (_findHistory._nbFindHistoryReplace < NB_MAX_FINDHISTORY_REPLACE);
+			childNode && (_findHistory._findHistoryReplaces.size() < NB_MAX_FINDHISTORY_REPLACE);
 			childNode = childNode->NextSibling(TEXT("Replace")))
 		{
 			const TCHAR *fileReplace = (childNode->ToElement())->Attribute(TEXT("name"));
 			if (fileReplace)
 			{
-				_findHistory._pFindHistoryReplace[_findHistory._nbFindHistoryReplace++] = new generic_string(fileReplace);
+				_findHistory._findHistoryReplaces.push_back(generic_string(fileReplace));
 			}
 		}
 	}
@@ -1768,6 +1851,24 @@ void NppParameters::feedScintKeys(TiXmlNode *node)
 	}
 }
 
+bool NppParameters::feedBlacklist(TiXmlNode *node)
+{
+	TiXmlNode *blackListRoot = node->FirstChildElement(TEXT("PluginBlackList"));
+	if (!blackListRoot) return false;
+
+	for (TiXmlNode *childNode = blackListRoot->FirstChildElement(TEXT("Plugin"));
+		childNode ;
+		childNode = childNode->NextSibling(TEXT("Plugin")) )
+	{
+        const TCHAR *name = (childNode->ToElement())->Attribute(TEXT("name"));
+	    if (name)
+        {
+            _blacklist.push_back(name);
+        }
+    }
+    return true;
+}
+
 bool NppParameters::getShortcuts(TiXmlNode *node, Shortcut & sc)
 {
 	if (!node) return false;
@@ -1834,6 +1935,38 @@ void NppParameters::feedUserLang(TiXmlNode *node)
 		}
 		_userLangArray.push_back(newLangContainer);
 	}
+}
+
+LangType NppParameters::getLangFromExt(const TCHAR *ext)
+{
+	int i = getNbLang();
+	i--;
+	while (i >= 0)
+	{
+		Lang *l = getLangFromIndex(i--);
+
+		const TCHAR *defList = l->getDefaultExtList();
+		const TCHAR *userList = NULL;
+
+		LexerStylerArray &lsa = getLStylerArray();
+		const TCHAR *lName = l->getLangName();
+		LexerStyler *pLS = lsa.getLexerStylerByName(lName);
+
+		if (pLS)
+			userList = pLS->getLexerUserExt();
+
+		generic_string list(TEXT(""));
+		if (defList)
+			list += defList;
+		if (userList)
+		{
+			list += TEXT(" ");
+			list += userList;
+		}
+		if (isInList(ext, list.c_str()))
+			return l->getLangID();
+	}
+	return L_TXT;
 }
 
 void NppParameters::writeUserDefinedLang()
@@ -1973,6 +2106,7 @@ void NppParameters::writeSession(const Session* session, const TCHAR *fileName)
 			(fileNameNode->ToElement())->SetAttribute(TEXT("endPos"), session->_mainViewFiles[i]._endPos);
 			(fileNameNode->ToElement())->SetAttribute(TEXT("selMode"), session->_mainViewFiles[i]._selMode);
 			(fileNameNode->ToElement())->SetAttribute(TEXT("lang"), session->_mainViewFiles[i]._langName.c_str());
+			(fileNameNode->ToElement())->SetAttribute(TEXT("encoding"), session->_mainViewFiles[i]._encoding);
 			(fileNameNode->ToElement())->SetAttribute(TEXT("filename"), session->_mainViewFiles[i]._fileName.c_str());
 
 			for (size_t j = 0 ; j < session->_mainViewFiles[i].marks.size() ; j++)
@@ -1996,6 +2130,7 @@ void NppParameters::writeSession(const Session* session, const TCHAR *fileName)
 			(fileNameNode->ToElement())->SetAttribute(TEXT("endPos"), session->_subViewFiles[i]._endPos);
 			(fileNameNode->ToElement())->SetAttribute(TEXT("selMode"), session->_subViewFiles[i]._selMode);
 			(fileNameNode->ToElement())->SetAttribute(TEXT("lang"), session->_subViewFiles[i]._langName.c_str());
+			(fileNameNode->ToElement())->SetAttribute(TEXT("encoding"), session->_subViewFiles[i]._encoding);
 			(fileNameNode->ToElement())->SetAttribute(TEXT("filename"), session->_subViewFiles[i]._fileName.c_str());
 
 			for (size_t j = 0 ; j < session->_subViewFiles[i].marks.size() ; j++)
@@ -3051,18 +3186,18 @@ void NppParameters::feedGUIParameters(TiXmlNode *node)
 			if (element->Attribute(TEXT("footerFontSize"), &i))
 				_nppGUI._printSettings._footerFontSize = i;
 
-
+			// JOCE: I can't rename the "marge" attributes to "margin" just yet. How annoying.
 			if (element->Attribute(TEXT("margeLeft"), &i))
-				_nppGUI._printSettings._marge.left = i;
+				_nppGUI._printSettings._margin.left = i;
 
 			if (element->Attribute(TEXT("margeTop"), &i))
-				_nppGUI._printSettings._marge.top = i;
+				_nppGUI._printSettings._margin.top = i;
 
 			if (element->Attribute(TEXT("margeRight"), &i))
-				_nppGUI._printSettings._marge.right = i;
+				_nppGUI._printSettings._margin.right = i;
 
 			if (element->Attribute(TEXT("margeBottom"), &i))
-				_nppGUI._printSettings._marge.bottom = i;
+				_nppGUI._printSettings._margin.bottom = i;
 		}
 
 		else if (!lstrcmp(nm, TEXT("ScintillaPrimaryView")))
@@ -4101,9 +4236,6 @@ bool NppParameters::writeFindHistory()
 		TiXmlElement element(TEXT("FindHistory"));
 		findHistoryRoot = nppRoot->InsertEndChild(element);
 	}
-
-	int i;
-
 	findHistoryRoot->Clear();
 
 	(findHistoryRoot->ToElement())->SetAttribute(TEXT("nbMaxFindHistoryPath"),    _findHistory._nbMaxFindHistoryPath);
@@ -4129,30 +4261,30 @@ bool NppParameters::writeFindHistory()
 	TiXmlElement hist_element(TEXT(""));
 
 	hist_element.SetValue(TEXT("Path"));
-	for (i = 0; i < _findHistory._nbFindHistoryPath; i++)
+    for (size_t i = 0; i < _findHistory._findHistoryPaths.size(); i++)
 	{
-		(hist_element.ToElement())->SetAttribute(TEXT("name"), _findHistory._pFindHistoryPath[i]->c_str());
+		(hist_element.ToElement())->SetAttribute(TEXT("name"), _findHistory._findHistoryPaths[i].c_str());
 		findHistoryRoot->InsertEndChild(hist_element);
 	}
 
 	hist_element.SetValue(TEXT("Filter"));
-	for (i = 0; i < _findHistory._nbFindHistoryFilter; i++)
+	for (size_t i = 0; i < _findHistory._findHistoryFilters.size(); i++)
 	{
-		(hist_element.ToElement())->SetAttribute(TEXT("name"), _findHistory._pFindHistoryFilter[i]->c_str());
+		(hist_element.ToElement())->SetAttribute(TEXT("name"), _findHistory._findHistoryFilters[i].c_str());
 		findHistoryRoot->InsertEndChild(hist_element);
 	}
 
 	hist_element.SetValue(TEXT("Find"));
-	for (i = 0; i < _findHistory._nbFindHistoryFind; i++)
+	for (size_t i = 0; i < _findHistory._findHistoryFinds.size(); i++)
 	{
-		(hist_element.ToElement())->SetAttribute(TEXT("name"), _findHistory._pFindHistoryFind[i]->c_str());
+		(hist_element.ToElement())->SetAttribute(TEXT("name"), _findHistory._findHistoryFinds[i].c_str());
 		findHistoryRoot->InsertEndChild(hist_element);
 	}
 
 	hist_element.SetValue(TEXT("Replace"));
-	for (i = 0; i < _findHistory._nbFindHistoryReplace; i++)
+	for (size_t i = 0; i < _findHistory._findHistoryReplaces.size(); i++)
 	{
-		(hist_element.ToElement())->SetAttribute(TEXT("name"), _findHistory._pFindHistoryReplace[i]->c_str());
+		(hist_element.ToElement())->SetAttribute(TEXT("name"), _findHistory._findHistoryReplaces[i].c_str());
 		findHistoryRoot->InsertEndChild(hist_element);
 	}
 
@@ -4227,10 +4359,11 @@ void NppParameters::writePrintSetting(TiXmlElement *element)
 	element->SetAttribute(TEXT("footerFontStyle"), _nppGUI._printSettings._footerFontStyle);
 	element->SetAttribute(TEXT("footerFontSize"), _nppGUI._printSettings._footerFontSize);
 
-	element->SetAttribute(TEXT("margeLeft"), _nppGUI._printSettings._marge.left);
-	element->SetAttribute(TEXT("margeRight"), _nppGUI._printSettings._marge.right);
-	element->SetAttribute(TEXT("margeTop"), _nppGUI._printSettings._marge.top);
-	element->SetAttribute(TEXT("margeBottom"), _nppGUI._printSettings._marge.bottom);
+	// JOCE: I can't rename the "marge" attributes to "margin" just yet. How annoying.
+	element->SetAttribute(TEXT("margeLeft"), _nppGUI._printSettings._margin.left);
+	element->SetAttribute(TEXT("margeRight"), _nppGUI._printSettings._margin.right);
+	element->SetAttribute(TEXT("margeTop"), _nppGUI._printSettings._margin.top);
+	element->SetAttribute(TEXT("margeBottom"), _nppGUI._printSettings._margin.bottom);
 }
 
 void NppParameters::writeExcludedLangList(TiXmlElement *element)
@@ -4417,6 +4550,21 @@ int NppParameters::langTypeToCommandID(LangType lt) const
 
 		case L_YAML :
             id = IDM_LANG_YAML; break;
+
+		case L_COBOL :
+            id = IDM_LANG_COBOL; break;
+
+		case L_D :
+            id = IDM_LANG_D; break;
+
+		case L_GUI4CLI :
+            id = IDM_LANG_GUI4CLI; break;
+
+		case L_POWERSHELL :
+            id = IDM_LANG_POWERSHELL; break;
+
+		case L_R :
+            id = IDM_LANG_R; break;
 
 		case L_SEARCHRESULT :
 			id = -1;	break;

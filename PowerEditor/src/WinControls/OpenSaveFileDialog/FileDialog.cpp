@@ -19,27 +19,28 @@
 #include "FileDialog.h"
 #include "Parameters.h"
 
-static generic_string changeExt(generic_string fn, generic_string ext)
+static generic_string changeExt(generic_string fn, generic_string ext, bool forceReplaced = true)
 {
 	if (ext == TEXT(""))
 		return fn;
 
 	generic_string fnExt = fn;
 
-	size_t index = fnExt.find_last_of(TEXT("."));
+	int index = fnExt.find_last_of(TEXT("."));
 	generic_string extension = TEXT(".");
 	extension += ext;
-	if (index == generic_string::npos)
+	if (size_t(index) == generic_string::npos)
 	{
 		fnExt += extension;
 	}
-	else
+	else if (forceReplaced)
 	{
 		int len = (extension.length() > fnExt.length() - index + 1)?extension.length():fnExt.length() - index + 1;
 		fnExt.replace(index, len, extension);
 	}
 	return fnExt;
-};
+}
+
 
 static void goToCenter(HWND hwnd)
 {
@@ -66,14 +67,13 @@ static void goToCenter(HWND hwnd)
 	int y = center.y - (_rc.bottom - _rc.top)/2;
 
 	::SetWindowPos(hwnd, HWND_TOP, x, y, _rc.right - _rc.left, _rc.bottom - _rc.top, SWP_SHOWWINDOW);
-};
-
+}
 
 FileDialog *FileDialog::staticThis = NULL;
 //int FileDialog::_dialogFileBoxId = (NppParameters::getInstance())->getWinVersion() < WV_W2K?edt1:cmb13;
 
 FileDialog::FileDialog(HWND hwnd, HINSTANCE hInst)
-	: _fileExt(NULL), _nbCharFileExt(0), _nbExt(0)
+	: _fileExt(NULL), _nbCharFileExt(0), _nbExt(0), _extTypeIndex(-1)
 {
 	staticThis = this;
 
@@ -312,6 +312,7 @@ static HWND hFileDlg = NULL;
 static WNDPROC oldProc = NULL;
 static generic_string currentExt = TEXT("");
 
+
 static BOOL CALLBACK fileDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message)
     {
@@ -329,7 +330,7 @@ static BOOL CALLBACK fileDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 
 					if (currentExt != TEXT(""))
 					{
-						generic_string fnExt = changeExt(fn, currentExt);
+						generic_string fnExt = changeExt(fn, currentExt, false);
 						::SetWindowText(fnControl, fnExt.c_str());
 					}
 					return oldProc(hwnd, message, wParam, lParam);
@@ -346,6 +347,7 @@ static BOOL CALLBACK fileDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 	}
 	return oldProc(hwnd, message, wParam, lParam);
 };
+
 
 static TCHAR * get1stExt(TCHAR *ext) { // precondition : ext should be under the format : Batch (*.bat;*.cmd;*.nt)
 	TCHAR *begin = ext;
@@ -390,7 +392,7 @@ UINT_PTR CALLBACK FileDialog::OFNHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
 			NppParameters *pNppParam = NppParameters::getInstance();
 			int index = pNppParam->getFileSaveDlgFilterIndex();
 
-			::SetWindowLongPtr(hWnd, GWL_USERDATA, (long)staticThis);
+			::SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)staticThis);
 			hFileDlg = ::GetParent(hWnd);
 			goToCenter(hFileDlg);
 
@@ -403,7 +405,7 @@ UINT_PTR CALLBACK FileDialog::OFNHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
 			// Don't touch the following 3 lines, they are cursed !!!
 			oldProc = (WNDPROC)::GetWindowLongPtr(hFileDlg, GWL_WNDPROC);
 			if ((long)oldProc > 0)
-				::SetWindowLongPtr(hFileDlg, GWL_WNDPROC, (LONG)fileDlgProc);
+				::SetWindowLongPtr(hFileDlg, GWLP_WNDPROC, (LONG_PTR)fileDlgProc);
 
 			return FALSE;
 		}
@@ -429,13 +431,25 @@ BOOL APIENTRY FileDialog::run(HWND hWnd, UINT uMsg, WPARAM /*wParam*/, LPARAM lP
 			LPNMHDR pNmhdr = (LPNMHDR)lParam;
 			switch(pNmhdr->code)
 			{
+                case CDN_INITDONE :
+                {
+                    if (_extTypeIndex == -1)
+                        return TRUE;
+
+                    HWND fnControl = ::GetDlgItem(::GetParent(hWnd), _dialogFileBoxId);
+                    HWND typeControl = ::GetDlgItem(::GetParent(hWnd), cmb1);
+                    ::SendMessage(typeControl, CB_SETCURSEL, _extTypeIndex, 0);
+
+                    currentExt = addExt(fnControl, typeControl);
+                    return TRUE;
+                }
+
 				case CDN_TYPECHANGE :
 				{
 					HWND fnControl = ::GetDlgItem(::GetParent(hWnd), _dialogFileBoxId);
 					HWND typeControl = ::GetDlgItem(::GetParent(hWnd), cmb1);
 					currentExt = addExt(fnControl, typeControl);
 					return TRUE;
-					//break;
 				}
 
 				case CDN_FILEOK :
@@ -445,7 +459,6 @@ BOOL APIENTRY FileDialog::run(HWND hWnd, UINT uMsg, WPARAM /*wParam*/, LPARAM lP
 					NppParameters *pNppParam = NppParameters::getInstance();
 					pNppParam->setFileSaveDlgFilterIndex(index);
 					return TRUE;
-					//break;
 				}
 
 				default :

@@ -180,7 +180,7 @@ public:
 
 // fileOperations
 	//The doXXX functions apply to a single buffer and dont need to worry about views, with the excpetion of doClose, since closing one view doesnt have to mean the document is gone
-    BufferID doOpen(const TCHAR *fileName, bool isReadOnly = false);
+    BufferID doOpen(const TCHAR *fileName, bool isReadOnly = false, int encoding = -1);
 	bool doReload(BufferID id, bool alert = true);
 	bool doSave(BufferID, const TCHAR * filename, bool isSaveCopy = false);
 	void doClose(BufferID, int whichOne);
@@ -251,6 +251,7 @@ public:
 	bool replaceInFiles();
 	void setFindReplaceFolderFilter(const TCHAR *dir, const TCHAR *filters);
 	std::vector<generic_string> addNppComponents(const TCHAR *destDir, const TCHAR *extFilterName, const TCHAR *extFilter);
+    int getHtmlXmlEncoding(const TCHAR *fileName) const;
 
 	static HWND gNppHWND;	//static handle to Notepad++ window, NULL if non-existant
 private:
@@ -318,6 +319,7 @@ private:
 	HMENU _mainMenuHandle;
 
 	bool _sysMenuEntering;
+	bool _isPrelaunch;
 
 	// For FullScreen/PostIt features
 	VisibleGUIConf	_beforeSpecialView;
@@ -446,15 +448,15 @@ private:
     void getMainClientRect(RECT & rc) const;
 	void dynamicCheckMenuAndTB() const;
 	void enableConvertMenuItems(formatType f) const;
-	void checkUnicodeMenuItems(UniMode um) const;
+	void checkUnicodeMenuItems() const;
 
 	generic_string getLangDesc(LangType langType, bool shortDesc = false);
 
 	void setLangStatus(LangType langType);
 
 	void setDisplayFormat(formatType f);
-
-	void setUniModeText(UniMode um);
+	int getCmdIDFromEncoding(int encoding) const;
+	void setUniModeText();
 
 	void checkLangsMenu(int id) const ;
     void setLanguage(LangType langType);
@@ -486,12 +488,19 @@ private:
 	generic_string getMarkedLine(int ln);
 
     void findMatchingBracePos(int & braceAtCaret, int & braceOpposite);
-    void braceMatch();
+    bool braceMatch();
 
     void activateNextDoc(bool direction);
 	void activateDoc(int pos);
 
 	void updateStatusBar();
+	size_t getSelectedCharNumber(UniMode);
+	size_t getCurrentDocCharCount(size_t numLines, UniMode u);
+	int getSelectedAreas();
+	int _numSel;
+	size_t getSelectedBytes();
+	bool isFormatUnicode(UniMode);
+	int getBOMSize(UniMode);
 
 	void showAutoComp();
 	void autoCompFromCurrentFile(bool autoInsert = true);
@@ -514,7 +523,7 @@ private:
 	int getLangFromMenuName(const TCHAR * langName);
 	generic_string getLangFromMenu(const Buffer * buf);
 
-	void setFileOpenSaveDlgFilters(FileDialog & fDlg);
+	int setFileOpenSaveDlgFilters(FileDialog & fDlg, int langType = -1);
 	void markSelectedTextInc(bool enable);
 
 	Style * getStyleFromName(const TCHAR *styleName);
@@ -526,6 +535,9 @@ private:
 
 	bool noOpenedDoc() const;
 	void EnableMouseWheelZoom(bool enable);
+
+	bool goToPreviousIndicator(int indicID2Search, bool isWrap = true) const;
+	bool goToNextIndicator(int indicID2Search, bool isWrap = true) const;
 };
 
 #endif //NOTEPAD_PLUS_H

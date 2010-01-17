@@ -17,18 +17,19 @@
 
 ; Define the application name
 !define APPNAME "Notepad++"
-!define APPVERSION "5.5"
-!define APPNAMEANDVERSION "Notepad++ v5.5"
-!define APPWEBSITE "http://notepad-plus.sourceforge.net/"
 
+!define APPVERSION "5.6.2"
+!define APPNAMEANDVERSION "Notepad++ v5.6.2"
 !define VERSION_MAJOR 5
-!define VERSION_MINOR 5
+!define VERSION_MINOR 62
+
+!define APPWEBSITE "http://notepad-plus.sourceforge.net/"
 
 ; Main Install settings
 Name "${APPNAMEANDVERSION}"
 InstallDir "$PROGRAMFILES\Notepad++"
 InstallDirRegKey HKLM "Software\${APPNAME}" ""
-OutFile "..\bin\npp.5.5.Installer.exe"
+OutFile "..\bin\npp.5.6.2.Installer.exe"
 
 ; GetWindowsVersion
  ;
@@ -196,7 +197,7 @@ FunctionEnd
 	!insertmacro MUI_LANGUAGE "Portuguese"
   !insertmacro MUI_LANGUAGE "Farsi"
   !insertmacro MUI_LANGUAGE "Bulgarian"
-	!insertmacro MUI_LANGUAGE "Indonesian"
+  !insertmacro MUI_LANGUAGE "Indonesian"
   !insertmacro MUI_LANGUAGE "Japanese"
   !insertmacro MUI_LANGUAGE "Croatian"
   !insertmacro MUI_LANGUAGE "Serbian"
@@ -210,9 +211,9 @@ FunctionEnd
   !insertmacro MUI_LANGUAGE "Luxembourgish"
   !insertmacro MUI_LANGUAGE "Afrikaans"
   !insertmacro MUI_LANGUAGE "Uzbek"
+  !insertmacro MUI_LANGUAGE "Macedonian"
 
   ;!insertmacro MUI_LANGUAGE "Latvian"
-  ;!insertmacro MUI_LANGUAGE "Macedonian"
   ;!insertmacro MUI_LANGUAGE "Estonian"
   ; !insertmacro MUI_LANGUAGE "Mongolian"
   ;!insertmacro MUI_LANGUAGE "Breton"
@@ -241,7 +242,7 @@ Function .onInit
 		Abort
 
 	StrCmp $R0 "ME" 0 +3
-		MessageBox MB_OK "The installer contains only Unicode version of Notepad++,, which is not compatible with your Windows ME.$\nPlease use ANSI version in zipped package, which you can download here :$\nhttps://sourceforge.net/project/showfiles.php?group_id=95717&package_id=102072"
+		MessageBox MB_OK "The installer contains only Unicode version of Notepad++, which is not compatible with your Windows ME.$\nPlease use ANSI version in zipped package, which you can download here :$\nhttps://sourceforge.net/project/showfiles.php?group_id=95717&package_id=102072"
 		Abort
 
   !insertmacro MUI_LANGDLL_DISPLAY
@@ -261,48 +262,59 @@ FunctionEnd
 LangString langFileName ${LANG_ENGLISH} "english.xml"
 LangString langFileName ${LANG_FRENCH} "french.xml"
 LangString langFileName ${LANG_TRADCHINESE} "chinese.xml"
+LangString langFileName ${LANG_SIMPCHINESE} "chineseSimplified.xml"
+LangString langFileName ${LANG_KOREAN} "korean.xml"
+LangString langFileName ${LANG_JAPANESE} "japanese.xml"
 LangString langFileName ${LANG_GERMAN} "german.xml"
 LangString langFileName ${LANG_SPANISH} "spanish.xml"
-LangString langFileName ${LANG_HUNGARIAN} "hungarian.xml"
-LangString langFileName ${LANG_RUSSIAN} "russian.xml"
-LangString langFileName ${LANG_DUTCH} "dutch.xml"
-LangString langFileName ${LANG_SIMPCHINESE} "chineseSimplified.xml"
 LangString langFileName ${LANG_ITALIAN} "italian.xml"
-LangString langFileName ${LANG_DANISH} "danish.xml"
+LangString langFileName ${LANG_PORTUGUESE} "portuguese.xml"
+LangString langFileName ${LANG_PORTUGUESEBR} "brazilian_portuguese.xml"
+LangString langFileName ${LANG_DUTCH} "dutch.xml"
+LangString langFileName ${LANG_RUSSIAN} "russian.xml"
 LangString langFileName ${LANG_POLISH} "polish.xml"
+LangString langFileName ${LANG_CATALAN} "catalan.xml"
 LangString langFileName ${LANG_CZECH} "czech.xml"
+LangString langFileName ${LANG_HUNGARIAN} "hungarian.xml"
+LangString langFileName ${LANG_ROMANIAN} "romanian.xml"
+LangString langFileName ${LANG_TURKISH} "turkish.xml"
+LangString langFileName ${LANG_FARSI} "farsi.xml"
+LangString langFileName ${LANG_UKRAINIAN} "ukrainian.xml"
+LangString langFileName ${LANG_HEBREW} "hebrew.xml"
+LangString langFileName ${LANG_NORWEGIANNYNORSK} "nynorsk.xml"
+LangString langFileName ${LANG_NORWEGIAN} "norwegian.xml"
+
+LangString langFileName ${LANG_THAI} "thai.xml"
+
+LangString langFileName ${LANG_ARABIC} "arabic.xml"
+LangString langFileName ${LANG_FINNISH} "finnish.xml"
+LangString langFileName ${LANG_LITHUANIAN} "lithuanian.xml"
+LangString langFileName ${LANG_GREEK} "greek.xml"
+LangString langFileName ${LANG_SWEDISH} "swedish.xml"
+LangString langFileName ${LANG_GALICIAN} "galician.xml"
 LangString langFileName ${LANG_SLOVENIAN} "slovenian.xml"
 LangString langFileName ${LANG_SLOVAK} "slovak.xml"
-LangString langFileName ${LANG_SWEDISH} "swedish.xml"
-LangString langFileName ${LANG_NORWEGIAN} "norwegian.xml"
-LangString langFileName ${LANG_PORTUGUESEBR} "brazilian_portuguese.xml"
-LangString langFileName ${LANG_UKRAINIAN} "ukrainian.xml"
-LangString langFileName ${LANG_TURKISH} "turkish.xml"
-LangString langFileName ${LANG_CATALAN} "catalan.xml"
-LangString langFileName ${LANG_ARABIC} "arabic.xml"
-LangString langFileName ${LANG_LITHUANIAN} "lithuanian.xml"
-LangString langFileName ${LANG_FINNISH} "finnish.xml"
-LangString langFileName ${LANG_GREEK} "greek.xml"
-LangString langFileName ${LANG_ROMANIAN} "romanian.xml"
-LangString langFileName ${LANG_KOREAN} "korean.xml"
-LangString langFileName ${LANG_HEBREW} "hebrew.xml"
-LangString langFileName ${LANG_PORTUGUESE} "portuguese.xml"
-LangString langFileName ${LANG_FARSI} "farsi.xml"
+LangString langFileName ${LANG_DANISH} "danish.xml"
+
+
+
 LangString langFileName ${LANG_BULGARIAN} "bulgarian.xml"
 LangString langFileName ${LANG_INDONESIAN} "indonesian.xml"
-LangString langFileName ${LANG_JAPANESE} "japanese.xml"
-LangString langFileName ${LANG_CROATIAN} "croatian.xml"
-LangString langFileName ${LANG_SERBIAN} "serbian.xml"
-LangString langFileName ${LANG_THAI} "thai.xml"
-LangString langFileName ${LANG_NORWEGIANNYNORSK} "nynorsk.xml"
-LangString langFileName ${LANG_BELARUSIAN} "belarusian.xml"
 LangString langFileName ${LANG_ALBANIAN} "albanian.xml"
-LangString langFileName ${LANG_MALAY} "malay.xml"
-LangString langFileName ${LANG_GALICIAN} "galician.xml"
+LangString langFileName ${LANG_CROATIAN} "croatian.xml"
+
 LangString langFileName ${LANG_BASQUE} "basque.xml"
+
+LangString langFileName ${LANG_BELARUSIAN} "belarusian.xml"
+LangString langFileName ${LANG_SERBIAN} "serbian.xml"
+LangString langFileName ${LANG_MALAY} "malay.xml"
 LangString langFileName ${LANG_LUXEMBOURGISH} "luxembourgish.xml"
+
 LangString langFileName ${LANG_AFRIKAANS} "afrikaans.xml"
+
 LangString langFileName ${LANG_UZBEK} "uzbek.xml"
+
+LangString langFileName ${LANG_MACEDONIAN} "macedonian.xml"
 
 
 ;--------------------------------
@@ -382,7 +394,6 @@ GLOBAL_INST:
 	; Set Section Files and Shortcuts
 	SetOverwrite on
 	File "..\license.txt"
-	File "..\bin\LINEDRAW.TTF"
 	File "..\bin\SciLexer.dll"
 	File "..\bin\change.log"
 	File "..\bin\notepad++.exe"
@@ -422,24 +433,24 @@ GLOBAL_INST:
 	CreateDirectory "$INSTDIR\plugins\disabled"
 
 	IfFileExists "$INSTDIR\plugins\HexEditorPlugin.dll" 0 +4
-		MessageBox MB_OK "Due to the stability issue,$\nHexEditorPlugin.dll is about to be deleted."
+		MessageBox MB_OK "Due to the stability issue,$\nHexEditorPlugin.dll is about to be deleted." /SD IDOK
 		Rename "$INSTDIR\plugins\HexEditorPlugin.dll" "$INSTDIR\plugins\disabled\HexEditorPlugin.dll"
 		Delete "$INSTDIR\plugins\HexEditorPlugin.dll"
 
 	IfFileExists "$INSTDIR\plugins\HexEditor.dll" 0 +4
-		MessageBox MB_OK "Due to the stability issue,$\nHexEditor.dll will be moved to the directory $\"disabled$\""
+		MessageBox MB_OK "Due to the stability issue,$\nHexEditor.dll will be moved to the directory $\"disabled$\"" /SD IDOK
 		Rename "$INSTDIR\plugins\HexEditor.dll" "$INSTDIR\plugins\disabled\HexEditor.dll"
 		Delete "$INSTDIR\plugins\HexEditor.dll"
 
 	IfFileExists "$INSTDIR\plugins\MultiClipboard.dll" 0 +4
-		MessageBox MB_OK "Due to the stability issue,$\nMultiClipboard.dll will be moved to the directory $\"disabled$\""
+		MessageBox MB_OK "Due to the stability issue,$\nMultiClipboard.dll will be moved to the directory $\"disabled$\"" /SD IDOK
 		Rename "$INSTDIR\plugins\MultiClipboard.dll" "$INSTDIR\plugins\disabled\MultiClipboard.dll"
 		Delete "$INSTDIR\plugins\MultiClipboard.dll"
 
 	Delete "$INSTDIR\plugins\NppDocShare.dll"
 
 	IfFileExists "$INSTDIR\plugins\FunctionList.dll" 0 +4
-		MessageBox MB_OK "Due to the stability issue,$\nFunctionList.dll will be moved to the directory $\"disabled$\""
+		MessageBox MB_OK "Due to the stability issue,$\nFunctionList.dll will be moved to the directory $\"disabled$\"" /SD IDOK
 		Rename "$INSTDIR\plugins\FunctionList.dll" "$INSTDIR\plugins\disabled\FunctionList.dll"
 		Delete "$INSTDIR\plugins\FunctionList.dll"
 
@@ -447,19 +458,36 @@ GLOBAL_INST:
 		Delete "$INSTDIR\plugins\NPPTextFX.ini"
 
 	IfFileExists "$INSTDIR\plugins\NppAutoIndent.dll" 0 +4
-		MessageBox MB_OK "Due to the stabilty issue,$\nNppAutoIndent.dll will be moved to the directory $\"disabled$\""
+		MessageBox MB_OK "Due to the stabilty issue,$\nNppAutoIndent.dll will be moved to the directory $\"disabled$\"" /SD IDOK
 		Rename "$INSTDIR\plugins\NppAutoIndent.dll" "$INSTDIR\plugins\disabled\NppAutoIndent.dll"
 		Delete "$INSTDIR\plugins\NppAutoIndent.dll"
 
 	IfFileExists "$INSTDIR\plugins\FTP_synchronize.dll" 0 +4
-		MessageBox MB_OK "Due to the stabilty issue,$\nFTP_synchronize.dll will be moved to the directory $\"disabled$\""
+		MessageBox MB_OK "Due to the stabilty issue,$\nFTP_synchronize.dll will be moved to the directory $\"disabled$\"" /SD IDOK
 		Rename "$INSTDIR\plugins\FTP_synchronize.dll" "$INSTDIR\plugins\disabled\FTP_synchronize.dll"
 		Delete "$INSTDIR\plugins\FTP_synchronize.dll"
 
 	IfFileExists "$INSTDIR\plugins\NppPlugin_ChangeMarker.dll" 0 +4
-		MessageBox MB_OK "Due to the stabilty issue,$\nNppPlugin_ChangeMarker.dll will be moved to the directory $\"disabled$\""
+		MessageBox MB_OK "Due to the stabilty issue,$\nNppPlugin_ChangeMarker.dll will be moved to the directory $\"disabled$\"" /SD IDOK
 		Rename "$INSTDIR\plugins\NppPlugin_ChangeMarker.dll" "$INSTDIR\plugins\disabled\NppPlugin_ChangeMarker.dll"
 		Delete "$INSTDIR\plugins\NppPlugin_ChangeMarker.dll"
+
+
+
+
+    ; Context Menu Management : removing old version of Context Menu module
+	IfFileExists "$INSTDIR\nppcm.dll" 0 +3
+		Exec 'regsvr32 /u /s "$INSTDIR\nppcm.dll"'
+		Delete "$INSTDIR\nppcm.dll"
+
+    IfFileExists "$INSTDIR\NppShell.dll" 0 +3
+		Exec 'regsvr32 /u /s "$INSTDIR\NppShell.dll"'
+		Delete "$INSTDIR\NppShell.dll"
+
+
+
+
+
 
 	; detect the right of
 	UserInfo::GetAccountType
@@ -480,14 +508,12 @@ Section "Context Menu Entry" explorerContextMenu
 	SetOverwrite try
 	SetOutPath "$INSTDIR\"
 	${If} ${RunningX64}
-		File /oname=$INSTDIR\nppcm.dll "..\bin\nppcm64.dll"
+		File /oname=$INSTDIR\NppShell_01.dll "..\bin\NppShell64_01.dll"
 	${Else}
-		File "..\bin\nppcm.dll"
+		File "..\bin\NppShell_01.dll"
 	${EndIf}
 
-	Exec 'regsvr32 /s "$INSTDIR\nppcm.dll"'
-	Exec 'regsvr32 /u /s "$INSTDIR\nppshellext.dll"'
-	Delete "$INSTDIR\nppshellext.dll"
+	Exec 'regsvr32 /s "$INSTDIR\NppShell_01.dll"'
 SectionEnd
 
 SubSection "Auto-completion Files" autoCompletionComponent
@@ -588,6 +614,10 @@ SubSection "Auto-completion Files" autoCompletionComponent
 		File "..\bin\plugins\APIs\nsis.xml"
 	SectionEnd
 
+	Section CMAKE
+		SetOutPath "$INSTDIR\plugins\APIs"
+		File "..\bin\plugins\APIs\cmake.xml"
+	SectionEnd
 SubSectionEnd
 
 SubSection "Plugins" Plugins
@@ -675,13 +705,13 @@ SubSection "Plugins" Plugins
 		File "..\bin\plugins\Config\NppAutoIndent.ini"
 
 	SectionEnd
-*/
+
 	Section "Document Monitor" DocMonitor
 		Delete "$INSTDIR\plugins\docMonitor.dll"
 		SetOutPath "$INSTDIR\plugins"
 		File "..\bin\plugins\docMonitor.dll"
 	SectionEnd
-/*
+
 	Section "Change Markers" ChangeMarkers
 		Delete "$INSTDIR\plugins\NppPlugin_ChangeMarker.dll"
 		SetOutPath "$INSTDIR\plugins"
@@ -694,6 +724,13 @@ SubSection "Plugins" Plugins
 		File "..\bin\plugins\ComparePlugin.dll"
 	SectionEnd
 
+	Section "Plugin Manager" PluginManager
+		Delete "$INSTDIR\plugins\PluginManager.dll"
+		SetOutPath "$INSTDIR\plugins"
+		File "..\bin\plugins\PluginManager.dll"
+		SetOutPath "$INSTDIR\updater"
+		File "..\bin\updater\gpup.exe"
+	SectionEnd
 SubSectionEnd
 
 SubSection "Themes" Themes
@@ -923,6 +960,10 @@ SubSection un.autoCompletionComponent
 		RMDir "$INSTDIR\plugins\APIs\"
 	SectionEnd
 
+	Section un.CMAKE
+		Delete "$INSTDIR\plugins\APIs\cmake.xml"
+		RMDir "$INSTDIR\plugins\APIs\"
+	SectionEnd
 SubSectionEnd
 
 SubSection un.Plugins
@@ -977,8 +1018,6 @@ SubSection un.Plugins
 	SectionEnd
 
 
-
-
 	Section un.FileBrowserLite
 		Delete "$INSTDIR\plugins\LightExplorer.dll"
 		Delete "$INSTDIR\lightExplorer.ini"
@@ -1022,7 +1061,12 @@ SubSection un.Plugins
 		Delete "$INSTDIR\plugins\ComparePlugin.dll"
 		RMDir "$INSTDIR\plugins\"
 	SectionEnd
-
+	Section un.PluginManager
+		Delete "$INSTDIR\plugins\PluginManager.dll"
+		RMDir "$INSTDIR\plugins\"
+		Delete "$INSTDIR\updater\gpup.exe"
+		RMDir "$INSTDIR\updater\"
+	SectionEnd
 	Section un.ChangeMarkers
 		Delete "$INSTDIR\plugins\NppPlugin_ChangeMarker.dll"
 		RMDir "$INSTDIR\plugins\"
@@ -1118,8 +1162,8 @@ Section un.AutoUpdater
 SectionEnd
 
 Section un.explorerContextMenu
-	Exec 'regsvr32 /u /s "$INSTDIR\nppcm.dll"'
-	Delete "$INSTDIR\nppcm.dll"
+	Exec 'regsvr32 /u /s "$INSTDIR\NppShell_01.dll"'
+	Delete "$INSTDIR\NppShell_01.dll"
 SectionEnd
 
 Section Uninstall

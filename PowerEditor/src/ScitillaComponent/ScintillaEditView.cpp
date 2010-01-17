@@ -30,6 +30,7 @@
 #include "colors.h"
 #include "npp_session.h"
 
+#include "menuCmdID.h"
 
 // initialize the static variable
 HINSTANCE ScintillaEditView::_hLib = ::LoadLibrary(TEXT("SciLexer.DLL"));
@@ -37,10 +38,10 @@ int ScintillaEditView::_refCount = 0;
 
 UserDefineDialog s_userDefineDlg;
 
-const int ScintillaEditView::_SC_MARGE_LINENUMBER = 0;
-const int ScintillaEditView::_SC_MARGE_SYBOLE = 1;
-const int ScintillaEditView::_SC_MARGE_FOLDER = 2;
-//const int ScintillaEditView::_SC_MARGE_MODIFMARKER = 3;
+const int ScintillaEditView::_SC_MARGIN_LINENUMBER = 0;
+const int ScintillaEditView::_SC_MARGIN_SYMBOL = 1;
+const int ScintillaEditView::_SC_MARGIN_FOLDER = 2;
+//const int ScintillaEditView::_SC_MARGIN_MODIFMARKER = 3;
 
 WNDPROC ScintillaEditView::_scintillaDefaultProc = NULL;
 /*
@@ -115,6 +116,11 @@ LanguageName ScintillaEditView::langNames[L_EXTERNAL+1] = {
 {TEXT("searchResult"), TEXT("Internal Search"),			TEXT("Internal Search"),										L_SEARCHRESULT,	SCLEX_SEARCHRESULT},
 {TEXT("cmake"),		TEXT("CMAKEFILE"),				TEXT("CMAKEFILE"),											L_CMAKE,		SCLEX_CMAKE},
 {TEXT("yaml"),		TEXT("YAML"),						TEXT("YAML Ain't Markup Language"),							L_YAML,			SCLEX_YAML},
+{TEXT("cobol"),		TEXT("COBOL"),						TEXT("COmmon Business Oriented Language"),							L_COBOL,			SCLEX_COBOL},
+{TEXT("gui4cli"),		TEXT("Gui4Cli"),						TEXT("Gui4Cli file"),							L_GUI4CLI,			SCLEX_GUI4CLI},
+{TEXT("d"),		TEXT("D"),						TEXT("D programming language"),							L_D,			SCLEX_D},
+{TEXT("powershell"),		TEXT("PowerShell"),						TEXT("Windows PowerShell"),							L_POWERSHELL,			SCLEX_POWERSHELL},
+{TEXT("r"),		TEXT("R"),						TEXT("R programming language"),							L_R,			SCLEX_R},
 {TEXT("ext"),			TEXT("External"),					TEXT("External"),												L_EXTERNAL,		SCLEX_NULL}
 };
 
@@ -178,14 +184,14 @@ void ScintillaEditView::init(HINSTANCE hInst, HWND hParent)
 		throw int(106901);
 	}
 
-    execute(SCI_SETMARGINMASKN, _SC_MARGE_FOLDER, SC_MASK_FOLDERS);
-    showMargin(_SC_MARGE_FOLDER, true);
+    execute(SCI_SETMARGINMASKN, _SC_MARGIN_FOLDER, SC_MASK_FOLDERS);
+    showMargin(_SC_MARGIN_FOLDER, true);
 
-    execute(SCI_SETMARGINMASKN, _SC_MARGE_SYBOLE, (1<<MARK_BOOKMARK) | (1<<MARK_HIDELINESBEGIN) | (1<<MARK_HIDELINESEND));
+    execute(SCI_SETMARGINMASKN, _SC_MARGIN_SYMBOL, (1<<MARK_BOOKMARK) | (1<<MARK_HIDELINESBEGIN) | (1<<MARK_HIDELINESEND));
 /*
-	execute(SCI_SETMARGINMASKN, _SC_MARGE_MODIFMARKER, (1<<MARK_LINEMODIFIEDUNSAVED)|(1<<MARK_LINEMODIFIEDSAVED));
-	execute(SCI_SETMARGINTYPEN, _SC_MARGE_MODIFMARKER, SC_MARGIN_BACK);
-	showMargin(_SC_MARGE_MODIFMARKER, true);
+	execute(SCI_SETMARGINMASKN, _SC_MARGIN_MODIFMARKER, (1<<MARK_LINEMODIFIEDUNSAVED)|(1<<MARK_LINEMODIFIEDSAVED));
+	execute(SCI_SETMARGINTYPEN, _SC_MARGIN_MODIFMARKER, SC_MARGIN_BACK);
+	showMargin(_SC_MARGIN_MODIFMARKER, true);
 
 	execute(SCI_MARKERDEFINE, MARK_LINEMODIFIEDSAVED, SCI_MARKERDEFINE);
 	execute(SCI_MARKERDEFINE, MARK_LINEMODIFIEDUNSAVED, SCI_MARKERDEFINE);
@@ -195,8 +201,8 @@ void ScintillaEditView::init(HINSTANCE hInst, HWND hParent)
 	execute(SCI_MARKERDEFINEPIXMAP, MARK_HIDELINESBEGIN, (LPARAM)acTop_xpm);
 	execute(SCI_MARKERDEFINEPIXMAP, MARK_HIDELINESEND, (LPARAM)acBottom_xpm);
 
-    execute(SCI_SETMARGINSENSITIVEN, _SC_MARGE_FOLDER, true);
-    execute(SCI_SETMARGINSENSITIVEN, _SC_MARGE_SYBOLE, true);
+    execute(SCI_SETMARGINSENSITIVEN, _SC_MARGIN_FOLDER, true);
+    execute(SCI_SETMARGINSENSITIVEN, _SC_MARGIN_SYMBOL, true);
 
     execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("fold"), reinterpret_cast<LPARAM>("1"));
     execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("fold.compact"), reinterpret_cast<LPARAM>("0"));
@@ -209,7 +215,7 @@ void ScintillaEditView::init(HINSTANCE hInst, HWND hParent)
 	execute(SCI_SETSCROLLWIDTH, 1);	//default empty document: override default width of 2000
 
 	// smart hilighting
-	execute(SCI_INDICSETSTYLE, SCE_UNIVERSAL_FOUND_STYLE_2, INDIC_ROUNDBOX);
+	execute(SCI_INDICSETSTYLE, SCE_UNIVERSAL_FOUND_STYLE_SMART, INDIC_ROUNDBOX);
 	execute(SCI_INDICSETSTYLE, SCE_UNIVERSAL_FOUND_STYLE, INDIC_ROUNDBOX);
 	execute(SCI_INDICSETSTYLE, SCE_UNIVERSAL_FOUND_STYLE_INC, INDIC_ROUNDBOX);
 	execute(SCI_INDICSETSTYLE, SCE_UNIVERSAL_TAGMATCH, INDIC_ROUNDBOX);
@@ -220,7 +226,7 @@ void ScintillaEditView::init(HINSTANCE hInst, HWND hParent)
 	execute(SCI_INDICSETSTYLE, SCE_UNIVERSAL_FOUND_STYLE_EXT4, INDIC_ROUNDBOX);
 	execute(SCI_INDICSETSTYLE, SCE_UNIVERSAL_FOUND_STYLE_EXT5, INDIC_ROUNDBOX);
 
-	execute(SCI_INDICSETALPHA, SCE_UNIVERSAL_FOUND_STYLE_2, 100);
+	execute(SCI_INDICSETALPHA, SCE_UNIVERSAL_FOUND_STYLE_SMART, 100);
 	execute(SCI_INDICSETALPHA, SCE_UNIVERSAL_FOUND_STYLE, 100);
 	execute(SCI_INDICSETALPHA, SCE_UNIVERSAL_FOUND_STYLE_INC, 100);
 	execute(SCI_INDICSETALPHA, SCE_UNIVERSAL_TAGMATCH, 100);
@@ -231,7 +237,7 @@ void ScintillaEditView::init(HINSTANCE hInst, HWND hParent)
 	execute(SCI_INDICSETALPHA, SCE_UNIVERSAL_FOUND_STYLE_EXT4, 100);
 	execute(SCI_INDICSETALPHA, SCE_UNIVERSAL_FOUND_STYLE_EXT5, 100);
 
-	execute(SCI_INDICSETUNDER, SCE_UNIVERSAL_FOUND_STYLE_2, true);
+	execute(SCI_INDICSETUNDER, SCE_UNIVERSAL_FOUND_STYLE_SMART, true);
 	execute(SCI_INDICSETUNDER, SCE_UNIVERSAL_FOUND_STYLE, true);
 	execute(SCI_INDICSETUNDER, SCE_UNIVERSAL_FOUND_STYLE_INC, true);
 	execute(SCI_INDICSETUNDER, SCE_UNIVERSAL_TAGMATCH, true);
@@ -244,7 +250,6 @@ void ScintillaEditView::init(HINSTANCE hInst, HWND hParent)
 	_pParameter = NppParameters::getInstance();
 
 	_codepage = ::GetACP();
-	_oemCodepage = ::GetOEMCP();
 
 	//Use either Unicode or ANSI setwindowlong, depending on environment
 	if (::IsWindowUnicode(_hSelf))
@@ -416,7 +421,6 @@ void ScintillaEditView::setStyle(const Style& styleToSet)
 	Style styleCopy;
 	styleCopy = styleToSet;
 	GlobalOverride & go = _pParameter->getGlobalOverrideStyle();
-	//go.enableBg = true;
 
 	if (go.isEnable())
 	{
@@ -666,14 +670,6 @@ void ScintillaEditView::setCppLexer(LangType langType)
 	const TCHAR *lexerName = ScintillaEditView::langNames[langType].lexerName;
 
     execute(SCI_SETLEXER, SCLEX_CPP);
-	/*
-	if (isCJK())
-	{
-		int charSet = codepage2CharSet();
-		if (charSet)
-			execute(SCI_STYLESETCHARACTERSET, SCE_C_STRING, charSet);
-	}
-	*/
 
 	if ((langType != L_RC) && (langType != L_JS))
     {
@@ -1000,10 +996,10 @@ void ScintillaEditView::defineDocType(LangType typeDoc)
     }
 	setSpecialIndicator(*pStyle);
 
-	defaultIndicatorStyle._styleID = SCE_UNIVERSAL_FOUND_STYLE_2;
+	defaultIndicatorStyle._styleID = SCE_UNIVERSAL_FOUND_STYLE_SMART;
 	defaultIndicatorStyle._bgColor = liteGreen;
 	pStyle = &defaultIndicatorStyle;
-	iFind = stylers.getStylerIndexByID(SCE_UNIVERSAL_FOUND_STYLE_2);
+	iFind = stylers.getStylerIndexByID(SCE_UNIVERSAL_FOUND_STYLE_SMART);
     if (iFind != -1)
     {
         pStyle = &(stylers.getStyler(iFind));
@@ -1104,7 +1100,7 @@ void ScintillaEditView::defineDocType(LangType typeDoc)
 		}
 	}
 
-	showMargin(_SC_MARGE_FOLDER, isNeededFolderMarge(typeDoc));
+	showMargin(_SC_MARGIN_FOLDER, isNeededFolderMargin(typeDoc));
 	switch (typeDoc)
 	{
 		case L_C :
@@ -1153,7 +1149,8 @@ void ScintillaEditView::defineDocType(LangType typeDoc)
 			LexerStyler *pStyler = (_pParameter->getLStylerArray()).getLexerStylerByName(TEXT("nfo"));
 			Style nfoStyle;
 			nfoStyle._styleID = STYLE_DEFAULT;
-			nfoStyle._fontName = TEXT("MS LineDraw");
+			nfoStyle._fontName = TEXT("Lucida Console");
+			nfoStyle._fontSize = 10;
 
 			if (pStyler)
 			{
@@ -1166,9 +1163,15 @@ void ScintillaEditView::defineDocType(LangType typeDoc)
 					nfoStyle._colorStyle = style._colorStyle;
 				}
 			}
-			setStyle(nfoStyle);
+			setSpecialStyle(nfoStyle);
 			execute(SCI_STYLECLEARALL);
 
+			Buffer * buf = MainFileManager->getBufferByID(_currentBufferID);
+			if (buf->getEncoding() != NPP_CP_DOS_437)
+			{
+			   buf->setEncoding(NPP_CP_DOS_437);
+			   ::SendMessage(_hParent, WM_COMMAND, IDM_FILE_RELOAD, 0);
+			}
 		}
 		break;
 
@@ -1258,6 +1261,21 @@ void ScintillaEditView::defineDocType(LangType typeDoc)
 
 		case L_YAML :
 			setYamlLexer(); break;
+
+        case L_COBOL :
+			setCobolLexer(); break;
+
+        case L_GUI4CLI :
+			setGui4CliLexer(); break;
+
+        case L_D :
+			setDLexer(); break;
+
+        case L_POWERSHELL :
+			setPowerShellLexer(); break;
+
+        case L_R :
+			setRLexer(); break;
 
 		case L_TXT :
 		default :
@@ -1473,19 +1491,23 @@ void ScintillaEditView::bufferUpdated(Buffer * buffer, int mask) {
 		}
 		if (mask & BufferChangeUnicode)
 		{
+            int enc = CP_ACP;
 			if (buffer->getUnicodeMode() == uni8Bit)
 			{	//either 0 or CJK codepage
 				LangType typeDoc = buffer->getLangType();
 				if (isCJK())
 				{
 					if (typeDoc == L_CSS || typeDoc == L_CAML || typeDoc == L_ASM || typeDoc == L_MATLAB)
-						execute(SCI_SETCODEPAGE, 0);	//you may also want to set charsets here, not yet implemented
+						enc = CP_ACP;	//you may also want to set charsets here, not yet implemented
 					else
-						execute(SCI_SETCODEPAGE, _codepage);
+						enc = _codepage;
 				}
+                else
+                    enc = CP_ACP;
 			}
 			else	//CP UTF8 for all unicode
-				execute(SCI_SETCODEPAGE, SC_CP_UTF8);
+				enc = SC_CP_UTF8;
+            execute(SCI_SETCODEPAGE, enc);
 		}
 	}
 }
@@ -2504,6 +2526,16 @@ void ScintillaEditView::columnReplace(ColumnModeInfos & cmi, int initial, int in
 
 			int2str(str, stringSize, initial, base, nb, isZeroLeading);
 
+			bool hasVirtualSpc = cmi[i]._nbVirtualAnchorSpc > 0;
+			if (hasVirtualSpc) // if virtual space is present, then insert space
+			{
+				for (int j = 0, k = cmi[i]._selLpos; j < cmi[i]._nbVirtualCaretSpc ; j++, k++)
+				{
+					execute(SCI_INSERTTEXT, k, (LPARAM)" ");
+				}
+				cmi[i]._selLpos += cmi[i]._nbVirtualAnchorSpc;
+				cmi[i]._selRpos += cmi[i]._nbVirtualCaretSpc;
+			}
 			execute(SCI_SETTARGETSTART, cmi[i]._selLpos);
 			execute(SCI_SETTARGETEND, cmi[i]._selRpos);
 #ifdef UNICODE
@@ -2515,7 +2547,17 @@ void ScintillaEditView::columnReplace(ColumnModeInfos & cmi, int initial, int in
 			execute(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)str);
 #endif
 			initial += incr;
-			totalDiff += diff;
+			if (hasVirtualSpc)
+			{
+				totalDiff += cmi[i]._nbVirtualAnchorSpc + lstrlen(str);
+				// Now there's no more virtual space
+				cmi[i]._nbVirtualAnchorSpc = 0;
+				cmi[i]._nbVirtualCaretSpc = 0;
+			}
+			else
+			{
+				totalDiff += diff;
+			}
 			cmi[i]._selRpos += diff;
 		}
 	}
@@ -2869,9 +2911,8 @@ void ScintillaEditView::reapplyHotspotStyles()
 ScintillaEditView::ScintillaEditView() :
 	_pScintillaFunc(NULL),_pScintillaPtr(NULL),_callWindowProc(NULL),
 	_currentBufferID(BUFFER_INVALID), _currentBuffer(NULL),
-	_folderStyle(FOLDER_STYLE_BOX), _pParameter(NULL),
-	_codepage(CP_ACP), _oemCodepage(CP_ACP),
-	 _lineNumbersShown(false), _wrapRestoreNeeded(false),
+	_folderStyle(FOLDER_STYLE_BOX), _pParameter(NULL), _codepage(CP_ACP),
+	_lineNumbersShown(false), _wrapRestoreNeeded(false),
 	_currentHotspotStyleMap(NULL), _currentHotspotOriginMap(NULL)
 {
 	++_refCount;
@@ -2951,22 +2992,22 @@ void ScintillaEditView::beSwitched()
 	s_userDefineDlg.setScintilla(this);
 }
 
-void ScintillaEditView::showMargin( int whichMarge, bool willBeShowed )
+void ScintillaEditView::showMargin( int whichMargin, bool willBeShowed )
 {
-	if (whichMarge == _SC_MARGE_LINENUMBER)
+	if (whichMargin == _SC_MARGIN_LINENUMBER)
 		showLineNumbersMargin(willBeShowed);
 	else
 	{
 		int width = 3;
-		if (whichMarge == _SC_MARGE_SYBOLE || whichMarge == _SC_MARGE_FOLDER)
+		if (whichMargin == _SC_MARGIN_SYMBOL || whichMargin == _SC_MARGIN_FOLDER)
 			width = 14;
-		execute(SCI_SETMARGINWIDTHN, whichMarge, willBeShowed?width:0);
+		execute(SCI_SETMARGINWIDTHN, whichMargin, willBeShowed?width:0);
 	}
 }
 
-bool ScintillaEditView::hasMarginShowed( int witchMarge )
+bool ScintillaEditView::hasMarginShowed( int whichMargin )
 {
-	return (execute(SCI_GETMARGINWIDTHN, witchMarge, 0) != 0);
+	return (execute(SCI_GETMARGINWIDTHN, whichMargin, 0) != 0);
 }
 
 void ScintillaEditView::setMakerStyle( folderStyle style )
@@ -3035,7 +3076,7 @@ bool ScintillaEditView::isWrapSymbolVisible() const
 
 void ScintillaEditView::showWrapSymbol( bool willBeShown )
 {
-	execute(SCI_SETWRAPVISUALFLAGSLOCATION, SC_WRAPVISUALFLAGLOC_END_BY_TEXT);
+	execute(SCI_SETWRAPVISUALFLAGSLOCATION, SC_WRAPVISUALFLAGLOC_DEFAULT);
 	execute(SCI_SETWRAPVISUALFLAGS, willBeShown?SC_WRAPVISUALFLAG_END:SC_WRAPVISUALFLAG_NONE);
 }
 
@@ -3118,7 +3159,7 @@ void ScintillaEditView::showLineNumbersMargin( bool show )
 	}
 	else
 	{
-		execute(SCI_SETMARGINWIDTHN, _SC_MARGE_LINENUMBER, 0);
+		execute(SCI_SETMARGINWIDTHN, _SC_MARGIN_LINENUMBER, 0);
 	}
 }
 
@@ -3140,7 +3181,7 @@ void ScintillaEditView::updateLineNumberWidth()
 			i = max(i, 3);
 			{
 				int pixelWidth = int(8 + i * execute(SCI_TEXTWIDTH, STYLE_LINENUMBER, (LPARAM)"8"));
-				execute(SCI_SETMARGINWIDTHN, _SC_MARGE_LINENUMBER, pixelWidth);
+				execute(SCI_SETMARGINWIDTHN, _SC_MARGIN_LINENUMBER, pixelWidth);
 			}
 		}
 	}
@@ -3265,6 +3306,7 @@ void ScintillaEditView::setIniLexer()
 
 void ScintillaEditView::setSqlLexer()
 {
+	execute(SCI_SETPROPERTY, (WPARAM)"sql.backslash.escapes", (LPARAM)"1");
 	setLexer(SCLEX_SQL, L_SQL, LIST_0);
 }
 
@@ -3317,12 +3359,12 @@ void ScintillaEditView::setFortranLexer()
 
 void ScintillaEditView::setLispLexer()
 {
-	setLexer(SCLEX_LISP, L_LISP, LIST_0);
+	setLexer(SCLEX_LISP, L_LISP, LIST_0 | LIST_1);
 }
 
 void ScintillaEditView::setSchemeLexer()
 {
-	setLexer(SCLEX_LISP, L_SCHEME, LIST_0);
+	setLexer(SCLEX_LISP, L_SCHEME, LIST_0 | LIST_1);
 }
 
 void ScintillaEditView::setAsmLexer()
@@ -3411,6 +3453,31 @@ void ScintillaEditView::setYamlLexer()
 	setLexer(SCLEX_YAML, L_YAML, LIST_0);
 }
 
+void ScintillaEditView::setCobolLexer()
+{
+	setLexer(SCLEX_COBOL, L_COBOL, LIST_0 | LIST_1 | LIST_2);
+}
+
+void ScintillaEditView::setGui4CliLexer()
+{
+	setLexer(SCLEX_GUI4CLI, L_GUI4CLI, LIST_0 | LIST_1 | LIST_2 | LIST_3 | LIST_4);
+}
+
+void ScintillaEditView::setDLexer()
+{
+	setLexer(SCLEX_D, L_D, LIST_0 | LIST_1 | LIST_2 | LIST_3 | LIST_4 | LIST_5 | LIST_6);
+}
+
+void ScintillaEditView::setPowerShellLexer()
+{
+	setLexer(SCLEX_POWERSHELL, L_POWERSHELL, LIST_0 | LIST_1 | LIST_2);
+}
+
+void ScintillaEditView::setRLexer()
+{
+	setLexer(SCLEX_R, L_R, LIST_0 | LIST_1 | LIST_2);
+}
+
 void ScintillaEditView::setSearchResultLexer()
 {
 	execute(SCI_STYLESETEOLFILLED, SCE_SEARCHRESULT_FILE_HEADER, true);
@@ -3418,7 +3485,7 @@ void ScintillaEditView::setSearchResultLexer()
 	setLexer(SCLEX_SEARCHRESULT, L_SEARCHRESULT, 0);
 }
 
-bool ScintillaEditView::isNeededFolderMarge( LangType typeDoc ) const
+bool ScintillaEditView::isNeededFolderMargin( LangType typeDoc ) const
 {
 	switch (typeDoc)
 	{
@@ -3426,9 +3493,8 @@ bool ScintillaEditView::isNeededFolderMarge( LangType typeDoc ) const
 		case L_BATCH:
 		case L_TXT:
 		case L_MAKEFILE:
-		case L_SQL:
+		//case L_SQL:
 		case L_ASM:
-		//case L_TEX:
 		case L_HASKELL:
 		case L_PROPS:
 		case L_SMALLTALK:

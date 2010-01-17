@@ -457,14 +457,15 @@ void XmlMatchedTagsHighlighter::tagMatch(bool doHiliteAttr)
 	int originalEndPos = _pEditView->execute(SCI_GETTARGETEND);
 	int originalSearchFlags = _pEditView->execute(SCI_GETSEARCHFLAGS);
 
-	// Detect if it's a xml/html tag. If yes, Colour it!
 	XmlMatchedTagsPos xmlTags;
+
+    // Detect if it's a xml/html tag. If yes, Colour it!
 	if (getXmlMatchedTagsPos(xmlTags))
 	{
-		_pEditView->execute(SCI_SETINDICATORCURRENT,  SCE_UNIVERSAL_TAGMATCH);
-
+		_pEditView->execute(SCI_SETINDICATORCURRENT, SCE_UNIVERSAL_TAGMATCH);
 		int openTagTailLen = 2;
-		// We colourise the close tag firstly
+
+		// Colourising the close tag firstly
 		if ((xmlTags.tagCloseStart != -1) && (xmlTags.tagCloseEnd != -1))
 		{
 			_pEditView->execute(SCI_INDICATORFILLRANGE,  xmlTags.tagCloseStart, xmlTags.tagCloseEnd - xmlTags.tagCloseStart);
@@ -472,17 +473,35 @@ void XmlMatchedTagsHighlighter::tagMatch(bool doHiliteAttr)
 			openTagTailLen = 1;
 		}
 
-		// Now the open tag and its attributs
+		// Colourising the open tag
 		_pEditView->execute(SCI_INDICATORFILLRANGE,  xmlTags.tagOpenStart, xmlTags.tagNameEnd - xmlTags.tagOpenStart);
 		_pEditView->execute(SCI_INDICATORFILLRANGE,  xmlTags.tagOpenEnd - openTagTailLen, openTagTailLen);
 
-		if (doHiliteAttr)
+
+        // Colourising its attributes
+        if (doHiliteAttr)
 		{
 			std::vector< std::pair<int, int> > attributes = getAttributesPos(xmlTags.tagNameEnd, xmlTags.tagOpenEnd - openTagTailLen);
 			_pEditView->execute(SCI_SETINDICATORCURRENT,  SCE_UNIVERSAL_TAGATTR);
 			for (size_t i = 0 ; i < attributes.size() ; i++)
 			{
 				_pEditView->execute(SCI_INDICATORFILLRANGE,  attributes[i].first, attributes[i].second - attributes[i].first);
+			}
+        }
+
+        // Colourising indent guide line position
+		if (_pEditView->isShownIndentGuide())
+		{
+			int columnAtCaret  = int(_pEditView->execute(SCI_GETCOLUMN, xmlTags.tagOpenStart));
+			int columnOpposite = int(_pEditView->execute(SCI_GETCOLUMN, xmlTags.tagCloseStart));
+
+			int lineAtCaret  = int(_pEditView->execute(SCI_LINEFROMPOSITION, xmlTags.tagOpenStart));
+			int lineOpposite = int(_pEditView->execute(SCI_LINEFROMPOSITION, xmlTags.tagCloseStart));
+
+			if (xmlTags.tagCloseStart != -1 && lineAtCaret != lineOpposite)
+			{
+				_pEditView->execute(SCI_BRACEHIGHLIGHT, xmlTags.tagOpenStart, xmlTags.tagCloseEnd-1);
+				_pEditView->execute(SCI_SETHIGHLIGHTGUIDE, (columnAtCaret < columnOpposite)?columnAtCaret:columnOpposite);
 			}
 		}
 	}

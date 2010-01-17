@@ -36,7 +36,7 @@ void SmartHighlighter::highlightView(ScintillaEditView * pHighlightView)
 	pHighlightView->getSelection(range);
 
 	//Clear marks
-	pHighlightView->clearIndicator(SCE_UNIVERSAL_FOUND_STYLE_2);
+	pHighlightView->clearIndicator(SCE_UNIVERSAL_FOUND_STYLE_SMART);
 
 	//If nothing selected, dont mark anything
 	if (range.cpMin == range.cpMax)

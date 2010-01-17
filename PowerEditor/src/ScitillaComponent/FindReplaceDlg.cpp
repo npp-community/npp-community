@@ -221,9 +221,9 @@ public:
 	void add(FoundInfo fi, SearchResultMarking mi, const TCHAR* foundline, int lineNb);
 	void setFinderStyle();
 	void removeAll();
+	void openAll();
 	void beginNewFilesSearch();
 	void finishFilesSearch(int count);
-
 	void gotoNextFoundResult(int direction);
 	void GotoFoundLine();
 	void DeleteResult();
@@ -269,7 +269,7 @@ bool Finder::notify(SCNotification *notification)
 	switch (notification->nmhdr.code)
 	{
 		case SCN_MARGINCLICK:
-			if (notification->margin == ScintillaEditView::_SC_MARGE_FOLDER)
+			if (notification->margin == ScintillaEditView::_SC_MARGIN_FOLDER)
 			{
 				_scintView.marginClick(notification->position, notification->modifiers);
 			}
@@ -523,13 +523,12 @@ void FindReplaceDlg::create(int dialogID, bool isRTL)
 void FindReplaceDlg::fillFindHistory()
 {
 	NppParameters *nppParams = NppParameters::getInstance();
+	FindHistory & findHistory = nppParams->getFindHistory();
 
-	FindHistory& findHistory = nppParams->getFindHistory();
-
-	fillComboHistory(IDD_FINDINFILES_DIR_COMBO,     findHistory._nbFindHistoryPath,    findHistory._pFindHistoryPath);
-	fillComboHistory(IDD_FINDINFILES_FILTERS_COMBO, findHistory._nbFindHistoryFilter,  findHistory._pFindHistoryFilter);
-	fillComboHistory(IDFINDWHAT,                    findHistory._nbFindHistoryFind,    findHistory._pFindHistoryFind);
-	fillComboHistory(IDREPLACEWITH,                 findHistory._nbFindHistoryReplace, findHistory._pFindHistoryReplace);
+	fillComboHistory(IDFINDWHAT, findHistory._findHistoryFinds);
+	fillComboHistory(IDREPLACEWITH, findHistory._findHistoryReplaces);
+	fillComboHistory(IDD_FINDINFILES_FILTERS_COMBO, findHistory._findHistoryFilters);
+    fillComboHistory(IDD_FINDINFILES_DIR_COMBO, findHistory._findHistoryPaths);
 
 	::SendDlgItemMessage(_hSelf, IDWRAP, BM_SETCHECK, findHistory._isWrap, 0);
 	::SendDlgItemMessage(_hSelf, IDWHOLEWORD, BM_SETCHECK, findHistory._isMatchWord, 0);
@@ -595,16 +594,14 @@ void FindReplaceDlg::fillFindHistory()
 	}
 }
 
-void FindReplaceDlg::fillComboHistory(int id, int count, generic_string **pStrings)
+void FindReplaceDlg::fillComboHistory(int id, const std::vector<generic_string> & strings)
 {
-	int i;
 	bool isUnicode = false;
-	HWND hCombo;
+	HWND hCombo = ::GetDlgItem(_hSelf, id);
 
-	hCombo = ::GetDlgItem(_hSelf, id);
-	for (i = count -1 ; i >= 0 ; i--)
+	for (std::vector<generic_string>::const_reverse_iterator i = strings.rbegin() ; i != strings.rend(); i++)
 	{
-		addText2Combo(pStrings[i]->c_str(), hCombo, isUnicode);
+		addText2Combo(i->c_str(), hCombo, isUnicode);
 	}
 	::SendMessage(hCombo, CB_SETCURSEL, 0, 0); // select first item
 }
@@ -615,31 +612,30 @@ void FindReplaceDlg::saveFindHistory()
 	if (! isCreated()) return;
 	FindHistory& findHistory = (NppParameters::getInstance())->getFindHistory();
 
-	saveComboHistory(IDD_FINDINFILES_DIR_COMBO,     findHistory._nbMaxFindHistoryPath,    findHistory._nbFindHistoryPath,    findHistory._pFindHistoryPath);
-	saveComboHistory(IDD_FINDINFILES_FILTERS_COMBO, findHistory._nbMaxFindHistoryFilter,  findHistory._nbFindHistoryFilter,  findHistory._pFindHistoryFilter);
-	saveComboHistory(IDFINDWHAT,                    findHistory._nbMaxFindHistoryFind,    findHistory._nbFindHistoryFind,    findHistory._pFindHistoryFind);
-	saveComboHistory(IDREPLACEWITH,                 findHistory._nbMaxFindHistoryReplace, findHistory._nbFindHistoryReplace, findHistory._pFindHistoryReplace);
+	saveComboHistory(IDD_FINDINFILES_DIR_COMBO, findHistory._nbMaxFindHistoryPath, findHistory._findHistoryPaths);
+	saveComboHistory(IDD_FINDINFILES_FILTERS_COMBO, findHistory._nbMaxFindHistoryFilter, findHistory._findHistoryFilters);
+	saveComboHistory(IDFINDWHAT,                    findHistory._nbMaxFindHistoryFind, findHistory._findHistoryFinds);
+	saveComboHistory(IDREPLACEWITH,                 findHistory._nbMaxFindHistoryReplace, findHistory._findHistoryReplaces);
 }
 
-void FindReplaceDlg::saveComboHistory(int id, int maxcount, int & oldcount, generic_string **pStrings)
+int FindReplaceDlg::saveComboHistory(int id, int maxcount, std::vector<generic_string> & strings)
 {
-	int i, count;
-	HWND hCombo;
 	TCHAR text[FINDREPLACE_MAXLENGTH];
-
-	hCombo = ::GetDlgItem(_hSelf, id);
-	count = ::SendMessage(hCombo, CB_GETCOUNT, 0, 0);
+	HWND hCombo = ::GetDlgItem(_hSelf, id);
+	int count = ::SendMessage(hCombo, CB_GETCOUNT, 0, 0);
 	count = min(count, maxcount);
-	for (i = 0; i < count; i++)
+
+    if (count == CB_ERR) return 0;
+
+    if (count)
+        strings.clear();
+
+    for (size_t i = 0 ; i < (size_t)count ; i++)
 	{
 		::SendMessage(hCombo, CB_GETLBTEXT, i, (LPARAM) text);
-		if (i < oldcount)
-			*pStrings[i] = text;
-		else
-			pStrings[i] = new generic_string(text);
+        strings.push_back(generic_string(text));
 	}
-	for (; i < oldcount; i++) delete pStrings[i];
-	oldcount = count;
+    return count;
 }
 
 void FindReplaceDlg::updateCombos()
@@ -1611,7 +1607,7 @@ int FindReplaceDlg::processRange(ProcessOperation op, const TCHAR *txt2find, con
 
 			case ProcessMarkAll_2:
 			{
-				(*_ppEditView)->execute(SCI_SETINDICATORCURRENT,  SCE_UNIVERSAL_FOUND_STYLE_2);
+				(*_ppEditView)->execute(SCI_SETINDICATORCURRENT,  SCE_UNIVERSAL_FOUND_STYLE_SMART);
 				(*_ppEditView)->execute(SCI_INDICATORFILLRANGE,  targetStart, foundTextLen);
 				break;
 			}
@@ -1686,7 +1682,7 @@ void FindReplaceDlg::findAllIn(InWhat op)
 		_pFinder->_scintView.init(_hInst, _pFinder->getHSelf());
 
 		// Subclass the ScintillaEditView for the Finder (Scintilla doesn't notify all key presses)
-		originalFinderProc = SetWindowLong( _pFinder->_scintView.getHSelf(), GWL_WNDPROC, (LONG) finderProc);
+		originalFinderProc = SetWindowLongPtr(_pFinder->_scintView.getHSelf(), GWLP_WNDPROC, (LONG_PTR)finderProc);
 
 		_pFinder->setFinderReadOnly(true);
 		_pFinder->_scintView.execute(SCI_SETCODEPAGE, SC_CP_UTF8);
@@ -1694,7 +1690,7 @@ void FindReplaceDlg::findAllIn(InWhat op)
 		_pFinder->_scintView.execute(SCI_SETUNDOCOLLECTION, false);	//dont store any undo information
 		_pFinder->_scintView.execute(SCI_SETCARETLINEVISIBLE, 1);
 		_pFinder->_scintView.execute(SCI_SETCARETWIDTH, 0);
-		_pFinder->_scintView.showMargin(ScintillaEditView::_SC_MARGE_FOLDER, true);
+		_pFinder->_scintView.showMargin(ScintillaEditView::_SC_MARGIN_FOLDER, true);
 		//_pFinder->_scintView.execute(SCI_SETEOLMODE, SC_EOL_CRLF); // yniq - needed?
 
 		// Send the address of _MarkingsStruct to the lexer
@@ -1707,7 +1703,7 @@ void FindReplaceDlg::findAllIn(InWhat op)
 		::GetWindowRect(_pFinder->getHSelf(), &findRect);
 
 		// overwrite some default settings
-		_pFinder->_scintView.showMargin(ScintillaEditView::_SC_MARGE_SYBOLE, false);
+		_pFinder->_scintView.showMargin(ScintillaEditView::_SC_MARGIN_SYMBOL, false);
 		_pFinder->_scintView.setMakerStyle(FOLDER_STYLE_SIMPLE);
 
 		_pFinder->_scintView.display();
@@ -2163,6 +2159,16 @@ void Finder::removeAll()
 	setFinderReadOnly(true);
 }
 
+void Finder::openAll()
+{
+	size_t sz = _pMainFoundInfos->size();
+
+	for (size_t i = 0; i < sz; i++)
+	{
+		::SendMessage(::GetParent(_hParent), WM_DOOPEN, 0, (LPARAM)_pMainFoundInfos->at(i)._fullPath.c_str());
+	}
+}
+
 void Finder::beginNewFilesSearch()
 {
 	_scintView.execute(SCI_SETLEXER, SCLEX_NULL);
@@ -2259,6 +2265,12 @@ BOOL CALLBACK Finder::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
 					return TRUE;
 				}
 
+				case NPPM_INTERNAL_SCINTILLAFINFEROPENALL:
+				{
+					openAll();
+					return TRUE;
+				}
+
 				default :
 				{
 					return FALSE;
@@ -2280,6 +2292,8 @@ BOOL CALLBACK Finder::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
 				tmp.push_back(MenuItemUnit(NPPM_INTERNAL_SCINTILLAFINFERCOPY, TEXT("Copy")));
 				tmp.push_back(MenuItemUnit(NPPM_INTERNAL_SCINTILLAFINFERSELECTALL, TEXT("Select All")));
 				tmp.push_back(MenuItemUnit(NPPM_INTERNAL_SCINTILLAFINFERCLEARALL, TEXT("Clear All")));
+				tmp.push_back(MenuItemUnit(0, TEXT("Separator")));
+				tmp.push_back(MenuItemUnit(NPPM_INTERNAL_SCINTILLAFINFEROPENALL, TEXT("Open All")));
 
 				scintillaContextmenu.create(_hSelf, tmp);
 

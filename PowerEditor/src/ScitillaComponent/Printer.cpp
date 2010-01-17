@@ -106,12 +106,12 @@ size_t Printer::doPrint(bool justDoIt)
 	rectPhysMargins.bottom = ptPage.y						// total paper height
 	                         - GetDeviceCaps(_pdlg.hDC, VERTRES)	// printable height
 	                         - rectPhysMargins.top;				// right unprintable margin
-	if (nppGUI._printSettings.isUserMargePresent())
+	if (nppGUI._printSettings.isUserMarginPresent())
 	{
-		userMargins.left  = MulDiv(nppGUI._printSettings._marge.left*100, ptDpi.x, 2540);
-		userMargins.top  = MulDiv(nppGUI._printSettings._marge.top*100, ptDpi.y, 2540);
-		userMargins.right  = MulDiv(nppGUI._printSettings._marge.right*100, ptDpi.x, 2540);
-		userMargins.bottom  = MulDiv(nppGUI._printSettings._marge.bottom*100, ptDpi.y, 2540);
+		userMargins.left  = MulDiv(nppGUI._printSettings._margin.left*100, ptDpi.x, 2540);
+		userMargins.top  = MulDiv(nppGUI._printSettings._margin.top*100, ptDpi.y, 2540);
+		userMargins.right  = MulDiv(nppGUI._printSettings._margin.right*100, ptDpi.x, 2540);
+		userMargins.bottom  = MulDiv(nppGUI._printSettings._margin.bottom*100, ptDpi.y, 2540);
 
 		rectMargins.left	= max(rectPhysMargins.left, userMargins.left);
 		rectMargins.top		= max(rectPhysMargins.top, userMargins.top);
@@ -178,8 +178,8 @@ size_t Printer::doPrint(bool justDoIt)
 
 
 	::GetTextMetrics(_pdlg.hDC, &tm);
-	int printMarge = tm.tmHeight + tm.tmExternalLeading;
-	printMarge = printMarge + printMarge / 2;
+	int printMargin = tm.tmHeight + tm.tmExternalLeading;
+	printMargin = printMargin + printMargin / 2;
 
 	DOCINFO docInfo;
 	docInfo.cbSize = sizeof(DOCINFO);
@@ -230,10 +230,10 @@ size_t Printer::doPrint(bool justDoIt)
 	frPrint.rcPage.right = ptPage.x - rectPhysMargins.left - rectPhysMargins.right - 1;
 	frPrint.rcPage.bottom = ptPage.y - rectPhysMargins.top - rectPhysMargins.bottom - 1;
 
-	frPrint.rc.top += printMarge;
-	frPrint.rc.bottom -= printMarge;
-	frPrint.rc.left += printMarge;
-	frPrint.rc.right -= printMarge;
+	frPrint.rc.top += printMargin;
+	frPrint.rc.bottom -= printMargin;
+	frPrint.rc.left += printMargin;
+	frPrint.rc.right -= printMargin;
 
 	const int headerSize = 256;
 	TCHAR headerL[headerSize] = TEXT("");
@@ -325,9 +325,9 @@ size_t Printer::doPrint(bool justDoIt)
 	}
 
 
-	bool isShown = _pSEView->hasMarginShowed(ScintillaEditView::_SC_MARGE_LINENUMBER);
+	bool isShown = _pSEView->hasMarginShowed(ScintillaEditView::_SC_MARGIN_LINENUMBER);
 	if (!nppGUI._printSettings._printLineNumber)
-		_pSEView->showMargin(ScintillaEditView::_SC_MARGE_LINENUMBER, false);
+		_pSEView->showMargin(ScintillaEditView::_SC_MARGIN_LINENUMBER, false);
 
 	size_t pageNum = 1;
 	bool printPage;
@@ -489,7 +489,7 @@ size_t Printer::doPrint(bool justDoIt)
 	//TCHAR toto[10];
 	//::MessageBox(NULL, itoa(pageNum, toto, 10), TEXT("page total"), MB_OK);
 	if (!nppGUI._printSettings._printLineNumber)
-		_pSEView->showMargin(ScintillaEditView::_SC_MARGE_LINENUMBER, isShown);
+		_pSEView->showMargin(ScintillaEditView::_SC_MARGIN_LINENUMBER, isShown);
 
 	_pSEView->execute(SCI_FORMATRANGE, FALSE, 0);
 	::EndDoc(_pdlg.hDC);

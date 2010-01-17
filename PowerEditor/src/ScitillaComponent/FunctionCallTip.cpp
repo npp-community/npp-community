@@ -84,7 +84,8 @@ void FunctionCallTip::close() {
 // Strange things are happening to the loop index variable, but I'm not touching this parsing code with a 10 foot pole.
 // for loop index variable ’Symbol’ whose type category is ’String’modified in body of the for loop
 //lint -e850
-bool FunctionCallTip::getCursorFunction() {
+bool FunctionCallTip::getCursorFunction()
+{
 	int line = _pEditView->execute(SCI_LINEFROMPOSITION, _curPos);
 	int startpos = _pEditView->execute(SCI_POSITIONFROMLINE, line);
 	int endpos = _pEditView->execute(SCI_GETLINEENDPOSITION, line);
@@ -108,23 +109,30 @@ bool FunctionCallTip::getCursorFunction() {
 	std::vector< Token > tokenVector;
 	int tokenLen = 0;
 	TCHAR ch;
-	for (int i = 0; i < offset; i++) {	//we dont care about stuff after the offset
+	for (int i = 0; i < offset; i++) 	//we dont care about stuff after the offset
+    {
 		//tokenVector.push_back(pair(lineData+i, len));
 		ch = lineData[i];
-		if (ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' || ch >= '0' && ch <= '9' || ch == '_') {	//part of identifier
+		if (isBasicWordChar(ch) || isAdditionalWordChar(ch))	//part of identifier
+        {
 			tokenLen = 0;
 			TCHAR * begin = lineData+i;
-			while ( (ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' || ch >= '0' && ch <= '9' || ch == '_') && i < offset) {
+            while ((isBasicWordChar(ch) || isAdditionalWordChar(ch)) && i < offset) {
 				tokenLen++;
 				i++;
 				ch = lineData[i];
 			}
 			tokenVector.push_back(Token(begin, tokenLen, true));
 			i--;	//correct overshooting of while loop
-		} else {
-			if (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r') {	//whitespace
+		}
+        else
+        {
+			if (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r') 	//whitespace
+            {
 				//do nothing
-			} else {
+			}
+            else
+            {
 				tokenLen = 1;
 				tokenVector.push_back(Token(lineData+i, tokenLen, false));
 			}
@@ -225,19 +233,21 @@ bool FunctionCallTip::loadFunction() {
 		else
 			compVal = (_funcName == name);
 
-		if (!compVal) {	//found it?
+		if (!compVal)	//found it?
+		{
 			const TCHAR* attrib = funcNode->Attribute(TEXT("func"));
 			generic_string val = attrib ? attrib : TEXT("");
-			if (val == TEXT("yes")) {
+			if (val == TEXT("yes"))
+			{
 				//what we've been looking for
 				_curFunction = funcNode;
 				break;
-			} else {
+			}
+			else
+			{
 				//name matches, but not a function, abort the entire procedure
 				return false;
 			}
-		} else if (compVal > 0) {	//too far, abort
-			return false;
 		}
 	}
 
@@ -282,8 +292,10 @@ bool FunctionCallTip::loadFunction() {
 	return true;
 }
 
-void FunctionCallTip::showCalltip() {
-	if (_currentNrOverloads == 0) {
+void FunctionCallTip::showCalltip()
+{
+	if (_currentNrOverloads == 0)
+    {
 		//ASSERT
 		return;
 	}
@@ -365,4 +377,17 @@ void FunctionCallTip::cleanup() {
 bool FunctionCallTip::isVisible()
 {
 	return _pEditView?_pEditView->execute(SCI_CALLTIPACTIVE) == TRUE:false;
+}
+
+bool FunctionCallTip::isBasicWordChar(TCHAR ch) const {
+	return (ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' || ch >= '0' && ch <= '9' || ch == '_');
+}
+
+bool FunctionCallTip::isAdditionalWordChar(TCHAR ch) const {
+	const TCHAR *addChars = _additionalWordChar.c_str();
+	size_t len = _additionalWordChar.length();
+	for (size_t i = 0 ; i < len ; i++)
+		if (ch == addChars[i])
+			return true;
+	return false;
 }

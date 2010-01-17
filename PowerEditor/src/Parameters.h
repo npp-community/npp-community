@@ -82,6 +82,7 @@ struct CmdLineParams {
 	bool _isReadOnly;
 	bool _isNoSession;
 	bool _isNoTab;
+	bool _isPreLaunch;
 
 	int _line2go;
     int _column2go;
@@ -196,12 +197,12 @@ struct PrintSettings {
 	int _footerFontStyle;
 	int _footerFontSize;
 
-	RECT _marge;
+	RECT _margin;
 
 	PrintSettings() : _printLineNumber(true), _printOption(SC_PRINT_NORMAL), _headerLeft(TEXT("")), _headerMiddle(TEXT("")), _headerRight(TEXT("")),\
 		_headerFontName(TEXT("")), _headerFontStyle(0), _headerFontSize(0),  _footerLeft(TEXT("")), _footerMiddle(TEXT("")), _footerRight(TEXT("")),\
 		_footerFontName(TEXT("")), _footerFontStyle(0), _footerFontSize(0) {
-			_marge.left = 0; _marge.top = 0; _marge.right = 0; _marge.bottom = 0;
+			_margin.left = 0; _margin.top = 0; _margin.right = 0; _margin.bottom = 0;
 		};
 
 	bool isHeaderPresent() const {
@@ -212,8 +213,8 @@ struct PrintSettings {
 		return ((_footerLeft != TEXT("")) || (_footerMiddle != TEXT("")) || (_footerRight != TEXT("")));
 	};
 
-	bool isUserMargePresent() const {
-		return ((_marge.left != 0) || (_marge.top != 0) || (_marge.right != 0) || (_marge.bottom != 0));
+	bool isUserMarginPresent() const {
+		return ((_margin.left != 0) || (_margin.top != 0) || (_margin.right != 0) || (_margin.bottom != 0));
 	};
 };
 
@@ -225,10 +226,10 @@ struct NppGUI
 		_userDefineDlgStatus(UDD_DOCKED), _tabSize(8), _tabReplacedBySpace(false), _fileAutoDetection(cdEnabled),
 		_fileAutoDetectionOriginalValue(_fileAutoDetection), _checkHistoryFiles(true), _isMaximized(false), _isMinimizedToTray(false),
 		_rememberLastSession(true), _enableMouseWheelZoom(true),  _doTaskList(true), _maitainIndent(true), _enableSmartHilite(true),
-		_enableTagsMatchHilite(true), _enableTagAttrsHilite(true), _enableHiliteNonHTMLZone(false), _styleMRU(true), _styleURL(0),
-		_isLangMenuCompact(false), _backup(bak_none), _useDir(false), _autocStatus(autoc_none), _autocFromLen(1), _funcParams(false),
-		_doesExistUpdater(false), _caretBlinkRate(250), _caretWidth(1), _enableMultiSelection(false), _shortTitlebar(false),
-		_openSaveDir(dir_followCurrent)
+		_disableSmartHiliteTmp(false),_enableTagsMatchHilite(true), _enableTagAttrsHilite(true), _enableHiliteNonHTMLZone(false),
+		_styleMRU(true), _styleURL(0), _isLangMenuCompact(false), _backup(bak_none), _useDir(false), _autocStatus(autoc_none),
+		_autocFromLen(1), _funcParams(false), _doesExistUpdater(false), _caretBlinkRate(250), _caretWidth(1),
+		_enableMultiSelection(false), _shortTitlebar(false), _openSaveDir(dir_followCurrent)
 	{
 		_appPos.left = 0;
 		_appPos.top = 0;
@@ -274,6 +275,7 @@ struct NppGUI
 	bool _doTaskList;
 	bool _maitainIndent;
 	bool _enableSmartHilite;
+	bool _disableSmartHiliteTmp;
 	bool _enableTagsMatchHilite;
 	bool _enableTagAttrsHilite;
 	bool _enableHiliteNonHTMLZone;
@@ -522,15 +524,10 @@ struct FindHistory {
 	enum transparencyMode{none, onLossingFocus, persistant};
 
 	FindHistory() : _nbMaxFindHistoryPath(10), _nbMaxFindHistoryFilter(10), _nbMaxFindHistoryFind(10), _nbMaxFindHistoryReplace(10),
-					_nbFindHistoryPath(0), _nbFindHistoryFilter(0),_nbFindHistoryFind(0), _nbFindHistoryReplace(0),
 					_isMatchWord(false), _isMatchCase(false),_isWrap(true),_isDirectionDown(true),
 					_isFifRecuisive(true), _isFifInHiddenFolder(false), _searchMode(normal), _transparencyMode(onLossingFocus),
 					_transparency(150), _isDlgAlwaysVisible(false), _isFilterFollowDoc(false), _isFolderFollowDoc(false)
 	{
-		memset(_pFindHistoryPath, 0, NB_MAX_FINDHISTORY_PATH * sizeof(generic_string*));
-		memset(_pFindHistoryFilter, 0, NB_MAX_FINDHISTORY_FILTER * sizeof(generic_string*));
-		memset(_pFindHistoryFind, 0, NB_MAX_FINDHISTORY_FIND * sizeof(generic_string*));
-		memset(_pFindHistoryReplace, 0, NB_MAX_FINDHISTORY_REPLACE * sizeof(generic_string*));
 	}
 
 	int _nbMaxFindHistoryPath;
@@ -538,16 +535,10 @@ struct FindHistory {
 	int _nbMaxFindHistoryFind;
 	int _nbMaxFindHistoryReplace;
 
-	int _nbFindHistoryPath;
-	int _nbFindHistoryFilter;
-	int _nbFindHistoryFind;
-	int _nbFindHistoryReplace;
-
-	// JOCE: Use vectors!
-	generic_string* _pFindHistoryPath[NB_MAX_FINDHISTORY_PATH];
-	generic_string* _pFindHistoryFilter[NB_MAX_FINDHISTORY_FILTER];
-	generic_string* _pFindHistoryFind[NB_MAX_FINDHISTORY_FIND];
-	generic_string* _pFindHistoryReplace[NB_MAX_FINDHISTORY_REPLACE];
+    std::vector<generic_string> _findHistoryPaths;
+	std::vector<generic_string> _findHistoryFilters;
+	std::vector<generic_string> _findHistoryFinds;
+	std::vector<generic_string> _findHistoryReplaces;
 
 	bool _isMatchWord;
 	bool _isMatchCase;
@@ -572,7 +563,7 @@ struct FindHistory {
 class LocalizationSwitcher {
 friend class NppParameters;
 public :
-	LocalizationSwitcher() {};
+    LocalizationSwitcher() {}
 
 	struct LocalizationDefinition {
 		wchar_t *_langName;
@@ -580,9 +571,9 @@ public :
 	};
 
 	bool addLanguageFromXml(std::wstring xmlFullPath);
-	std::wstring getLangFromXmlFileName(wchar_t *fn) const;
+	std::wstring getLangFromXmlFileName(const wchar_t *fn) const;
 
-	std::wstring getXmlFilePathFromLangName(wchar_t *langName) const;
+	std::wstring getXmlFilePathFromLangName(const wchar_t *langName) const;
 	bool switchToLang(wchar_t *lang2switch) const;
 
 	size_t size() const {
@@ -595,9 +586,19 @@ public :
 		return _localizationList[index];
 	};
 
+    void setFileName(const char *fn) {
+        if (fn)
+            _fileName = fn;
+    };
+
+    std::string getFileName() const {
+        return _fileName;
+    };
+
 private :
 	std::vector< std::pair< std::wstring, std::wstring > > _localizationList;
 	std::wstring _nativeLangPath;
+    std::string _fileName;
 };
 #endif
 
@@ -648,6 +649,15 @@ private :
 	generic_string _stylesXmlPath;
 };
 
+class PluginList {
+public :
+    void add(generic_string fn, bool isInBL){
+        _list.push_back(std::pair<generic_string, bool>(fn, isInBL));
+    };
+private :
+    std::vector<std::pair<generic_string, bool>>_list;
+};
+
 class NppParameters
 {
 public:
@@ -661,7 +671,7 @@ public:
 	bool _isTaskListRBUTTONUP_Active;
 	int L_END;
 
-	const NppGUI & getNppGUI() const {
+	NppGUI & getNppGUI() {
         return _nppGUI;
     };
 
@@ -695,6 +705,8 @@ public:
 	}
 
 	int getNbLang() const {return _langList.size();}
+
+	LangType getLangFromExt(const TCHAR *ext);
 
 	const TCHAR * getLangExtFromName(const TCHAR *langName) const {
 		for( std::vector<Lang *>::const_iterator it = _langList.begin(), end = _langList.end();
@@ -880,7 +892,7 @@ public:
 
 	void SetTransparent(HWND hwnd, int percent) {
 		if (!_transparentFuncAddr) return;
-		::SetWindowLongPtr(hwnd, GWL_EXSTYLE, ::GetWindowLongPtr(hwnd, GWL_EXSTYLE) | 0x00080000);
+		::SetWindowLongPtr(hwnd, GWL_EXSTYLE, ::GetWindowLongPtrW(hwnd, GWL_EXSTYLE) | 0x00080000);
 		_transparentFuncAddr(hwnd, 0, percent, 0x00000002);
 	};
 
@@ -966,6 +978,16 @@ public:
 
 	int getIndexFromKeywordListName(const TCHAR *name);
 
+    std::vector<generic_string> & getBlackList() {return _blacklist;};
+    bool isInBlackList(TCHAR *fn) {
+        for (size_t i = 0 ; i < _blacklist.size() ; i++)
+            if (_blacklist[i] == fn)
+                return true;
+        return false;
+    };
+
+    PluginList & getPluginList() {return _pluginList;};
+
 private:
     NppParameters();
 	~NppParameters();
@@ -980,6 +1002,7 @@ private:
 	TiXmlDocument* _pXmlShortcutDoc;
 	TiXmlDocument* _pXmlContextMenuDoc;
 	TiXmlDocument* _pXmlSessionDoc;
+	TiXmlDocument* _pXmlBlacklistDoc;
 
 	TiXmlDocumentA *_pXmlNativeLangDocA;
 
@@ -1010,6 +1033,8 @@ private:
     StyleArray _widgetStyleArray;
 
 	std::vector<generic_string> _fontlist;
+    std::vector<generic_string> _blacklist;
+    PluginList _pluginList;
 
 	HMODULE _hUser32;
 	HMODULE _hUXTheme;
@@ -1039,6 +1064,7 @@ private:
 	generic_string _shortcutsPath;
 	generic_string _contextMenuPath;
 	generic_string _sessionPath;
+    generic_string _blacklistPath;
 	generic_string _nppPath;
 	generic_string _userPath;
 	generic_string _stylerPath;
@@ -1079,6 +1105,7 @@ private:
 	bool getPluginCmdsFromXmlTree();
 	bool getScintKeysFromXmlTree();
 	bool getSessionFromXmlTree(TiXmlDocument *pSessionDoc = NULL, Session *session = NULL);
+    bool getBlackListFromXmlTree();
 
 	void feedGUIParameters(TiXmlNode *node);
 	void feedKeyWordsParameters(TiXmlNode *node);
@@ -1097,6 +1124,7 @@ private:
 	void feedUserCmds(TiXmlNode *node);
 	void feedPluginCustomizedCmds(TiXmlNode *node);
 	void feedScintKeys(TiXmlNode *node);
+    bool feedBlacklist(TiXmlNode *node);
 
 	void getActions(TiXmlNode *node, Macro & macro);
 	bool getShortcuts(TiXmlNode *node, Shortcut & sc);

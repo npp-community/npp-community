@@ -37,61 +37,38 @@ const int blockSize = 128 * 1024 + 4;
 const int CR = 0x0D;
 const int LF = 0x0A;
 
-static bool isInList(const TCHAR *token, const TCHAR *list) {
-	if ((!token) || (!list))
-		return false;
-	TCHAR word[64];
-	int i = 0;
-	int j = 0;
-	for (; i <= int(lstrlen(list)) ; i++)
+Buffer::Buffer( FileManager * pManager, BufferID id, Document doc, DocFileStatus type, const TCHAR *fileName ) :
+_pManager(pManager), _canNotify(false), _references(0), _id(id),
+_doc(doc), _lang(L_TXT), _isDirty(false), _encoding(-1),
+_isUserReadOnly(false), _needLexer(false), //new buffers do not need lexing, Scintilla takes care of that
+_currentStatus(type), _timeStamp(0), _isFileReadOnly(false),
+_fileName(NULL), _needReloading(false), _recentTag(-1)
+{
+	NppParameters *pNppParamInst = NppParameters::getInstance();
+	const NewDocDefaultSettings & ndds = (pNppParamInst->getNppGUI()).getNewDocDefaultSettings();
+	_unicodeMode = ndds._encoding;
+	_format = ndds._format;
+
+	setFileName(fileName, ndds._lang);
+	updateTimeStamp();
+	checkFileState();
+
+	_isDirty = false;
+	_canNotify = true;
+}
+
+
+void Buffer::setLangType(LangType lang, const TCHAR * userLangName)
+{
+	if (lang == _lang && lang != L_USER)
+		return;
+	_lang = lang;
+	if (_lang == L_USER)
 	{
-		if ((list[i] == ' ')||(list[i] == '\0'))
-		{
-			if (j != 0)
-			{
-				word[j] = '\0';
-				j = 0;
-
-				if (!generic_stricmp(token, word))
-					return true;
-			}
-		}
-		else
-		{
-			word[j] = list[i];
-			j++;
-		}
+		_userLangExt = userLangName;
 	}
-	return false;
-};
-
-void Buffer::determinateFormat(const char *data) {
-	_format = WIN_FORMAT;
-	size_t len = strlen(data);
-	for (size_t i = 0 ; i < len ; i++)
-	{
-		if (data[i] == CR)
-		{
-			if (data[i+1] == LF)
-			{
-				_format = WIN_FORMAT;
-				break;
-			}
-			else
-			{
-				_format = MAC_FORMAT;
-				break;
-			}
-		}
-		if (data[i] == LF)
-		{
-			_format = UNIX_FORMAT;
-			break;
-		}
-	}
-
-	doNotify(BufferChangeFormat);
-	return;
+	_needLexer = true;	//change of lang means lexern eeds updating
+	doNotify(BufferChangeLanguage|BufferChangeLexing);
 }
 
 long Buffer::_recentTagCtr = 0;
@@ -136,7 +113,8 @@ void Buffer::setFileName(const TCHAR *fn, LangType defaultLang)
 		}
 		else // if it's not user lang, then check if it's supported lang
 		{
-			newLang = getLangFromExt(ext);
+			_userLangExt[0] = '\0';
+			newLang = pNppParamInst->getLangFromExt(ext);
 		}
 	}
 
@@ -148,7 +126,6 @@ void Buffer::setFileName(const TCHAR *fn, LangType defaultLang)
 			newLang = L_CMAKE;
 		else if ((!generic_stricmp(_fileName, TEXT("SConstruct"))) || (!generic_stricmp(_fileName, TEXT("SConscript"))))
 			newLang = L_PYTHON;
-
 	}
 
 	updateTimeStamp();
@@ -246,39 +223,6 @@ std::vector<HeaderLineState> & Buffer::getHeaderLineState(ScintillaEditView * id
 	return _foldStates.at(index);
 }
 
-LangType Buffer::getLangFromExt(const TCHAR *ext)
-{
-	NppParameters *pNppParam = NppParameters::getInstance();
-	int i = pNppParam->getNbLang();
-	i--;
-	while (i >= 0)
-	{
-		Lang *l = pNppParam->getLangFromIndex(i--);
-
-		const TCHAR *defList = l->getDefaultExtList();
-		const TCHAR *userList = NULL;
-
-		LexerStylerArray &lsa = pNppParam->getLStylerArray();
-		const TCHAR *lName = l->getLangName();
-		LexerStyler *pLS = lsa.getLexerStylerByName(lName);
-
-		if (pLS)
-			userList = pLS->getLexerUserExt();
-
-		generic_string list(TEXT(""));
-		if (defList)
-			list += defList;
-		if (userList)
-		{
-			list += TEXT(" ");
-			list += userList;
-		}
-		if (isInList(ext, list.c_str()))
-			return l->getLangID();
-	}
-	return L_TXT;
-}
-
 Lang * Buffer::getCurrentLang() const {
 	NppParameters *pNppParam = NppParameters::getInstance();
 	int i = 0;
@@ -340,38 +284,6 @@ void Buffer::setDeferredReload() {	//triggers a reload on the next Document acce
 	_isDirty = false;	//when reloading, just set to false, since it sohuld be marked as clean
 	_needReloading = true;
 	doNotify(BufferChangeDirty);
-}
-
-Buffer::Buffer( FileManager * pManager, BufferID id, Document doc, DocFileStatus type, const TCHAR *fileName ) :
-	_pManager(pManager), _canNotify(false), _references(0), _id(id),
-	_doc(doc), _lang(L_TXT), _isDirty(false),
-	_isUserReadOnly(false), _needLexer(false), //new buffers do not need lexing, Scintilla takes care of that
-	_currentStatus(type), _timeStamp(0), _isFileReadOnly(false),
-	_fileName(NULL), _needReloading(false), _recentTag(-1)
-{
-	NppParameters *pNppParamInst = NppParameters::getInstance();
-	const NewDocDefaultSettings & ndds = (pNppParamInst->getNppGUI()).getNewDocDefaultSettings();
-	_unicodeMode = ndds._encoding;
-	_format = ndds._format;
-
-	setFileName(fileName, ndds._lang);
-	updateTimeStamp();
-	checkFileState();
-
-	_isDirty = false;
-	_canNotify = true;
-}
-
-void Buffer::setLangType( LangType lang, const TCHAR * userLangName /*= TEXT("")*/ )
-{
-	if (lang == _lang && lang != L_USER)
-		return;
-	_lang = lang;
-	if (_lang == L_USER) {
-		_userLangExt = userLangName;
-	}
-	_needLexer = true;	//change of lang means lexern eeds updating
-	doNotify(BufferChangeLanguage|BufferChangeLexing);
 }
 
 const TCHAR * Buffer::getCommentLineSymbol() const
@@ -494,7 +406,8 @@ void FileManager::closeBuffer(BufferID id, ScintillaEditView * identifier) {
 	}
 }
 
-BufferID FileManager::loadFile(const TCHAR * filename, Document doc) {
+BufferID FileManager::loadFile(const TCHAR * filename, Document doc, int encoding)
+{
 	bool ownDoc = false;
 	if (doc == NULL)
 	{
@@ -506,7 +419,9 @@ BufferID FileManager::loadFile(const TCHAR * filename, Document doc) {
 	::GetFullPathName(filename, MAX_PATH, fullpath, NULL);
 	::GetLongPathName(fullpath, fullpath, MAX_PATH);
 	Utf8_16_Read UnicodeConvertor;	//declare here so we can get information after loading is done
-	bool res = loadFileData(doc, fullpath, &UnicodeConvertor, L_TXT);
+
+	formatType format;
+	bool res = loadFileData(doc, fullpath, &UnicodeConvertor, L_TXT, encoding, &format);
 	if (res)
 	{
 		Buffer * newBuf = new Buffer(this, _nextBufferID, doc, DOC_REGULAR, fullpath);
@@ -516,32 +431,42 @@ BufferID FileManager::loadFile(const TCHAR * filename, Document doc) {
 		_nrBufs++;
 		Buffer * buf = _buffers.at(_nrBufs - 1);
 
-		// 3 formats : WIN_FORMAT, UNIX_FORMAT and MAC_FORMAT
-		if (UnicodeConvertor.getNewBuf())
+		if (encoding == -1)
 		{
-			buf->determinateFormat(UnicodeConvertor.getNewBuf());
-		}
-		else
-		{
-			buf->determinateFormat("");
-		}
-
-		UniMode encoding = UnicodeConvertor.getEncoding();
-		if (encoding == uni7Bit)
-		{
-			NppParameters *pNppParamInst = NppParameters::getInstance();
-			const NewDocDefaultSettings & ndds = (pNppParamInst->getNppGUI()).getNewDocDefaultSettings();
-			if (ndds._openAnsiAsUtf8)
+			// 3 formats : WIN_FORMAT, UNIX_FORMAT and MAC_FORMAT
+			if (UnicodeConvertor.getNewBuf())
 			{
-				encoding = uniCookie;
+				int format = getEOLFormatForm(UnicodeConvertor.getNewBuf());
+				buf->setFormat(format == -1?WIN_FORMAT:(formatType)format);
+
 			}
 			else
 			{
-				encoding = uni8Bit;
+				buf->setFormat(WIN_FORMAT);
 			}
-		}
-		buf->setUnicodeMode(encoding);
 
+			UniMode um = UnicodeConvertor.getEncoding();
+			if (um == uni7Bit)
+			{
+				NppParameters *pNppParamInst = NppParameters::getInstance();
+				const NewDocDefaultSettings & ndds = (pNppParamInst->getNppGUI()).getNewDocDefaultSettings();
+				if (ndds._openAnsiAsUtf8)
+				{
+					um = uniCookie;
+				}
+				else
+				{
+					um = uni8Bit;
+				}
+			}
+			buf->setUnicodeMode(um);
+		}
+		else
+		{
+			buf->setUnicodeMode(uniCookie);
+			buf->setFormat(format);
+			buf->setEncoding(encoding);
+		}
 		//determine buffer properties
 		_nextBufferID++;
 		return id;
@@ -552,26 +477,44 @@ BufferID FileManager::loadFile(const TCHAR * filename, Document doc) {
 	}
 }
 
-bool FileManager::reloadBuffer(BufferID id) {
+bool FileManager::reloadBuffer(BufferID id)
+{
 	Buffer * buf = getBufferByID(id);
 	Document doc = buf->getDocument();
 	Utf8_16_Read UnicodeConvertor;
 	buf->_canNotify = false;	//disable notify during file load, we dont want dirty to be triggered
-	bool res = loadFileData(doc, buf->getFullPathName(), &UnicodeConvertor, buf->getLangType());
+	int encoding = buf->getEncoding();
+	formatType format;
+	bool res = loadFileData(doc, buf->getFullPathName(), &UnicodeConvertor, buf->getLangType(), encoding, &format);
 	buf->_canNotify = true;
-	if (res) {
-		if (UnicodeConvertor.getNewBuf()) {
-			buf->determinateFormat(UnicodeConvertor.getNewBuf());
-		} else {
-			buf->determinateFormat("");
+	if (res)
+	{
+		if (encoding == -1)
+		{
+			if (UnicodeConvertor.getNewBuf())
+			{
+				int format = getEOLFormatForm(UnicodeConvertor.getNewBuf());
+				buf->setFormat(format == -1?WIN_FORMAT:(formatType)format);
+			}
+			else
+			{
+				buf->setFormat(WIN_FORMAT);
+			}
+			buf->setUnicodeMode(UnicodeConvertor.getEncoding());
 		}
-		buf->setUnicodeMode(UnicodeConvertor.getEncoding());
-		//	buf->setNeedsLexing(true);
+		else
+		{
+			buf->setEncoding(encoding);
+			buf->setFormat(format);
+			buf->setUnicodeMode(uniCookie);
+		}
+
 	}
 	return res;
 }
 
-bool FileManager::reloadBufferDeferred(BufferID id) {
+bool FileManager::reloadBufferDeferred(BufferID id)
+{
 	Buffer * buf = getBufferByID(id);
 	buf->setDeferredReload();
 	return true;
@@ -632,6 +575,8 @@ bool FileManager::saveBuffer(BufferID id, const TCHAR * filename, bool isCopy) {
 	Utf8_16_Write UnicodeConvertor;
 	UnicodeConvertor.setEncoding(mode);
 
+	int encoding = buffer->getEncoding();
+
 	FILE *fp = UnicodeConvertor.fopen(fullpath, TEXT("wb"));
 	if (fp)
 	{
@@ -646,7 +591,16 @@ bool FileManager::saveBuffer(BufferID id, const TCHAR * filename, bool isCopy) {
 				grabSize = blockSize;
 
 			_pscratchTilla->getText(data, i, i + grabSize);
-			UnicodeConvertor.fwrite(data, grabSize);
+			if (encoding != -1)
+			{
+				WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
+				const char *newData = wmc->encode(SC_CP_UTF8, encoding, data);
+				UnicodeConvertor.fwrite(newData, strlen(newData));
+			}
+			else
+			{
+				UnicodeConvertor.fwrite(data, grabSize);
+			}
 		}
 		UnicodeConvertor.fclose();
 
@@ -712,29 +666,35 @@ BufferID FileManager::bufferFromDocument(Document doc, bool dontIncrease, bool d
 	return id;
 }
 
-bool FileManager::loadFileData(Document doc, const TCHAR * filename, Utf8_16_Read * UnicodeConvertor, LangType language)
+bool FileManager::loadFileData(Document doc, const TCHAR * filename, Utf8_16_Read * UnicodeConvertor, LangType language, int encoding, formatType *pFormat)
 {
 	const int blockSize = 128 * 1024;	//128 kB
-	char data[blockSize];
+	char data[blockSize+1];
 	FILE *fp = NULL;
-	generic_fopen(fp, filename, TEXT("rb"));
+	generic_fopen(fp,filename, TEXT("rb"));
 	if (!fp)
 		return false;
 
 	//Setup scratchtilla for new filedata
 	_pscratchTilla->execute(SCI_SETDOCPOINTER, 0, doc);
 	bool ro = _pscratchTilla->execute(SCI_GETREADONLY) != 0;
-	if (ro) {
+	if (ro)
+	{
 		_pscratchTilla->execute(SCI_SETREADONLY, false);
 	}
 	_pscratchTilla->execute(SCI_CLEARALL);
-	if (language < L_EXTERNAL) {
+#ifdef UNICODE
+	WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
+#endif
+	if (language < L_EXTERNAL)
+	{
 		_pscratchTilla->execute(SCI_SETLEXER, ScintillaEditView::langNames[language].lexerID);
-	} else {
+	}
+	else
+	{
 		int id = language - L_EXTERNAL;
 		TCHAR * name = NppParameters::getInstance()->getELCFromIndex(id)._name;
 #ifdef UNICODE
-		WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
 		const char *pName = wmc->wchar2char(name, CP_ACP);
 #else
 		const char *pName = name;
@@ -742,14 +702,34 @@ bool FileManager::loadFileData(Document doc, const TCHAR * filename, Utf8_16_Rea
 		_pscratchTilla->execute(SCI_SETLEXERLANGUAGE, 0, (LPARAM)pName);
 	}
 
+	if (encoding != -1)
+	{
+		_pscratchTilla->execute(SCI_SETCODEPAGE, SC_CP_UTF8);
+	}
+
 	bool success = true;
+	int format = -1;
 	__try {
 		size_t lenFile = 0;
 		size_t lenConvert = 0;	//just in case conversion results in 0, but file not empty
+
 		do {
 			lenFile = fread(data, 1, blockSize, fp);
-			lenConvert = UnicodeConvertor->convert(data, lenFile);
-			_pscratchTilla->execute(SCI_APPENDTEXT, lenConvert, (LPARAM)(UnicodeConvertor->getNewBuf()));
+			if (encoding != -1)
+			{
+				data[lenFile] = '\0';
+				WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
+				const char *newData = wmc->encode(encoding, SC_CP_UTF8, data);
+				_pscratchTilla->execute(SCI_APPENDTEXT, strlen(newData), (LPARAM)newData);
+				if (format == -1)
+					format = getEOLFormatForm(data);
+			}
+			else
+			{
+				lenConvert = UnicodeConvertor->convert(data, lenFile);
+				_pscratchTilla->execute(SCI_APPENDTEXT, lenConvert, (LPARAM)(UnicodeConvertor->getNewBuf()));
+			}
+
 		} while (lenFile > 0);
 	} __except(filter(GetExceptionCode())) {
 		printStr(TEXT("File is too big to be opened by Notepad++"));
@@ -758,6 +738,10 @@ bool FileManager::loadFileData(Document doc, const TCHAR * filename, Utf8_16_Rea
 
 	fclose(fp);
 
+	if (pFormat != NULL)
+	{
+		*pFormat = (format == -1)?WIN_FORMAT:(formatType)format;
+	}
 	_pscratchTilla->execute(SCI_EMPTYUNDOBUFFER);
 	_pscratchTilla->execute(SCI_SETSAVEPOINT);
 	if (ro) {
@@ -810,4 +794,28 @@ int FileManager::docLength(Buffer * buffer) const
 	int docLen = _pscratchTilla->getCurrentDocLen();
 	_pscratchTilla->execute(SCI_SETDOCPOINTER, 0, _scratchDocDefault);
 	return docLen;
+}
+
+int FileManager::getEOLFormatForm(const char *data) const
+{
+	size_t len = strlen(data);
+	for (size_t i = 0 ; i < len ; i++)
+	{
+		if (data[i] == CR)
+		{
+			if (i+1 < len &&  data[i+1] == LF)
+			{
+				return int(WIN_FORMAT);
+			}
+			else
+			{
+				return int(MAC_FORMAT);
+			}
+		}
+		if (data[i] == LF)
+		{
+			return int(UNIX_FORMAT);
+		}
+	}
+	return -1;
 }
