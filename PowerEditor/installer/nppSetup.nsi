@@ -696,27 +696,6 @@ SubSection "Plugins" Plugins
 	SectionEnd
 
 
-	Section "NppAutoIndent" NppAutoIndent
-		Delete "$INSTDIR\plugins\NppAutoIndent.dll"
-		SetOutPath "$INSTDIR\plugins"
-		File "..\bin\plugins\NppAutoIndent.dll"
-
-		StrCmp $IS_LOCAL "1" 0 NOT_LOCAL
-			SetOutPath "$INSTDIR\plugins\Config\"
-			goto LOCAL
-	NOT_LOCAL:
-			SetOutPath "$APPDATA\Notepad++\plugins\Config\"
-	LOCAL:
-		File "..\bin\plugins\Config\NppAutoIndent.ini"
-
-	SectionEnd
-
-	Section "Document Monitor" DocMonitor
-		Delete "$INSTDIR\plugins\docMonitor.dll"
-		SetOutPath "$INSTDIR\plugins"
-		File "..\bin\plugins\docMonitor.dll"
-	SectionEnd
-
 	Section "Change Markers" ChangeMarkers
 		Delete "$INSTDIR\plugins\NppPlugin_ChangeMarker.dll"
 		SetOutPath "$INSTDIR\plugins"
@@ -736,6 +715,13 @@ SubSection "Plugins" Plugins
 		SetOutPath "$INSTDIR\updater"
 		File "..\bin\updater\gpup.exe"
 	SectionEnd
+
+	Section "Light Explorer" LightExplorer
+		Delete "$INSTDIR\plugins\LightExplorer.dll"
+		SetOutPath "$INSTDIR\plugins"
+		File "..\bin\plugins\LightExplorer.dll"
+	SectionEnd
+
 SubSectionEnd
 
 SubSection "Themes" Themes
@@ -1023,7 +1009,7 @@ SubSection un.Plugins
 	SectionEnd
 
 
-	Section un.FileBrowserLite
+	Section un.LightExplorer
 		Delete "$INSTDIR\plugins\LightExplorer.dll"
 		Delete "$INSTDIR\lightExplorer.ini"
 		RMDir "$INSTDIR\plugins\"
