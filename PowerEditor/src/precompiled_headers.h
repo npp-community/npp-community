@@ -18,8 +18,6 @@
 #ifndef PRECOMPILED_HEADERS_H
 #define PRECOMPILED_HEADERS_H
 
-
-
 #include "targetver.h"
 
 // Allow to track emplacement where leaked memory was allocated.

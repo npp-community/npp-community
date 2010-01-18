@@ -31,4 +31,28 @@
 	#define _debugf(format, ...) void(0)
 #endif
 
+#ifdef _DEBUG
+	#ifdef NPPCR_DEBUG_NO_DEFAULT_CASE
+		#define NO_DEFAULT_CASE default: {\
+			Debug::OutputF(TEXT("%s(%d): %s"), TEXT(__FILE__), __LINE__, TEXT("Unhandled default case.\n"));\
+			TCHAR errorMsg[ERROR_MSG_SIZE];\
+			_stprintf_s(errorMsg, ERROR_MSG_SIZE, TEXT("Unhandled default case in %s, line %d\n\n\nDo you want to break?"), TEXT(__FILE__), __LINE__ );\
+			int ret = ::MessageBox(NULL, errorMsg, TEXT("Unhandled default case."), MB_YESNO|MB_ICONWARNING);\
+			if (ret == IDYES)\
+			{\
+				/* JOCE: could throw an exception instead and be properly tested. */ \
+				DebugBreak(); \
+			}\
+		}\
+		break
+	#else
+		#define NO_DEFAULT_CASE default: {\
+		Debug::OutputF(TEXT("%s(%d): %s"), TEXT(__FILE__), __LINE__, TEXT("Unhandled default case.\n"));\
+		}\
+		break
+	#endif
+#else
+	#define NO_DEFAULT_CASE default: break
+#endif
+
 #endif // MISC_DEBUG_NPPDEBUG_H
