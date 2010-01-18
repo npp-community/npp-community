@@ -107,9 +107,8 @@ public:
 
 	bool createEmptyFile(const TCHAR * path);
 
-	// JOCE: Get Instance / destroy instance not symmetric. Maybe _pSelf shouldn't be a pointer...
-	static FileManager * getInstance() {return _pSelf;}
-	static void destroyInstance() { delete _pSelf; }
+	static FileManager * getInstance();
+	static void destroyInstance();
 
 	void increaseDocNr() {_nextNewNumber++;};
 
