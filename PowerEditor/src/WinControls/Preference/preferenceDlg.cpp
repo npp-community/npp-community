@@ -37,8 +37,17 @@ const int BLINKRATE_FASTEST = 50;
 const int BLINKRATE_SLOWEST = 2500;
 const int BLINKRATE_INTERVAL = 50;
 
+// Base class intended to provide common services to the different preference dialogs
+class PreferenceDialogBase : public StaticDialog
+{
+protected:
+	PreferenceDialogBase() {}
+	bool isCheckedOrNot(int checkControlID) const {
+		return (BST_CHECKED == ::SendMessage(::GetDlgItem(_hSelf, checkControlID), BM_GETCHECK, 0, 0));
+	}
+};
 
-class SettingsDlg : public StaticDialog
+class SettingsDlg : public PreferenceDialogBase
 {
 public :
 	SettingsDlg() {}
@@ -52,13 +61,10 @@ public :
 	};
 private :
 	URLCtrl _nbHistoryVal;
-	bool isCheckedOrNot(int checkControlID) const {
-		return (BST_CHECKED == ::SendMessage(::GetDlgItem(_hSelf, checkControlID), BM_GETCHECK, 0, 0));
-	};
 	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 };
 
-class BarsDlg : public StaticDialog
+class BarsDlg : public PreferenceDialogBase
 {
 public :
 	BarsDlg() {}
@@ -66,7 +72,7 @@ private :
 	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 };
 
-class MarginsDlg : public StaticDialog
+class MarginsDlg : public PreferenceDialogBase
 {
 public :
 	MarginsDlg() {}
@@ -92,7 +98,7 @@ struct LangID_Name
 	LangID_Name(LangType id, generic_string name) : _id(id), _name(name){};
 };
 
-class DefaultNewDocDlg : public StaticDialog
+class DefaultNewDocDlg : public PreferenceDialogBase
 {
 public :
 	DefaultNewDocDlg() {}
@@ -106,7 +112,7 @@ private :
 	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM lParam);
 };
 
-class LangMenuDlg : public StaticDialog
+class LangMenuDlg : public PreferenceDialogBase
 {
 public :
 	LangMenuDlg() {}
@@ -123,7 +129,7 @@ struct strCouple {
 	strCouple(TCHAR *varDesc, TCHAR *var): _varDesc(varDesc), _var(var){};
 };
 
-class PrintSettingsDlg : public StaticDialog
+class PrintSettingsDlg : public PreferenceDialogBase
 {
 public :
 	PrintSettingsDlg():
@@ -139,7 +145,7 @@ private :
 	DWORD _selEnd;
 };
 
-class BackupDlg : public StaticDialog
+class BackupDlg : public PreferenceDialogBase
 {
 public :
 	BackupDlg() {}
@@ -432,21 +438,21 @@ BOOL CALLBACK BarsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*
 			{
 				case IDC_CHECK_SHOWSTATUSBAR :
 				{
-					bool isChecked = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_CHECK_SHOWSTATUSBAR, BM_GETCHECK, 0, 0));
+					bool isChecked = isCheckedOrNot(IDC_CHECK_SHOWSTATUSBAR);
 					::SendMessage(::GetParent(_hParent), NPPM_HIDESTATUSBAR, 0, isChecked?FALSE:TRUE);
 				}
 				return TRUE;
 
 				case IDC_CHECK_HIDEMENUBAR :
 				{
-					bool isChecked = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_CHECK_HIDEMENUBAR, BM_GETCHECK, 0, 0));
+					bool isChecked = isCheckedOrNot(IDC_CHECK_HIDEMENUBAR);
 					::SendMessage(::GetParent(_hParent), NPPM_HIDEMENU, 0, isChecked?TRUE:FALSE);
 				}
 				return TRUE;
 
 				case IDC_CHECK_TAB_HIDE :
 				{
-					bool toBeHidden = (BST_CHECKED == ::SendMessage(::GetDlgItem(_hSelf, IDC_CHECK_TAB_HIDE), BM_GETCHECK, 0, 0));
+					bool toBeHidden = isCheckedOrNot(IDC_CHECK_TAB_HIDE);
 					::EnableWindow(::GetDlgItem(_hSelf, IDC_CHECK_TAB_MULTILINE), !toBeHidden);
 					::EnableWindow(::GetDlgItem(_hSelf, IDC_CHECK_TAB_VERTICAL), !toBeHidden);
 					::EnableWindow(::GetDlgItem(_hSelf, IDC_CHECK_REDUCE), !toBeHidden);
@@ -496,7 +502,7 @@ BOOL CALLBACK BarsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lParam*
 
 				case IDC_CHECK_HIDE :
 				{
-					bool isChecked = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_CHECK_HIDE, BM_GETCHECK, 0, 0));
+					bool isChecked = isCheckedOrNot(IDC_CHECK_HIDE);
 					::SendMessage(::GetParent(_hParent), NPPM_HIDETOOLBAR, 0, isChecked?TRUE:FALSE);
 				}
 				return TRUE;
@@ -668,23 +674,23 @@ BOOL CALLBACK MarginsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPar
 			int iView = i + 1;
 			switch (wParam)
 			{
-				case IDC_CHECK_LINENUMBERMARGIN:
-					svp._lineNumberMarginShow = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_CHECK_LINENUMBERMARGIN, BM_GETCHECK, 0, 0));
+				case IDC_CHECK_LINENUMBERMARGE:
+					svp._lineNumberMarginShow = isCheckedOrNot(IDC_CHECK_LINENUMBERMARGE);
 					::SendMessage(_hParent, WM_COMMAND, IDM_VIEW_LINENUMBER, iView);
 					return TRUE;
 
-				case IDC_CHECK_BOOKMARKMARGIN:
-					svp._bookMarkMarginShow = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_CHECK_BOOKMARKMARGIN, BM_GETCHECK, 0, 0));
+				case IDC_CHECK_BOOKMARKMARGE:
+					svp._bookMarkMarginShow = isCheckedOrNot(IDC_CHECK_BOOKMARKMARGE);
 					::SendMessage(_hParent, WM_COMMAND, IDM_VIEW_SYMBOLMARGIN, iView);
 					return TRUE;
 
 				case IDC_CHECK_CURRENTLINEHILITE:
-					svp._currentLineHilitingShow = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_CHECK_CURRENTLINEHILITE, BM_GETCHECK, 0, 0));
+					svp._currentLineHilitingShow = isCheckedOrNot(IDC_CHECK_CURRENTLINEHILITE);
 					::SendMessage(_hParent, WM_COMMAND, IDM_VIEW_CURLINE_HILITING, iView);
 					return TRUE;
 
                 case IDC_CHECK_MULTISELECTION :
-                    nppGUI._enableMultiSelection = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_CHECK_MULTISELECTION, BM_GETCHECK, 0, 0));
+					nppGUI._enableMultiSelection = isCheckedOrNot(IDC_CHECK_MULTISELECTION);
                     ::SendMessage(::GetParent(_hParent), NPPM_INTERNAL_SETMULTISELCTION, 0, 0);
                     return TRUE;
 
@@ -709,7 +715,7 @@ BOOL CALLBACK MarginsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPar
 				case IDC_CHECK_SHOWVERTICALEDGE:
 				{
 					int modeID = 0;
-					bool isChecked = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_CHECK_SHOWVERTICALEDGE, BM_GETCHECK, 0, 0));
+					bool isChecked = isCheckedOrNot(IDC_CHECK_SHOWVERTICALEDGE);
 					if (isChecked)
 					{
 						::SendDlgItemMessage(_hSelf, IDC_RADIO_LNMODE, BM_SETCHECK, TRUE, 0);
@@ -1224,7 +1230,7 @@ BOOL CALLBACK DefaultNewDocDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM 
 					return TRUE;
 
 				case IDC_CHECK_OPENANSIASUTF8 :
-					ndds._openAnsiAsUtf8 = (BST_CHECKED == ::SendMessage(::GetDlgItem(_hSelf, IDC_CHECK_OPENANSIASUTF8), BM_GETCHECK, 0, 0));
+					ndds._openAnsiAsUtf8 = isCheckedOrNot(IDC_CHECK_OPENANSIASUTF8);
 					return TRUE;
 
 
@@ -1385,7 +1391,7 @@ BOOL CALLBACK LangMenuDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPara
 
 				case IDC_CHECK_REPLACEBYSPACE:
                 {
-                    bool isTabReplacedBySpace = BST_CHECKED == ::SendMessage(::GetDlgItem(_hSelf, IDC_CHECK_REPLACEBYSPACE), BM_GETCHECK, 0, 0);
+					bool isTabReplacedBySpace = isCheckedOrNot(IDC_CHECK_REPLACEBYSPACE);
                     int index = ::SendDlgItemMessage(_hSelf, IDC_LIST_TABSETTNG, LB_GETCURSEL, 0, 0);
                     if (index == LB_ERR) return FALSE;
                     if (index != 0)
@@ -1463,7 +1469,7 @@ BOOL CALLBACK LangMenuDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPara
 
                 case IDC_CHECK_DEFAULTTABVALUE:
                 {
-                    bool useDefaultTab = BST_CHECKED == ::SendMessage(::GetDlgItem(_hSelf, IDC_CHECK_DEFAULTTABVALUE), BM_GETCHECK, 0, 0);
+					bool useDefaultTab = isCheckedOrNot(IDC_CHECK_DEFAULTTABVALUE);
                     int index = ::SendDlgItemMessage(_hSelf, IDC_LIST_TABSETTNG, LB_GETCURSEL, 0, 0);
 	                if (index == LB_ERR || index == 0) // index == 0 shouldn't happen
 		                return FALSE;
@@ -1535,7 +1541,7 @@ BOOL CALLBACK LangMenuDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM lPara
 
 				case IDC_CHECK_LANGMENUCOMPACT :
 				{
-					nppGUI._isLangMenuCompact = (BST_CHECKED == ::SendMessage(::GetDlgItem(_hSelf, IDC_CHECK_LANGMENUCOMPACT), BM_GETCHECK, 0, 0));
+					nppGUI._isLangMenuCompact = isCheckedOrNot(IDC_CHECK_LANGMENUCOMPACT);
 					::MessageBox(_hSelf,
 						nppGUI._isLangMenuCompact?TEXT("This option will be enable on the next launch."):TEXT("This option will be disable on the next launch."),
 						TEXT("Compact Language Menu"), MB_OK);
@@ -1911,7 +1917,7 @@ BOOL CALLBACK PrintSettingsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM)
 			switch (wParam)
 			{
 				case IDC_CHECK_PRINTLINENUM:
-					nppGUI._printSettings._printLineNumber = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_CHECK_PRINTLINENUM, BM_GETCHECK, 0, 0));
+					nppGUI._printSettings._printLineNumber = isCheckedOrNot(IDC_CHECK_PRINTLINENUM);
 					break;
 
 				case  IDC_RADIO_WYSIWYG:
@@ -2127,7 +2133,7 @@ BOOL CALLBACK BackupDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPara
 
 				case IDD_AUTOC_ENABLECHECK :
 				{
-					bool isEnableAutoC = BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDD_AUTOC_ENABLECHECK, BM_GETCHECK, 0, 0);
+					bool isEnableAutoC = isCheckedOrNot(IDD_AUTOC_ENABLECHECK);
 
 					if (isEnableAutoC)
 					{
@@ -2162,7 +2168,7 @@ BOOL CALLBACK BackupDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPara
 				}
 				case IDD_FUNC_CHECK :
 				{
-					nppGUI._funcParams = (BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDD_FUNC_CHECK, BM_GETCHECK, 0, 0));
+					nppGUI._funcParams = isCheckedOrNot(IDD_FUNC_CHECK);
 					return TRUE;
 				}
 
@@ -2189,14 +2195,14 @@ BOOL CALLBACK BackupDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPara
 
 void BackupDlg::updateBackupGUI()
 {
-	bool noBackup = BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_RADIO_BKNONE, BM_GETCHECK, 0, 0);
+	bool noBackup = isCheckedOrNot(IDC_RADIO_BKNONE);
 	bool isEnableGlobableCheck = false;
 	bool isEnableLocalCheck = false;
 
 	if (!noBackup)
 	{
 		isEnableGlobableCheck = true;
-		isEnableLocalCheck = BST_CHECKED == ::SendDlgItemMessage(_hSelf, IDC_BACKUPDIR_CHECK, BM_GETCHECK, 0, 0);
+		isEnableLocalCheck = isCheckedOrNot(IDC_BACKUPDIR_CHECK);
 	}
 	::EnableWindow(::GetDlgItem(_hSelf, IDC_BACKUPDIR_USERCUSTOMDIR_GRPSTATIC), isEnableGlobableCheck);
 	::EnableWindow(::GetDlgItem(_hSelf, IDC_BACKUPDIR_CHECK), isEnableGlobableCheck);
