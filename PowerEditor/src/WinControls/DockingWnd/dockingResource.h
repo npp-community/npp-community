@@ -15,8 +15,8 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef DOCKING_RESOURCE_H
-#define DOCKING_RESOURCE_H
+#ifndef WINCONTROLS_DOCKINGWND_DOCKINGRESOURCE_H
+#define WINCONTROLS_DOCKINGWND_DOCKINGRESOURCE_H
 
 #define IDD_PLUGIN_DLG                  103
 #define IDC_EDIT1                       1000
@@ -59,5 +59,5 @@
 
 
 
-#endif //DOCKING_RESOURCE_H
+#endif //WINCONTROLS_DOCKINGWND_DOCKINGRESOURCE_H
 

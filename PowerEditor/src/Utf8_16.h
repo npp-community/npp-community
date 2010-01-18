@@ -19,8 +19,8 @@
 // - Add convert function in Utf8_16_Write
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef UTF_8_16_H
-#define UTF_8_16_H
+#ifndef UTF816_H
+#define UTF816_H
 
 #ifndef PARAMETERS_DEF_H
 #include "Parameters_def.h"
@@ -150,4 +150,4 @@ protected:
 	bool m_bFirstWrite;
 };
 
-#endif // UTF_8_16_H
+#endif // UTF816_H

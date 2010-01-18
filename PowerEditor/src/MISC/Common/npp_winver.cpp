@@ -16,7 +16,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "precompiled_headers.h"
 
-#include "npp_winver.h"
+#include "MISC/Common/npp_winver.h"
 
 winVer getWindowsVersionInternal();
 

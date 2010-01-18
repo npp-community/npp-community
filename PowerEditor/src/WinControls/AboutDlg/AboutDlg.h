@@ -15,11 +15,11 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef ABOUT_DLG_H
-#define ABOUT_DLG_H
+#ifndef WINCONTROLS_ABOUTDLG_ABOUTDLG_H
+#define WINCONTROLS_ABOUTDLG_ABOUTDLG_H
 
-#ifndef STATIC_DIALOG_H
-#include "StaticDialog.h"
+#ifndef WINCONTROLS_STATICDIALOG_STATICDIALOG_H
+#include "WinControls/StaticDialog/StaticDialog.h"
 #endif
 
 class URLCtrl;
@@ -42,4 +42,4 @@ private :
 	URLCtrl* _ircLink;
 };
 
-#endif //ABOUT_DLG_H
+#endif //WINCONTROLS_ABOUTDLG_ABOUTDLG_H

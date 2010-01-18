@@ -16,8 +16,8 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "StaticDialog.h"
-#include "Notepad_plus_msgs.h"
+#include "WinControls/StaticDialog/StaticDialog.h"
+#include "MISC/PluginsManager/Notepad_plus_msgs.h"
 
 StaticDialog::~StaticDialog()
 {

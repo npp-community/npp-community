@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef NPP_DATE
-#define NPP_DATE
+#ifndef MISC_COMMON_NPPDATE_H
+#define MISC_COMMON_NPPDATE_H
 
 class Date
 {
@@ -46,4 +46,4 @@ private:
 	unsigned long _day;
 };
 
-#endif // NPP_DATE
+#endif // MISC_COMMON_NPPDATE_H

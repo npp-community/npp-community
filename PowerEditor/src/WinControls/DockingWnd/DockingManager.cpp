@@ -17,11 +17,11 @@
 
 
 #include "precompiled_headers.h"
-#include "DockingManager.h"
-#include "DockingCont.h"
-#include "dockingResource.h"
-#include "DockingSplitter.h"
-#include "Gripper.h"
+#include "WinControls/DockingWnd/DockingManager.h"
+#include "WinControls/DockingWnd/DockingCont.h"
+#include "WinControls/DockingWnd/dockingResource.h"
+#include "WinControls/DockingWnd/DockingSplitter.h"
+#include "WinControls/DockingWnd/Gripper.h"
 
 
 BOOL DockingManager::_isRegistered = FALSE;

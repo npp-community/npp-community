@@ -17,11 +17,11 @@
 
 // created by Daniel Volk mordorpost@volkarts.com
 
-#ifndef RUN_MACRO_DLG_H
-#define RUN_MACRO_DLG_H
+#ifndef WINCONTROLS_SHORTCUT_RUNMACRODLG_H
+#define WINCONTROLS_SHORTCUT_RUNMACRODLG_H
 
-#ifndef STATIC_DIALOG_H
-#include "StaticDialog.h"
+#ifndef WINCONTROLS_STATICDIALOG_STATICDIALOG_H
+#include "WinControls/StaticDialog/StaticDialog.h"
 #endif
 
 #define RM_CANCEL -1
@@ -53,4 +53,4 @@ private :
 	int m_macroIndex;
 };
 
-#endif //RUN_MACRO_DLG_H
+#endif //WINCONTROLS_SHORTCUT_RUNMACRODLG_H

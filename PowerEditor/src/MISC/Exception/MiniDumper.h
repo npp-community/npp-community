@@ -17,8 +17,8 @@
 //Adapted from http://www.codeproject.com/KB/debug/postmortemdebug_standalone1.aspx#_Reading_a_Minidump_with%20Visual%20Stud
 //Modified for use by Npp
 
-#ifndef MDUMP_H
-#define MDUMP_H
+#ifndef MISC_EXCEPTION_MINIDUMPER_H
+#define MISC_EXCEPTION_MINIDUMPER_H
 
 
 // based on dbghelp.h
@@ -34,4 +34,4 @@ public:
 	bool writeDump(EXCEPTION_POINTERS * pExceptionInfo);
 };
 
-#endif //MDUMP_H
+#endif //MISC_EXCEPTION_MINIDUMPER_H

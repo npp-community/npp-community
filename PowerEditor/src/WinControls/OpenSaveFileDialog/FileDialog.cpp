@@ -16,7 +16,7 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "FileDialog.h"
+#include "WinControls/OpenSaveFileDialog/FileDialog.h"
 #include "Parameters.h"
 
 static generic_string changeExt(generic_string fn, generic_string ext, bool forceReplaced = true)

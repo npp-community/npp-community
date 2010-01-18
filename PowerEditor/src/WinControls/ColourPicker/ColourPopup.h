@@ -17,11 +17,11 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef COLOUR_POPUP_H
-#define COLOUR_POPUP_H
+#ifndef WINCONTROLS_COLOURPICKER_COLOURPOPUP_H
+#define WINCONTROLS_COLOURPICKER_COLOURPOPUP_H
 
-#ifndef WINDOW_CONTROL_H
-#include "Window.h"
+#ifndef WINCONTROLS_WINDOW_H
+#include "WinControls/Window.h"
 #endif
 
 #ifndef RESOURCE_H
@@ -51,6 +51,6 @@ private :
 	BOOL CALLBACK run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam);
 };
 
-#endif //COLOUR_POPUP_H
+#endif //WINCONTROLS_COLOURPICKER_COLOURPOPUP_H
 
 

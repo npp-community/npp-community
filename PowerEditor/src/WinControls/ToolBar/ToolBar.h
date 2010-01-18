@@ -15,11 +15,11 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef TOOL_BAR_H
-#define TOOL_BAR_H
+#ifndef WINCONTROLS_TOOLBAR_TOOLBAR_H
+#define WINCONTROLS_TOOLBAR_TOOLBAR_H
 
-#ifndef WINDOW_CONTROL_H
-#include "Window.h"
+#ifndef WINCONTROLS_WINDOW_H
+#include "WinControls/Window.h"
 #endif
 
 #define REBAR_BAR_TOOLBAR		0
@@ -131,4 +131,4 @@ private:
 	bool isIDTaken(int id);
 };
 
-#endif // TOOL_BAR_H
+#endif // WINCONTROLS_TOOLBAR_TOOLBAR_H

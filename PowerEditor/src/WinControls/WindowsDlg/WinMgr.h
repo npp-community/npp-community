@@ -9,10 +9,8 @@
 //
 // Theo - Heavily modified to remove MFC dependencies
 //        Replaced CWnd*/HWND, CRect/RECT, CSize/SIZE, CPoint/POINT
-#ifndef WINMGR_H
-#define WINMGR_H
-
-#pragma once
+#ifndef WINCONTROLS_WINDOWSDLG_WINMGR_H
+#define WINCONTROLS_WINDOWSDLG_WINMGR_H
 
 // when using screen dimensions, this is infinite
 //const LONG INFINITY=0x7fff; // max short
@@ -309,4 +307,4 @@ private:
 };
 
 // Theo - Removed CSizerBar and CSizeableDlg
-#endif
+#endif // WINCONTROLS_WINDOWSDLG_WINMGR_H

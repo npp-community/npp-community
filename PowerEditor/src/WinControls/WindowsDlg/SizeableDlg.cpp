@@ -16,8 +16,8 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "SizeableDlg.h"
-#include "WinMgr.h"
+#include "WinControls/WindowsDlg/SizeableDlg.h"
+#include "WinControls/WindowsDlg/WinMgr.h"
 
 SizeableDlg::SizeableDlg(WINRECT* pWinMap)
 	: MyBaseClass(), _winMgr(new CWinMgr(pWinMap))

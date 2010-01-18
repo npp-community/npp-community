@@ -17,11 +17,11 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __TOOLTIP_H__
-#define __TOOLTIP_H__
+#ifndef WINCONTROLS_TOOLTIP_TOOLTIP_H
+#define WINCONTROLS_TOOLTIP_TOOLTIP_H
 
-#ifndef WINDOW_CONTROL_H
-#include "Window.h"
+#ifndef WINCONTROLS_WINDOW_H
+#include "WinControls/Window.h"
 #endif
 
 class ToolTip : public Window
@@ -49,4 +49,4 @@ protected:
 	void SendHitMessage();
 };
 
-#endif // __TOOLTIP_H__
+#endif // WINCONTROLS_TOOLTIP_TOOLTIP_H

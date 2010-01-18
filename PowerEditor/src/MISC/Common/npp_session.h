@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef NPP_SESSION
-#define NPP_SESSION
+#ifndef MISC_COMMON_NPPSESSION_H
+#define MISC_COMMON_NPPSESSION_H
 
 struct Position
 {
@@ -52,4 +52,4 @@ struct Session {
 	std::vector<sessionFileInfo> _subViewFiles;
 };
 
-#endif // NPP_SESSION
+#endif // MISC_COMMON_NPPSESSION_H

@@ -15,11 +15,11 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef RUN_DLG_H
-#define RUN_DLG_H
+#ifndef WINCONTROLS_STATICDIALOG_RUNDLG_RUNDLG_H
+#define WINCONTROLS_STATICDIALOG_RUNDLG_RUNDLG_H
 
-#ifndef STATIC_DIALOG_H
-#include "StaticDialog.h"
+#ifndef WINCONTROLS_STATICDIALOG_STATICDIALOG_H
+#include "WinControls/StaticDialog/StaticDialog.h"
 #endif
 
 #define CURRENTWORD_MAXLENGTH 2048
@@ -54,4 +54,4 @@ private :
 	void removeTextFromCombo(const TCHAR *txt2Remove) const;
 };
 
-#endif //RUN_DLG_H
+#endif //WINCONTROLS_STATICDIALOG_RUNDLG_RUNDLG_H

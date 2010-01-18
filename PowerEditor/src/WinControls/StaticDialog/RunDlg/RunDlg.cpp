@@ -16,13 +16,13 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "RunDlg.h"
-#include "FileDialog.h"
+#include "WinControls/StaticDialog/RunDlg/RunDlg.h"
+#include "WinControls/OpenSaveFileDialog/FileDialog.h"
 #include "resource.h"
-#include "Notepad_plus_msgs.h"
-#include "shortcut.h"
+#include "MISC/PluginsManager/Notepad_plus_msgs.h"
+#include "WinControls/shortcut/shortcut.h"
 #include "Parameters.h"
-#include "RunDlg_rc.h"
+#include "WinControls/StaticDialog/RunDlg/RunDlg_rc.h"
 
 const TCHAR fullCurrentPath[] = TEXT("FULL_CURRENT_PATH");
 const TCHAR currentDirectory[] = TEXT("CURRENT_DIRECTORY");

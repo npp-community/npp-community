@@ -17,14 +17,14 @@
 
 #include "precompiled_headers.h"
 
-#include "TaskListDlg.h"
+#include "WinControls/TaskList/TaskListDlg.h"
 
-#include "TaskListDlg_rc.h"
+#include "WinControls/TaskList/TaskListDlg_rc.h"
 #include "resource.h"
-#include "TaskList.h"
-#include "Notepad_plus_msgs.h"
-#include "npp_winver.h"
-#include "colors.h"
+#include "WinControls/TaskList/TaskList.h"
+#include "MISC/PluginsManager/Notepad_plus_msgs.h"
+#include "MISC/Common/npp_winver.h"
+#include "ScintillaComponent/colors.h"
 
 static HWND hWndServer = NULL;
 static HHOOK hook = NULL;

@@ -18,9 +18,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "precompiled_headers.h"
-#include "BabyGridWrapper.h"
+#include "WinControls/Grid/BabyGridWrapper.h"
 
-#include "babygrid.h"
+#include "WinControls/Grid/BabyGrid.h"
 
 
 const TCHAR *babyGridClassName = TEXT("BABYGRID");

@@ -16,7 +16,7 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "ImageListSet.h"
+#include "WinControls/ImageListSet/ImageListSet.h"
 
 void IconList::create(HINSTANCE hInst, int iconSize)
 {

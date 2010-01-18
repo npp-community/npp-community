@@ -17,21 +17,21 @@
 
 #include "precompiled_headers.h"
 
-#include "tinyxml.h"
+#include "TinyXML/tinyxml.h"
 
-#include "preferenceDlg.h"
+#include "WinControls/Preference/preferenceDlg.h"
 #include "ValueDlg.h"
 
-#include "preference_rc.h"
-#include "URLCtrl.h"
-#include "regExtDlg.h"
-#include "regExtDlgRc.h"
-#include "WordStyleDlg.h"
-#include "ControlsTab.h"
+#include "WinControls/Preference/preference_rc.h"
+#include "WinControls/AboutDlg/URLCtrl.h"
+#include "MISC/RegExt/regExtDlg.h"
+#include "MISC/RegExt/regExtDlgRc.h"
+#include "WinControls/ColourPicker/WordStyleDlg.h"
+#include "WinControls/TabBar/ControlsTab.h"
 #include "menuCmdID.h"
 #include "resource.h"
 #include "Parameters.h"
-#include "npp_winver.h"
+#include "MISC/Common/npp_winver.h"
 
 const int BLINKRATE_FASTEST = 50;
 const int BLINKRATE_SLOWEST = 2500;
@@ -674,13 +674,13 @@ BOOL CALLBACK MarginsDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM /*lPar
 			int iView = i + 1;
 			switch (wParam)
 			{
-				case IDC_CHECK_LINENUMBERMARGE:
-					svp._lineNumberMarginShow = isCheckedOrNot(IDC_CHECK_LINENUMBERMARGE);
+				case IDC_CHECK_LINENUMBERMARGIN:
+					svp._lineNumberMarginShow = isCheckedOrNot(IDC_CHECK_LINENUMBERMARGIN);
 					::SendMessage(_hParent, WM_COMMAND, IDM_VIEW_LINENUMBER, iView);
 					return TRUE;
 
-				case IDC_CHECK_BOOKMARKMARGE:
-					svp._bookMarkMarginShow = isCheckedOrNot(IDC_CHECK_BOOKMARKMARGE);
+				case IDC_CHECK_BOOKMARKMARGIN:
+					svp._bookMarkMarginShow = isCheckedOrNot(IDC_CHECK_BOOKMARKMARGIN);
 					::SendMessage(_hParent, WM_COMMAND, IDM_VIEW_SYMBOLMARGIN, iView);
 					return TRUE;
 

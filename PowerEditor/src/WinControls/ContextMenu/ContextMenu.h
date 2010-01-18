@@ -17,8 +17,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CONTEXTMENU_H
-#define CONTEXTMENU_H
+#ifndef WINCONTROLS_CONTEXTMENU_CONTEXTMENU_H
+#define WINCONTROLS_CONTEXTMENU_CONTEXTMENU_H
 
 struct MenuItemUnit {
 	unsigned long _cmdID;
@@ -47,4 +47,4 @@ private:
 	HMENU _hMenu;
 };
 
-#endif //CONTEXTMENU_h
+#endif // WINCONTROLS_CONTEXTMENU_CONTEXTMENU_H

@@ -15,11 +15,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef NPP_WINVER_H
-#define NPP_WINVER_H
+#ifndef MISC_COMMON_NPPWINVER_H
+#define MISC_COMMON_NPPWINVER_H
 
 enum winVer{WV_UNKNOWN, WV_WIN32S, WV_95, WV_98, WV_ME, WV_NT, WV_W2K, WV_XP, WV_S2003, WV_XPX64, WV_VISTA, WV_WIN7};
 
 winVer getWinVersion();
 
-#endif // NPP_WINVER_H
+#endif // MISC_COMMON_NPPWINVER_H

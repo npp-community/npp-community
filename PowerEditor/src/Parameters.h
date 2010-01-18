@@ -18,28 +18,28 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
-#ifndef SCINTILLA_REF_H
-#include "ScintillaRef.h"
+#ifndef SCINTILLACOMPONENT_SCINTILLAREF_H
+#include "ScintillaComponent/ScintillaRef.h"
 #endif
 
-#ifndef TOOL_BAR_H
-#include "ToolBar.h"
+#ifndef WINCONTROLS_TOOLBAR_TOOLBAR_H
+#include "WinControls/ToolBar/ToolBar.h"
 #endif
 
-#ifndef USER_DEFINE_LANG_REFERENCE_H
-#include "UserDefineLangReference.h"
+#ifndef SCINTILLACOMPONENT_USERDEFINELANGREFERENCE_H
+#include "ScintillaComponent/UserDefineLangReference.h"
 #endif
 
-#ifndef SHORTCUTS_H
-#include "shortcut.h"
+#ifndef WINCONTROLS_SHORTCUT_SHORTCUT_H
+#include "WinControls/shortcut/shortcut.h"
 #endif
 
-#ifndef CONTEXTMENU_H
-#include "ContextMenu.h"
+#ifndef WINCONTROLS_CONTEXTMENU_CONTEXTMENU_H
+#include "WinControls/ContextMenu/ContextMenu.h"
 #endif
 
-#ifndef NOTEPAD_PLUS_MSGS_H
-#include "Notepad_plus_msgs.h"
+#ifndef MISC_PLUGINSMANAGER_NOTEPADPLUSMSGS_H
+#include "MISC/PluginsManager/Notepad_plus_msgs.h"
 #endif
 
 #ifndef PARAMETERS_DEF_H
@@ -47,18 +47,18 @@
 #endif
 
 // JOCE: this needs to be taken out at some point...
-#ifndef NPP_STYLES
-#include "npp_styles.h"
+#ifndef MISC_COMMON_NPPSTYLES_H
+#include "MISC/Common/npp_styles.h"
 #endif
 
 // JOCE: this needs to be taken out at some point...
-#ifndef NPP_DATE
-#include "npp_date.h"
+#ifndef MISC_COMMON_NPPDATE_H
+#include "MISC/Common/npp_date.h"
 #endif
 
 // JOCE: this needs to be taken out at some point...
-#ifndef USER_DEFINE_DIALOG_H
-#include "UserDefineDialog.h"
+#ifndef SCINTILLACOMPONENT_USERDEFINEDIALOG_H
+#include "ScintillaComponent/UserDefineDialog.h"
 #endif
 
 // Forward declarations

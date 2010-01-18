@@ -18,6 +18,8 @@
 #ifndef PRECOMPILED_HEADERS_H
 #define PRECOMPILED_HEADERS_H
 
+
+
 #include "targetver.h"
 
 // Allow to track emplacement where leaked memory was allocated.
@@ -84,8 +86,7 @@
 #include "SciLexer.h"
 
 // Power Editor
-#include "Common.h"
-
-#include "Debug/npp_debug.h"
+#include "MISC/Common/Common.h"
+#include "MISC/Debug/npp_debug.h"
 
 #endif // PRECOMPILED_HEADERS_H

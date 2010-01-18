@@ -16,8 +16,8 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef REGEXTDLGRC_H
-#define REGEXTDLGRC_H
+#ifndef MISC_REGEXT_REGEXTDLGRC_H
+#define MISC_REGEXT_REGEXTDLGRC_H
 
 #define	IDD_REGEXT_BOX 4000
 
@@ -32,4 +32,4 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 	#define IDC_SUPPORTEDEXTS_STATIC     (IDD_REGEXT_BOX + 9)
 	#define IDC_REGISTEREDEXTS_STATIC     (IDD_REGEXT_BOX + 10)
 
-#endif //REGEXTDLGRC_H
+#endif //MISC_REGEXT_REGEXTDLGRC_H

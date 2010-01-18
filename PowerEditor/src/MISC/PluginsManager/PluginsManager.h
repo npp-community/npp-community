@@ -15,11 +15,11 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef PLUGINSMANAGER_H
-#define PLUGINSMANAGER_H
+#ifndef MISC_PLUGINSMANAGER_PLUGINSMANAGER_H
+#define MISC_PLUGINSMANAGER_PLUGINSMANAGER_H
 
-#ifndef PLUGININTERFACE_H
-#include "PluginInterface.h"
+#ifndef MISC_PLUGINSMANAGER_PLUGININTERFACE_H
+#include "MISC/PluginsManager/PluginInterface.h"
 #endif
 
 typedef BOOL (__cdecl * PFUNCISUNICODE)();
@@ -99,4 +99,4 @@ typedef int (EXT_LEXER_DECL *GetLexerCountFn)();
 typedef void (EXT_LEXER_DECL *GetLexerNameFn)(unsigned int Index, char *name, int buflength);
 typedef void (EXT_LEXER_DECL *GetLexerStatusTextFn)(unsigned int Index, TCHAR *desc, int buflength);
 
-#endif //PLUGINSMANAGER_H
+#endif //MISC_PLUGINSMANAGER_PLUGINSMANAGER_H

@@ -15,11 +15,11 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef STATUS_BAR_H
-#define STATUS_BAR_H
+#ifndef WINCONTROLS_STATUSBAR_STATUSBAR_H
+#define WINCONTROLS_STATUSBAR_STATUSBAR_H
 
-#ifndef WINDOW_CONTROL_H
-#include "Window.h"
+#ifndef WINCONTROLS_WINDOW_H
+#include "WinControls/Window.h"
 #endif
 
 class StatusBar : public Window
@@ -77,4 +77,4 @@ private :
     LPINT _lpParts;
 };
 
-#endif // STATUS_BAR_H
+#endif // WINCONTROLS_STATUSBAR_STATUSBAR_H

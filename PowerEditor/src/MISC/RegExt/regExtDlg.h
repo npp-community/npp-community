@@ -17,11 +17,11 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef REG_EXT_DLG_H
-#define REG_EXT_DLG_H
+#ifndef MISC_REGEXT_REGEXTDLG_H
+#define MISC_REGEXT_REGEXTDLG_H
 
-#ifndef STATIC_DIALOG_H
-#include "StaticDialog.h"
+#ifndef WINCONTROLS_STATICDIALOG_STATICDIALOG_H
+#include "WinControls/StaticDialog/StaticDialog.h"
 #endif
 
 class RegExtDlg : public StaticDialog
@@ -54,4 +54,4 @@ private :
 	};
 };
 
-#endif //REG_EXT_DLG_H
+#endif //MISC_REGEXT_REGEXTDLG_H

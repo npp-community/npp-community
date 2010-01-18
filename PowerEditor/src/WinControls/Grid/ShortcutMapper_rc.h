@@ -16,8 +16,8 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef SHORTCUTMAPPER_RC_H
-#define SHORTCUTMAPPER_RC_H
+#ifndef WINCONTROLS_GRID_SHORTCUTMAPPERRC_H
+#define WINCONTROLS_GRID_SHORTCUTMAPPERRC_H
 
 #define	IDD_SHORTCUTMAPPER_DLG      2600
 #define	IDD_BABYGRID_ID1      (IDD_SHORTCUTMAPPER_DLG + 1)
@@ -25,4 +25,4 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define	IDM_BABYGRID_DELETE   (IDD_SHORTCUTMAPPER_DLG + 3)
 #define	IDC_BABYGRID_TABBAR   (IDD_SHORTCUTMAPPER_DLG + 4)
 
-#endif // SHORTCUTMAPPER_RC_H
+#endif // WINCONTROLS_GRID_SHORTCUTMAPPERRC_H

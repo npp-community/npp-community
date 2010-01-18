@@ -19,10 +19,10 @@
 
 #include "precompiled_headers.h"
 
-#include "RunMacroDlg.h"
+#include "WinControls/shortcut/RunMacroDlg.h"
 #include "Parameters.h"
 #include "resource.h"
-#include "RunMacroDlg_rc.h"
+#include "WinControls/shortcut/RunMacroDlg_rc.h"
 
 
 void RunMacroDlg::init(HINSTANCE hInst, HWND hParent)

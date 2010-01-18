@@ -15,11 +15,11 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef TASKLISTDLG_H
-#define TASKLISTDLG_H
+#ifndef WINCONTROLS_TASKLIST_TASKLISTDLG_H
+#define WINCONTROLS_TASKLIST_TASKLISTDLG_H
 
-#ifndef STATIC_DIALOG_H
-#include "StaticDialog.h"
+#ifndef WINCONTROLS_STATICDIALOG_STATICDIALOG_H
+#include "WinControls/StaticDialog/StaticDialog.h"
 #endif
 
 #define dirUp true
@@ -68,4 +68,4 @@ private :
 };
 
 
-#endif // TASKLISTDLG_H
+#endif // WINCONTROLS_TASKLIST_TASKLISTDLG_H

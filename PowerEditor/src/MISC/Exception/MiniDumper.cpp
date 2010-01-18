@@ -17,7 +17,7 @@
 
 #include "precompiled_headers.h"
 
-#include "MiniDumper.h"
+#include "MISC/Exception/MiniDumper.h"
 
 LPCTSTR msgTitle = TEXT("Notepad++ crash analysis");
 

@@ -15,11 +15,11 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef DOCKINGMANAGER_H
-#define DOCKINGMANAGER_H
+#ifndef WINCONTROLS_DOCKINGWND_DOCKINGMANAGER_H
+#define WINCONTROLS_DOCKINGWND_DOCKINGMANAGER_H
 
-#ifndef WINDOW_CONTROL_H
-#include "Window.h"
+#ifndef WINCONTROLS_WINDOW_H
+#include "WinControls/Window.h"
 #endif
 
 #define DSPC_CLASS_NAME TEXT("dockingManager")
@@ -110,4 +110,4 @@ private:
 	std::vector<DockingSplitter*>	_vSplitter;
 };
 
-#endif //DOCKINGMANAGER_H
+#endif //WINCONTROLS_DOCKINGWND_DOCKINGMANAGER_H

@@ -16,11 +16,11 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "AboutDlg.h"
+#include "WinControls/AboutDlg/AboutDlg.h"
 #include "Parameters.h"
 #include "resource.h"
 
-#include "URLCtrl.h"
+#include "WinControls/AboutDlg/URLCtrl.h"
 
 
 BOOL CALLBACK AboutDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)

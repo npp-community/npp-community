@@ -16,21 +16,21 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "tinyxmlA.h"
-#include "tinyxml.h"
+#include "TinyXML/tinyXmlA/tinystrA.h"
+#include "TinyXML/tinyxml.h"
 
 #include "Parameters.h"
-#include "FileDialog.h"
-#include "ScintillaEditView.h"
+#include "WinControls/OpenSaveFileDialog/FileDialog.h"
+#include "ScintillaComponent/ScintillaEditView.h"
 
 #include "keys.h"
 #include "MenuCmdID.h"
 
 #include "resource.h"
-#include "colors.h"
+#include "ScintillaComponent/colors.h"
 
-#include "npp_winver.h"
-#include "npp_session.h"
+#include "MISC/Common/npp_winver.h"
+#include "MISC/Common/npp_session.h"
 
 struct WinMenuKeyDefinition {	//more or less matches accelerator table definition, easy copy/paste
 	//const TCHAR * name;	//name retrieved from menu?

@@ -15,10 +15,10 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef WINDOWS_DLG_H
-#define WINDOWS_DLG_H
+#ifndef WINCONTROLS_WINDOWSDLG_WINDOWSDLG_H
+#define WINCONTROLS_WINDOWSDLG_WINDOWSDLG_H
 
-#ifndef SIZEABLE_DLG_H
+#ifndef WINCONTROLS_WINDOWSDLG_SIZEABLEDLG_H
 #include "SizeableDlg.h"
 #endif
 
@@ -108,4 +108,4 @@ private:
 };
 
 
-#endif //WINDOWS_DLG_H
+#endif //WINCONTROLS_WINDOWSDLG_WINDOWSDLG_H

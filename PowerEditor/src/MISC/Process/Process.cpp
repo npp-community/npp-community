@@ -16,7 +16,7 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "process.h"
+#include "MISC/Process/Process.h"
 
 Process::Process(progType pt) :
 	_type(pt),

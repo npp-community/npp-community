@@ -17,8 +17,6 @@
 #ifndef TARGETVER_H
 #define TARGETVER_H
 
-#pragma once
-
 // The following macros define the minimum required platform.  The minimum required platform
 // is the earliest version of Windows, Internet Explorer etc. that has the necessary features to run
 // your application.  The macros work by enabling all features available on platform versions up to and

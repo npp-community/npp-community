@@ -7,7 +7,7 @@
 //
 //#include "StdAfx.h"
 #include "precompiled_headers.h"
-#include "WinMgr.h"
+#include "WinControls/WindowsDlg/WinMgr.h"
 
 //////////////////
 // Construct from args

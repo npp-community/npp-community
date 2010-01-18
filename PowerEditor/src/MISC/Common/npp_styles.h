@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef NPP_STYLES
-#define NPP_STYLES
+#ifndef MISC_COMMON_NPPSTYLES_H
+#define MISC_COMMON_NPPSTYLES_H
 
 enum FontStyle
 {
@@ -154,4 +154,4 @@ private :
 	int _nbLexerStyler;
 };
 
-#endif // NPP_STYLES
+#endif // MISC_COMMON_NPPSTYLES_H

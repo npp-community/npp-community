@@ -15,8 +15,8 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef PROCESSUS_H
-#define PROCESSUS_H
+#ifndef MISC_PROCESS_PROCESS_H
+#define MISC_PROCESS_PROCESS_H
 
 enum progType {WIN32_PROG, CONSOLE_PROG};
 
@@ -89,5 +89,5 @@ protected:
 	void error(const TCHAR *txt2display, BOOL & returnCode, int errCode);
 };
 
-#endif //PROCESSUS_H
+#endif //MISC_PROCESS_PROCESS_H
 

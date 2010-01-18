@@ -15,11 +15,11 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef GRIPPER_H
-#define GRIPPER_H
+#ifndef WINCONTROLS_DOCKINGWND_GRIPPER_H
+#define WINCONTROLS_DOCKINGWND_GRIPPER_H
 
-#ifndef DOCKING_H
-#include "Docking.h"
+#ifndef WINCONTROLS_DOCKINGWND_DOCKING_H
+#include "WinControls/DockingWnd/Docking.h"
 #endif
 
 // Used by getRectAndStyle() to draw the drag rectangle
@@ -129,4 +129,4 @@ private:
 	static BOOL _isRegistered;
 };
 
-#endif // GRIPPER_H
+#endif // WINCONTROLS_DOCKINGWND_GRIPPER_H

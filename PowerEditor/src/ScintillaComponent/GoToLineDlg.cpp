@@ -1,0 +1,161 @@
+//this file is part of notepad++
+//Copyright (C)2003 Don HO ( donho@altern.org )
+//
+//This program is free software; you can redistribute it and/or
+//modify it under the terms of the GNU General Public License
+//as published by the Free Software Foundation; either
+//version 2 of the License, or (at your option) any later version.
+//
+//This program is distributed in the hope that it will be useful,
+//but WITHOUT ANY WARRANTY; without even the implied warranty of
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//GNU General Public License for more details.
+//
+//You should have received a copy of the GNU General Public License
+//along with this program; if not, write to the Free Software
+//Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+#include "precompiled_headers.h"
+#include "ScintillaComponent/GoToLineDlg.h"
+#include "ScintillaComponent/ScintillaEditView.h"
+#include "resource.h"
+
+BOOL CALLBACK GoToLineDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lParam*/)
+{
+	switch (message)
+	{
+		case WM_INITDIALOG :
+		{
+			::SendDlgItemMessage(_hSelf, IDC_RADIO_GOTOLINE, BM_SETCHECK, TRUE, 0);
+			goToCenter();
+			return TRUE;
+		}
+		case WM_COMMAND :
+		{
+			switch (wParam)
+			{
+				case IDCANCEL : // Close
+					display(false);
+                    cleanLineEdit();
+					return TRUE;
+
+				case IDOK :
+                {
+                    int line = getLine();
+                    if (line != -1)
+                    {
+                        display(false);
+                        cleanLineEdit();
+						if (_mode == go2line) {
+							(*_ppEditView)->execute(SCI_ENSUREVISIBLE, line-1);
+							(*_ppEditView)->execute(SCI_GOTOLINE, line-1);
+						} else {
+							int sci_line = (*_ppEditView)->execute(SCI_LINEFROMPOSITION, line);
+							(*_ppEditView)->execute(SCI_ENSUREVISIBLE, sci_line);
+							(*_ppEditView)->execute(SCI_GOTOPOS, line);
+						}
+                    }
+                    (*_ppEditView)->getFocus();
+                    return TRUE;
+                }
+
+				case IDC_RADIO_GOTOLINE :
+				case IDC_RADIO_GOTOOFFSET :
+				{
+
+					bool isLine, isOffset;
+					if (wParam == IDC_RADIO_GOTOLINE)
+					{
+						isLine = true;
+						isOffset = false;
+						_mode = go2line;
+					}
+					else
+					{
+						isLine = false;
+						isOffset = true;
+						_mode = go2offsset;
+					}
+					::SendDlgItemMessage(_hSelf, IDC_RADIO_GOTOLINE, BM_SETCHECK, isLine, 0);
+					::SendDlgItemMessage(_hSelf, IDC_RADIO_GOTOOFFSET, BM_SETCHECK, isOffset, 0);
+					updateLinesNumbers();
+					return TRUE;
+				}
+				default :
+				{
+					switch (HIWORD(wParam))
+					{
+						case EN_SETFOCUS :
+						case BN_SETFOCUS :
+							updateLinesNumbers();
+							return TRUE;
+						default :
+							return TRUE;
+					}
+					break;
+				}
+			}
+		}
+
+		default :
+			return FALSE;
+	}
+}
+
+void GoToLineDlg::init( HINSTANCE hInst, HWND hParent, ScintillaEditView **ppEditView )
+{
+	Window::init(hInst, hParent);
+	if (!ppEditView)
+		throw int(9900);
+	_ppEditView = ppEditView;
+}
+
+void GoToLineDlg::updateLinesNumbers() const
+{
+	unsigned int current = 0;
+	unsigned int limit = 0;
+
+	if (_mode == go2line)
+	{
+		current = (unsigned int)((*_ppEditView)->getCurrentLineNumber() + 1);
+		limit = (unsigned int)((*_ppEditView)->execute(SCI_GETLINECOUNT));
+	}
+	else
+	{
+		current = (unsigned int)(*_ppEditView)->execute(SCI_GETCURRENTPOS);
+		limit = (unsigned int)((*_ppEditView)->getCurrentDocLen() - 1);
+	}
+    ::SetDlgItemInt(_hSelf, ID_CURRLINE, current, FALSE);
+    ::SetDlgItemInt(_hSelf, ID_LASTLINE, limit, FALSE);
+}
+
+void GoToLineDlg::create( int dialogID, bool isRTL)
+{
+	StaticDialog::create(dialogID, isRTL);
+}
+
+void GoToLineDlg::doDialog( bool isRTL /*= false*/ )
+{
+	if (!isCreated())
+		create(IDD_GOLINE, isRTL);
+	display();
+}
+
+void GoToLineDlg::display( bool toShow /*= true*/ ) const
+{
+	Window::display(toShow);
+	if (toShow)
+		::SetFocus(::GetDlgItem(_hSelf, ID_GOLINE_EDIT));
+}
+
+void GoToLineDlg::cleanLineEdit() const
+{
+	::SetDlgItemText(_hSelf, ID_GOLINE_EDIT, TEXT(""));
+}
+
+int GoToLineDlg::getLine() const
+{
+	BOOL isSuccessful;
+	int line = ::GetDlgItemInt(_hSelf, ID_GOLINE_EDIT, &isSuccessful, FALSE);
+	return (isSuccessful?line:-1);
+}

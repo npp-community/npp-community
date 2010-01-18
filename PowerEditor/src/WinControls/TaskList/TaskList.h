@@ -15,11 +15,11 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef TASKLIST_H
-#define TASKLIST_H
+#ifndef WINCONTROLS_TASKLIST_TASKLIST_H
+#define WINCONTROLS_TASKLIST_TASKLIST_H
 
-#ifndef WINDOW_CONTROL_H
-#include "Window.h"
+#ifndef WINCONTROLS_WINDOW_H
+#include "WinControls/Window.h"
 #endif
 
 #ifndef WM_MOUSEWHEEL
@@ -67,4 +67,4 @@ protected:
 	RECT _rc;
 };
 
-#endif // TASKLIST_H
+#endif // WINCONTROLS_TASKLIST_TASKLIST_H

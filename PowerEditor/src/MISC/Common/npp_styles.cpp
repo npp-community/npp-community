@@ -17,10 +17,10 @@
 
 #include "precompiled_headers.h"
 
-#include "npp_styles.h"
-#include "TinyXml.h"
+#include "MISC/Common/npp_styles.h"
+#include "TinyXML/tinyxml.h"
 #include "Parameters_def.h"
-#include "colors.h"
+#include "ScintillaComponent/colors.h"
 
 // ***********************************
 //

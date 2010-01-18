@@ -16,12 +16,14 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "DockingCont.h"
-#include "dockingResource.h"
-#include "Docking.h"
-#include "ToolTip.h"
-#include "Tabbar.h"
-#include "npp_winver.h"
+#include "WinControls/DockingWnd/DockingCont.h"
+#include "WinControls/DockingWnd/dockingResource.h"
+#include "WinControls/DockingWnd/Docking.h"
+#include "WinControls/ToolTip/ToolTip.h"
+#include "WinControls/TabBar/TabBar.h"
+#include "MISC/Common/npp_winver.h"
+
+#include "MISC/Debug/npp_debug.h"
 
 #ifndef WH_MOUSE_LL
 #define WH_MOUSE_LL 14

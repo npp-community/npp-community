@@ -17,7 +17,7 @@
 
 
 #include "precompiled_headers.h"
-#include "ControlsTab.h"
+#include "WinControls/TabBar/ControlsTab.h"
 
 #define MARGIN 8
 
