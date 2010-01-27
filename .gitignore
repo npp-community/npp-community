@@ -21,6 +21,7 @@ Thumbs.db
 *.log
 [Bb]in
 [Dd]ebug*/
+!PowerEditor/src/MISC/Debug/
 *.lib
 *.sbr
 obj/
