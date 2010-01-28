@@ -1,0 +1,4 @@
+FuncGuards.h
+# Ignore developer's private funcguards templates
+Templates/
+*.tmp
