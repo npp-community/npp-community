@@ -27,7 +27,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				Description="Runtime build and version generation."
-				CommandLine="CALL &quot;$(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat&quot; &quot;$(IntDir)\&quot; &quot;$(SolutionDir)PowerEditor\src\gen-versioninfo.h&quot;"
+				CommandLine="CALL &quot;$(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat&quot; &quot;$(IntDir)\&quot; &quot;$(SolutionDir)PowerEditor\src\gen-versioninfo.h&quot;&#x0D;&#x0A;IF NOT EXIST &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards.h&quot; copy &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards_skel.h&quot; &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards.h&quot;&#x0D;&#x0A;"
 				ExcludedFromBuild="false"
 			/>
 			<Tool
@@ -126,7 +126,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				Description="Runtime build and version generation."
-				CommandLine="CALL $(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat &quot;$(IntDir)\&quot; &quot;$(SolutionDir)PowerEditor\src\gen-versioninfo.h&quot;"
+				CommandLine="CALL $(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat &quot;$(IntDir)\&quot; &quot;$(SolutionDir)PowerEditor\src\gen-versioninfo.h&quot;&#x0D;&#x0A;IF NOT EXIST &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards.h&quot; copy &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards_skel.h&quot; &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards.h&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -459,6 +459,18 @@
 				<Filter
 					Name="Debug"
 					>
+					<File
+						RelativePath="..\src\MISC\Debug\FuncGuards.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\MISC\Debug\FuncGuards_skel.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\MISC\Debug\FuncGuardsImport.h"
+						>
+					</File>
 					<File
 						RelativePath="..\src\MISC\Debug\npp_debug.h"
 						>
@@ -1462,6 +1474,18 @@
 				<Filter
 					Name="Debug"
 					>
+					<File
+						RelativePath="..\src\MISC\Debug\FuncGuards.cpp"
+						>
+						<FileConfiguration
+							Name="Shipping|Win32"
+							ExcludedFromBuild="true"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+							/>
+						</FileConfiguration>
+					</File>
 					<File
 						RelativePath="..\src\MISC\Debug\npp_debug.cpp"
 						>
