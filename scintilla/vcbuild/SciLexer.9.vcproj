@@ -195,6 +195,96 @@
 				CommandLine="xcopy /Y $(TargetPath) ..\..\PowerEditor\bin"
 			/>
 		</Configuration>
+		<Configuration
+			Name="Shipping|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="2"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+				Description="Notepad++ CR Scintilla Version Generation"
+				CommandLine="CALL $(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat &quot;$(IntDir)\&quot; &quot;$(SolutionDir)scintilla\src\gen-versioninfo.h&quot;"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				InlineFunctionExpansion="2"
+				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="..\include;..\src"
+				PreprocessorDefinitions="WIN32;NDEBUG;SHIPPING;_WINDOWS;_USRDLL;SCILEXER7_EXPORTS;SCI_LEXER;_CRT_SECURE_NO_WARNINGS"
+				StringPooling="true"
+				RuntimeLibrary="0"
+				EnableFunctionLevelLinking="true"
+				DefaultCharIsUnsigned="true"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="precompiled_headers.h"
+				WarningLevel="4"
+				WarnAsError="true"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				AdditionalIncludeDirectories="..\src"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="Imm32.lib"
+				OutputFile="$(OutDir)/SciLexer.dll"
+				LinkIncremental="1"
+				ModuleDefinitionFile="..\win32\Scintilla.def"
+				GenerateDebugInformation="false"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				ImportLibrary="$(OutDir)/SciLexer.9.lib"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="xcopy /Y $(TargetPath) ..\..\PowerEditor\bin"
+			/>
+		</Configuration>
 	</Configurations>
 	<References>
 	</References>
@@ -281,6 +371,14 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Shipping|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
