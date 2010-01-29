@@ -266,6 +266,7 @@ Notepad_plus::~Notepad_plus()
 	NppParameters::destroyInstance();
 	FileManager::destroyInstance();
 	WcharMbcsConvertor::destroyInstance();
+	EncodingMapper::destroyInstance();
 	if (_pTrayIco)
 		delete _pTrayIco;
 
