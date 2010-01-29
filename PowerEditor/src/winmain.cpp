@@ -155,6 +155,10 @@ int getNumberFromParam(char paramName, ParamVector & params, bool & isParamePres
 	#define FLAG_RUN_UNITTESTS TEXT("-unittests") // "Secret" option
 #endif
 
+#ifdef _DEBUG
+	#define FLAG_LEAK_DETECT TEXT("-leakdetect") // "Secret" option
+#endif
+
 #define COMMAND_ARG_HELP TEXT("Usage :\n\
 \n\
 notepad++ [--help] [-multiInst] [-noPlugins] [-lLanguage] [-nLineNumber] [-cColumnNumber] [-xPos] [-yPos] [-nosession] [-notabbar] [-ro] [-systemtray] [fullFilePathName]\n\
@@ -216,6 +220,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 	bool isParamePresent;
 	bool showHelp = isInList(FLAG_HELP, params);
 	bool isMultiInst = isInList(FLAG_MULTI_INSTANCE, params);
+
+#ifdef _DEBUG
+	bool isLeakDetect = isInList(FLAG_LEAK_DETECT, params);
+#endif
 
 	CmdLineParams cmdLineParams;
 	cmdLineParams._isNoTab = isInList(FLAG_NOTABBAR, params);
@@ -368,6 +376,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 	try {
 		notepad_plus_plus.init(hInstance, NULL, quotFileName.c_str(), &cmdLineParams);
 		bool unicodeSupported = getWinVersion() >= WV_NT;
+#ifdef _DEBUG
+		// mem leak check output for build-testing.
+		if (isLeakDetect)
+		{
+			::SendMessage(notepad_plus_plus.gNppHWND, WM_CLOSE, 0, 0);
+			return 0;
+		};
+#endif
 		bool going = true;
 		while (going)
 		{
