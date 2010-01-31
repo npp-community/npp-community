@@ -50,7 +50,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\src;..\lexlib"
+				AdditionalIncludeDirectories="..\..\common;..\include;..\src;..\lexlib"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;SCILEXER7_EXPORTS;SCI_LEXER;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -159,7 +159,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\include;..\src;..\lexlib"
+				AdditionalIncludeDirectories="..\..\common;..\include;..\src;..\lexlib"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SCILEXER7_EXPORTS;SCI_LEXER;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -230,7 +230,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /Y $(TargetPath) ..\..\PowerEditor\bin&#x0D;&#x0A;SETLOCAL&#x0D;&#x0A;set PATH=%PATH%;%ENV_LIB_PATHS%;%SM_LIB_PATHS%&#x0D;&#x0A;gtest_runner.exe &quot;$(TargetPath)&quot;"
+				CommandLine="xcopy /Y $(TargetPath) ..\..\PowerEditor\bin&#x0D;&#x0A;SETLOCAL&#x0D;&#x0A;set PATH=%PATH%;%ENV_LIB_PATHS%;%SM_LIB_PATHS%&#x0D;&#x0A;gtest_runner.exe &quot;$(TargetPath)&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -271,7 +271,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\include;..\src;..\lexlib"
+				AdditionalIncludeDirectories="..\..\common;..\include;..\src;..\lexlib"
 				PreprocessorDefinitions="WIN32;NDEBUG;SHIPPING;_WINDOWS;_USRDLL;SCILEXER7_EXPORTS;SCI_LEXER;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				RuntimeLibrary="0"
