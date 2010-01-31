@@ -1,0 +1,71 @@
+FuncGuard PowerShell Module
+===========================
+
+Overview
+--------
+Function guards (FuncGuards) are a debug tracing feature provided by the
+N++CR npp_debug header.  FuncGuards provide a common interface for debug
+statements and gives the ability to enable or disable multiple related
+FuncGuards with a single statement.
+
+While this is very helpful it can lead to some issues with making sure that
+the main source repository does not get polluted with various guards that
+are either enabled or disabled, and that the source stays clean.  To take
+care of that the git repository is setup to track four files that list,
+enable, disable, and make available all of the FuncGuards.  That can be
+tedious to manage when actively working on different topics.
+
+That is where this module helps.  It takes care of the adding, removing,
+and modifying of the headers and source files so you don't need to.  It
+can be used to control different projects and to update private groups or
+templates of enabled/disabled FuncGuards that you may use often.
+
+Requirements
+------------
+	* PowerShell v2
+	* PSUnit (if you want to run the unit tests)
+	* C++ project that uses npp_debug
+
+
+Installation
+-------------------
+
+Start from Windows Explorer:
+	- Double click the N++CR FuncGuards shortcut.
+
+Start from a PowerShell prompt:
+	- change directories to $N++CR_Root\contrib\FuncGuard-PowerShell-Module\FuncGuard
+	- execute FuncGuard-Setup.ps1
+
+PowerShell, like most other command line utilities allows for temporary, session
+only setup of an environment, or a setup that persists for any new session
+started.  To setup FuncGuards for every Powershell session you start, you need
+to:
+	- Copy the contents of this ($N++CR_Root\contrib\FuncGuard-PowerShell-Module)
+	folder to your $Home\(My )Documents\WindowsPowerShell\Modules\ folder and edit
+	your PowerShell profile to load the FuncGuard module.
+
+
+Usage
+-------------------
+Get-Command -module FuncGuard
+help <command>
+
+
+Example
+-------------------
+
+PS C:\> Set-FuncguardProject N++
+PS C:\> get-funcguard
+
+Status   Name    Usage                     ShortDescription
+------   ----    -----                     ----------------
+Disabled WinMain func_guard(guardWinMain); Function tracing in WinMain.cpp
+
+PS C:\> Enable-FuncGuard WinMain
+
+Status  Name    Usage                     ShortDescription
+------  ----    -----                     ----------------
+Enabled WinMain func_guard(guardWinMain); Function tracing in WinMain.cpp
+
+PS C:\> # Rebuild the project in Visual Studio and run a new debug instance.
