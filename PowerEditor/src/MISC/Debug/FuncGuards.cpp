@@ -53,4 +53,10 @@
 
 // FUNCGUARD_BLOCK_START << Do not alter or remove
 
+#ifdef FUNCGUARD_NPPCR_WINMAIN
+        func_guard_enable_cat(guardWinMain);
+#else
+        func_guard_disable_cat(guardWinMain);
+#endif
+
 // FUNCGUARD_BLOCK_END << Do not alter or remove

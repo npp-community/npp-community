@@ -83,5 +83,9 @@
 
 #ifndef SHIPPING
 
+// func_guard(guardWinMain);
+// Description: Function tracing in WinMain.cpp
+//#define FUNCGUARD_NPPCR_WINMAIN
+
 #endif // SHIPPING
 #endif // MISC_DEBUG_FUNCGUARD_H
