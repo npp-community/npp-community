@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\src;..\lexlib"
+				AdditionalIncludeDirectories="..\..\common;..\include;..\src;..\lexlib"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;SCILEXER7_EXPORTS;SCI_LEXER;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -134,7 +134,7 @@
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\include;..\src;..\lexlib"
+				AdditionalIncludeDirectories="..\..\common;..\include;..\src;..\lexlib"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SCILEXER7_EXPORTS;SCI_LEXER;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -224,7 +224,7 @@
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\include;..\src;..\lexlib"
+				AdditionalIncludeDirectories="..\..\common;..\include;..\src;..\lexlib"
 				PreprocessorDefinitions="WIN32;NDEBUG;SHIPPING;_WINDOWS;_USRDLL;SCILEXER7_EXPORTS;SCI_LEXER;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -798,6 +798,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="MISC"
+				>
+				<Filter
+					Name="Debug"
+					>
+					<File
+						RelativePath="..\..\common\MISC\Debug\npp_debug.cpp"
+						>
+					</File>
+				</Filter>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -999,6 +1011,26 @@
 					RelativePath="..\lexlib\WordList.h"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="MISC"
+				>
+				<Filter
+					Name="Common"
+					>
+					<File
+						RelativePath="..\..\common\MISC\Common\CommonGenerics.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Debug"
+					>
+					<File
+						RelativePath="..\..\common\MISC\Debug\npp_debug.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter

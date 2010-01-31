@@ -44,7 +44,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				FavorSizeOrSpeed="0"
-				AdditionalIncludeDirectories="..\..\scintilla\include;..\src"
+				AdditionalIncludeDirectories="..\..\common;..\..\scintilla\include;..\src"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;TIXML_USE_STL;TIXMLA_USE_STL"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
@@ -123,7 +123,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				Description="Runtime build and version generation."
-				CommandLine="CALL $(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat &quot;$(IntDir)\&quot; &quot;$(SolutionDir)PowerEditor\src\gen-versioninfo.h&quot;&#x0D;&#x0A;IF NOT EXIST &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards.h&quot; copy &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards_skel.h&quot; &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards.h&quot;"
+				CommandLine="CALL $(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat &quot;$(IntDir)\&quot; &quot;$(SolutionDir)PowerEditor\src\gen-versioninfo.h&quot;&#x0D;&#x0A;IF NOT EXIST &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards.h&quot; copy &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards_skel.h&quot; &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards.h&quot;&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -144,7 +144,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="..\..\scintilla\include;..\src"
+				AdditionalIncludeDirectories="..\..\common;..\..\scintilla\include;..\src"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;TIXMLA_USE_STL;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				ExceptionHandling="2"
@@ -244,7 +244,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="..\..\scintilla\include;..\src"
+				AdditionalIncludeDirectories="..\..\common;..\..\scintilla\include;..\src"
 				PreprocessorDefinitions="WIN32;NDEBUG;SHIPPING;_WINDOWS;TIXML_USE_STL;TIXMLA_USE_STL;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				ExceptionHandling="2"
@@ -551,7 +551,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="..\src\MISC\Debug\npp_debug.cpp"
+						RelativePath="..\..\common\MISC\Debug\npp_debug.cpp"
 						>
 					</File>
 				</Filter>
@@ -968,7 +968,7 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\MISC\Debug\npp_debug.h"
+						RelativePath="..\..\common\MISC\Debug\npp_debug.h"
 						>
 					</File>
 				</Filter>
