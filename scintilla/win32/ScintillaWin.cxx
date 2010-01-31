@@ -2769,6 +2769,7 @@ sptr_t PASCAL ScintillaWin::SWndProc(
 // This function is externally visible so it can be called from container when building statically.
 // Must be called once only.
 int Scintilla_RegisterClasses(void *hInstance) {
+	func_guard(guardDllMain);
 	Platform_Initialise(hInstance);
 	bool result = ScintillaWin::Register(reinterpret_cast<HINSTANCE>(hInstance));
 #ifdef SCI_LEXER
@@ -2779,6 +2780,7 @@ int Scintilla_RegisterClasses(void *hInstance) {
 
 // This function is externally visible so it can be called from container when building statically.
 int Scintilla_ReleaseResources() {
+	func_guard(guardDllMain);
 	bool result = ScintillaWin::Unregister();
 	Platform_Finalise();
 	return result;
@@ -2786,6 +2788,7 @@ int Scintilla_ReleaseResources() {
 
 #ifndef STATIC_BUILD
 extern "C" int APIENTRY DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID) {
+	func_guard(guardDllMain);
 	//Platform::DebugPrintf("Scintilla::DllMain %d %d\n", hInstance, dwReason);
 	if (dwReason == DLL_PROCESS_ATTACH) {
 		if (!Scintilla_RegisterClasses(hInstance))

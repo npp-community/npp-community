@@ -52,4 +52,6 @@
 #ifndef MISC_DEBUG_FUNCGUARDIMPORT_H
 #define MISC_DEBUG_FUNCGUARDIMPORT_H
 
+func_guard_import_cat(guardDllMain);
+
 #endif // MISC_DEBUG_FUNCGUARDS_H
