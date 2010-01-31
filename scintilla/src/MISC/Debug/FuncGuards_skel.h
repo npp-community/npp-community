@@ -83,5 +83,9 @@
 
 #ifndef SHIPPING
 
+// func_guard(guardDllMain);
+// Description: Traces main entry point of SciLexer.dll
+//#define FUNCGUARD_NPPCR_DLLMAIN
+
 #endif // SHIPPING
 #endif // MISC_DEBUG_FUNCGUARD_H

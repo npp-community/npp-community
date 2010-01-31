@@ -53,4 +53,10 @@
 
 // FUNCGUARD_BLOCK_START << Do not alter or remove
 
+#ifdef FUNCGUARD_NPPCR_DLLMAIN
+        func_guard_enable_cat(guardDllMain);
+#else
+        func_guard_disable_cat(guardDllMain);
+#endif
+
 // FUNCGUARD_BLOCK_END << Do not alter or remove
