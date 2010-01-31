@@ -70,6 +70,9 @@
 // NPPCR
 #include "MISC/Common/CommonGenerics.h"
 #include "MISC/Debug/npp_debug.h"
+#ifndef SHIPPING
+	#include "MISC/Debug/FuncGuardsImport.h"
+#endif
 
 // Scintilla specific
 #include "ILexer.h"
