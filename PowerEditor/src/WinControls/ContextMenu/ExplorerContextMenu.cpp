@@ -99,14 +99,14 @@ void ExplorerContextMenu::CleanUpMenu()
 	{
 		// Disable a few standard file related items (cut, paste, etc) and hide
 		// others that don't make sense in the context of a text editor.
-		MENUITEMINFO info = {0};
-
-		info.cbSize = sizeof(MENUITEMINFO);
 		bool wasLastASeparator = false;
 		for (int i = ::GetMenuItemCount(m_hStandardMenu) -1; i >= 0 ; --i)
 		{
+			MENUITEMINFO info = {0};
+			info.cbSize = sizeof(MENUITEMINFO);
+
 			info.fMask = MIIM_ID;
-			#if WINVER <= 0x0600 // Anything before Vista
+			#if WINVER < 0x0600 // Anything before Vista
 				// See http://msdn.microsoft.com/en-us/library/ms647578%28VS.85%29.aspx for more info.
 				info.fMask |=MIIM_FTYPE;
 			#else
