@@ -109,7 +109,6 @@ FuncGuard::FuncGuard( const TCHAR* funcsig, const TCHAR* funcname, const TCHAR* 
 		// JOCE: we currently don't do anything with the category variable. Should it be here at all?
 		_category = category;
 
-		// JOCE Only one call to OutputF.
 		g_debugOutput->printf(TEXT("%s%s(%d):\n"),  getIndent(), file, line);
 		g_debugOutput->printf(TEXT("%sEntering[ %s ]\n"),  getIndent(), funcsig);
 		indent();
