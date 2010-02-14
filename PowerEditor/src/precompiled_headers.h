@@ -84,7 +84,8 @@
 #include "SciLexer.h"
 
 // Power Editor
-#include "MISC/Common/Common.h"
+#include "MISC/Common/CommonGenerics.h"
 #include "MISC/Debug/npp_debug.h"
+#include "MISC/Common/Common.h"
 
 #endif // PRECOMPILED_HEADERS_H

@@ -876,6 +876,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\MISC\Common\CommonGenerics.h"
+						>
+					</File>
+					<File
 						RelativePath="..\src\MISC\Common\npp_date.h"
 						>
 					</File>
@@ -1741,6 +1745,10 @@
 			>
 			<File
 				RelativePath="..\tests\testCommon.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\tests\testNppDebug.cpp"
 				>
 			</File>
 			<File
