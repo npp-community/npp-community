@@ -241,7 +241,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 	}
 
 	generic_string quotFileName = TEXT("");
-    // tell the running instance the FULL path to the new files to load
+	// tell the running instance the FULL path to the new files to load
 	size_t nrFilesToOpen = params.size();
 	const TCHAR * currentFile;
 	TCHAR fullFileName[MAX_PATH];
@@ -276,8 +276,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 			hNotepad_plus = ::FindWindow(Notepad_plus::getClassName(), NULL);
 		}
 
-        if (hNotepad_plus)
-        {
+		if (hNotepad_plus)
+		{
 			// First of all, destroy static object NppParameters
 			NppParameters::destroyInstance();
 			FileManager::destroyInstance();
@@ -312,7 +312,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 				::SendMessage(hNotepad_plus, WM_COPYDATA, (WPARAM)hInstance, (LPARAM)&fileNamesData);
 			}
 			return 0;
-        }
+		}
 	}
 
 	pNppParameters->load();
@@ -332,15 +332,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 
 	bool isUpExist = nppGui._doesExistUpdater = (::PathFileExists(updaterFullPath.c_str()) == TRUE);
 	bool winSupported = (curWinVer >= WV_W2K);
-    bool doUpdate = nppGui._autoUpdateOpt._doAutoUpdate;
+	bool doUpdate = nppGui._autoUpdateOpt._doAutoUpdate;
 
-    if (doUpdate) // check more detail
-    {
-        Date today(0);
+	if (doUpdate) // check more detail
+	{
+		Date today(0);
 
-        if (today < nppGui._autoUpdateOpt._nextUpdateDate)
-            doUpdate = false;
-    }
+		if (today < nppGui._autoUpdateOpt._nextUpdateDate)
+			doUpdate = false;
+	}
 
 	// Vista/Win7 UAC de mes couilles!!!
 	bool isVista = (curWinVer >= WV_VISTA);
@@ -353,10 +353,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 		Process updater(updaterFullPath.c_str(), version.c_str(), updaterDir.c_str());
 		updater.run();
 
-        // Update next update date
-        if (nppGui._autoUpdateOpt._intervalDays < 0) // Make sure interval days value is positive
-            nppGui._autoUpdateOpt._intervalDays = 0 - nppGui._autoUpdateOpt._intervalDays;
-        nppGui._autoUpdateOpt._nextUpdateDate = Date(nppGui._autoUpdateOpt._intervalDays);
+		// Update next update date
+		if (nppGui._autoUpdateOpt._intervalDays < 0) // Make sure interval days value is positive
+			nppGui._autoUpdateOpt._intervalDays = 0 - nppGui._autoUpdateOpt._intervalDays;
+			nppGui._autoUpdateOpt._nextUpdateDate = Date(nppGui._autoUpdateOpt._intervalDays);
 	}
 
 	MSG msg;
