@@ -150,7 +150,10 @@ int getNumberFromParam(char paramName, ParamVector & params, bool & isParamePres
 #define FLAG_NOTABBAR TEXT("-notabbar")
 #define FLAG_SYSTRAY TEXT("-systemtray")
 #define FLAG_HELP TEXT("--help")
-#define FLAG_RUN_UNITTESTS TEXT("-unittests") // "Secret" option
+
+#ifndef SHIPPING
+	#define FLAG_RUN_UNITTESTS TEXT("-unittests") // "Secret" option
+#endif
 
 #define COMMAND_ARG_HELP TEXT("Usage :\n\
 \n\
