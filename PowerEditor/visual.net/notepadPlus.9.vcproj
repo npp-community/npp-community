@@ -74,7 +74,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="unicows.lib comctl32.lib shlwapi.lib shell32.lib gmock.lib gmock_main.lib gtestd.lib gtest_maind.lib"
+				AdditionalDependencies="unicows.lib comctl32.lib shlwapi.lib shell32.lib gmock.lib gtestd.lib"
 				ShowProgress="0"
 				OutputFile="../bin/notepad++Debug.exe"
 				Version="1.0"
@@ -173,7 +173,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="unicows.lib comctl32.lib shlwapi.lib shell32.lib Oleacc.lib gmock.lib gmock_main.lib gtest.lib gtest_main.lib"
+				AdditionalDependencies="unicows.lib comctl32.lib shlwapi.lib shell32.lib Oleacc.lib gmock.lib gtest.lib"
 				ShowProgress="0"
 				OutputFile="../bin/notepad++Release.exe"
 				Version="1.0"
