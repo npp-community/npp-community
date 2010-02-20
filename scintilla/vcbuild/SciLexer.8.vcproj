@@ -118,7 +118,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /Y &quot;$(TargetPath)&quot; ..\..\PowerEditor\bin&#x0D;&#x0A;IF EXIST &quot;$(smGTEST_DIR)\gtest_runner.exe&quot; (&quot;$(smGTEST_DIR)\gtest_runner.exe&quot; &quot;$(TargetPath)&quot;)&#x0D;&#x0A;IF EXIST &quot;$(envGTEST_DIR)\gtest_runner.exe&quot; (&quot;$(envGTEST_DIR)\gtest_runner.exe&quot; &quot;$(TargetPath)&quot;)&#x0D;&#x0A;"
+				CommandLine="xcopy /Y &quot;$(TargetPath)&quot; ..\..\PowerEditor\bin&#x0D;&#x0A;SETLOCAL&#x0D;&#x0A;set PATH=%PATH%;%ENV_LIB_PATHS%;%SM_LIB_PATHS%&#x0D;&#x0A;gtest_runner.exe &quot;$(TargetPath)&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -230,7 +230,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /Y $(TargetPath) ..\..\PowerEditor\bin&#x0D;&#x0A;IF EXIST &quot;$(smGTEST_DIR)\gtest_runner.exe&quot; (&quot;$(smGTEST_DIR)\gtest_runner.exe&quot; &quot;$(TargetPath)&quot;)&#x0D;&#x0A;IF EXIST &quot;$(envGTEST_DIR)\gtest_runner.exe&quot; (&quot;$(envGTEST_DIR)\gtest_runner.exe&quot; &quot;$(TargetPath)&quot;)&#x0D;&#x0A;"
+				CommandLine="xcopy /Y $(TargetPath) ..\..\PowerEditor\bin&#x0D;&#x0A;SETLOCAL&#x0D;&#x0A;set PATH=%PATH%;%ENV_LIB_PATHS%;%SM_LIB_PATHS%&#x0D;&#x0A;gtest_runner.exe &quot;$(TargetPath)&quot;"
 			/>
 		</Configuration>
 		<Configuration
