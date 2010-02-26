@@ -8,10 +8,6 @@
 		Name="VCCLCompilerTool"
 		AdditionalIncludeDirectories="&quot;$(envGTEST_DIR)\include&quot;;&quot;$(envGMOCK_DIR)\include&quot;"
 	/>
-	<Tool
-		Name="VCLinkerTool"
-		AdditionalLibraryDirectories="&quot;$(envGTEST_DIR)\msvc\$(ConfigurationName)&quot;;&quot;$(envGMOCK_DIR)\msvc\$(ConfigurationName)&quot;"
-	/>
 	<UserMacro
 		Name="envGTEST_DIR"
 		Value="$(GOOGLE_TEST_DIR)"

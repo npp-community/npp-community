@@ -8,10 +8,6 @@
 		Name="VCCLCompilerTool"
 		AdditionalIncludeDirectories="&quot;$(smGTEST_DIR)\include&quot;;&quot;$(smGMOCK_DIR)\include&quot;"
 	/>
-	<Tool
-		Name="VCLinkerTool"
-		AdditionalLibraryDirectories="&quot;$(smGTEST_DIR)\msvc\$(ConfigurationName)&quot;;&quot;$(smGMOCK_DIR)\msvc\$(ConfigurationName)&quot;"
-	/>
 	<UserMacro
 		Name="smGMOCK_DIR"
 		Value="$(SolutionDir)google_mock"
