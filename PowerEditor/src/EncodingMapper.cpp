@@ -72,7 +72,7 @@ EncodingUnit encodings[] = {
 
 };
 
-EncodingMapper * EncodingMapper::_pSelf = new EncodingMapper;
+EncodingMapper * EncodingMapper::_pSelf = NULL;
 
 bool isInListA(const char *token, const char *list) {
 	if ((!token) || (!list))
@@ -143,3 +143,19 @@ int EncodingMapper::getEncodingFromString(const char *encodingAlias) const
 	}
 	return enc;
 }
+
+EncodingMapper * EncodingMapper::getInstance()
+{
+	if (!_pSelf)
+	{
+		_pSelf = new EncodingMapper;
+	}
+	return _pSelf;
+}
+
+void EncodingMapper::destroyInstance()
+{
+	delete _pSelf;
+	_pSelf = NULL;
+}
+

@@ -25,8 +25,9 @@ struct EncodingUnit {
 
 class EncodingMapper {
 public:
-    static EncodingMapper * getInstance() {return _pSelf;};
-    int getEncodingFromIndex(int index) const;
+	static EncodingMapper * getInstance();
+	static void destroyInstance();
+	int getEncodingFromIndex(int index) const;
 	int getIndexFromEncoding(int encoding) const;
 	int getEncodingFromString(const char * encodingAlias) const;
 
