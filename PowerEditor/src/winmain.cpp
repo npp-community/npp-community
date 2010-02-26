@@ -150,7 +150,14 @@ int getNumberFromParam(char paramName, ParamVector & params, bool & isParamePres
 #define FLAG_NOTABBAR TEXT("-notabbar")
 #define FLAG_SYSTRAY TEXT("-systemtray")
 #define FLAG_HELP TEXT("--help")
-#define FLAG_RUN_UNITTESTS TEXT("-unittests") // "Secret" option
+
+#ifndef SHIPPING
+	#define FLAG_RUN_UNITTESTS TEXT("-unittests") // "Secret" option
+#endif
+
+#ifdef _DEBUG
+	#define FLAG_LEAK_DETECT TEXT("-leakdetect") // "Secret" option
+#endif
 
 #define COMMAND_ARG_HELP TEXT("Usage :\n\
 \n\
@@ -214,6 +221,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 	bool showHelp = isInList(FLAG_HELP, params);
 	bool isMultiInst = isInList(FLAG_MULTI_INSTANCE, params);
 
+#ifdef _DEBUG
+	bool isLeakDetect = isInList(FLAG_LEAK_DETECT, params);
+#endif
+
 	CmdLineParams cmdLineParams;
 	cmdLineParams._isNoTab = isInList(FLAG_NOTABBAR, params);
 	cmdLineParams._isNoPlugin = isInList(FLAG_NO_PLUGIN, params);
@@ -241,7 +252,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 	}
 
 	generic_string quotFileName = TEXT("");
-    // tell the running instance the FULL path to the new files to load
+	// tell the running instance the FULL path to the new files to load
 	size_t nrFilesToOpen = params.size();
 	const TCHAR * currentFile;
 	TCHAR fullFileName[MAX_PATH];
@@ -276,8 +287,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 			hNotepad_plus = ::FindWindow(Notepad_plus::getClassName(), NULL);
 		}
 
-        if (hNotepad_plus)
-        {
+		if (hNotepad_plus)
+		{
 			// First of all, destroy static object NppParameters
 			NppParameters::destroyInstance();
 			FileManager::destroyInstance();
@@ -312,7 +323,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 				::SendMessage(hNotepad_plus, WM_COPYDATA, (WPARAM)hInstance, (LPARAM)&fileNamesData);
 			}
 			return 0;
-        }
+		}
 	}
 
 	pNppParameters->load();
@@ -332,15 +343,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 
 	bool isUpExist = nppGui._doesExistUpdater = (::PathFileExists(updaterFullPath.c_str()) == TRUE);
 	bool winSupported = (curWinVer >= WV_W2K);
-    bool doUpdate = nppGui._autoUpdateOpt._doAutoUpdate;
+	bool doUpdate = nppGui._autoUpdateOpt._doAutoUpdate;
 
-    if (doUpdate) // check more detail
-    {
-        Date today(0);
+	if (doUpdate) // check more detail
+	{
+		Date today(0);
 
-        if (today < nppGui._autoUpdateOpt._nextUpdateDate)
-            doUpdate = false;
-    }
+		if (today < nppGui._autoUpdateOpt._nextUpdateDate)
+			doUpdate = false;
+	}
 
 	// Vista/Win7 UAC de mes couilles!!!
 	bool isVista = (curWinVer >= WV_VISTA);
@@ -353,10 +364,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 		Process updater(updaterFullPath.c_str(), version.c_str(), updaterDir.c_str());
 		updater.run();
 
-        // Update next update date
-        if (nppGui._autoUpdateOpt._intervalDays < 0) // Make sure interval days value is positive
-            nppGui._autoUpdateOpt._intervalDays = 0 - nppGui._autoUpdateOpt._intervalDays;
-        nppGui._autoUpdateOpt._nextUpdateDate = Date(nppGui._autoUpdateOpt._intervalDays);
+		// Update next update date
+		if (nppGui._autoUpdateOpt._intervalDays < 0) // Make sure interval days value is positive
+			nppGui._autoUpdateOpt._intervalDays = 0 - nppGui._autoUpdateOpt._intervalDays;
+			nppGui._autoUpdateOpt._nextUpdateDate = Date(nppGui._autoUpdateOpt._intervalDays);
 	}
 
 	MSG msg;
@@ -365,6 +376,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 	try {
 		notepad_plus_plus.init(hInstance, NULL, quotFileName.c_str(), &cmdLineParams);
 		bool unicodeSupported = getWinVersion() >= WV_NT;
+#ifdef _DEBUG
+		// mem leak check output for build-testing.
+		if (isLeakDetect)
+		{
+			::SendMessage(notepad_plus_plus.gNppHWND, WM_CLOSE, 0, 0);
+			return 0;
+		};
+#endif
 		bool going = true;
 		while (going)
 		{
