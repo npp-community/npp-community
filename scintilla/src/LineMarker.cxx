@@ -31,7 +31,7 @@ void LineMarker::SetXPM(const char *textForm) {
 	markType = SC_MARK_PIXMAP;
 }
 
-void LineMarker::SetXPM(const char * const *linesForm) {
+void LineMarker::SetXPM(const char *const *linesForm) {
 	delete pxpm;
 	pxpm = new XPM(linesForm);
 	markType = SC_MARK_PIXMAP;

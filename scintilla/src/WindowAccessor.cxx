@@ -174,7 +174,7 @@ int WindowAccessor::IndentAmount(int line, int *flags, PFNIsCommentLeader pfnIsC
 	*flags = spaceFlags;
 	indent += SC_FOLDLEVELBASE;
 	// if completely empty line or the start of a comment...
-	if (isspace(ch) || (pfnIsCommentLeader && (*pfnIsCommentLeader)(*this, pos, end-pos)) )
+	if (isspace(ch) || (pfnIsCommentLeader && (*pfnIsCommentLeader)(*this, pos, end-pos)))
 		return indent | SC_FOLDLEVELWHITEFLAG;
 	else
 		return indent;

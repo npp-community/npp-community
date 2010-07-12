@@ -161,7 +161,7 @@ static bool IsCommentLine(int line, Accessor &styler) {
 static void FoldNoBoxVHDLDoc(
   unsigned int startPos,
   int length,
-  int initStyle,
+  int,
   Accessor &styler)
 {
   // Decided it would be smarter to have the lexer have all keywords included. Therefore I
@@ -249,7 +249,6 @@ static void FoldNoBoxVHDLDoc(
   char  chPrev          = '\0';
   char  chNextNonBlank;
   int   styleNext       = styler.StyleAt(startPos);
-  int   style           = initStyle;
   //Platform::DebugPrintf("Line[%04d] Prev[%20s] ************************* Level[%x]\n", lineCurrent+1, prevWord, levelCurrent);
 
   /***************************************/
@@ -265,7 +264,7 @@ static void FoldNoBoxVHDLDoc(
       j ++ ;
       chNextNonBlank = styler.SafeGetCharAt(j);
     }
-    style           = styleNext;
+    int style           = styleNext;
     styleNext       = styler.StyleAt(i + 1);
     bool atEOL      = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
