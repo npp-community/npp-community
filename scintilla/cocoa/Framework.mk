@@ -18,7 +18,7 @@ SCI_LEXERS=LexAPDL.o LexASY.o LexAU3.o LexAVE.o LexAbaqus.o LexAda.o \
 	LexPython.o LexR.o LexRebol.o LexRuby.o LexSML.o LexSQL.o LexScriptol.o \
 	LexSmalltalk.o LexSorcus.o LexSpecman.o LexSpice.o LexTACL.o LexTADS3.o \
 	LexTAL.o LexTCL.o LexTeX.o LexVB.o LexVHDL.o LexVerilog.o LexYAML.o \
-	LexerBase.o LexerModule.o LexerSimple.o Accessor.o
+	LexTxt2tags.o LexerBase.o LexerModule.o LexerSimple.o Accessor.o
 
 SCI_OBJ=AutoComplete.o CallTip.o CellBuffer.o CharClassify.o \
 	ContractionState.o Decoration.o Document.o Editor.o \
