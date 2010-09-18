@@ -795,6 +795,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\icons\chameleon.ico"
+					>
+				</File>
+				<File
 					RelativePath="..\src\icons\cut_dis.ico"
 					>
 				</File>
