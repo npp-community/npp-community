@@ -268,6 +268,9 @@
 #define	IDC_VALUE_STATIC  2401
 #define	IDC_VALUE_EDIT      2402
 
+#define	IDD_BUTTON_DLG       2410
+#define	IDC_RESTORE_BUTTON  2411
+
 // see TaskListDlg_rc.h
 //#define	IDD_TASKLIST_DLG    2450
 #define	IDD_SETTING_DLG    2500

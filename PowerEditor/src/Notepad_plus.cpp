@@ -127,6 +127,7 @@ Notepad_plus::Notepad_plus():
 	_pTrayIco(NULL),
 	_zoomOriginalValue(0),
 	_pluginsManager(new PluginsManager()),
+	_restoreButton(NULL),
 	_isRTL(false),
 	_isFileOpening(false),
 	_rememberThisSession(true),
@@ -568,6 +569,12 @@ void Notepad_plus::killAllChildren()
 	{
 		delete _preferenceDlg;
 		_preferenceDlg = NULL;
+	}
+
+	if (_restoreButton)
+	{
+		delete _restoreButton;
+		_restoreButton = NULL;
 	}
 
 	if (_windowsMenu)
@@ -8439,6 +8446,11 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 				_subSplitter = new SplitterContainer();
 			}
 
+			if (!_restoreButton)
+			{
+				_restoreButton = new ButtonDlg();
+			}
+
 			// Menu
 			_mainMenuHandle = ::GetMenu(hwnd);
 			int langPos2BeRemoved = MENUINDEX_LANGUAGE+1;
@@ -8602,6 +8614,8 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			const TCHAR *appDataNpp = pNppParam->getAppDataNppDir();
 			if (appDataNpp[0])
 				_pluginsManager->loadPlugins(appDataNpp);
+
+		    _restoreButton->init(_hInst, _hSelf);
 
 			// ------------ //
 			// Menu Section //
@@ -10804,7 +10818,12 @@ void Notepad_plus::fullScreenToggle()
 		}
 
 		//Setup GUI
-		if (!_beforeSpecialView.isPostIt)
+        int bs = buttonStatus_fullscreen;
+		if (_beforeSpecialView.isPostIt)
+        {
+            bs |= buttonStatus_postit;
+        }
+        else
 		{
 			//only change the GUI if not already done by postit
 			_beforeSpecialView.isMenuShown = ::SendMessage(_hSelf, NPPM_ISMENUHIDDEN, 0, 0) != TRUE;
@@ -10815,6 +10834,7 @@ void Notepad_plus::fullScreenToggle()
 			_rebarTop->display(false);
 			_rebarBottom->display(false);
 		}
+        _restoreButton->setButtonStatus(bs);
 
 		//Hide window so windows can properly update it
 		::ShowWindow(_hSelf, SW_HIDE);
@@ -10832,11 +10852,30 @@ void Notepad_plus::fullScreenToggle()
 		::ShowWindow(_hSelf, SW_SHOW);
 		::SetWindowPos(_hSelf, HWND_TOP, fullscreenArea.left, fullscreenArea.top, fullscreenArea.right, fullscreenArea.bottom, SWP_NOZORDER|SWP_DRAWFRAME|SWP_FRAMECHANGED);
 		::SetForegroundWindow(_hSelf);
+
+        // show restore button
+        _restoreButton->doDialog(_isRTL);
+
+        RECT rect;
+        GetWindowRect(_restoreButton->getHSelf(), &rect);
+	    int w = rect.right - rect.left;
+	    int h = rect.bottom - rect.top;
+
+        RECT nppRect;
+        GetWindowRect(_hSelf, &nppRect);
+        int x = nppRect.right - w;
+        int y = nppRect.top;
+        ::MoveWindow(_restoreButton->getHSelf(), x, y, w, h, FALSE);
+
+        _pEditView->getFocus();
 	}
 	else	//toggle fullscreen off
 	{
 		//Hide window for updating, restore style and menu then restore position and Z-Order
 		::ShowWindow(_hSelf, SW_HIDE);
+
+        _restoreButton->setButtonStatus(buttonStatus_fullscreen ^ _restoreButton->getButtonStatus());
+        _restoreButton->display(false);
 
 		//Setup GUI
 		if (!_beforeSpecialView.isPostIt)
@@ -10903,7 +10942,12 @@ void Notepad_plus::postItToggle()
 				::SendMessage(_hSelf, WM_COMMAND, IDM_VIEW_ALWAYSONTOP, 0);
 		}
 		//Only check these if not fullscreen
-		if (!_beforeSpecialView.isFullScreen)
+        int bs = buttonStatus_postit;
+		if (_beforeSpecialView.isFullScreen)
+        {
+            bs |= buttonStatus_fullscreen;
+        }
+        else
 		{
 			_beforeSpecialView.isMenuShown = ::SendMessage(_hSelf, NPPM_ISMENUHIDDEN, 0, 0) != TRUE;
 			if (_beforeSpecialView.isMenuShown)
@@ -10913,6 +10957,7 @@ void Notepad_plus::postItToggle()
 			_rebarTop->display(false);
 			_rebarBottom->display(false);
 		}
+        _restoreButton->setButtonStatus(bs);
 
 		// PostIt!
 
@@ -10929,9 +10974,28 @@ void Notepad_plus::postItToggle()
 			::SetWindowPos(_hSelf, HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER|SWP_DRAWFRAME|SWP_FRAMECHANGED);
 			::ShowWindow(_hSelf, SW_SHOW);
 		}
+
+        // show restore button
+        _restoreButton->doDialog(_isRTL);
+
+        RECT rect;
+        GetWindowRect(_restoreButton->getHSelf(), &rect);
+	    int w = rect.right - rect.left;
+	    int h = rect.bottom - rect.top;
+
+        RECT nppRect;
+        GetWindowRect(_hSelf, &nppRect);
+        int x = nppRect.right - w;
+        int y = nppRect.top;
+        ::MoveWindow(_restoreButton->getHSelf(), x, y, w, h, FALSE);
+
+        _pEditView->getFocus();
 	}
 	else	//PostIt enabled, disable it
 	{
+        _restoreButton->setButtonStatus(buttonStatus_postit ^ _restoreButton->getButtonStatus());
+        _restoreButton->display(false);
+
 		//Setup GUI
 		if (!_beforeSpecialView.isFullScreen)
 		{

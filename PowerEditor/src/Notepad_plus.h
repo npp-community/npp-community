@@ -88,6 +88,7 @@ class WordStyleDlg;
 class PreferenceDlg;
 class WindowsMenu;
 class RunMacroDlg;
+class ButtonDlg;
 
 class ContextMenu;
 class StatusBar;
@@ -366,7 +367,8 @@ private:
 	Accelerator _accelerator;
 	ScintillaAccelerator _scintaccelerator;
 
-	PluginsManager* _pluginsManager;
+	PluginsManager*_pluginsManager;
+    ButtonDlg* _restoreButton;
 
 	bool _isRTL;
 
