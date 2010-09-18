@@ -114,7 +114,36 @@ BOOL CALLBACK ValueDlg::run_dlgProc( UINT Message, WPARAM wParam, LPARAM /*lPara
 	}
 }
 
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 
+// JOCE: Should move this class to its own file.
+
+ButtonDlg::ButtonDlg() :
+	StaticDialog(), _buttonStatus(buttonStatus_hidden)
+{
+
+}
+
+int ButtonDlg::getButtonStatus() const
+{
+	return _buttonStatus;
+}
+
+void ButtonDlg::setButtonStatus(int buttonStatus)
+{
+	_buttonStatus = buttonStatus;
+}
+
+void ButtonDlg::display(bool toShow /*= true*/) const
+{
+	int cmdToShow = toShow?SW_SHOW:SW_HIDE;
+	if (!toShow)
+	{
+		cmdToShow = (_buttonStatus != buttonStatus_hidden)?SW_SHOW:SW_HIDE;
+	}
+	::ShowWindow(_hSelf, cmdToShow);
+}
 
 BOOL CALLBACK ButtonDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM)
 {
@@ -162,12 +191,11 @@ BOOL CALLBACK ButtonDlg::run_dlgProc(UINT Message, WPARAM wParam, LPARAM)
 	}
 }
 
-
-
-
 void ButtonDlg::doDialog(bool isRTL)
 {
     if (!isCreated())
-			create(IDD_BUTTON_DLG, isRTL);
+    {
+		create(IDD_BUTTON_DLG, isRTL);
+	}
 	display();
 }
