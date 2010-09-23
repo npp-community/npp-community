@@ -2925,8 +2925,7 @@ ScintillaEditView::~ScintillaEditView()
 		{
 			for (StyleMap::iterator it2(it->second->begin()) ; it2 != it->second->end() ; ++it2)
 			{
-				if (it2->second._fontName != NULL)
-					delete [] it2->second._fontName;
+				delete [] it2->second;
 			}
 			delete it->second;
 		}
