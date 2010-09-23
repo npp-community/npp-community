@@ -121,6 +121,7 @@ LanguageName ScintillaEditView::langNames[L_EXTERNAL+1] = {
 {TEXT("d"),		TEXT("D"),						TEXT("D programming language"),							L_D,			SCLEX_D},
 {TEXT("powershell"),		TEXT("PowerShell"),						TEXT("Windows PowerShell"),							L_POWERSHELL,			SCLEX_POWERSHELL},
 {TEXT("r"),		TEXT("R"),						TEXT("R programming language"),							L_R,			SCLEX_R},
+{TEXT("jsp"),			TEXT("JSP"),						TEXT("Java Server Pages script file"),						L_JSP,			SCLEX_HTML},
 {TEXT("ext"),			TEXT("External"),					TEXT("External"),												L_EXTERNAL,		SCLEX_NULL}
 };
 
@@ -499,7 +500,7 @@ void ScintillaEditView::setXmlLexer(LangType type)
 
         makeStyle(type);
 	}
-	else if ((type == L_HTML) || (type == L_PHP) || (type == L_ASP))
+	else if ((type == L_HTML) || (type == L_PHP) || (type == L_ASP) || (type == L_JSP))
 	{
         execute(SCI_SETLEXER, SCLEX_HTML);
         const TCHAR *htmlKeyWords_generic =_pParameter->getWordList(L_HTML, LANG_INDEX_INSTR);
@@ -514,7 +515,7 @@ void ScintillaEditView::setXmlLexer(LangType type)
 		makeStyle(L_HTML);
 
         setEmbeddedJSLexer();
-        setPhpEmbeddedLexer();
+        setEmbeddedPhpLexer();
 		setEmbeddedAspLexer();
 	}
 }
@@ -541,7 +542,7 @@ void ScintillaEditView::setEmbeddedJSLexer()
 	execute(SCI_STYLESETEOLFILLED, SCE_HJ_COMMENTDOC, true);
 }
 
-void ScintillaEditView::setPhpEmbeddedLexer()
+void ScintillaEditView::setEmbeddedPhpLexer()
 {
 	const TCHAR *pKwArray[10] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 	makeStyle(L_PHP, pKwArray);
@@ -1120,6 +1121,7 @@ void ScintillaEditView::defineDocType(LangType typeDoc)
 
 	    case L_PHP :
 		case L_ASP :
+        case L_JSP :
 		case L_HTML :
 		case L_XML :
 			setXmlLexer(typeDoc); break;
@@ -2918,22 +2920,22 @@ ScintillaEditView::~ScintillaEditView()
 	if ((!_refCount)&&(_hLib))
 	{
 		::FreeLibrary(_hLib);
-	}
 
-	for (BufferStyleMap::iterator it(_hotspotStyles.begin()); it != _hotspotStyles.end(); ++it )
-	{
-		for (StyleMap::iterator it2(it->second->begin()) ; it2 != it->second->end() ; ++it2)
+		for (BufferStyleMap::iterator it(_hotspotStyles.begin()); it != _hotspotStyles.end(); ++it )
 		{
-			delete it2->second;
+			for (StyleMap::iterator it2(it->second->begin()) ; it2 != it->second->end() ; ++it2)
+			{
+				if (it2->second._fontName != NULL)
+					delete [] it2->second._fontName;
+			}
+			delete it->second;
 		}
-		delete it->second;
-	}
 
 	for (BufferHotspotOriginMap::iterator it(_hotspotOrigins.begin()); it != _hotspotOrigins.end(); ++it )
 	{
 		delete it->second;
 	}
-
+	}
 }
 
 int ScintillaEditView::getSelectedTextCount()
