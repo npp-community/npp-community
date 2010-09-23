@@ -4056,22 +4056,23 @@ void Notepad_plus::command(int id)
         case IDM_SEARCH_SETANDFINDNEXT :
 		case IDM_SEARCH_SETANDFINDPREV :
         {
-            bool isFirstTime = !_findReplaceDlg.isCreated();
+			assert(_findReplaceDlg);
+            bool isFirstTime = !_findReplaceDlg->isCreated();
 			if (isFirstTime)
-				_findReplaceDlg.doDialog(FIND_DLG, _isRTL, false);
+				_findReplaceDlg->doDialog(FIND_DLG, _isRTL, false);
 
 			const int strSize = FINDREPLACE_MAXLENGTH;
 			TCHAR str[strSize];
 			_pEditView->getGenericSelectedText(str, strSize);
-			_findReplaceDlg.setSearchText(str);
+			_findReplaceDlg->setSearchText(str);
 			setFindReplaceFolderFilter(NULL, NULL);
 			if (isFirstTime)
 				changeFindReplaceDlgLang();
 
-			FindOption op = _findReplaceDlg.getCurrentOptions();
+			FindOption op = _findReplaceDlg->getCurrentOptions();
 			op._whichDirection = (id == IDM_SEARCH_SETANDFINDNEXT?DIR_DOWN:DIR_UP);
 
-			_findReplaceDlg.processFindNext(str, &op);
+			_findReplaceDlg->processFindNext(str, &op);
 			break;
         }
 
