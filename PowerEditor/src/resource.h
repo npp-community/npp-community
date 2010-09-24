@@ -18,10 +18,10 @@
 #ifndef RESOURCE_H
 #define RESOURCE_H
 
-#define NOTEPAD_PLUS_VERSION TEXT("Notepad++ v5.6.4")
+#define NOTEPAD_PLUS_VERSION TEXT("Notepad++ v5.6.5")
 
-#define VERSION_VALUE TEXT("5.6.4\0")
-#define VERSION_DIGITALVALUE 5, 6, 4, 0
+#define VERSION_VALUE TEXT("5.6.5\0")
+#define VERSION_DIGITALVALUE 5, 6, 5, 0
 
 #ifdef UNICODE
 #define UNICODE_ANSI_MODE TEXT("(UNICODE)")
