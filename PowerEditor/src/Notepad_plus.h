@@ -107,7 +107,6 @@ class AutoCompletion;
 class PluginsManager;
 class ShortcutMapper;
 
-
 struct TaskListInfo;
 
 struct tTbData;
@@ -118,8 +117,6 @@ class TiXmlNode;
 // Stuff from Parameters.h
 struct CmdLineParams;
 struct Session;
-
-TiXmlNodeA * searchDlgNode(TiXmlNodeA *node, const char *dlgTagName);
 
 struct iconLocator {
 	int listIndex;
@@ -221,6 +218,7 @@ public:
 	const TCHAR * fileSaveSession(size_t nbFile, TCHAR ** fileNames, const TCHAR *sessionFile2save);
 	const TCHAR * fileSaveSession(size_t nbFile = 0, TCHAR ** fileNames = NULL);
 
+    TiXmlNodeA * searchDlgNode(TiXmlNodeA *node, const char *dlgTagName);
 	bool changeDlgLang(HWND hDlg, const char *dlgTagName, char *title = NULL, int titleBufLen = 0);
 	void changeFindReplaceDlgLang();
 	void changeConfigLang();

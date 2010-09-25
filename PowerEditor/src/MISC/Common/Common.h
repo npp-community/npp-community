@@ -18,6 +18,9 @@
 #ifndef MISC_COMMON_COMMON_H
 #define MISC_COMMON_COMMON_H
 
+#define dirUp true
+#define dirDown false
+
 #define NPP_CP_WIN_1252           1252
 #define NPP_CP_DOS_437            437
 #define NPP_CP_BIG5               950

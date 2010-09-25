@@ -5948,7 +5948,7 @@ void Notepad_plus::changeShortcutmapperLang(ShortcutMapper * sm)
 }
 
 
-TiXmlNodeA * searchDlgNode(TiXmlNodeA *node, const char *dlgTagName)
+TiXmlNodeA * Notepad_plus::searchDlgNode(TiXmlNodeA *node, const char *dlgTagName)
 {
 	TiXmlNodeA *dlgNode = node->FirstChild(dlgTagName);
 	if (dlgNode) return dlgNode;
