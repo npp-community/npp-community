@@ -898,8 +898,14 @@ void CommentStyleDialog::updateDlg()
 }
 
 TCHAR symbolesArray[] = TEXT("+-*/.?!:;,%^$&\"'(_)=}]@\\`|[{#~<>");
-const bool SymbolsStyleDialog::ADD = true;
-const bool SymbolsStyleDialog::REMOVE = false;
+
+// JOCE: For some obscure reason I get compilation problems with these static const variables:
+// I'm switching to defines just for now.
+//const bool SymbolsStyleDialog::ADD = true;
+//const bool SymbolsStyleDialog::REMOVE = false;
+
+#define ADD true
+#define REMOVE false
 
 int fgStatic4[] = {IDC_SYMBOL_FG_STATIC, IDC_SYMBOL_FG2_STATIC, IDC_SYMBOL_FG3_STATIC};
 int bgStatic4[] = {IDC_SYMBOL_BG_STATIC, IDC_SYMBOL_BG2_STATIC, IDC_SYMBOL_BG3_STATIC};

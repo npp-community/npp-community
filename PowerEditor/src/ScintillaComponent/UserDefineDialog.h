@@ -125,8 +125,10 @@ private :
 class SymbolsStyleDialog : public SharedParametersDialog
 {
 public :
-	static const bool ADD;
-	static const bool REMOVE;
+	// JOCE: For some obscure reason I get compilation problems with these static const variables:
+	// I'm switching to defines just for now.
+	//static const bool ADD;
+	//static const bool REMOVE;
 	SymbolsStyleDialog();
 	void updateDlg();
 	void undeleteChar();

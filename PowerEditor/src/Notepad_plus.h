@@ -119,7 +119,7 @@ class TiXmlNode;
 struct CmdLineParams;
 struct Session;
 
-static TiXmlNodeA * searchDlgNode(TiXmlNodeA *node, const char *dlgTagName);
+TiXmlNodeA * searchDlgNode(TiXmlNodeA *node, const char *dlgTagName);
 
 struct iconLocator {
 	int listIndex;
