@@ -83,6 +83,7 @@ struct CmdLineParams {
 	bool _isNoSession;
 	bool _isNoTab;
 	bool _isPreLaunch;
+	bool _showLoadingTime;
 
 	int _line2go;
     int _column2go;
@@ -96,7 +97,8 @@ struct CmdLineParams {
 
 	LangType _langType;
 	CmdLineParams() : _isNoPlugin(false), _isReadOnly(false), _isNoSession(false), _isNoTab(false),
-        _line2go(-1), _column2go(-1), _isPointXValid(false), _isPointYValid(false), _langType(L_EXTERNAL)
+        _isPreLaunch(false), _showLoadingTime(false), _line2go(-1), _column2go(-1), _isPointXValid(false),
+        _isPointYValid(false), _langType(L_EXTERNAL)
     {
         _point.x = 0;
         _point.y = 0;
