@@ -66,7 +66,7 @@ const int ScintillaEditView::_markersArray[][NB_FOLDER_STATE] = {
 
 //Array with all the names of all languages
 LanguageName ScintillaEditView::langNames[L_EXTERNAL+1] = {
-{TEXT("normal"),		TEXT("Normal text"),				TEXT("Normal text file"),										L_TXT,			SCLEX_NULL},
+{TEXT("normal"),		TEXT("Normal text"),				TEXT("Normal text file"),										L_TEXT,			SCLEX_NULL},
 {TEXT("php"),			TEXT("PHP"),						TEXT("PHP Hypertext Preprocessor file"),						L_PHP,			SCLEX_HTML},
 {TEXT("c"),			TEXT("C"),						TEXT("C source file"),										L_C,			SCLEX_CPP},
 {TEXT("cpp"),			TEXT("C++"),						TEXT("C++ source file"),										L_CPP,			SCLEX_CPP},
@@ -80,7 +80,7 @@ LanguageName ScintillaEditView::langNames[L_EXTERNAL+1] = {
 {TEXT("pascal"),		TEXT("Pascal"),					TEXT("Pascal source file"),									L_PASCAL,		SCLEX_PASCAL},
 {TEXT("batch"),		TEXT("Batch"),					TEXT("Batch file"),											L_BATCH,		SCLEX_BATCH},
 {TEXT("ini"),			TEXT("ini"),						TEXT("MS ini file"),											L_INI,			SCLEX_PROPERTIES},
-{TEXT("nfo"),			TEXT("NFO"),						TEXT("MSDOS Style/ASCII Art"),								L_NFO,			SCLEX_NULL},
+{TEXT("nfo"),			TEXT("NFO"),						TEXT("MSDOS Style/ASCII Art"),								L_ASCII,			SCLEX_NULL},
 {TEXT("udf"),			TEXT("udf"),						TEXT("User Define File"),										L_USER,			SCLEX_USER},
 {TEXT("asp"),			TEXT("ASP"),						TEXT("Active Server Pages script file"),						L_ASP,			SCLEX_HTML},
 {TEXT("sql"),			TEXT("SQL"),						TEXT("Structured Query Language file"),						L_SQL,			SCLEX_SQL},
@@ -1146,7 +1146,7 @@ void ScintillaEditView::defineDocType(LangType typeDoc)
 				setUserLexer();
 			break; }
 
-        case L_NFO :
+        case L_ASCII :
 		{
 			LexerStyler *pStyler = (_pParameter->getLStylerArray()).getLexerStylerByName(TEXT("nfo"));
 			Style nfoStyle;
@@ -1279,7 +1279,7 @@ void ScintillaEditView::defineDocType(LangType typeDoc)
         case L_R :
 			setRLexer(); break;
 
-		case L_TXT :
+		case L_TEXT :
 		default :
 			if (typeDoc >= L_EXTERNAL && typeDoc < NppParameters::getInstance()->L_END)
 				setExternalLexer(typeDoc);
@@ -3485,11 +3485,10 @@ bool ScintillaEditView::isNeededFolderMargin( LangType typeDoc ) const
 {
 	switch (typeDoc)
 	{
-		case L_NFO:
+		case L_ASCII:
 		case L_BATCH:
-		case L_TXT:
+		case L_TEXT:
 		case L_MAKEFILE:
-		//case L_SQL:
 		case L_ASM:
 		case L_HASKELL:
 		case L_PROPS:

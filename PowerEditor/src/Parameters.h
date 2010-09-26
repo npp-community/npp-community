@@ -167,7 +167,7 @@ struct NewDocDefaultSettings
 	UniMode _encoding;
 	bool _openAnsiAsUtf8;
 	LangType _lang;
-	NewDocDefaultSettings():_format(WIN_FORMAT), _encoding(uni8Bit), _openAnsiAsUtf8(false), _lang(L_TXT){};
+	NewDocDefaultSettings():_format(WIN_FORMAT), _encoding(uni8Bit), _openAnsiAsUtf8(false), _lang(L_TEXT){};
 };
 
 struct LangMenuItem {
@@ -380,7 +380,7 @@ struct Lang
 	int _tabSize;
 
 	Lang():
-		_langID(L_TXT),
+		_langID(L_TEXT),
 		_defaultExtList(NULL),
 		_pCommentLineSymbol(NULL),
 		_pCommentStart(NULL),
