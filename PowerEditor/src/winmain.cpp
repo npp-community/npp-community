@@ -52,12 +52,20 @@ void parseCommandLine(TCHAR * commandLine, ParamVector & paramVector) {
 	}
 	//while this is not really DBCS compliant, space and quote are in the lower 127 ASCII range
 	while(commandLine[0] && commandLine[0] != stopChar)
+    {
 		commandLine++;
-	commandLine++;	//advance past stopChar
+    }
+
+    // For unknown reason, the following command :
+    // c:\NppDir>notepad++
+    // (without quote) will give string "notepad++\0notepad++\0"
+    // To avoid the unexpected behaviour we check the end of string before increasing the pointer
+    if (commandLine[0] != '\0')
+	    commandLine++;	//advance past stopChar
+
 	//kill remaining spaces
 	while(commandLine[0] == TEXT(' '))
 		commandLine++;
-
 
 	bool isFile = checkSingleFile(commandLine);	//if the commandline specifies only a file, open it as such
 	if (isFile) {

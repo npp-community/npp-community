@@ -1111,3 +1111,8 @@ bool Notepad_plus::fileReload()
 	BufferID buf = _pEditView->getCurrentBufferID();
 	return doReload(buf, buf->isDirty());
 }
+
+void Notepad_plus::saveSession(const Session & session)
+{
+	(NppParameters::getInstance())->writeSession(&session);
+}
