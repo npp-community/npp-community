@@ -716,7 +716,8 @@ bool Notepad_plus::fileSave(BufferID id)
 	return false;
 }
 
-bool Notepad_plus::fileSaveAll() {
+bool Notepad_plus::fileSaveAll()
+{
 	if (viewVisible(MAIN_VIEW)) {
 		assert(_mainDocTab);
 		for(int i = 0; i < _mainDocTab->nbItem(); i++) {
