@@ -36,7 +36,7 @@ static bool isInList(generic_string word, const std::vector<generic_string> & wo
 };
 
 AutoCompletion::AutoCompletion(ScintillaEditView * pEditView) :
-	_funcCompletionActive(false), _pEditView(pEditView), _curLang(L_TXT),
+	_funcCompletionActive(false), _pEditView(pEditView), _curLang(L_TEXT),
 	_XmlFile(NULL), _pXmlKeyword(NULL), _activeCompletion(CompletionNone),
 	_ignoreCase(true), _keyWords(TEXT("")), _funcCalltip(new FunctionCallTip(pEditView))
 {

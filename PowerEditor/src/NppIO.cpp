@@ -28,6 +28,7 @@
 #include "ScintillaComponent/ScintillaEditView.h"
 
 #include "lastRecentFileList.h"
+#include "MenuCmdID.h"
 #include "Parameters.h"
 
 #include "Notepad_plus.h"
@@ -871,30 +872,34 @@ bool Notepad_plus::isFileSession(const TCHAR * filename) {
 
 // return true if all the session files are loaded
 // return false if one or more sessions files fail to load (and session is modify to remove invalid files)
-bool Notepad_plus::loadSession(Session & session)
+bool Notepad_plus::loadSession(Session* session)
 {
+	// JOCE: This function is so retarded my brain hurts. This is basically twice the same
+	// chunk of code, with the only distinction being which edit view the methods are called for.
+	// Need to be factored. Badly.
+
 	bool allSessionFilesLoaded = true;
 	BufferID lastOpened = BUFFER_INVALID;
 	size_t i = 0;
 	showView(MAIN_VIEW);
 	switchEditViewTo(MAIN_VIEW);	//open files in main
-	for ( ; i < session.nbMainFiles() ; )
+	for ( ; i < session->nbMainFiles() ; )
 	{
-		const TCHAR *pFn = session._mainViewFiles[i]._fileName.c_str();
+		const TCHAR *pFn = session->_mainViewFiles[i]._fileName.c_str();
 		if (isFileSession(pFn)) {
-			vector<sessionFileInfo>::iterator posIt = session._mainViewFiles.begin() + i;
-			session._mainViewFiles.erase(posIt);
+			std::vector<sessionFileInfo>::iterator posIt = session->_mainViewFiles.begin() + i;
+			session->_mainViewFiles.erase(posIt);
 			continue;	//skip session files, not supporting recursive sessions
 		}
 		if (PathFileExists(pFn)) {
-			lastOpened = doOpen(pFn, false, session._mainViewFiles[i]._encoding);
+			lastOpened = doOpen(pFn, false, session->_mainViewFiles[i]._encoding);
 		} else {
 			lastOpened = BUFFER_INVALID;
 		}
 		if (lastOpened != BUFFER_INVALID)
 		{
 			showView(MAIN_VIEW);
-			const TCHAR *pLn = session._mainViewFiles[i]._langName.c_str();
+			const TCHAR *pLn = session->_mainViewFiles[i]._langName.c_str();
 			int id = getLangFromMenuName(pLn);
 			LangType typeToSet = L_TEXT;
 			if (id != 0 && lstrcmp(pLn, TEXT("User Defined")) != 0)
@@ -903,26 +908,26 @@ bool Notepad_plus::loadSession(Session & session)
 				typeToSet = (LangType)(id - IDM_LANG_EXTERNAL + L_EXTERNAL);
 
 			Buffer * buf = MainFileManager->getBufferByID(lastOpened);
-			buf->setPosition(session._mainViewFiles[i], &_mainEditView);
+			buf->setPosition(session->_mainViewFiles[i], _mainEditView);
 			buf->setLangType(typeToSet, pLn);
-			if (session._mainViewFiles[i]._encoding != -1)
-				buf->setEncoding(session._mainViewFiles[i]._encoding);
+			if (session->_mainViewFiles[i]._encoding != -1)
+				buf->setEncoding(session->_mainViewFiles[i]._encoding);
 
 			//Force in the document so we can add the markers
-			//Dont use default methods because of performance
-			Document prevDoc = _mainEditView.execute(SCI_GETDOCPOINTER);
-			_mainEditView.execute(SCI_SETDOCPOINTER, 0, buf->getDocument());
-			for (size_t j = 0 ; j < session._mainViewFiles[i].marks.size() ; j++)
+			//Don't use default methods because of performance
+			Document prevDoc = _mainEditView->execute(SCI_GETDOCPOINTER);
+			_mainEditView->execute(SCI_SETDOCPOINTER, 0, buf->getDocument());
+			for (size_t j = 0 ; j < session->_mainViewFiles[i].marks.size() ; j++)
 			{
-				_mainEditView.execute(SCI_MARKERADD, session._mainViewFiles[i].marks[j], MARK_BOOKMARK);
+				_mainEditView->execute(SCI_MARKERADD, session->_mainViewFiles[i].marks[j], MARK_BOOKMARK);
 			}
-			_mainEditView.execute(SCI_SETDOCPOINTER, 0, prevDoc);
+			_mainEditView->execute(SCI_SETDOCPOINTER, 0, prevDoc);
 			i++;
 		}
 		else
 		{
-			vector<sessionFileInfo>::iterator posIt = session._mainViewFiles.begin() + i;
-			session._mainViewFiles.erase(posIt);
+			std::vector<sessionFileInfo>::iterator posIt = session->_mainViewFiles.begin() + i;
+			session->_mainViewFiles.erase(posIt);
 			allSessionFilesLoaded = false;
 		}
 	}
@@ -930,18 +935,18 @@ bool Notepad_plus::loadSession(Session & session)
 	size_t k = 0;
 	showView(SUB_VIEW);
 	switchEditViewTo(SUB_VIEW);	//open files in sub
-	for ( ; k < session.nbSubFiles() ; )
+	for ( ; k < session->nbSubFiles() ; )
 	{
-		const TCHAR *pFn = session._subViewFiles[k]._fileName.c_str();
+		const TCHAR *pFn = session->_subViewFiles[k]._fileName.c_str();
 		if (isFileSession(pFn)) {
-			vector<sessionFileInfo>::iterator posIt = session._subViewFiles.begin() + k;
-			session._subViewFiles.erase(posIt);
+			std::vector<sessionFileInfo>::iterator posIt = session->_subViewFiles.begin() + k;
+			session->_subViewFiles.erase(posIt);
 			continue;	//skip session files, not supporting recursive sessions
 		}
 		if (PathFileExists(pFn)) {
-			lastOpened = doOpen(pFn, false, session._subViewFiles[k]._encoding);
+			lastOpened = doOpen(pFn, false, session->_subViewFiles[k]._encoding);
 			//check if already open in main. If so, clone
-			if (_mainDocTab.getIndexByBuffer(lastOpened) != -1) {
+			if (_mainDocTab->getIndexByBuffer(lastOpened) != -1) {
 				loadBufferIntoView(lastOpened, SUB_VIEW);
 			}
 		} else {
@@ -952,7 +957,7 @@ bool Notepad_plus::loadSession(Session & session)
 			showView(SUB_VIEW);
 			if (canHideView(MAIN_VIEW))
 				hideView(MAIN_VIEW);
-			const TCHAR *pLn = session._subViewFiles[k]._langName.c_str();
+			const TCHAR *pLn = session->_subViewFiles[k]._langName.c_str();
 			int id = getLangFromMenuName(pLn);
 			LangType typeToSet = L_TEXT;
 			if (id != 0)
@@ -961,46 +966,46 @@ bool Notepad_plus::loadSession(Session & session)
 				typeToSet = (LangType)(id - IDM_LANG_EXTERNAL + L_EXTERNAL);
 
 			Buffer * buf = MainFileManager->getBufferByID(lastOpened);
-			buf->setPosition(session._subViewFiles[k], &_subEditView);
+			buf->setPosition(session->_subViewFiles[k], _subEditView);
 			if (typeToSet == L_USER) {
 				if (!lstrcmp(pLn, TEXT("User Defined"))) {
 					pLn = TEXT("");	//default user defined
 				}
 			}
 			buf->setLangType(typeToSet, pLn);
-			buf->setEncoding(session._subViewFiles[k]._encoding);
+			buf->setEncoding(session->_subViewFiles[k]._encoding);
 
 			//Force in the document so we can add the markers
-			//Dont use default methods because of performance
-			Document prevDoc = _subEditView.execute(SCI_GETDOCPOINTER);
-			_subEditView.execute(SCI_SETDOCPOINTER, 0, buf->getDocument());
-			for (size_t j = 0 ; j < session._subViewFiles[k].marks.size() ; j++)
+			//Don't use default methods because of performance
+			Document prevDoc = _subEditView->execute(SCI_GETDOCPOINTER);
+			_subEditView->execute(SCI_SETDOCPOINTER, 0, buf->getDocument());
+			for (size_t j = 0 ; j < session->_subViewFiles[k].marks.size() ; j++)
 			{
-				_subEditView.execute(SCI_MARKERADD, session._subViewFiles[k].marks[j], MARK_BOOKMARK);
+				_subEditView->execute(SCI_MARKERADD, session->_subViewFiles[k].marks[j], MARK_BOOKMARK);
 			}
-			_subEditView.execute(SCI_SETDOCPOINTER, 0, prevDoc);
+			_subEditView->execute(SCI_SETDOCPOINTER, 0, prevDoc);
 
 			k++;
 		}
 		else
 		{
-			vector<sessionFileInfo>::iterator posIt = session._subViewFiles.begin() + k;
-			session._subViewFiles.erase(posIt);
+			std::vector<sessionFileInfo>::iterator posIt = session->_subViewFiles.begin() + k;
+			session->_subViewFiles.erase(posIt);
 			allSessionFilesLoaded = false;
 		}
 	}
 
-	_mainEditView.restoreCurrentPos();
-	_subEditView.restoreCurrentPos();
+	_mainEditView->restoreCurrentPos();
+	_subEditView->restoreCurrentPos();
 
-	if (session._activeMainIndex < (size_t)_mainDocTab.nbItem())//session.nbMainFiles())
-		activateBuffer(_mainDocTab.getBufferByIndex(session._activeMainIndex), MAIN_VIEW);
+	if (session->_activeMainIndex < (size_t)_mainDocTab->nbItem())//session->nbMainFiles())
+		activateBuffer(_mainDocTab->getBufferByIndex(session->_activeMainIndex), MAIN_VIEW);
 
-	if (session._activeSubIndex < (size_t)_subDocTab.nbItem())//session.nbSubFiles())
-		activateBuffer(_subDocTab.getBufferByIndex(session._activeSubIndex), SUB_VIEW);
+	if (session->_activeSubIndex < (size_t)_subDocTab->nbItem())//session->nbSubFiles())
+		activateBuffer(_subDocTab->getBufferByIndex(session->_activeSubIndex), SUB_VIEW);
 
-	if ((session.nbSubFiles() > 0) && (session._activeView == MAIN_VIEW || session._activeView == SUB_VIEW))
-		switchEditViewTo(session._activeView);
+	if ((session->nbSubFiles() > 0) && (session->_activeView == MAIN_VIEW || session->_activeView == SUB_VIEW))
+		switchEditViewTo(session->_activeView);
 	else
 		switchEditViewTo(MAIN_VIEW);
 

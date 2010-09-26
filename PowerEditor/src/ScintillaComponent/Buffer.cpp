@@ -39,7 +39,7 @@ const int LF = 0x0A;
 
 Buffer::Buffer( FileManager * pManager, BufferID id, Document doc, DocFileStatus type, const TCHAR *fileName ) :
 _pManager(pManager), _canNotify(false), _references(0), _id(id),
-_doc(doc), _lang(L_TXT), _isDirty(false), _encoding(-1),
+_doc(doc), _lang(L_TEXT), _isDirty(false), _encoding(-1),
 _isUserReadOnly(false), _needLexer(false), //new buffers do not need lexing, Scintilla takes care of that
 _currentStatus(type), _timeStamp(0), _isFileReadOnly(false),
 _fileName(NULL), _needReloading(false), _recentTag(-1)
