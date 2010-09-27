@@ -224,20 +224,20 @@ LRESULT DockingManager::runProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 		}
 		case WM_DESTROY:
 		{
-			/* unregister window event hooking BEFORE EVERYTHING ELSE */
+			// unregister window event hooking BEFORE EVERYTHING ELSE
 			if (hWndServer == hwnd) {
 				UnhookWindowsHookEx(gWinCallHook);
 				gWinCallHook = NULL;
 				hWndServer = NULL;
 			}
 
-			/* destroy imagelist if it exists */
+			// destroy imagelist if it exists
 			if (_hImageList != NULL)
 			{
 				::ImageList_Destroy(_hImageList);
 			}
 
-			/* destroy containers */
+			// destroy containers
 			for (int i = _vContainer.size(); i > 0; i--)
 			{
 				_vContainer[i-1]->destroy();
@@ -258,6 +258,7 @@ LRESULT DockingManager::runProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 			}
 			return TRUE;
 		}
+
 		case DMM_MOVE:
 		{
 			// Gripper will self delete on WM_DESTROY
@@ -266,6 +267,7 @@ LRESULT DockingManager::runProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 			pGripper->startGrip((DockingCont*)lParam, this);
 			break;
 		}
+
 		case DMM_MOVE_SPLITTER:
 		{
 			INT			offset = (INT)wParam;
