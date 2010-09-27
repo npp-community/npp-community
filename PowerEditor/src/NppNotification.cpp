@@ -693,7 +693,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 			notifyView->execute(SCI_SETTARGETSTART, startPos);
 			notifyView->execute(SCI_SETTARGETEND, endPos);
 
-			int posFound = notifyView->execute(SCI_SEARCHINTARGET, strlen(urlHttpRegExpr), (LPARAM)urlHttpRegExpr);
+			int posFound = notifyView->execute(SCI_SEARCHINTARGET, strlen(URL_HTTP_REG_EXPR), (LPARAM)URL_HTTP_REG_EXPR);
 			if (posFound != -1)
 			{
 				startPos = int(notifyView->execute(SCI_GETTARGETSTART));
