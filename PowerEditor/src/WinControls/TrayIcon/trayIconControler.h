@@ -25,6 +25,7 @@
 #define INCORRECT_OPERATION     1
 #define OPERATION_INCOHERENT    2
 
+// JOCE orthographic error: Controller. Two 'L's
 class trayIconControler
 {
 public:

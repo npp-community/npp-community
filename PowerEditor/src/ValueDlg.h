@@ -24,6 +24,8 @@
 
 #define DEFAULT_NB_NUMBER 2
 
+// JOCE: Needs to be moved in WinControls somewhere.
+
 class ValueDlg : public StaticDialog
 {
 public :
