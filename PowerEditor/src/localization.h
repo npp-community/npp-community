@@ -28,7 +28,7 @@ class PreferenceDlg;
 class NativeLangSpeaker {
 public:
     NativeLangSpeaker();
-    void init(TiXmlDocumentA* nativeLangDocRootA);
+    void init(TiXmlDocumentA* nativeLangDocRootA, bool loadIfEnglish = false);
 	void changeConfigLang(HWND hDlg);
 	void changeLangTabContextMenu(HMENU hCM);
 	TiXmlNodeA * searchDlgNode(TiXmlNodeA *node, const char *dlgTagName);

@@ -51,7 +51,7 @@ NativeLangSpeaker::NativeLangSpeaker():
 	_isRTL(false)
 {}
 
-void NativeLangSpeaker::init(TiXmlDocumentA *nativeLangDocRootA)
+void NativeLangSpeaker::init(TiXmlDocumentA *nativeLangDocRootA, bool loadIfEnglish)
 {
 	if (nativeLangDocRootA)
 	{
@@ -78,7 +78,7 @@ void NativeLangSpeaker::init(TiXmlDocumentA *nativeLangDocRootA)
 					std::transform(_fileName.begin(), _fileName.end(), _fileName.begin(), ::tolower);
                 }
 
-				if (_fileName == "english.xml")
+				if (!loadIfEnglish &&_fileName == "english.xml")
                 {
 					_nativeLangA = NULL;
 					return;
