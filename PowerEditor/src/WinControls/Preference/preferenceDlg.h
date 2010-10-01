@@ -29,7 +29,8 @@ struct PreferenceDlgWindows;
 
 class PreferenceDlg : public StaticDialog
 {
-friend class Notepad_plus;
+// JOCE: What NativeLangSpeaker does here, PreferenceDlg should do it.
+friend class NativeLangSpeaker;
 
 public :
 	PreferenceDlg();

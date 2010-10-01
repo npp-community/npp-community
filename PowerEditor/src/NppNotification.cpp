@@ -30,6 +30,7 @@
 #include "ScintillaComponent/SmartHighlighter.h"
 #include "ScintillaComponent/xmlMatchedTagsHighlighter.h"
 
+#include "localization.h"
 #include "MenuCmdID.h"
 #include "Parameters.h"
 
@@ -270,7 +271,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 						itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_GOTO_ANOTHER_VIEW, goToView));
 						itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_CLONE_TO_ANOTHER_VIEW, cloneToView));
 						_tabPopupDropMenu->create(_hSelf, itemUnitArray);
-						changeLangTabDrapContextMenu();
+						_nativeLangSpeaker->changeLangTabDrapContextMenu(_tabPopupDropMenu->getMenuHandle());
 					}
 					_tabPopupDropMenu->display(p);
 				}
@@ -413,9 +414,9 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 				if (lpnm->dwItemSpec == DWORD(STATUSBAR_CUR_POS))
 				{
 					bool isFirstTime = !_goToLineDlg->isCreated();
-					_goToLineDlg->doDialog(_isRTL);
+					_goToLineDlg->doDialog(_nativeLangSpeaker->isRTL());
 					if (isFirstTime)
-						changeDlgLang(_goToLineDlg->getHSelf(), "GoToLine");
+						_nativeLangSpeaker->changeDlgLang(_goToLineDlg->getHSelf(), "GoToLine");
 				}
 			}
 			break;
@@ -469,7 +470,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 				itemUnitArray.push_back(MenuItemUnit(IDM_VIEW_LOAD_IN_NEW_INSTANCE, TEXT("Open in New Instance")));
 
 				_tabPopupMenu->create(_hSelf, itemUnitArray);
-				changeLangTabContextMenu();
+				_nativeLangSpeaker->changeLangTabContextMenu(_tabPopupMenu->getMenuHandle());
 			}
 
 			bool isEnable = ((::GetMenuState(_mainMenuHandle, IDM_FILE_SAVE, MF_BYCOMMAND)&MF_DISABLED) == 0);

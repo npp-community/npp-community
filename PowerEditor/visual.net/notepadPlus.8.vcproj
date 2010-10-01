@@ -328,6 +328,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\localization.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Notepad_plus.cpp"
 				>
 			</File>
@@ -341,10 +345,6 @@
 			</File>
 			<File
 				RelativePath="..\src\NppIO.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\NppLocalization.cpp"
 				>
 			</File>
 			<File
@@ -803,6 +803,10 @@
 			</File>
 			<File
 				RelativePath="..\src\lastRecentFileList.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\localization.h"
 				>
 			</File>
 			<File

@@ -98,6 +98,7 @@ class ToolBar;
 class ReBar;
 
 class ScintillaEditView;
+class NativeLangSpeaker;
 class DocTabView;
 class IconList;
 class trayIconControler;
@@ -219,20 +220,6 @@ public:
 	bool fileLoadSession(const TCHAR *fn = NULL);
 	const TCHAR * fileSaveSession(size_t nbFile, TCHAR ** fileNames, const TCHAR *sessionFile2save);
 	const TCHAR * fileSaveSession(size_t nbFile = 0, TCHAR ** fileNames = NULL);
-
-    TiXmlNodeA * searchDlgNode(TiXmlNodeA *node, const char *dlgTagName);
-	bool changeDlgLang(HWND hDlg, const char *dlgTagName, char *title = NULL, int titleBufLen = 0);
-	void changeFindReplaceDlgLang();
-	void changeConfigLang();
-	void changeUserDefineLang();
-	void changeMenuLang(generic_string & pluginsTrans, generic_string & windowTrans);
-	void changeLangTabContextMenu();
-	void changeLangTabDrapContextMenu();
-	void changePrefereceDlgLang();
-	void changeShortcutLang();
-	void changeShortcutmapperLang(ShortcutMapper * sm);
-
-	const TCHAR * getNativeTip(int btnID);
 	void changeToolBarIcons();
 
 	bool doBlockComment(comment_mode currCommentMode);
@@ -263,14 +250,11 @@ private:
 	SmartHighlighter* _smartHighlighter;
 
 	TiXmlNode *_toolIcons;
-	TiXmlNodeA *_nativeLangA;
-
-	int _nativeLangEncoding;
-
-    DocTabView* _mainDocTab;
-    DocTabView* _subDocTab;
-    DocTabView* _pDocTab;
-	DocTabView* _pNonDocTab;
+    NativeLangSpeaker* _nativeLangSpeaker;
+    DocTabView*_mainDocTab;
+    DocTabView*_subDocTab;
+    DocTabView*_pDocTab;
+	DocTabView*_pNonDocTab;
 
     ScintillaEditView* _subEditView;
     ScintillaEditView* _mainEditView;
@@ -369,8 +353,6 @@ private:
 
 	PluginsManager*_pluginsManager;
     ButtonDlg* _restoreButton;
-
-	bool _isRTL;
 
 	bool _isFileOpening;
 
@@ -508,7 +490,6 @@ private:
 	void autoCompFromCurrentFile(bool autoInsert = true);
 	void showFunctionComp();
 
-	void changeStyleCtrlsLang(HWND hDlg, int *idArray, const char **translatedText);
 	bool replaceAllFiles();
 	bool findInOpenedFiles();
 	bool findInCurrentFile();
