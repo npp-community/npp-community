@@ -189,6 +189,10 @@ LRESULT Notepad_plus::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			if (!_toolBar)
 			{
 				_toolBar = new ToolBar();
+				if (TiXmlDocument *toolIconsDocRoot = (NppParameters::getInstance())->getToolIcons())
+				{
+					_toolBar->initTheme(toolIconsDocRoot);
+				}
 			}
 
 			if (!_statusBar)

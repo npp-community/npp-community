@@ -121,15 +121,6 @@ class TiXmlNode;
 struct CmdLineParams;
 struct Session;
 
-struct iconLocator {
-	int listIndex;
-	int iconIndex;
-	generic_string iconLocation;
-
-	iconLocator(int iList, int iIcon, const generic_string iconLoc)
-		: listIndex(iList), iconIndex(iIcon), iconLocation(iconLoc){};
-};
-
 struct VisibleGUIConf {
 	bool isPostIt;
 	bool isFullScreen;
@@ -249,7 +240,6 @@ private:
 
 	SmartHighlighter* _smartHighlighter;
 
-	TiXmlNode *_toolIcons;
     NativeLangSpeaker* _nativeLangSpeaker;
     DocTabView*_mainDocTab;
     DocTabView*_subDocTab;
@@ -298,7 +288,6 @@ private:
 
 	LastRecentFileList* _lastRecentFileList;
 
-	std::vector<iconLocator> _customIconVect;
 
 	WindowsMenu* _windowsMenu;
 	HMENU _mainMenuHandle;

@@ -128,78 +128,6 @@ Notepad_plus::Notepad_plus():
     }
 #endif
 
-	TiXmlDocument *toolIconsDocRoot = (NppParameters::getInstance())->getToolIcons();
-	if (toolIconsDocRoot)
-	{
-		// JOCE: Can't we use XPath style accessors?
-		_toolIcons =  toolIconsDocRoot->FirstChild(TEXT("NotepadPlus"));
-		if (_toolIcons)
-		{
-			_toolIcons = _toolIcons->FirstChild(TEXT("ToolBarIcons"));
-			if (_toolIcons)
-			{
-				_toolIcons = _toolIcons->FirstChild(TEXT("Theme"));
-				if (_toolIcons)
-				{
-					const TCHAR *themeDir = (_toolIcons->ToElement())->Attribute(TEXT("pathPrefix"));
-
-					for (TiXmlNode *childNode = _toolIcons->FirstChildElement(TEXT("Icon"));
-						 childNode ;
-						 childNode = childNode->NextSibling(TEXT("Icon")))
-					{
-						int iIcon;
-						const TCHAR *res = (childNode->ToElement())->Attribute(TEXT("id"), &iIcon);
-						if (res)
-						{
-							TiXmlNode *grandChildNode = childNode->FirstChildElement(TEXT("normal"));
-							if (grandChildNode)
-							{
-								TiXmlNode *valueNode = grandChildNode->FirstChild();
-								if (valueNode)
-								{
-									generic_string locator = themeDir?themeDir:TEXT("");
-
-									locator += valueNode->Value();
-									_customIconVect.push_back(iconLocator(0, iIcon, locator));
-								}
-							}
-
-							grandChildNode = childNode->FirstChildElement(TEXT("hover"));
-							if (grandChildNode)
-							{
-								TiXmlNode *valueNode = grandChildNode->FirstChild();
-								if (valueNode)
-								{
-									generic_string locator = themeDir?themeDir:TEXT("");
-
-									locator += valueNode->Value();
-									_customIconVect.push_back(iconLocator(1, iIcon, locator));
-								}
-							}
-
-							grandChildNode = childNode->FirstChildElement(TEXT("disabled"));
-							if (grandChildNode)
-							{
-								TiXmlNode *valueNode = grandChildNode->FirstChild();
-								//putain, enfin!!!
-								if (valueNode)
-								{
-									generic_string locator = themeDir?themeDir:TEXT("");
-
-									locator += valueNode->Value();
-									_customIconVect.push_back(iconLocator(2, iIcon, locator));
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	else
-	{
-		_toolIcons = NULL;
-	}
 }
 
 // ATTENTION : the order of the destruction is very important
@@ -3325,10 +3253,7 @@ bool Notepad_plus::addCurrentMacro()
 void Notepad_plus::changeToolBarIcons()
 {
 	assert(_toolBar);
-	if (!_toolIcons)
-		return;
-	for (int i = 0 ; i < int(_customIconVect.size()) ; i++)
-		_toolBar->changeIcons(_customIconVect[i].listIndex, _customIconVect[i].iconIndex, (_customIconVect[i].iconLocation).c_str());
+	_toolBar->changeIcons();
 }
 
 bool Notepad_plus::switchToFile(BufferID id)
