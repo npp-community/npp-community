@@ -1104,18 +1104,19 @@ bool NppParameters::getUserParametersFromXmlTree()
 	return true;
 }
 
-bool NppParameters::getUserDefineLangsFromXmlTree()
+bool NppParameters::getUserDefineLangsFromXmlTree(TiXmlDocument *tixmldoc)
 {
-	if (!_pXmlUserLangDoc)
+	if (!tixmldoc)
 		return false;
 
-	TiXmlNode *root = _pXmlUserLangDoc->FirstChild(TEXT("NotepadPlus"));
+	TiXmlNode *root = tixmldoc->FirstChild(TEXT("NotepadPlus"));
 	if (!root)
 		return false;
 
-	feedUserLang(root);
-	return true;
+	return feedUserLang(root);
 }
+
+
 
 bool NppParameters::getShortcutsFromXmlTree()
 {
@@ -1918,14 +1919,18 @@ bool NppParameters::getShortcuts(TiXmlNode *node, Shortcut & sc)
 
 const int loadFailed = 100;
 const int missingName = 101;
-void NppParameters::feedUserLang(TiXmlNode *node)
+bool NppParameters::feedUserLang(TiXmlNode *node)
 {
+    bool isEverythingOK = true;
+    bool hasFoundElement = false;
+
 	for (TiXmlNode *childNode = node->FirstChildElement(TEXT("UserLang"));
 		childNode ;
 		childNode = childNode->NextSibling(TEXT("UserLang")) )
 	{
 		const TCHAR *name = (childNode->ToElement())->Attribute(TEXT("name"));
 		const TCHAR *ext = (childNode->ToElement())->Attribute(TEXT("ext"));
+        hasFoundElement = true;
 		UserLangContainer* newLangContainer = new UserLangContainer(name, ext);
 		try {
 			if (!name || !name[0] || !ext) throw int(missingName);
@@ -1944,10 +1949,54 @@ void NppParameters::feedUserLang(TiXmlNode *node)
 
 		} catch (int e) {
 			if (e == loadFailed)
+			{
 				delete newLangContainer;
+				newLangContainer = NULL;
+			}
+			isEverythingOK = false;
 		}
-		_userLangArray.push_back(newLangContainer);
+
+		if (newLangContainer)
+		{
+			_userLangArray.push_back(newLangContainer);
+		}
 	}
+
+    if (isEverythingOK)
+	{
+        isEverythingOK = hasFoundElement;
+	}
+
+    return isEverythingOK;
+}
+
+bool NppParameters::importUDLFromFile(generic_string sourceFile)
+{
+    TiXmlDocument *pXmlUserLangDoc = new TiXmlDocument(sourceFile);
+	bool loadOkay = pXmlUserLangDoc->LoadFile();
+	if (loadOkay)
+	{
+		loadOkay = getUserDefineLangsFromXmlTree(pXmlUserLangDoc);
+    }
+    delete pXmlUserLangDoc;
+    return loadOkay;
+}
+
+bool NppParameters::exportUDLToFile(int langIndex2export, generic_string fileName2save)
+{
+    if (langIndex2export != -1 && langIndex2export >= (int)_userLangArray.size())
+        return false;
+
+    TiXmlDocument *pNewXmlUserLangDoc = new TiXmlDocument(fileName2save);
+    TiXmlNode *newRoot2export = pNewXmlUserLangDoc->InsertEndChild(TiXmlElement(TEXT("NotepadPlus")));
+
+    bool b = false;
+
+    insertUserLang2Tree(newRoot2export, _userLangArray[langIndex2export]);
+    b = pNewXmlUserLangDoc->SaveFile();
+
+    delete pNewXmlUserLangDoc;
+    return b;
 }
 
 LangType NppParameters::getLangFromExt(const TCHAR *ext)
