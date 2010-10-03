@@ -27,10 +27,21 @@
 #include "Parameters.h"
 #include "resource.h"
 
+#include "Notepad_plus.h"
 #include "Notepad_plus_Window.h"
 
 const TCHAR Notepad_plus_Window::_className[32] = TEXT("Notepad++");
 HWND Notepad_plus_Window::gNppHWND = NULL;
+
+Notepad_plus_Window::Notepad_plus_Window() :
+	_notepad_plus_plus_core(new Notepad_plus())
+{
+}
+
+Notepad_plus_Window::~Notepad_plus_Window()
+{
+	delete _notepad_plus_plus_core;
+}
 
 void Notepad_plus_Window::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLine, CmdLineParams *cmdLineParams)
 {
@@ -67,10 +78,14 @@ void Notepad_plus_Window::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLin
 	const NppGUI & nppGUI = pNppParams->getNppGUI();
 
 	if (cmdLineParams->_isNoPlugin)
-		_notepad_plus_plus_core._pluginsManager->disable();
+	{
+		assert(_notepad_plus_plus_core->_pluginsManager);
+		_notepad_plus_plus_core->_pluginsManager->disable();
+	}
 
+	assert(_notepad_plus_plus_core->_nativeLangSpeaker);
 	_hSelf = ::CreateWindowEx(
-					WS_EX_ACCEPTFILES | (_notepad_plus_plus_core._nativeLangSpeaker->isRTL()?WS_EX_LAYOUTRTL:0),\
+					WS_EX_ACCEPTFILES | (_notepad_plus_plus_core->_nativeLangSpeaker->isRTL()?WS_EX_LAYOUTRTL:0),\
 					_className,\
 					TEXT("Notepad++"),\
 					WS_OVERLAPPEDWINDOW	| WS_CLIPCHILDREN,\
@@ -128,10 +143,10 @@ void Notepad_plus_Window::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLin
 		::SendMessage(_hSelf, NPPM_HIDETABBAR, 0, TRUE);
 	}
 
-    _notepad_plus_plus_core._rememberThisSession = !cmdLineParams->_isNoSession;
+    _notepad_plus_plus_core->_rememberThisSession = !cmdLineParams->_isNoSession;
 	if (nppGUI._rememberLastSession && !cmdLineParams->_isNoSession)
 	{
-		_notepad_plus_plus_core.loadLastSession();
+		_notepad_plus_plus_core->loadLastSession();
 	}
 
 	if (!cmdLineParams->_isPreLaunch)
@@ -143,13 +158,13 @@ void Notepad_plus_Window::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLin
 	}
 	else
 	{
-		_notepad_plus_plus_core._pTrayIco = new trayIconControler(_hSelf, IDI_M30ICON, IDC_MINIMIZED_TRAY, ::LoadIcon(_hInst, MAKEINTRESOURCE(IDI_M30ICON)), TEXT(""));
-		_notepad_plus_plus_core._pTrayIco->doTrayIcon(ADD);
+		_notepad_plus_plus_core->_pTrayIco = new trayIconControler(_hSelf, IDI_M30ICON, IDC_MINIMIZED_TRAY, ::LoadIcon(_hInst, MAKEINTRESOURCE(IDI_M30ICON)), TEXT(""));
+		_notepad_plus_plus_core->_pTrayIco->doTrayIcon(ADD);
 	}
 
     if (cmdLine)
     {
-		_notepad_plus_plus_core.loadCommandlineParams(cmdLine, cmdLineParams);
+		_notepad_plus_plus_core->loadCommandlineParams(cmdLine, cmdLineParams);
     }
 
 	std::vector<generic_string> fileNames;
@@ -162,7 +177,7 @@ void Notepad_plus_Window::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLin
 	generic_string localizationDir = nppDir;
 	PathAppend(localizationDir, TEXT("localization\\"));
 
-	_notepad_plus_plus_core.getMatchedFileNames(localizationDir.c_str(), patterns, fileNames, false, false);
+	_notepad_plus_plus_core->getMatchedFileNames(localizationDir.c_str(), patterns, fileNames, false, false);
 	for (size_t i = 0 ; i < fileNames.size() ; i++)
 	{
 		localizationSwitcher.addLanguageFromXml(fileNames[i].c_str());
@@ -177,7 +192,7 @@ void Notepad_plus_Window::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLin
 	generic_string themeDir(pNppParams->getAppDataNppDir());
 	PathAppend(themeDir, TEXT("themes\\"));
 
-	_notepad_plus_plus_core.getMatchedFileNames(themeDir.c_str(), patterns, fileNames, false, false);
+	_notepad_plus_plus_core->getMatchedFileNames(themeDir.c_str(), patterns, fileNames, false, false);
 	for (size_t i = 0 ; i < fileNames.size() ; i++)
 	{
 		themeSwitcher.addThemeFromXml(fileNames[i].c_str());
@@ -187,7 +202,7 @@ void Notepad_plus_Window::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLin
 	themeDir.clear();
 	themeDir = nppDir.c_str(); // <- should use the pointer to avoid the constructor of copy
 	PathAppend(themeDir, TEXT("themes\\"));
-	_notepad_plus_plus_core.getMatchedFileNames(themeDir.c_str(), patterns, fileNames, false, false);
+	_notepad_plus_plus_core->getMatchedFileNames(themeDir.c_str(), patterns, fileNames, false, false);
 	for (size_t i = 0 ; i < fileNames.size() ; i++)
 	{
 		generic_string themeName( themeSwitcher.getThemeFromXmlFileName(fileNames[i].c_str()) );
@@ -202,7 +217,8 @@ void Notepad_plus_Window::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLin
 	scnN.nmhdr.code = NPPN_READY;
 	scnN.nmhdr.hwndFrom = _hSelf;
 	scnN.nmhdr.idFrom = 0;
-	_notepad_plus_plus_core._pluginsManager->notify(&scnN);
+	assert(_notepad_plus_plus_core->_pluginsManager);
+	_notepad_plus_plus_core->_pluginsManager->notify(&scnN);
 
 	if (cmdLineParams->_showLoadingTime)
 	{
@@ -217,10 +233,20 @@ void Notepad_plus_Window::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLin
 
 bool Notepad_plus_Window::isDlgsMsg(MSG *msg, bool unicodeSupported) const
 {
-	for (size_t i = 0; i < _notepad_plus_plus_core._hModelessDlgs.size(); i++)
+	for (size_t i = 0; i < _notepad_plus_plus_core->_hModelessDlgs.size(); i++)
 	{
-		if (unicodeSupported?(::IsDialogMessageW(_notepad_plus_plus_core._hModelessDlgs[i], msg)):(::IsDialogMessageA(_notepad_plus_plus_core._hModelessDlgs[i], msg)))
+		if (unicodeSupported?(::IsDialogMessageW(_notepad_plus_plus_core->_hModelessDlgs[i], msg)):(::IsDialogMessageA(_notepad_plus_plus_core->_hModelessDlgs[i], msg)))
 			return true;
 	}
 	return false;
+}
+
+HACCEL Notepad_plus_Window::getAccTable() const
+{
+	return _notepad_plus_plus_core->getAccTable();
+}
+
+bool Notepad_plus_Window::emergency( generic_string emergencySavedDir )
+{
+	return _notepad_plus_plus_core->emergency(emergencySavedDir);
 }

@@ -109,15 +109,15 @@ LRESULT Notepad_plus_Window::runProc(HWND hwnd, UINT Message, WPARAM wParam, LPA
 	{
 		case WM_CREATE:
 		{
-			_notepad_plus_plus_core._pPublicInterface = this;
-			result = _notepad_plus_plus_core.init(hwnd);
+			_notepad_plus_plus_core->_pPublicInterface = this;
+			result = _notepad_plus_plus_core->init(hwnd);
 		}
 		break;
 		default:
 		{
 			if (this)
 			{
-				return _notepad_plus_plus_core.process(hwnd, Message, wParam, lParam);
+				return _notepad_plus_plus_core->process(hwnd, Message, wParam, lParam);
 			}
 		}
 	}
