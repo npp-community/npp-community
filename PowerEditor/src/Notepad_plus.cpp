@@ -4385,11 +4385,19 @@ void Notepad_plus::notifyBufferChanged(Buffer * buffer, int mask)
 				bool autoUpdate = (nppGUI._fileAutoDetection == cdAutoUpdate) || (nppGUI._fileAutoDetection == cdAutoUpdateGo2end);
 				if (!autoUpdate || buffer->isDirty())
 				{
+                    // if file updating is not silently, we switch to the file to update.
+                    int index = _pDocTab->getIndexByBuffer(buffer->getID());
+				    int iView = currentView();
+				    if (index == -1)
+					    iView = otherView();
+				    activateBuffer(buffer->getID(), iView);	//activate the buffer in the first view possible
+
+                    // Then we ask user to update
 					didDialog = true;
 					if (doReloadOrNot(buffer->getFullPathName(), buffer->isDirty()) != IDYES)
 						break;	//abort
 				}
-				//activateBuffer(buffer->getID(), iView);	//activate the buffer in the first view possible
+
 				doReload(buffer->getID(), false);
 				if (mainActive || subActive)
 				{
@@ -4399,6 +4407,12 @@ void Notepad_plus::notifyBufferChanged(Buffer * buffer, int mask)
 			}
 			case DOC_DELETED: 	//ask for keep
 			{
+				int index = _pDocTab->getIndexByBuffer(buffer->getID());
+				int iView = currentView();
+				if (index == -1)
+					iView = otherView();
+
+				activateBuffer(buffer->getID(), iView);	//activate the buffer in the first view possible
 				didDialog = true;
 				if (doCloseOrNot(buffer->getFullPathName()) == IDNO)
 				{
