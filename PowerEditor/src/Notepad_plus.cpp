@@ -74,10 +74,75 @@
 
 #include "localization.h"
 
-const TCHAR Notepad_plus::_className[32] = TEXT("Notepad++");
-HWND Notepad_plus::gNppHWND = NULL;
+#include "Notepad_plus_Window.h"
 
 enum tb_stat {tb_saved, tb_unsaved, tb_ro};
+#define DIR_LEFT true
+#define DIR_RIGHT false
+
+int docTabIconIDs[] = {IDI_SAVED_ICON, IDI_UNSAVED_ICON, IDI_READONLY_ICON};
+ToolBarButtonUnit toolBarIcons[] = {
+	{IDM_FILE_NEW,		IDI_NEW_OFF_ICON,		IDI_NEW_ON_ICON,		IDI_NEW_OFF_ICON, IDR_FILENEW},
+	{IDM_FILE_OPEN,		IDI_OPEN_OFF_ICON,		IDI_OPEN_ON_ICON,		IDI_NEW_OFF_ICON, IDR_FILEOPEN},
+	{IDM_FILE_SAVE,		IDI_SAVE_OFF_ICON,		IDI_SAVE_ON_ICON,		IDI_SAVE_DISABLE_ICON, IDR_FILESAVE},
+	{IDM_FILE_SAVEALL,	IDI_SAVEALL_OFF_ICON,	IDI_SAVEALL_ON_ICON,	IDI_SAVEALL_DISABLE_ICON, IDR_SAVEALL},
+	{IDM_FILE_CLOSE,	IDI_CLOSE_OFF_ICON,		IDI_CLOSE_ON_ICON,		IDI_CLOSE_OFF_ICON, IDR_CLOSEFILE},
+	{IDM_FILE_CLOSEALL,	IDI_CLOSEALL_OFF_ICON,	IDI_CLOSEALL_ON_ICON,	IDI_CLOSEALL_OFF_ICON, IDR_CLOSEALL},
+	{IDM_FILE_PRINTNOW,	IDI_PRINT_OFF_ICON,		IDI_PRINT_ON_ICON,		IDI_PRINT_OFF_ICON, IDR_PRINT},
+
+	//-------------------------------------------------------------------------------------//
+	{0,					IDI_SEPARATOR_ICON,		IDI_SEPARATOR_ICON,		IDI_SEPARATOR_ICON, IDI_SEPARATOR_ICON},
+	//-------------------------------------------------------------------------------------//
+
+	{IDM_EDIT_CUT,		IDI_CUT_OFF_ICON,		IDI_CUT_ON_ICON,		IDI_CUT_DISABLE_ICON, IDR_CUT},
+	{IDM_EDIT_COPY,		IDI_COPY_OFF_ICON,		IDI_COPY_ON_ICON,		IDI_COPY_DISABLE_ICON, IDR_COPY},
+	{IDM_EDIT_PASTE,	IDI_PASTE_OFF_ICON,		IDI_PASTE_ON_ICON,		IDI_PASTE_DISABLE_ICON, IDR_PASTE},
+
+	//-------------------------------------------------------------------------------------//
+	{0,					IDI_SEPARATOR_ICON,		IDI_SEPARATOR_ICON,		IDI_SEPARATOR_ICON, IDI_SEPARATOR_ICON},
+	//-------------------------------------------------------------------------------------//
+
+	{IDM_EDIT_UNDO,		IDI_UNDO_OFF_ICON,		IDI_UNDO_ON_ICON,		IDI_UNDO_DISABLE_ICON, IDR_UNDO},
+	{IDM_EDIT_REDO,		IDI_REDO_OFF_ICON,		IDI_REDO_ON_ICON,		IDI_REDO_DISABLE_ICON, IDR_REDO},
+	//-------------------------------------------------------------------------------------//
+	{0,					IDI_SEPARATOR_ICON,		IDI_SEPARATOR_ICON,		IDI_SEPARATOR_ICON, IDI_SEPARATOR_ICON},
+	//-------------------------------------------------------------------------------------//
+
+	{IDM_SEARCH_FIND,		IDI_FIND_OFF_ICON,		IDI_FIND_ON_ICON,		IDI_FIND_OFF_ICON, IDR_FIND},
+	{IDM_SEARCH_REPLACE,  IDI_REPLACE_OFF_ICON,	IDI_REPLACE_ON_ICON,	IDI_REPLACE_OFF_ICON, IDR_REPLACE},
+
+	//-------------------------------------------------------------------------------------//
+	{0,					IDI_SEPARATOR_ICON,		IDI_SEPARATOR_ICON,		IDI_SEPARATOR_ICON, IDI_SEPARATOR_ICON},
+	//-------------------------------------------------------------------------------------//
+	{IDM_VIEW_ZOOMIN,	IDI_ZOOMIN_OFF_ICON,	IDI_ZOOMIN_ON_ICON,		IDI_ZOOMIN_OFF_ICON, IDR_ZOOMIN},
+	{IDM_VIEW_ZOOMOUT,	IDI_ZOOMOUT_OFF_ICON,	IDI_ZOOMOUT_ON_ICON,	IDI_ZOOMOUT_OFF_ICON, IDR_ZOOMOUT},
+
+	//-------------------------------------------------------------------------------------//
+	{0,					IDI_SEPARATOR_ICON,		IDI_SEPARATOR_ICON,		IDI_SEPARATOR_ICON, IDI_SEPARATOR_ICON},
+	//-------------------------------------------------------------------------------------//
+	{IDM_VIEW_SYNSCROLLV,	IDI_SYNCV_OFF_ICON,	IDI_SYNCV_ON_ICON,	IDI_SYNCV_DISABLE_ICON, IDR_SYNCV},
+	{IDM_VIEW_SYNSCROLLH,	IDI_SYNCH_OFF_ICON,	IDI_SYNCH_ON_ICON,	IDI_SYNCH_DISABLE_ICON, IDR_SYNCH},
+
+	//-------------------------------------------------------------------------------------//
+	{0,					IDI_SEPARATOR_ICON,		IDI_SEPARATOR_ICON,		IDI_SEPARATOR_ICON, IDI_SEPARATOR_ICON},
+	//-------------------------------------------------------------------------------------//
+	{IDM_VIEW_WRAP,  IDI_VIEW_WRAP_OFF_ICON,	IDI_VIEW_WRAP_ON_ICON,	IDI_VIEW_WRAP_OFF_ICON, IDR_WRAP},
+	{IDM_VIEW_ALL_CHARACTERS,  IDI_VIEW_ALL_CHAR_OFF_ICON,	IDI_VIEW_ALL_CHAR_ON_ICON,	IDI_VIEW_ALL_CHAR_OFF_ICON, IDR_INVISIBLECHAR},
+	{IDM_VIEW_INDENT_GUIDE,  IDI_VIEW_INDENT_OFF_ICON,	IDI_VIEW_INDENT_ON_ICON,	IDI_VIEW_INDENT_OFF_ICON, IDR_INDENTGUIDE},
+	{IDM_VIEW_USER_DLG,  IDI_VIEW_UD_DLG_OFF_ICON,	IDI_VIEW_UD_DLG_ON_ICON,	IDI_VIEW_UD_DLG_OFF_ICON, IDR_SHOWPANNEL},
+
+	//-------------------------------------------------------------------------------------//
+	{0,					IDI_SEPARATOR_ICON,		IDI_SEPARATOR_ICON,		IDI_SEPARATOR_ICON, IDI_SEPARATOR_ICON},
+	//-------------------------------------------------------------------------------------//
+
+	{IDM_MACRO_STARTRECORDINGMACRO,		IDI_STARTRECORD_OFF_ICON,	IDI_STARTRECORD_ON_ICON,	IDI_STARTRECORD_DISABLE_ICON, IDR_STARTRECORD},
+	{IDM_MACRO_STOPRECORDINGMACRO,		IDI_STOPRECORD_OFF_ICON,	IDI_STOPRECORD_ON_ICON,		IDI_STOPRECORD_DISABLE_ICON, IDR_STOPRECORD},
+	{IDM_MACRO_PLAYBACKRECORDEDMACRO,	IDI_PLAYRECORD_OFF_ICON,	IDI_PLAYRECORD_ON_ICON,		IDI_PLAYRECORD_DISABLE_ICON, IDR_PLAYRECORD},
+	{IDM_MACRO_RUNMULTIMACRODLG,			IDI_MMPLAY_OFF_ICON,		IDI_MMPLAY_ON_ICON,			IDI_MMPLAY_DIS_ICON, IDR_M_PLAYRECORD},
+	{IDM_MACRO_SAVECURRENTMACRO,			IDI_SAVERECORD_OFF_ICON,	IDI_SAVERECORD_ON_ICON,		IDI_SAVERECORD_DISABLE_ICON, IDR_SAVERECORD}
+
+};
+
 
 Notepad_plus::Notepad_plus():
 	_pMainWindow(NULL), _dockingManager(NULL), _smartHighlighter(NULL),
@@ -101,7 +166,6 @@ Notepad_plus::Notepad_plus():
 	_lastRecentFileList(new LastRecentFileList()),
 	_windowsMenu(NULL), _mainMenuHandle(NULL),
 	_sysMenuEntering(false),
-	_isPrelaunch(false),
 	_recordingMacro(false), _runMacroDlg(NULL),
 	_linkTriggered(true), _isDocModifing(false), _isHotspotDblClicked(false),
 	_isUDDocked(false),
@@ -156,188 +220,549 @@ Notepad_plus::~Notepad_plus()
 	delete _nativeLangSpeaker;
 }
 
-void Notepad_plus::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLine, CmdLineParams *cmdLineParams)
+LRESULT Notepad_plus::init(HWND hwnd)
 {
-	time_t timestampBegin = 0;
-	if (cmdLineParams->_showLoadingTime)
-		timestampBegin = time(NULL);
+	NppParameters *pNppParam = NppParameters::getInstance();
+	NppGUI & nppGUI = pNppParam->getNppGUI();
 
-	Window::init(hInst, parent);
-	WNDCLASS nppClass;
-
-	nppClass.style = CS_BYTEALIGNWINDOW | CS_DBLCLKS;
-	nppClass.lpfnWndProc = Notepad_plus_Proc;
-	nppClass.cbClsExtra = 0;
-	nppClass.cbWndExtra = 0;
-	nppClass.hInstance = _hInst;
-  nppClass.hIcon = ::LoadIcon(hInst, MAKEINTRESOURCE(IDI_M30ICON));
-	nppClass.hCursor = ::LoadCursor(NULL, IDC_ARROW);
-	nppClass.hbrBackground = ::CreateSolidBrush(::GetSysColor(COLOR_MENU));
-	nppClass.lpszMenuName = MAKEINTRESOURCE(IDR_M30_MENU);
-	nppClass.lpszClassName = _className;
-
-	_isPrelaunch = cmdLineParams->_isPreLaunch;
-
-	if (!::RegisterClass(&nppClass))
+	if (!_dockingManager)
 	{
-		systemMessage(TEXT("System Err"));
-		throw int(98);
+		_dockingManager = new DockingManager();
 	}
 
-	RECT workAreaRect;
-	::SystemParametersInfo(SPI_GETWORKAREA, 0, &workAreaRect, 0);
-
-	NppParameters *pNppParams = NppParameters::getInstance();
-	const NppGUI & nppGUI = pNppParams->getNppGUI();
-
-	if (cmdLineParams->_isNoPlugin)
-		_pluginsManager->disable();
-
-	_hSelf = ::CreateWindowEx(
-					WS_EX_ACCEPTFILES | (_nativeLangSpeaker->isRTL()?WS_EX_LAYOUTRTL:0),\
-					_className,\
-					TEXT("Notepad++"),\
-					WS_OVERLAPPEDWINDOW	| WS_CLIPCHILDREN,\
-					// CreateWindowEx bug : set all 0 to walk around the pb
-					0, 0, 0, 0,\
-					_hParent,\
-					NULL,\
-					_hInst,\
-					(LPVOID)this); // pass the ptr of this instantiated object
-                                   // for retrieve it in Notepad_plus_Proc from
-                                   // the CREATESTRUCT.lpCreateParams afterward.
-
-	if (!_hSelf)
+	if (!_toolBar)
 	{
-		systemMessage(TEXT("System Err"));
-		throw int(777);
-	}
-
-	gNppHWND = _hSelf;
-
-	// In setting the startup window position, take into account that the last-saved
-	// position might have assumed a second monitor that's no longer available.
-	POINT newUpperLeft;
-	newUpperLeft.x = nppGUI._appPos.left + workAreaRect.left;
-	newUpperLeft.y = nppGUI._appPos.top + workAreaRect.top;
-
-	winVer winVersion = getWinVersion();
-
-	// GetSystemMetrics does not support the multi-monitor values on Windows NT and Windows 95.
-	if ((winVersion != WV_95) && (winVersion != WV_NT))
-	{
-		int margin = ::GetSystemMetrics(SM_CYSMCAPTION);
-		if (newUpperLeft.x > ::GetSystemMetrics(SM_CXVIRTUALSCREEN)-margin)
-			newUpperLeft.x = workAreaRect.right - nppGUI._appPos.right;
-		if (newUpperLeft.x + nppGUI._appPos.right < ::GetSystemMetrics(SM_XVIRTUALSCREEN)+margin)
-			newUpperLeft.x = workAreaRect.left;
-		if (newUpperLeft.y > ::GetSystemMetrics(SM_CYVIRTUALSCREEN)-margin)
-			newUpperLeft.y = workAreaRect.bottom - nppGUI._appPos.bottom;
-		if (newUpperLeft.y + nppGUI._appPos.bottom < ::GetSystemMetrics(SM_YVIRTUALSCREEN)+margin)
-			newUpperLeft.y = workAreaRect.top;
-	}
-
-	if (cmdLineParams->isPointValid())
-		::MoveWindow(_hSelf, cmdLineParams->_point.x, cmdLineParams->_point.y, nppGUI._appPos.right, nppGUI._appPos.bottom, TRUE);
-	else
-		::MoveWindow(_hSelf, newUpperLeft.x, newUpperLeft.y, nppGUI._appPos.right, nppGUI._appPos.bottom, TRUE);
-
-	if (nppGUI._tabStatus & TAB_MULTILINE)
-		::SendMessage(_hSelf, WM_COMMAND, IDM_VIEW_DRAWTABBAR_MULTILINE, 0);
-
-	if (!nppGUI._menuBarShow)
-		::SetMenu(_hSelf, NULL);
-
-	if (cmdLineParams->_isNoTab || (nppGUI._tabStatus & TAB_HIDE))
-	{
-		::SendMessage(_hSelf, NPPM_HIDETABBAR, 0, TRUE);
-	}
-
-    _rememberThisSession = !cmdLineParams->_isNoSession;
-	if (nppGUI._rememberLastSession && !cmdLineParams->_isNoSession)
-	{
-		loadLastSession();
-	}
-
-	if (!cmdLineParams->_isPreLaunch)
-	{
-		if (cmdLineParams->isPointValid())
-			::ShowWindow(_hSelf, SW_SHOW);
-		else
-			::ShowWindow(_hSelf, nppGUI._isMaximized?SW_MAXIMIZE:SW_SHOW);
-	}
-	else
-	{
-		_pTrayIco = new trayIconControler(_hSelf, IDI_M30ICON, IDC_MINIMIZED_TRAY, ::LoadIcon(_hInst, MAKEINTRESOURCE(IDI_M30ICON)), TEXT(""));
-		_pTrayIco->doTrayIcon(ADD);
-	}
-
-    if (cmdLine)
-    {
-		loadCommandlineParams(cmdLine, cmdLineParams);
-    }
-
-	std::vector<generic_string> fileNames;
-	std::vector<generic_string> patterns;
-	patterns.push_back(TEXT("*.xml"));
-
-	generic_string nppDir = pNppParams->getNppPath();
-#ifdef UNICODE
-	LocalizationSwitcher & localizationSwitcher = pNppParams->getLocalizationSwitcher();
-	std::wstring localizationDir = nppDir;
-	PathAppend(localizationDir, TEXT("localization\\"));
-
-	getMatchedFileNames(localizationDir.c_str(), patterns, fileNames, false, false);
-	for (size_t i = 0 ; i < fileNames.size() ; i++)
-	{
-		localizationSwitcher.addLanguageFromXml(fileNames[i].c_str());
-	}
-#endif
-
-	fileNames.clear();
-	ThemeSwitcher & themeSwitcher = pNppParams->getThemeSwitcher();
-
-	//  Get themes from both npp install themes dir and app data themes dir with the per user
-	//  overriding default themes of the same name.
-	generic_string themeDir(pNppParams->getAppDataNppDir());
-	PathAppend(themeDir, TEXT("themes\\"));
-
-	getMatchedFileNames(themeDir.c_str(), patterns, fileNames, false, false);
-	for (size_t i = 0 ; i < fileNames.size() ; i++)
-	{
-		themeSwitcher.addThemeFromXml(fileNames[i].c_str());
-	}
-
-	fileNames.clear();
-	themeDir.clear();
-	themeDir.assign(nppDir);
-	PathAppend(themeDir, TEXT("themes\\"));
-	getMatchedFileNames(themeDir.c_str(), patterns, fileNames, false, false);
-	for (size_t i = 0 ; i < fileNames.size() ; i++)
-	{
-		generic_string themeName( themeSwitcher.getThemeFromXmlFileName(fileNames[i].c_str()) );
-		if (! themeSwitcher.themeNameExists(themeName.c_str()) )
+		_toolBar = new ToolBar();
+		if (TiXmlDocument *toolIconsDocRoot = (NppParameters::getInstance())->getToolIcons())
 		{
-			themeSwitcher.addThemeFromXml(fileNames[i].c_str());
+			_toolBar->initTheme(toolIconsDocRoot);
 		}
 	}
 
-	// Notify plugins that Notepad++ is ready
+	if (!_statusBar)
+	{
+		_statusBar = new StatusBar();
+	}
+
+	if (!_rebarTop)
+	{
+		_rebarTop = new ReBar();
+	}
+
+	if (!_rebarBottom)
+	{
+		_rebarBottom = new ReBar();
+	}
+
+	// Init dialogs and windows.
+	if(!_findReplaceDlg)
+	{
+		_findReplaceDlg = new FindReplaceDlg();
+	}
+
+	if (!_incrementFindDlg)
+	{
+		_incrementFindDlg = new FindIncrementDlg();
+	}
+
+	if (!_aboutDlg)
+	{
+		_aboutDlg = new AboutDlg();
+	}
+
+	if (!_runDlg)
+	{
+		_runDlg = new RunDlg();
+	}
+
+	if (!_goToLineDlg)
+	{
+		_goToLineDlg = new GoToLineDlg();
+	}
+
+	if (!_colEditorDlg)
+	{
+		_colEditorDlg = new ColumnEditorDlg();
+	}
+
+	if (!_configStyleDlg)
+	{
+		_configStyleDlg = new WordStyleDlg();
+	}
+
+	if (!_preferenceDlg)
+	{
+		_preferenceDlg = new PreferenceDlg();
+	}
+
+	if (!_windowsMenu)
+	{
+		_windowsMenu = new WindowsMenu();
+	}
+
+	if (!_runMacroDlg)
+	{
+		_runMacroDlg = new RunMacroDlg();
+	}
+
+	if (!_smartHighlighter)
+	{
+		_smartHighlighter = new SmartHighlighter(_findReplaceDlg);
+	}
+
+	if (!_docTabIconList)
+	{
+		_docTabIconList = new IconList();
+	}
+
+	if (!_mainDocTab)
+	{
+		_mainDocTab = new DocTabView();
+	}
+
+	if (!_subDocTab)
+	{
+		_subDocTab = new DocTabView();
+	}
+
+	if (!_subSplitter)
+	{
+		_subSplitter = new SplitterContainer();
+	}
+
+	if (!_restoreButton)
+	{
+		_restoreButton = new ButtonDlg();
+	}
+
+	// Menu
+	_mainMenuHandle = ::GetMenu(hwnd);
+	int langPos2BeRemoved = MENUINDEX_LANGUAGE+1;
+	if (nppGUI._isLangMenuCompact)
+		langPos2BeRemoved = MENUINDEX_LANGUAGE;
+	::RemoveMenu(_mainMenuHandle, langPos2BeRemoved, MF_BYPOSITION);
+
+	//Views
+	_pDocTab = _mainDocTab;
+	_pEditView = _mainEditView;
+	_pNonDocTab = _subDocTab;
+	_pNonEditView = _subEditView;
+
+	_mainEditView->init(_pPublicInterface->getHinst(), hwnd);
+	_subEditView->init(_pPublicInterface->getHinst(), hwnd);
+
+	_fileEditView->init(_pPublicInterface->getHinst(), hwnd);
+	MainFileManager->init(this, _fileEditView);	//get it up and running asap.
+
+	pNppParam->setFontList(hwnd);
+
+
+	_mainWindowStatus = WindowMainActive;
+	_activeView = MAIN_VIEW;
+
+	const ScintillaViewParams & svp1 = pNppParam->getSVP(SCIV_PRIMARY);
+	const ScintillaViewParams & svp2 = pNppParam->getSVP(SCIV_SECOND);
+
+	int tabBarStatus = nppGUI._tabStatus;
+	_toReduceTabBar = ((tabBarStatus & TAB_REDUCE) != 0);
+	_docTabIconList->create(_toReduceTabBar?13:20, _pPublicInterface->getHinst(), docTabIconIDs, sizeof(docTabIconIDs)/sizeof(int));
+
+	_mainDocTab->init(_pPublicInterface->getHinst(), hwnd, _mainEditView, _docTabIconList);
+	_subDocTab->init(_pPublicInterface->getHinst(), hwnd, _subEditView, _docTabIconList);
+
+	_mainEditView->display();
+
+	_invisibleEditView->init(_pPublicInterface->getHinst(), hwnd);
+	_invisibleEditView->execute(SCI_SETUNDOCOLLECTION);
+	_invisibleEditView->execute(SCI_EMPTYUNDOBUFFER);
+	_invisibleEditView->wrap(false); // Make sure no slow down
+
+	// Configuration of 2 scintilla views
+	_mainEditView->showMargin(ScintillaEditView::_SC_MARGIN_LINENUMBER, svp1._lineNumberMarginShow);
+	_subEditView->showMargin(ScintillaEditView::_SC_MARGIN_LINENUMBER, svp2._lineNumberMarginShow);
+	_mainEditView->showMargin(ScintillaEditView::_SC_MARGIN_SYMBOL, svp1._bookMarkMarginShow);
+	_subEditView->showMargin(ScintillaEditView::_SC_MARGIN_SYMBOL, svp2._bookMarkMarginShow);
+
+	_mainEditView->showIndentGuideLine(svp1._indentGuideLineShow);
+	_subEditView->showIndentGuideLine(svp2._indentGuideLineShow);
+
+	::SendMessage(hwnd, NPPM_INTERNAL_SETCARETWIDTH, 0, 0);
+	::SendMessage(hwnd, NPPM_INTERNAL_SETCARETBLINKRATE, 0, 0);
+
+	_configStyleDlg->init(_pPublicInterface->getHinst(), hwnd);
+	_preferenceDlg->init(_pPublicInterface->getHinst(), hwnd);
+
+	//Marker Margin config
+	_mainEditView->setMakerStyle(svp1._folderStyle);
+	_subEditView->setMakerStyle(svp2._folderStyle);
+
+	_mainEditView->execute(SCI_SETCARETLINEVISIBLE, svp1._currentLineHilitingShow);
+	_subEditView->execute(SCI_SETCARETLINEVISIBLE, svp2._currentLineHilitingShow);
+
+	_mainEditView->execute(SCI_SETCARETLINEVISIBLEALWAYS, true);
+	_subEditView->execute(SCI_SETCARETLINEVISIBLEALWAYS, true);
+
+	_mainEditView->wrap(svp1._doWrap);
+	_subEditView->wrap(svp2._doWrap);
+
+	_mainEditView->execute(SCI_SETEDGECOLUMN, svp1._edgeNbColumn);
+	_mainEditView->execute(SCI_SETEDGEMODE, svp1._edgeMode);
+	_subEditView->execute(SCI_SETEDGECOLUMN, svp2._edgeNbColumn);
+	_subEditView->execute(SCI_SETEDGEMODE, svp2._edgeMode);
+
+	_mainEditView->showEOL(svp1._eolShow);
+	_subEditView->showEOL(svp2._eolShow);
+
+	_mainEditView->showWSAndTab(svp1._whiteSpaceShow);
+	_subEditView->showWSAndTab(svp2._whiteSpaceShow);
+
+	_mainEditView->showWrapSymbol(svp1._wrapSymbolShow);
+	_subEditView->showWrapSymbol(svp2._wrapSymbolShow);
+
+	_mainEditView->performGlobalStyles();
+	_subEditView->performGlobalStyles();
+
+	_zoomOriginalValue = _pEditView->execute(SCI_GETZOOM);
+	_mainEditView->execute(SCI_SETZOOM, svp1._zoom);
+	_subEditView->execute(SCI_SETZOOM, svp2._zoom);
+
+	EnableMouseWheelZoom(nppGUI._enableMouseWheelZoom);
+
+	::SendMessage(hwnd, NPPM_INTERNAL_SETMULTISELCTION, 0, 0);
+
+	_mainEditView->execute(SCI_SETADDITIONALSELECTIONTYPING, true);
+	_subEditView->execute(SCI_SETADDITIONALSELECTIONTYPING, true);
+
+	_mainEditView->execute(SCI_SETVIRTUALSPACEOPTIONS, SCVS_RECTANGULARSELECTION);
+	_subEditView->execute(SCI_SETVIRTUALSPACEOPTIONS, SCVS_RECTANGULARSELECTION);
+
+	TabBarPlus::doDragNDrop(true);
+
+	if (_toReduceTabBar)
+	{
+		HFONT hf = (HFONT)::GetStockObject(DEFAULT_GUI_FONT);
+
+		if (hf)
+		{
+			::SendMessage(_mainDocTab->getHSelf(), WM_SETFONT, (WPARAM)hf, MAKELPARAM(TRUE, 0));
+			::SendMessage(_subDocTab->getHSelf(), WM_SETFONT, (WPARAM)hf, MAKELPARAM(TRUE, 0));
+		}
+		TabCtrl_SetItemSize(_mainDocTab->getHSelf(), 45, 20);
+		TabCtrl_SetItemSize(_subDocTab->getHSelf(), 45, 20);
+	}
+	_mainDocTab->display();
+
+
+	TabBarPlus::doDragNDrop((tabBarStatus & TAB_DRAGNDROP) != 0);
+	TabBarPlus::setDrawTopBar((tabBarStatus & TAB_DRAWTOPBAR) != 0);
+	TabBarPlus::setDrawInactiveTab((tabBarStatus & TAB_DRAWINACTIVETAB) != 0);
+	TabBarPlus::setDrawTabCloseButton((tabBarStatus & TAB_CLOSEBUTTON) != 0);
+	TabBarPlus::setDbClk2Close((tabBarStatus & TAB_DBCLK2CLOSE) != 0);
+	TabBarPlus::setVertical((tabBarStatus & TAB_VERTICAL) != 0);
+	drawTabbarColoursFromStylerArray();
+
+	//--Splitter Section--//
+	bool isVertical = (nppGUI._splitterPos == POS_VERTICAL);
+
+	_subSplitter->init(_pPublicInterface->getHinst(), hwnd);
+	_subSplitter->create(_mainDocTab, _subDocTab, 8, DYNAMIC, 50, isVertical);
+
+	//--Status Bar Section--//
+	bool willBeShown = nppGUI._statusBarShow;
+	_statusBar->init(_pPublicInterface->getHinst(), hwnd, 6);
+	_statusBar->setPartWidth(STATUSBAR_DOC_SIZE, 250);
+	_statusBar->setPartWidth(STATUSBAR_CUR_POS, 300);
+	_statusBar->setPartWidth(STATUSBAR_EOF_FORMAT, 80);
+	_statusBar->setPartWidth(STATUSBAR_UNICODE_TYPE, 100);
+	_statusBar->setPartWidth(STATUSBAR_TYPING_MODE, 30);
+	_statusBar->display(willBeShown);
+
+	_pMainWindow = _mainDocTab;
+
+	_dockingManager->init(_pPublicInterface->getHinst(), hwnd, &_pMainWindow);
+
+	if (nppGUI._isMinimizedToTray && _pTrayIco == NULL)
+		_pTrayIco = new trayIconControler(hwnd, IDI_M30ICON, IDC_MINIMIZED_TRAY, ::LoadIcon(_pPublicInterface->getHinst(), MAKEINTRESOURCE(IDI_M30ICON)), TEXT(""));
+
+	checkSyncState();
+
+	// Plugin Manager
+	NppData nppData;
+	nppData._nppHandle = hwnd;
+	nppData._scintillaMainHandle = _mainEditView->getHSelf();
+	nppData._scintillaSecondHandle = _subEditView->getHSelf();
+
+	_scintillaCtrls4Plugins.init(_pPublicInterface->getHinst(), hwnd);
+	_pluginsManager->init(nppData);
+	_pluginsManager->loadPlugins();
+	const TCHAR *appDataNpp = pNppParam->getAppDataNppDir();
+	if (appDataNpp[0])
+		_pluginsManager->loadPlugins(appDataNpp);
+
+	_restoreButton->init(_pPublicInterface->getHinst(), _pPublicInterface->getHSelf());
+
+	// ------------ //
+	// Menu Section //
+	// ------------ //
+
+	// Macro Menu
+	std::vector<MacroShortcut> & macros  = pNppParam->getMacroList();
+	HMENU hMacroMenu = ::GetSubMenu(_mainMenuHandle, MENUINDEX_MACRO);
+	size_t const posBase = 6;
+	size_t nbMacro = macros.size();
+	if (nbMacro >= 1)
+		::InsertMenu(hMacroMenu, posBase - 1, MF_BYPOSITION, (unsigned int)-1, 0);
+	for (size_t i = 0 ; i < nbMacro ; i++)
+	{
+		::InsertMenu(hMacroMenu, posBase + i, MF_BYPOSITION, ID_MACRO + i, macros[i].toMenuItemString().c_str());
+	}
+	// Run Menu
+	std::vector<UserCommand> & userCommands = pNppParam->getUserCommandList();
+	HMENU hRunMenu = ::GetSubMenu(_mainMenuHandle, MENUINDEX_RUN);
+	int const runPosBase = 2;
+	size_t nbUserCommand = userCommands.size();
+	if (nbUserCommand >= 1)
+		::InsertMenu(hRunMenu, runPosBase - 1, MF_BYPOSITION, (unsigned int)-1, 0);
+	for (size_t i = 0 ; i < nbUserCommand ; i++)
+	{
+		::InsertMenu(hRunMenu, runPosBase + i, MF_BYPOSITION, ID_USER_CMD + i, userCommands[i].toMenuItemString().c_str());
+	}
+
+	// Updater menu item
+	if (!nppGUI._doesExistUpdater)
+	{
+		//::MessageBox(NULL, TEXT("pas de updater"), TEXT(""), MB_OK);
+		::DeleteMenu(_mainMenuHandle, IDM_UPDATE_NPP, MF_BYCOMMAND);
+		::DrawMenuBar(hwnd);
+	}
+	//Languages Menu
+	HMENU hLangMenu = ::GetSubMenu(_mainMenuHandle, MENUINDEX_LANGUAGE);
+
+	// Add external languages to menu
+	for (int i = 0 ; i < pNppParam->getNbExternalLang() ; i++)
+	{
+		ExternalLangContainer & externalLangContainer = pNppParam->getELCFromIndex(i);
+
+		int numLangs = ::GetMenuItemCount(hLangMenu);
+		const int bufferSize = 100;
+		TCHAR buffer[bufferSize];
+
+		int x;
+		for(x = 0; (x == 0 || lstrcmp(externalLangContainer._name, buffer) > 0) && x < numLangs; x++)
+		{
+			::GetMenuString(hLangMenu, x, buffer, bufferSize, MF_BYPOSITION);
+		}
+
+		::InsertMenu(hLangMenu, x-1, MF_BYPOSITION, IDM_LANG_EXTERNAL + i, externalLangContainer._name);
+	}
+
+	if (nppGUI._excludedLangList.size() > 0)
+	{
+		for (size_t i = 0 ; i < nppGUI._excludedLangList.size() ; i++)
+		{
+			int cmdID = pNppParam->langTypeToCommandID(nppGUI._excludedLangList[i]._langType);
+			const int itemSize = 256;
+			TCHAR itemName[itemSize];
+			::GetMenuString(hLangMenu, cmdID, itemName, itemSize, MF_BYCOMMAND);
+			nppGUI._excludedLangList[i]._cmdID = cmdID;
+			nppGUI._excludedLangList[i]._langName = itemName;
+			::DeleteMenu(hLangMenu, cmdID, MF_BYCOMMAND);
+			DrawMenuBar(hwnd);
+		}
+	}
+
+	// Add User Define Languages Entry
+	int udlpos = ::GetMenuItemCount(hLangMenu);
+
+	if (pNppParam->getNbUserLang() > 0)
+	{
+		::InsertMenu(hLangMenu, udlpos++, MF_BYPOSITION|MF_SEPARATOR, 0, TEXT(""));
+	}
+
+	for (int i = 0 ; i < pNppParam->getNbUserLang() ; i++)
+	{
+		UserLangContainer & userLangContainer = pNppParam->getULCFromIndex(i);
+		::InsertMenu(hLangMenu, udlpos + i, MF_BYPOSITION, IDM_LANG_USER + i + 1, userLangContainer.getName().c_str());
+	}
+
+	//Add recent files
+	HMENU hFileMenu = ::GetSubMenu(_mainMenuHandle, MENUINDEX_FILE);
+	int nbLRFile = pNppParam->getNbLRFile();
+	int pos = IDM_FILEMENU_LASTONE - IDM_FILE + 2;
+
+	_lastRecentFileList->initMenu(hFileMenu, IDM_FILEMENU_LASTONE + 1, pos);
+	_lastRecentFileList->setLangEncoding(_nativeLangSpeaker->getLangEncoding());
+	for (int i = 0 ; i < nbLRFile ; i++)
+	{
+		const generic_string& stdStr = pNppParam->getLRFile(i);
+		if (!nppGUI._checkHistoryFiles || PathFileExists(stdStr.c_str()))
+		{
+			_lastRecentFileList->add(stdStr.c_str());
+		}
+	}
+
+	//Plugin menu
+	_pluginsManager->setMenu(_mainMenuHandle, NULL);
+
+	//Main menu is loaded, now load context menu items
+	pNppParam->getContextMenuFromXmlTree(_mainMenuHandle);
+
+	if (pNppParam->hasCustomContextMenu())
+	{
+		_mainEditView->execute(SCI_USEPOPUP, FALSE);
+		_subEditView->execute(SCI_USEPOPUP, FALSE);
+	}
+
+	generic_string pluginsTrans, windowTrans;
+	_nativeLangSpeaker->changeMenuLang(_mainMenuHandle, pluginsTrans, windowTrans);
+	::DrawMenuBar(_pPublicInterface->getHSelf());
+
+	if (_pluginsManager->hasPlugins() && pluginsTrans != TEXT(""))
+	{
+		::ModifyMenu(_mainMenuHandle, MENUINDEX_PLUGINS, MF_BYPOSITION, 0, pluginsTrans.c_str());
+	}
+	//Windows menu
+	_windowsMenu->init(_pPublicInterface->getHinst(), _mainMenuHandle, windowTrans.c_str());
+
+	// Update context menu strings
+	std::vector<MenuItemUnit> & tmp = pNppParam->getContextMenuItems();
+	size_t len = tmp.size();
+	TCHAR menuName[64];
+	for (size_t i = 0 ; i < len ; i++)
+	{
+		if (tmp[i]._itemName == TEXT(""))
+		{
+			::GetMenuString(_mainMenuHandle, tmp[i]._cmdID, menuName, 64, MF_BYCOMMAND);
+			tmp[i]._itemName = purgeMenuItemString(menuName);
+		}
+	}
+
+	//Input all the menu item names into shortcut list
+	//This will automatically do all translations, since menu translation has been done already
+	std::vector<CommandShortcut> & shortcuts = pNppParam->getUserShortcuts();
+	len = shortcuts.size();
+
+	for(size_t i = 0; i < len; i++)
+	{
+		CommandShortcut & csc = shortcuts[i];
+		if (!csc.getName()[0])
+		{	//no predefined name, get name from menu and use that
+			::GetMenuString(_mainMenuHandle, csc.getID(), menuName, 64, MF_BYCOMMAND);
+			csc.setName(purgeMenuItemString(menuName, true).c_str());
+		}
+	}
+	//Translate non-menu shortcuts
+	_nativeLangSpeaker->changeShortcutLang();
+
+	//Update plugin shortcuts, all plugin commands should be available now
+	pNppParam->reloadPluginCmds();
+
+	// Shortcut Accelerator : should be the last one since it will capture all the shortcuts
+	_accelerator.init(_mainMenuHandle, hwnd);
+	pNppParam->setAccelerator(&_accelerator);
+
+	// Scintilla key accelerator
+	std::vector<HWND> scints;
+	scints.push_back(_mainEditView->getHSelf());
+	scints.push_back(_subEditView->getHSelf());
+	_scintaccelerator.init(&scints, _mainMenuHandle, hwnd);
+
+	pNppParam->setScintillaAccelerator(&_scintaccelerator);
+	_scintaccelerator.updateKeys();
+
+	::DrawMenuBar(hwnd);
+
+
+	//-- Tool Bar Section --//
+	toolBarStatusType tbStatus = nppGUI._toolBarStatus;
+	willBeShown = nppGUI._toolbarShow;
+
+	// To notify plugins that toolbar icons can be registered
 	SCNotification scnN;
-	scnN.nmhdr.code = NPPN_READY;
-	scnN.nmhdr.hwndFrom = _hSelf;
+	scnN.nmhdr.code = NPPN_TBMODIFICATION;
+	scnN.nmhdr.hwndFrom = hwnd;
 	scnN.nmhdr.idFrom = 0;
 	_pluginsManager->notify(&scnN);
 
-	if (cmdLineParams->_showLoadingTime)
-	{
-		time_t timestampEnd = time(NULL);
-		double loadTime = difftime(timestampEnd, timestampBegin);
+	_toolBar->init(_pPublicInterface->getHinst(), hwnd, tbStatus, toolBarIcons, sizeof(toolBarIcons)/sizeof(ToolBarButtonUnit));
 
-		TCHAR dest[256];
-		wsprintf(dest, TEXT("Loading time : %.2lf seconds"), loadTime);
-		::MessageBox(NULL, dest, TEXT(""), MB_OK);
+	changeToolBarIcons();
+
+	_rebarTop->init(_pPublicInterface->getHinst(), hwnd);
+	_rebarBottom->init(_pPublicInterface->getHinst(), hwnd);
+	_toolBar->addToRebar(_rebarTop);
+	_rebarTop->setIDVisible(REBAR_BAR_TOOLBAR, willBeShown);
+
+	//--Init dialogs--//
+	_findReplaceDlg->init(_pPublicInterface->getHinst(), hwnd, &_pEditView);
+	_incrementFindDlg->init(_pPublicInterface->getHinst(), hwnd, _findReplaceDlg, _nativeLangSpeaker->isRTL());
+	_incrementFindDlg->addToRebar(_rebarBottom);
+	_goToLineDlg->init(_pPublicInterface->getHinst(), hwnd, &_pEditView);
+	_colEditorDlg->init(_pPublicInterface->getHinst(), hwnd, &_pEditView);
+	_aboutDlg->init(_pPublicInterface->getHinst(), hwnd);
+	_runDlg->init(_pPublicInterface->getHinst(), hwnd);
+	_runMacroDlg->init(_pPublicInterface->getHinst(), hwnd);
+
+	//--User Define Dialog Section--//
+	int uddStatus = nppGUI._userDefineDlgStatus;
+	UserDefineDialog *udd = ScintillaEditView::getUserDefineDlg();
+
+	bool uddShow = false;
+	switch (uddStatus)
+	{
+		case UDD_SHOW :                 // show & undocked
+			udd->doDialog(true, _nativeLangSpeaker->isRTL());
+			_nativeLangSpeaker->changeUserDefineLang(udd);
+			uddShow = true;
+			break;
+		case UDD_DOCKED : {              // hide & docked
+			_isUDDocked = true;
+			break;}
+		case (UDD_SHOW | UDD_DOCKED) :    // show & docked
+			udd->doDialog(true, _nativeLangSpeaker->isRTL());
+			_nativeLangSpeaker->changeUserDefineLang(udd);
+			::SendMessage(udd->getHSelf(), WM_COMMAND, IDC_DOCK_BUTTON, 0);
+			uddShow = true;
+			break;
+
+		default :                        // hide & undocked
+			break;
 	}
+	// UserDefine Dialog
+
+	checkMenuItem(IDM_VIEW_USER_DLG, uddShow);
+	_toolBar->setCheck(IDM_VIEW_USER_DLG, uddShow);
+
+	//launch the plugin dlg memorized at the last session
+	DockingManagerData &dmd = nppGUI._dockingData;
+
+	_dockingManager->setDockedContSize(CONT_LEFT  , nppGUI._dockingData._leftWidth);
+	_dockingManager->setDockedContSize(CONT_RIGHT , nppGUI._dockingData._rightWidth);
+	_dockingManager->setDockedContSize(CONT_TOP	 , nppGUI._dockingData._topHeight);
+	_dockingManager->setDockedContSize(CONT_BOTTOM, nppGUI._dockingData._bottomHight);
+
+	for (size_t i = 0 ; i < dmd._pluginDockInfo.size() ; i++)
+	{
+		PlugingDlgDockingInfo & pdi = dmd._pluginDockInfo[i];
+
+		if (pdi._isVisible)
+			_pluginsManager->runPluginCommand(pdi._name.c_str(), pdi._internalID);
+	}
+
+	for (size_t i = 0 ; i < dmd._containerTabInfo.size() ; i++)
+	{
+		ContainerTabInfo & cti = dmd._containerTabInfo[i];
+		_dockingManager->setActiveTab(cti._cont, cti._activeTab);
+	}
+	//Load initial docs into doctab
+	loadBufferIntoView(_mainEditView->getCurrentBufferID(), MAIN_VIEW);
+	loadBufferIntoView(_subEditView->getCurrentBufferID(), SUB_VIEW);
+	activateBuffer(_mainEditView->getCurrentBufferID(), MAIN_VIEW);
+	activateBuffer(_subEditView->getCurrentBufferID(), SUB_VIEW);
+	MainFileManager->increaseDocNr();	//so next doc starts at 2
+
+	::SetFocus(_mainEditView->getHSelf());
+	return TRUE;
 }
 
 
@@ -525,13 +950,13 @@ bool Notepad_plus::saveGUIParams()
 	WINDOWPLACEMENT posInfo;
 
     posInfo.length = sizeof(WINDOWPLACEMENT);
-	::GetWindowPlacement(_hSelf, &posInfo);
+	::GetWindowPlacement(_pPublicInterface->getHSelf(), &posInfo);
 
 	nppGUI._appPos.left = posInfo.rcNormalPosition.left;
 	nppGUI._appPos.top = posInfo.rcNormalPosition.top;
 	nppGUI._appPos.right = posInfo.rcNormalPosition.right - posInfo.rcNormalPosition.left;
 	nppGUI._appPos.bottom = posInfo.rcNormalPosition.bottom - posInfo.rcNormalPosition.top;
-	nppGUI._isMaximized = (IsZoomed(_hSelf) || (posInfo.flags & WPF_RESTORETOMAXIMIZED));
+	nppGUI._isMaximized = (IsZoomed(_pPublicInterface->getHSelf()) || (posInfo.flags & WPF_RESTORETOMAXIMIZED));
 
 	saveDockingParams();
 
@@ -983,13 +1408,13 @@ bool Notepad_plus::replaceInFiles()
 	getMatchedFileNames(dir2Search, patterns2Match, fileNames, isRecursive, isInHiddenDir);
 
 	if (fileNames.size() > 1)
-		CancelThreadHandle = ::CreateThread(NULL, 0, AsyncCancelFindInFiles, _hSelf, 0, NULL);
+		CancelThreadHandle = ::CreateThread(NULL, 0, AsyncCancelFindInFiles, _pPublicInterface->getHSelf(), 0, NULL);
 
 	bool dontClose = false;
 	for (size_t i = 0 ; i < fileNames.size() ; i++)
 	{
 		MSG msg;
-		if (PeekMessage(&msg, _hSelf, NPPM_INTERNAL_CANCEL_FIND_IN_FILES, NPPM_INTERNAL_CANCEL_FIND_IN_FILES, PM_REMOVE)) break;
+		if (PeekMessage(&msg, _pPublicInterface->getHSelf(), NPPM_INTERNAL_CANCEL_FIND_IN_FILES, NPPM_INTERNAL_CANCEL_FIND_IN_FILES, PM_REMOVE)) break;
 
 		BufferID id = MainFileManager->getBufferFromName(fileNames.at(i).c_str());
 		if (id != BUFFER_INVALID)
@@ -1065,7 +1490,7 @@ bool Notepad_plus::findInFiles()
 	getMatchedFileNames(dir2Search, patterns2Match, fileNames, isRecursive, isInHiddenDir);
 
 	if (fileNames.size() > 1)
-		CancelThreadHandle = ::CreateThread(NULL, 0, AsyncCancelFindInFiles, _hSelf, 0, NULL);
+		CancelThreadHandle = ::CreateThread(NULL, 0, AsyncCancelFindInFiles, _pPublicInterface->getHSelf(), 0, NULL);
 
 	_findReplaceDlg->beginNewFilesSearch();
 
@@ -1073,7 +1498,7 @@ bool Notepad_plus::findInFiles()
 	for (size_t i = 0 ; i < fileNames.size() ; i++)
 	{
 		MSG msg;
-		if (PeekMessage(&msg, _hSelf, NPPM_INTERNAL_CANCEL_FIND_IN_FILES, NPPM_INTERNAL_CANCEL_FIND_IN_FILES, PM_REMOVE)) break;
+		if (PeekMessage(&msg, _pPublicInterface->getHSelf(), NPPM_INTERNAL_CANCEL_FIND_IN_FILES, NPPM_INTERNAL_CANCEL_FIND_IN_FILES, PM_REMOVE)) break;
 
 		BufferID id = MainFileManager->getBufferFromName(fileNames.at(i).c_str());
 		if (id != BUFFER_INVALID)
@@ -1209,7 +1634,7 @@ void Notepad_plus::filePrint(bool showDialog)
 	int startPos = int(_pEditView->execute(SCI_GETSELECTIONSTART));
 	int endPos = int(_pEditView->execute(SCI_GETSELECTIONEND));
 
-	printer.init(_hInst, _hSelf, _pEditView, showDialog, startPos, endPos);
+	printer.init(_pPublicInterface->getHinst(), _pPublicInterface->getHSelf(), _pEditView, showDialog, startPos, endPos);
 	printer.doPrint();
 }
 
@@ -1249,7 +1674,7 @@ int Notepad_plus::doDeleteOrNot(const TCHAR *fn)
 
 int Notepad_plus::doActionOrNot(const TCHAR *title, const TCHAR *displayText, int type)
 {
-	return ::MessageBox(_hSelf, displayText, title, type);
+	return ::MessageBox(_pPublicInterface->getHSelf(), displayText, title, type);
 }
 
 void Notepad_plus::enableMenu(int cmdID, bool doEnable) const
@@ -1491,7 +1916,7 @@ void Notepad_plus::pasteToMarkedLines()
 		return;
 	int lastLine = _pEditView->lastZeroBasedLineNumber();
 
-	::OpenClipboard(_hSelf);
+	::OpenClipboard(_pPublicInterface->getHSelf());
 	HANDLE clipboardData = ::GetClipboardData(clipFormat);
 	::GlobalSize(clipboardData);
 	LPVOID clipboardDataPtr = ::GlobalLock(clipboardData);
@@ -1936,12 +2361,12 @@ void Notepad_plus::specialCmd(int id, int param)
 			assert(_preferenceDlg);
 			ValueDlg nbColumnEdgeDlg;
 			ScintillaViewParams & svp = (ScintillaViewParams &)pNppParam->getSVP(param == 1?SCIV_PRIMARY:SCIV_SECOND);
-			nbColumnEdgeDlg.init(_hInst, _preferenceDlg->getHSelf(), svp._edgeNbColumn, TEXT("Nb of column:"));
+			nbColumnEdgeDlg.init(_pPublicInterface->getHinst(), _preferenceDlg->getHSelf(), svp._edgeNbColumn, TEXT("Nb of column:"));
 			nbColumnEdgeDlg.setNBNumber(3);
 
 			POINT p;
 			::GetCursorPos(&p);
-			::ScreenToClient(_hParent, &p);
+			::ScreenToClient(_pPublicInterface->getHParent(), &p);
 			int size = nbColumnEdgeDlg.doDialog(p, _nativeLangSpeaker->isRTL());
 
 			if (size != -1)
@@ -2131,8 +2556,9 @@ void Notepad_plus::setTitle()
 	result += TEXT(" - ");
 	result += TEXT("Notepad++ CR");
 	//::SetWindowText(_hSelf, title);
-	::SendMessage(_hSelf, WM_SETTEXT, 0, (LPARAM)result.c_str());
+	::SendMessage(_pPublicInterface->getHSelf(), WM_SETTEXT, 0, (LPARAM)result.c_str());
 
+	::SendMessage(_pPublicInterface->getHSelf(), WM_SETTEXT, 0, (LPARAM)result.c_str());
 }
 
 void Notepad_plus::activateNextDoc(bool direction)
@@ -2333,7 +2759,7 @@ void Notepad_plus::dropFiles(HDROP hdrop)
 		// Determinate in which view the file(s) is (are) dropped
 		POINT p;
 		::DragQueryPoint(hdrop, &p);
-		HWND hWin = ::RealChildWindowFromPoint(_hSelf, p);
+		HWND hWin = ::RealChildWindowFromPoint(_pPublicInterface->getHSelf(), p);
 		if (!hWin) return;
 
 		if ((_mainEditView->getHSelf() == hWin) || (_mainDocTab->getHSelf() == hWin))
@@ -2365,11 +2791,11 @@ void Notepad_plus::dropFiles(HDROP hdrop)
 		// May not work for Win2k, but OK for lower versions
 		// Note: how to drop a file to an iconic window?
 		// Actually, it is the Send To command that generates a drop.
-		if (::IsIconic(_hSelf))
+		if (::IsIconic(_pPublicInterface->getHSelf()))
 		{
-			::ShowWindow(_hSelf, SW_RESTORE);
+			::ShowWindow(_pPublicInterface->getHSelf(), SW_RESTORE);
 		}
-		::SetForegroundWindow(_hSelf);
+		::SetForegroundWindow(_pPublicInterface->getHSelf());
 	}
 }
 
@@ -2384,7 +2810,7 @@ void Notepad_plus::getMainClientRect(RECT &rc) const
 	assert(_rebarTop);
 	assert(_rebarBottom);
 	assert(_statusBar);
-    getClientRect(rc);
+    _pPublicInterface->getClientRect(rc);
 	rc.top += _rebarTop->getHeight();
 	rc.bottom -= rc.top + _rebarBottom->getHeight() + _statusBar->getHeight();
 }
@@ -2416,7 +2842,7 @@ void Notepad_plus::showView(int whichOne) {
 	_mainWindowStatus |= (whichOne==MAIN_VIEW)?WindowMainActive:WindowSubActive;
 
 	//Send sizing info to make windows fit
-	::SendMessage(_hSelf, WM_SIZE, 0, 0);
+	::SendMessage(_pPublicInterface->getHSelf(), WM_SIZE, 0, 0);
 }
 
 bool Notepad_plus::viewVisible(int whichOne) {
@@ -2457,7 +2883,7 @@ void Notepad_plus::hideView(int whichOne)
 	}
 
 	// resize the main window
-	::SendMessage(_hSelf, WM_SIZE, 0, 0);
+	::SendMessage(_pPublicInterface->getHSelf(), WM_SIZE, 0, 0);
 
 	switchEditViewTo(otherFromView(whichOne));
 	int viewToDisable = (whichOne == SUB_VIEW?WindowSubActive:WindowMainActive);
@@ -2602,7 +3028,7 @@ void Notepad_plus::dockUserDlg()
     if (!_pMainSplitter)
     {
         _pMainSplitter = new SplitterContainer;
-        _pMainSplitter->init(_hInst, _hSelf);
+		_pMainSplitter->init(_pPublicInterface->getHinst(), _pPublicInterface->getHSelf());
 
         Window *pWindow;
 		if (_mainWindowStatus & (WindowMainActive | WindowSubActive))
@@ -2623,7 +3049,7 @@ void Notepad_plus::dockUserDlg()
     _mainWindowStatus |= WindowUserActive;
     _pMainWindow = _pMainSplitter;
 
-	::SendMessage(_hSelf, WM_SIZE, 0, 0);
+	::SendMessage(_pPublicInterface->getHSelf(), WM_SIZE, 0, 0);
 }
 
 void Notepad_plus::undockUserDlg()
@@ -2641,7 +3067,7 @@ void Notepad_plus::undockUserDlg()
         _pMainWindow = _pDocTab;
     }
 
-    ::SendMessage(_hSelf, WM_SIZE, 0, 0);
+    ::SendMessage(_pPublicInterface->getHSelf(), WM_SIZE, 0, 0);
 
     _mainWindowStatus &= ~WindowUserActive;
     (ScintillaEditView::getUserDefineDlg())->display();
@@ -2670,12 +3096,12 @@ void Notepad_plus::docOpenInNewInstance(FileTransferMode mode, int x, int y)
 	command += pY;
 
 	Command cmd(command);
-	cmd.run(_hSelf);
+	cmd.run(_pPublicInterface->getHSelf());
 	if (mode == TransferMove)
 	{
 		doClose(bufferID, currentView());
 		if (noOpenedDoc())
-			::SendMessage(_hSelf, WM_CLOSE, 0, 0);
+			::SendMessage(_pPublicInterface->getHSelf(), WM_CLOSE, 0, 0);
 	}
 }
 
@@ -2735,7 +3161,7 @@ void Notepad_plus::docGotoAnotherEditView(FileTransferMode mode)
 		//just close the activate document, since thats the one we moved (no search)
 		doClose(_pEditView->getCurrentBufferID(), currentView());
 		if (noOpenedDoc())
-			::SendMessage(_hSelf, WM_CLOSE, 0, 0);
+			::SendMessage(_pPublicInterface->getHSelf(), WM_CLOSE, 0, 0);
 	} // else it was cone, so leave it
 
 	//Activate the other view since thats where the document went
@@ -3231,7 +3657,7 @@ bool Notepad_plus::addCurrentMacro()
 
 	int cmdID = ID_MACRO + nbMacro;
 	MacroShortcut ms(Shortcut(), _macro, cmdID);
-	ms.init(_hInst, _hSelf);
+	ms.init(_pPublicInterface->getHinst(), _pPublicInterface->getHSelf());
 
 	if (ms.doDialog() != -1)
 	{
@@ -3313,15 +3739,6 @@ void Notepad_plus::getTaskListInfo(TaskListInfo *tli)
 	}
 }
 
-bool Notepad_plus::isDlgsMsg(MSG *msg, bool unicodeSupported) const
-{
-	for (size_t i = 0; i < _hModelessDlgs.size(); i++)
-	{
-		if (unicodeSupported?(::IsDialogMessageW(_hModelessDlgs[i], msg)):(::IsDialogMessageA(_hModelessDlgs[i], msg)))
-			return true;
-	}
-	return false;
-}
 
 bool Notepad_plus::goToPreviousIndicator(int indicID2Search, bool isWrap) const
 {
@@ -3436,7 +3853,7 @@ void Notepad_plus::fullScreenToggle()
 	if (!_beforeSpecialView.isFullScreen)	//toggle fullscreen on
 	{
 		_beforeSpecialView._winPlace.length = sizeof(_beforeSpecialView._winPlace);
-		::GetWindowPlacement(_hSelf, &_beforeSpecialView._winPlace);
+		::GetWindowPlacement(_pPublicInterface->getHSelf(), &_beforeSpecialView._winPlace);
 
 		RECT fullscreenArea;		//RECT used to calculate window fullscreen size
 		//Preset view area, in case something fails, primary monitor values
@@ -3450,7 +3867,7 @@ void Notepad_plus::fullScreenToggle()
 			HMONITOR currentMonitor;	//Handle to monitor where fullscreen should go
 			MONITORINFO mi;				//Info of that monitor
 			//Caution, this will not work on windows 95, so probably add some checking of some sorts like Unicode checks, IF 95 were to be supported
-			currentMonitor = ::MonitorFromWindow(_hSelf, MONITOR_DEFAULTTONEAREST);	//should always be valid monitor handle
+			currentMonitor = ::MonitorFromWindow(_pPublicInterface->getHSelf(), MONITOR_DEFAULTTONEAREST);	//should always be valid monitor handle
 			mi.cbSize = sizeof(MONITORINFO);
 			if (::GetMonitorInfo(currentMonitor, &mi) != FALSE)
 			{
@@ -3469,9 +3886,9 @@ void Notepad_plus::fullScreenToggle()
         else
 		{
 			//only change the GUI if not already done by postit
-			_beforeSpecialView.isMenuShown = ::SendMessage(_hSelf, NPPM_ISMENUHIDDEN, 0, 0) != TRUE;
+			_beforeSpecialView.isMenuShown = ::SendMessage(_pPublicInterface->getHSelf(), NPPM_ISMENUHIDDEN, 0, 0) != TRUE;
 			if (_beforeSpecialView.isMenuShown)
-				::SendMessage(_hSelf, NPPM_HIDEMENU, 0, TRUE);
+				::SendMessage(_pPublicInterface->getHSelf(), NPPM_HIDEMENU, 0, TRUE);
 
 			//Hide rebar
 			_rebarTop->display(false);
@@ -3480,21 +3897,21 @@ void Notepad_plus::fullScreenToggle()
         _restoreButton->setButtonStatus(bs);
 
 		//Hide window so windows can properly update it
-		::ShowWindow(_hSelf, SW_HIDE);
+		::ShowWindow(_pPublicInterface->getHSelf(), SW_HIDE);
 
 		//Set popup style for fullscreen window and store the old style
 		if (!_beforeSpecialView.isPostIt)
 		{
-			_beforeSpecialView.preStyle = ::SetWindowLongPtr(_hSelf, GWL_STYLE, WS_POPUP);
+			_beforeSpecialView.preStyle = ::SetWindowLongPtr(_pPublicInterface->getHSelf(), GWL_STYLE, WS_POPUP);
 			if (!_beforeSpecialView.preStyle) {	//something went wrong, use default settings
 				_beforeSpecialView.preStyle = WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN;
 			}
 		}
 
 		//Set fullscreen window, highest non-top z-order, show the window and redraw it (refreshing the windowmanager cache aswell)
-		::ShowWindow(_hSelf, SW_SHOW);
-		::SetWindowPos(_hSelf, HWND_TOP, fullscreenArea.left, fullscreenArea.top, fullscreenArea.right, fullscreenArea.bottom, SWP_NOZORDER|SWP_DRAWFRAME|SWP_FRAMECHANGED);
-		::SetForegroundWindow(_hSelf);
+		::ShowWindow(_pPublicInterface->getHSelf(), SW_SHOW);
+		::SetWindowPos(_pPublicInterface->getHSelf(), HWND_TOP, fullscreenArea.left, fullscreenArea.top, fullscreenArea.right, fullscreenArea.bottom, SWP_NOZORDER|SWP_DRAWFRAME|SWP_FRAMECHANGED);
+		::SetForegroundWindow(_pPublicInterface->getHSelf());
 
         // show restore button
         _restoreButton->doDialog(_nativeLangSpeaker->isRTL());
@@ -3505,7 +3922,7 @@ void Notepad_plus::fullScreenToggle()
 	    int h = rect.bottom - rect.top;
 
         RECT nppRect;
-        GetWindowRect(_hSelf, &nppRect);
+        GetWindowRect(_pPublicInterface->getHSelf(), &nppRect);
         int x = nppRect.right - w;
         int y = nppRect.top;
         ::MoveWindow(_restoreButton->getHSelf(), x, y, w, h, FALSE);
@@ -3515,7 +3932,7 @@ void Notepad_plus::fullScreenToggle()
 	else	//toggle fullscreen off
 	{
 		//Hide window for updating, restore style and menu then restore position and Z-Order
-		::ShowWindow(_hSelf, SW_HIDE);
+		::ShowWindow(_pPublicInterface->getHSelf(), SW_HIDE);
 
         _restoreButton->setButtonStatus(buttonStatus_fullscreen ^ _restoreButton->getButtonStatus());
         _restoreButton->display(false);
@@ -3525,7 +3942,7 @@ void Notepad_plus::fullScreenToggle()
 		{
 			//only change the GUI if postit isnt active
 			if (_beforeSpecialView.isMenuShown)
-				::SendMessage(_hSelf, NPPM_HIDEMENU, 0, FALSE);
+				::SendMessage(_pPublicInterface->getHSelf(), NPPM_HIDEMENU, 0, FALSE);
 
 			//Show rebar
 			_rebarTop->display(true);
@@ -3535,32 +3952,31 @@ void Notepad_plus::fullScreenToggle()
 		//Set old style if not fullscreen
 		if (!_beforeSpecialView.isPostIt)
 		{
-			::SetWindowLongPtr( _hSelf, GWL_STYLE, _beforeSpecialView.preStyle);
+			::SetWindowLongPtr( _pPublicInterface->getHSelf(), GWL_STYLE, _beforeSpecialView.preStyle);
 			//Redraw the window and refresh windowmanager cache, dont do anything else, sizing is done later on
-			::SetWindowPos(_hSelf, HWND_TOP,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER|SWP_DRAWFRAME|SWP_FRAMECHANGED);
-			::ShowWindow(_hSelf, SW_SHOW);
+			::SetWindowPos(_pPublicInterface->getHSelf(), HWND_TOP,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER|SWP_DRAWFRAME|SWP_FRAMECHANGED);
+			::ShowWindow(_pPublicInterface->getHSelf(), SW_SHOW);
 		}
 
 		if (_beforeSpecialView._winPlace.length)
 		{
 			if (_beforeSpecialView._winPlace.showCmd == SW_SHOWMAXIMIZED)
 			{
-				//::ShowWindow(_hSelf, SW_RESTORE);
-				::ShowWindow(_hSelf, SW_SHOWMAXIMIZED);
+				::ShowWindow(_pPublicInterface->getHSelf(), SW_SHOWMAXIMIZED);
 			}
 			else
 			{
-				::SetWindowPlacement(_hSelf, &_beforeSpecialView._winPlace);
+				::SetWindowPlacement(_pPublicInterface->getHSelf(), &_beforeSpecialView._winPlace);
 			}
 		}
 		else	//fallback
 		{
-			::ShowWindow(_hSelf, SW_SHOW);
+			::ShowWindow(_pPublicInterface->getHSelf(), SW_SHOW);
 		}
 	}
-	//::SetForegroundWindow(_hSelf);
+	//::SetForegroundWindow(_pPublicInterface->getHSelf());
 	_beforeSpecialView.isFullScreen = !_beforeSpecialView.isFullScreen;
-	::SendMessage(_hSelf, WM_SIZE, 0, 0);
+	::SendMessage(_pPublicInterface->getHSelf(), WM_SIZE, 0, 0);
     if (_beforeSpecialView.isPostIt)
     {
         // show restore button on the right position
@@ -3570,7 +3986,7 @@ void Notepad_plus::fullScreenToggle()
         int h = rect.bottom - rect.top;
 
         RECT nppRect;
-        GetWindowRect(_hSelf, &nppRect);
+        GetWindowRect(_pPublicInterface->getHSelf(), &nppRect);
         int x = nppRect.right - w - w;
         int y = nppRect.top + 1;
         ::MoveWindow(_restoreButton->getHSelf(), x, y, w, h, FALSE);
@@ -3589,14 +4005,14 @@ void Notepad_plus::postItToggle()
 		//check these always
 		{
 			_beforeSpecialView.isAlwaysOnTop = ::GetMenuState(_mainMenuHandle, IDM_VIEW_ALWAYSONTOP, MF_BYCOMMAND) == MF_CHECKED;
-			_beforeSpecialView.isTabbarShown = ::SendMessage(_hSelf, NPPM_ISTABBARHIDDEN, 0, 0) != TRUE;
+			_beforeSpecialView.isTabbarShown = ::SendMessage(_pPublicInterface->getHSelf(), NPPM_ISTABBARHIDDEN, 0, 0) != TRUE;
 			_beforeSpecialView.isStatusbarShown = nppGUI._statusBarShow;
 			if (nppGUI._statusBarShow)
-				::SendMessage(_hSelf, NPPM_HIDESTATUSBAR, 0, TRUE);
+				::SendMessage(_pPublicInterface->getHSelf(), NPPM_HIDESTATUSBAR, 0, TRUE);
 			if (_beforeSpecialView.isTabbarShown)
-				::SendMessage(_hSelf, NPPM_HIDETABBAR, 0, TRUE);
+				::SendMessage(_pPublicInterface->getHSelf(), NPPM_HIDETABBAR, 0, TRUE);
 			if (!_beforeSpecialView.isAlwaysOnTop)
-				::SendMessage(_hSelf, WM_COMMAND, IDM_VIEW_ALWAYSONTOP, 0);
+				::SendMessage(_pPublicInterface->getHSelf(), WM_COMMAND, IDM_VIEW_ALWAYSONTOP, 0);
 		}
 		//Only check these if not fullscreen
         int bs = buttonStatus_postit;
@@ -3606,9 +4022,9 @@ void Notepad_plus::postItToggle()
         }
         else
 		{
-			_beforeSpecialView.isMenuShown = ::SendMessage(_hSelf, NPPM_ISMENUHIDDEN, 0, 0) != TRUE;
+			_beforeSpecialView.isMenuShown = ::SendMessage(_pPublicInterface->getHSelf(), NPPM_ISMENUHIDDEN, 0, 0) != TRUE;
 			if (_beforeSpecialView.isMenuShown)
-				::SendMessage(_hSelf, NPPM_HIDEMENU, 0, TRUE);
+				::SendMessage(_pPublicInterface->getHSelf(), NPPM_HIDEMENU, 0, TRUE);
 
 			//Hide rebar
 			_rebarTop->display(false);
@@ -3622,14 +4038,14 @@ void Notepad_plus::postItToggle()
 		if (!_beforeSpecialView.isFullScreen)
 		{
 			//Hide window so windows can properly update it
-			::ShowWindow(_hSelf, SW_HIDE);
-			_beforeSpecialView.preStyle = ::SetWindowLongPtr( _hSelf, GWL_STYLE, WS_POPUP );
+			::ShowWindow(_pPublicInterface->getHSelf(), SW_HIDE);
+			_beforeSpecialView.preStyle = ::SetWindowLongPtr( _pPublicInterface->getHSelf(), GWL_STYLE, WS_POPUP );
 			if (!_beforeSpecialView.preStyle) {	//something went wrong, use default settings
 				_beforeSpecialView.preStyle = WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN;
 			}
 			//Redraw the window and refresh windowmanager cache, dont do anything else, sizing is done later on
-			::SetWindowPos(_hSelf, HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER|SWP_DRAWFRAME|SWP_FRAMECHANGED);
-			::ShowWindow(_hSelf, SW_SHOW);
+			::SetWindowPos(_pPublicInterface->getHSelf(), HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER|SWP_DRAWFRAME|SWP_FRAMECHANGED);
+			::ShowWindow(_pPublicInterface->getHSelf(), SW_SHOW);
 		}
 
         // show restore button
@@ -3641,7 +4057,7 @@ void Notepad_plus::postItToggle()
 	    int h = rect.bottom - rect.top;
 
         RECT nppRect;
-        GetWindowRect(_hSelf, &nppRect);
+        GetWindowRect(_pPublicInterface->getHSelf(), &nppRect);
         int x = nppRect.right - w - w;
         int y = nppRect.top + 1;
         ::MoveWindow(_restoreButton->getHSelf(), x, y, w, h, FALSE);
@@ -3658,7 +4074,7 @@ void Notepad_plus::postItToggle()
 		{
 			//only change the these parts of GUI if not already done by fullscreen
 			if (_beforeSpecialView.isMenuShown)
-				::SendMessage(_hSelf, NPPM_HIDEMENU, 0, FALSE);
+				::SendMessage(_pPublicInterface->getHSelf(), NPPM_HIDEMENU, 0, FALSE);
 
 			//Show rebar
 			_rebarTop->display(true);
@@ -3666,27 +4082,27 @@ void Notepad_plus::postItToggle()
 		}
 		//Do this GUI config always
 		if (_beforeSpecialView.isStatusbarShown)
-			::SendMessage(_hSelf, NPPM_HIDESTATUSBAR, 0, FALSE);
+			::SendMessage(_pPublicInterface->getHSelf(), NPPM_HIDESTATUSBAR, 0, FALSE);
 		if (_beforeSpecialView.isTabbarShown)
-			::SendMessage(_hSelf, NPPM_HIDETABBAR, 0, FALSE);
+			::SendMessage(_pPublicInterface->getHSelf(), NPPM_HIDETABBAR, 0, FALSE);
 		if (!_beforeSpecialView.isAlwaysOnTop)
-			::SendMessage(_hSelf, WM_COMMAND, IDM_VIEW_ALWAYSONTOP, 0);
+			::SendMessage(_pPublicInterface->getHSelf(), WM_COMMAND, IDM_VIEW_ALWAYSONTOP, 0);
 
 		//restore window style if not fullscreen
 		if (!_beforeSpecialView.isFullScreen)
 		{
 			//dwStyle |= (WS_CAPTION | WS_SIZEBOX);
-			::ShowWindow(_hSelf, SW_HIDE);
-			::SetWindowLongPtr(_hSelf, GWL_STYLE, _beforeSpecialView.preStyle);
+			::ShowWindow(_pPublicInterface->getHSelf(), SW_HIDE);
+			::SetWindowLongPtr(_pPublicInterface->getHSelf(), GWL_STYLE, _beforeSpecialView.preStyle);
 
 			//Redraw the window and refresh windowmanager cache, dont do anything else, sizing is done later on
-			::SetWindowPos(_hSelf, HWND_NOTOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER|SWP_DRAWFRAME|SWP_FRAMECHANGED);
-			::ShowWindow(_hSelf, SW_SHOW);
+			::SetWindowPos(_pPublicInterface->getHSelf(), HWND_NOTOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER|SWP_DRAWFRAME|SWP_FRAMECHANGED);
+			::ShowWindow(_pPublicInterface->getHSelf(), SW_SHOW);
 		}
 	}
 
 	_beforeSpecialView.isPostIt = !_beforeSpecialView.isPostIt;
-	::SendMessage(_hSelf, WM_SIZE, 0, 0);
+	::SendMessage(_pPublicInterface->getHSelf(), WM_SIZE, 0, 0);
 }
 
 void Notepad_plus::doSynScorll(HWND whichView)
@@ -3866,7 +4282,7 @@ bool Notepad_plus::str2Cliboard(const TCHAR *str2cpy)
 		return false;
 	}
 
-	if (!::OpenClipboard(_hSelf))
+	if (!::OpenClipboard(_pPublicInterface->getHSelf()))
 		return false;
 
 	::EmptyClipboard();
@@ -3999,8 +4415,8 @@ void Notepad_plus::notifyBufferChanged(Buffer * buffer, int mask)
 			int curPos = _pEditView->execute(SCI_GETCURRENTPOS);
 			::PostMessage(_pEditView->getHSelf(), WM_LBUTTONUP, 0, 0);
 			::PostMessage(_pEditView->getHSelf(), SCI_SETSEL, curPos, curPos);
-			if (::IsIconic(_hSelf))
-				::ShowWindow(_hSelf, SW_RESTORE);
+			if (::IsIconic(_pPublicInterface->getHSelf()))
+				::ShowWindow(_pPublicInterface->getHSelf(), SW_RESTORE);
 		}
 	}
 
@@ -4064,7 +4480,7 @@ void Notepad_plus::notifyBufferChanged(Buffer * buffer, int mask)
 
 		SCNotification scnN;
 		scnN.nmhdr.code = NPPN_LANGCHANGED;
-		scnN.nmhdr.hwndFrom = _hSelf;
+		scnN.nmhdr.hwndFrom = _pPublicInterface->getHSelf();
 		scnN.nmhdr.idFrom = (uptr_t)_pEditView->getCurrentBufferID();
 		_pluginsManager->notify(&scnN);
 	}
@@ -4117,7 +4533,7 @@ void Notepad_plus::notifyBufferActivated(BufferID bufid, int view)
 
 	SCNotification scnN;
 	scnN.nmhdr.code = NPPN_BUFFERACTIVATED;
-	scnN.nmhdr.hwndFrom = _hSelf;
+	scnN.nmhdr.hwndFrom = _pPublicInterface->getHSelf();
 	scnN.nmhdr.idFrom = (uptr_t)bufid;
 	_pluginsManager->notify(&scnN);
 
@@ -4225,6 +4641,58 @@ void Notepad_plus::setFindReplaceFolderFilter(const TCHAR *dir, const TCHAR *fil
 		filter = fltr.c_str();
 	}
 	_findReplaceDlg->setFindInFilesDirFilter(dir, filter);
+}
+
+std::vector<generic_string> Notepad_plus::addNppComponents(const TCHAR *destDir, const TCHAR *extFilterName, const TCHAR *extFilter)
+{
+    FileDialog fDlg(_pPublicInterface->getHSelf(), _pPublicInterface->getHinst());
+    fDlg.setExtFilter(extFilterName, extFilter, NULL);
+
+    std::vector<generic_string> copiedFiles;
+
+    if (stringVector *pfns = fDlg.doOpenMultiFilesDlg())
+    {
+        // Get plugins dir
+		generic_string destDirName = (NppParameters::getInstance())->getNppPath();
+        PathAppend(destDirName, destDir);
+
+        if (!::PathFileExists(destDirName.c_str()))
+        {
+            ::CreateDirectory(destDirName.c_str(), NULL);
+        }
+
+        destDirName += TEXT("\\");
+
+        size_t sz = pfns->size();
+        for (size_t i = 0 ; i < sz ; i++)
+        {
+            if (::PathFileExists(pfns->at(i).c_str()))
+            {
+                // copy to plugins directory
+                generic_string destName = destDirName;
+                destName += ::PathFindFileName(pfns->at(i).c_str());
+                //printStr(destName.c_str());
+                if (::CopyFile(pfns->at(i).c_str(), destName.c_str(), FALSE))
+                    copiedFiles.push_back(destName.c_str());
+            }
+        }
+    }
+    return copiedFiles;
+}
+
+void Notepad_plus::setWorkingDir(const TCHAR *dir)
+{
+	NppParameters * params = NppParameters::getInstance();
+	if (params->getNppGUI()._openSaveDir == dir_last)
+		return;
+	if (params->getNppGUI()._openSaveDir == dir_userDef)
+	{
+		params->setWorkingDir(NULL);
+	}
+	else if (dir && PathIsDirectory(dir))
+	{
+		params->setWorkingDir(dir);
+	}
 }
 
 void Notepad_plus::bookmarkAdd(int lineno) const
@@ -4366,58 +4834,6 @@ void Notepad_plus::checkMenuItem(int itemID, bool willBeChecked) const
 	::CheckMenuItem(_mainMenuHandle, itemID, MF_BYCOMMAND | (willBeChecked?MF_CHECKED:MF_UNCHECKED));
 }
 
-std::vector<generic_string> Notepad_plus::addNppComponents(const TCHAR *destDir, const TCHAR *extFilterName, const TCHAR *extFilter)
-{
-    FileDialog fDlg(_hSelf, _hInst);
-    fDlg.setExtFilter(extFilterName, extFilter, NULL);
-
-    //setFileOpenSaveDlgFilters(fDlg);
-    std::vector<generic_string> copiedFiles;
-
-    if (stringVector *pfns = fDlg.doOpenMultiFilesDlg())
-    {
-        // Get plugins dir
-		generic_string destDirName = (NppParameters::getInstance())->getNppPath();
-        PathAppend(destDirName, destDir);
-
-        if (!::PathFileExists(destDirName.c_str()))
-        {
-            ::CreateDirectory(destDirName.c_str(), NULL);
-        }
-
-        destDirName += TEXT("\\");
-
-        size_t sz = pfns->size();
-        for (size_t i = 0 ; i < sz ; i++)
-        {
-            if (::PathFileExists(pfns->at(i).c_str()))
-            {
-                // copy to plugins directory
-                generic_string destName = destDirName;
-                destName += ::PathFindFileName(pfns->at(i).c_str());
-                //printStr(destName.c_str());
-                if (::CopyFile(pfns->at(i).c_str(), destName.c_str(), FALSE))
-                    copiedFiles.push_back(destName.c_str());
-            }
-        }
-    }
-    return copiedFiles;
-}
-
-void Notepad_plus::setWorkingDir(const TCHAR *dir)
-{
-	NppParameters * params = NppParameters::getInstance();
-	if (params->getNppGUI()._openSaveDir == dir_last)
-		return;
-	if (params->getNppGUI()._openSaveDir == dir_userDef)
-	{
-		params->setWorkingDir(NULL);
-	}
-	else if (dir && PathIsDirectory(dir))
-	{
-		params->setWorkingDir(dir);
-	}
-}
 
 bool Notepad_plus::reloadLang()
 {
@@ -4440,7 +4856,7 @@ bool Notepad_plus::reloadLang()
 
 	generic_string pluginsTrans, windowTrans;
 	_nativeLangSpeaker->changeMenuLang(_mainMenuHandle, pluginsTrans, windowTrans);
-    ::DrawMenuBar(_hSelf);
+    ::DrawMenuBar(_pPublicInterface->getHSelf());
 
 	int indexWindow = ::GetMenuItemCount(_mainMenuHandle) - 3;
 

@@ -20,7 +20,7 @@
 #include "Parameters.h"
 #include "ScintillaComponent/ScintillaEditView.h"
 #include "resource.h"
-#include "Notepad_plus.h"
+#include "Notepad_plus_Window.h"
 #include "WinControls/shortcut/shortcutRc.h"
 
 #include "keys.h"
@@ -340,7 +340,7 @@ void getNameStrFromCmd(INT cmd, generic_string & str)
 	else
 	{
 		// JOCE: Used only to get the class name.  We should move the class name elsewhere, where it brings less baggage with it.
-		HWND hNotepad_plus = ::FindWindow(Notepad_plus::getClassName(), NULL);
+		HWND hNotepad_plus = ::FindWindow(Notepad_plus_Window::getClassName(), NULL);
 		const int commandSize = 64;
 		TCHAR cmdName[commandSize];
 		int nbChar = ::GetMenuString((HMENU)::SendMessage(hNotepad_plus, NPPM_INTERNAL_GETMENU, 0, 0), cmd, cmdName, commandSize, MF_BYCOMMAND);

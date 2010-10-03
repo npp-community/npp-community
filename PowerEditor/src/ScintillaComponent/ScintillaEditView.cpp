@@ -2922,20 +2922,20 @@ ScintillaEditView::~ScintillaEditView()
 	if ((!_refCount)&&(_hLib))
 	{
 		::FreeLibrary(_hLib);
+	}
 
-		for (BufferStyleMap::iterator it(_hotspotStyles.begin()); it != _hotspotStyles.end(); ++it )
+	for (BufferStyleMap::iterator it(_hotspotStyles.begin()); it != _hotspotStyles.end(); ++it )
+	{
+		for (StyleMap::iterator it2(it->second->begin()) ; it2 != it->second->end() ; ++it2)
 		{
-			for (StyleMap::iterator it2(it->second->begin()) ; it2 != it->second->end() ; ++it2)
-			{
-				delete [] it2->second;
-			}
-			delete it->second;
+			delete [] it2->second;
 		}
+		delete it->second;
+	}
 
 	for (BufferHotspotOriginMap::iterator it(_hotspotOrigins.begin()); it != _hotspotOrigins.end(); ++it )
 	{
 		delete it->second;
-	}
 	}
 }
 

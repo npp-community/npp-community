@@ -346,6 +346,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\Notepad_plus_Window.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Parameters.h"
 				>
 			</File>
@@ -1318,6 +1322,10 @@
 			</File>
 			<File
 				RelativePath="..\src\Notepad_plus.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Notepad_plus_Window.cpp"
 				>
 			</File>
 			<File
