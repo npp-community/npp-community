@@ -356,9 +356,6 @@ struct ScintillaViewParams
 #define NB_LIST 20
 // JOCE: There's no longer a reason to keep around the NB_MAX_* below now that we use std::vectors.
 #define NB_MAX_LRF_FILE 30
-#define NB_MAX_USER_LANG 30
-#define NB_MAX_EXTERNAL_LANG 30
-#define LANG_NAME_LEN 32
 
 #define NB_MAX_FINDHISTORY_FIND    30
 #define NB_MAX_FINDHISTORY_REPLACE 30
@@ -512,6 +509,7 @@ private:
 class ExternalLangContainer
 {
 public:
+	// JOCE: Change to generic_string
 	TCHAR _name[MAX_EXTERNAL_LEXER_NAME_LEN];
 	TCHAR _desc[MAX_EXTERNAL_LEXER_DESC_LEN];
 
@@ -802,18 +800,28 @@ public:
 		return NULL;
 	}
 
-	int getNbExternalLang() const {return _nbExternalLang;};
-	int getExternalLangIndexFromName(const TCHAR *externalLangName) const {
-		for (int i = 0 ; i < _nbExternalLang ; i++)
+	int getNbExternalLang() const {return (int)_externalLangArray.size();};
+	int getExternalLangIndexFromName(const TCHAR *externalLangName) const
+	{
+		int i = 0;
+		for (std::vector<ExternalLangContainer*>::const_iterator it = _externalLangArray.begin(), end = _externalLangArray.end();
+			it != end;
+			++it)
 		{
-			if (!lstrcmp(externalLangName, _externalLangArray[i]->_name))
+			if ((*it)->_name == externalLangName)
+			{
 				return i;
+			}
+			else
+			{
+				i++;
+			}
 		}
 		return -1;
 	};
 	ExternalLangContainer & getELCFromIndex(int i) {return *_externalLangArray[i];};
 
-	bool ExternalLangHasRoom() const {return _nbExternalLang < NB_MAX_EXTERNAL_LANG;};
+	bool ExternalLangHasRoom() const {return true;}
 
 	void getExternalLexerFromXmlTree(TiXmlDocument *doc);
 	std::vector<TiXmlDocument *> * getExternalLexerDoc() { return &_pXmlExternalLexerDoc;};
@@ -872,13 +880,8 @@ public:
 		if ((!newName) || (!newName[0]))
 			return true;
 
-		for (int i = 0 ; i < _nbExternalLang ; i++)
-		{
-			if (!lstrcmp(_externalLangArray[i]->_name, newName))
-				return true;
-		}
-		return false;
-	};
+		return getExternalLangIndexFromName(newName) != -1;
+	}
 
 	int addExternalLangToEnd(ExternalLangContainer * externalLang);
 
@@ -1008,6 +1011,8 @@ private:
 	TiXmlDocument* _pXmlSessionDoc;
 	TiXmlDocument* _pXmlBlacklistDoc;
 
+	std::vector<TiXmlDocument*> _importedUDL;
+
 	TiXmlDocumentA *_pXmlNativeLangDocA;
 
 	std::vector<TiXmlDocument *> _pXmlExternalLexerDoc;
@@ -1024,9 +1029,8 @@ private:
 	std::vector<UserLangContainer *> _userLangArray;
 
 	generic_string _userDefineLangPath;
-	// JOCE use a std::vector instead!
-	ExternalLangContainer *_externalLangArray[NB_MAX_EXTERNAL_LANG];
-	int _nbExternalLang;
+	// JOCE: These seem to be allocated in PluginsManager.cpp
+	std::vector<ExternalLangContainer*> _externalLangArray;
 
 	CmdLineParams _cmdLineParams;
 

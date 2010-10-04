@@ -507,7 +507,7 @@ NppParameters::NppParameters() :
 	_pXmlDoc(NULL), _pXmlUserDoc(NULL), _pXmlUserStylerDoc(NULL),
 	_pXmlUserLangDoc(NULL), _pXmlToolIconsDoc(NULL), _pXmlShortcutDoc(NULL),
 	_pXmlContextMenuDoc(NULL), _pXmlSessionDoc(NULL), _pXmlBlacklistDoc(NULL),
-	_pXmlNativeLangDocA(NULL), _nbMaxFile(10), _nbExternalLang(0),
+	_pXmlNativeLangDocA(NULL), _nbMaxFile(10),
 	_fileSaveDlgFilterIndex(-1),
 	_hUser32(NULL), _hUXTheme(NULL),
 	_transparentFuncAddr(NULL), _enableThemeDialogTextureFuncAddr(NULL),
@@ -575,6 +575,12 @@ NppParameters::~NppParameters()
 		delete _pXmlSessionDoc;
 
 	for( std::vector<Lang *>::const_iterator it = _langList.begin(), end = _langList.end();
+		it != end;
+		++it)
+	{
+		delete (*it);
+	}
+	for (std::vector<TiXmlDocument*>::iterator it = _importedUDL.begin(), end = _importedUDL.end();
 		it != end;
 		++it)
 	{
@@ -1062,10 +1068,9 @@ void NppParameters::getExternalLexerFromXmlTree(TiXmlDocument *doc)
 
 int NppParameters::addExternalLangToEnd(ExternalLangContainer * externalLang)
 {
-	_externalLangArray[_nbExternalLang] = externalLang;
-	_nbExternalLang++;
+	_externalLangArray.push_back(externalLang);
 	L_END++;
-	return _nbExternalLang-1;
+	return _externalLangArray.size();
 }
 
 bool NppParameters::getUserStylersFromXmlTree()
@@ -1978,7 +1983,10 @@ bool NppParameters::importUDLFromFile(generic_string sourceFile)
 	{
 		loadOkay = getUserDefineLangsFromXmlTree(pXmlUserLangDoc);
     }
-    delete pXmlUserLangDoc;
+	if (loadOkay)
+	{
+		_importedUDL.push_back(pXmlUserLangDoc);
+	}
     return loadOkay;
 }
 
