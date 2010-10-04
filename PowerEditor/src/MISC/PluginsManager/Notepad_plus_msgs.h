@@ -117,7 +117,7 @@ enum LangType {L_TEXT, L_PHP , L_C, L_CPP, L_CS, L_OBJC, L_JAVA, L_RC,\
 	//BOOL NPPM_SWITCHTOFILE(0, TCHAR *filePathName2switch)
 
 	#define NPPM_SAVECURRENTFILE (NPPMSG + 38)
-	//NPPM_SAVECURRENTFILE(0, 0)
+	//BOOL NPPM_SAVECURRENTFILE(0, 0)
 
 	#define NPPM_SAVEALLFILES	(NPPMSG + 39)
 	//BOOL NPPM_SAVEALLFILES(0, 0)
@@ -304,6 +304,9 @@ enum LangType {L_TEXT, L_PHP , L_C, L_CPP, L_CS, L_OBJC, L_JAVA, L_RC,\
 	// BOOL NPPM_DOOPEN(0, const TCHAR *fullPathName2Open)
 	// fullPathName2Open indicates the full file path name to be opened.
 	// The return value is TRUE (1) if the operation is successful, otherwise FALSE (0).
+
+	#define NPPM_SAVECURRENTFILEAS (NPPMSG + 78)
+	// BOOL NPPM_SAVECURRENTFILEAS (BOOL asCopy, const TCHAR* filename)
 
 #define	RUNCOMMAND_USER    (WM_USER + 3000)
 	#define NPPM_GETFULLCURRENTPATH		(RUNCOMMAND_USER + FULL_CURRENT_PATH)
