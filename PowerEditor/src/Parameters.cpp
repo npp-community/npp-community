@@ -1922,8 +1922,6 @@ bool NppParameters::getShortcuts(TiXmlNode *node, Shortcut & sc)
 }
 
 
-const int loadFailed = 100;
-const int missingName = 101;
 bool NppParameters::feedUserLang(TiXmlNode *node)
 {
     bool isEverythingOK = true;
@@ -1938,26 +1936,29 @@ bool NppParameters::feedUserLang(TiXmlNode *node)
         hasFoundElement = true;
 		UserLangContainer* newLangContainer = new UserLangContainer(name, ext);
 		try {
-			if (!name || !name[0] || !ext) throw int(missingName);
+			if (!name || !name[0] || !ext)
+				throw std::runtime_error("NppParameters::feedUserLang : UserLang name is missing");
 
 			TiXmlNode *settingsRoot = childNode->FirstChildElement(TEXT("Settings"));
-			if (!settingsRoot) throw int(loadFailed);
+			if (!settingsRoot)
+				throw std::runtime_error("NppParameters::feedUserLang : Settings node is missing");
 			newLangContainer->feedUserSettings(settingsRoot);
 
 			TiXmlNode *keywordListsRoot = childNode->FirstChildElement(TEXT("KeywordLists"));
-			if (!keywordListsRoot) throw int(loadFailed);
+			if (!keywordListsRoot)
+				throw std::runtime_error("NppParameters::feedUserLang : KeywordLists node is missing");
+
 			newLangContainer->feedUserKeywordList(keywordListsRoot);
 
 			TiXmlNode *stylesRoot = childNode->FirstChildElement(TEXT("Styles"));
-			if (!stylesRoot) throw int(loadFailed);
+			if (!stylesRoot)
+				throw std::runtime_error("NppParameters::feedUserLang : Styles node is missing");
+
 			newLangContainer->feedUserStyles(stylesRoot);
 
-		} catch (int e) {
-			if (e == loadFailed)
-			{
-				delete newLangContainer;
-				newLangContainer = NULL;
-			}
+		} catch (std::exception e) {
+			delete newLangContainer;
+			newLangContainer = NULL;
 			isEverythingOK = false;
 		}
 

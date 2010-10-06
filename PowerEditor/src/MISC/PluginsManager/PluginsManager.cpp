@@ -221,9 +221,10 @@ int PluginsManager::loadPlugin(const generic_string& pluginFilePath, std::vector
 
 		_pluginInfos.push_back(pi);
         return (_pluginInfos.size() - 1);
-	}
-	catch(generic_string s)
-	{
+	} catch(std::exception e) {
+		::MessageBoxA(NULL, e.what(), "Exception", MB_OK);
+		return -1;
+	} catch(generic_string s) {
 		s += TEXT("\n\n");
 		s += USERMSG;
 		if (::MessageBox(NULL, s.c_str(), pluginFilePath.c_str(), MB_YESNO) == IDYES)
@@ -232,9 +233,7 @@ int PluginsManager::loadPlugin(const generic_string& pluginFilePath, std::vector
 		}
 		delete pi;
         return -1;
-	}
-	catch(...)
-	{
+	} catch(...) {
 		generic_string msg = TEXT("Fail loaded");
 		msg += TEXT("\n\n");
 		msg += USERMSG;
@@ -408,6 +407,8 @@ void PluginsManager::runPluginCommand(size_t i)
 		{
 			try {
 				_pluginsCommands[i]._pFunc();
+			} catch(std::exception e) {
+				::MessageBoxA(NULL, e.what(), "Exception", MB_OK);
 			} catch (...) {
 				TCHAR funcInfo[128];
 				generic_sprintf(funcInfo, 128, TEXT("runPluginCommand(size_t i : %d)"), i);
@@ -428,6 +429,8 @@ void PluginsManager::runPluginCommand(const TCHAR *pluginName, int commandID)
 			{
 				try {
 					_pluginsCommands[i]._pFunc();
+				} catch(std::exception e) {
+					::MessageBoxA(NULL, e.what(), "Exception", MB_OK);
 				} catch (...) {
 					TCHAR funcInfo[128];
 					generic_sprintf(funcInfo, 128, TEXT("runPluginCommand(const TCHAR *pluginName : %s, int commandID : %d)"), pluginName, commandID);
@@ -449,6 +452,8 @@ void PluginsManager::notify(SCNotification *notification)
 			SCNotification scNotif = *notification;
 			try {
 				_pluginInfos[i]->_pBeNotified(&scNotif);
+			} catch(std::exception e) {
+				::MessageBoxA(NULL, e.what(), "Exception", MB_OK);
 			} catch (...) {
 				TCHAR funcInfo[128];
 				generic_sprintf(funcInfo, 128, TEXT("notify(SCNotification *notification) : \r notification->nmhdr.code == %d\r notification->nmhdr.hwndFrom == %d\r notification->nmhdr.idFrom == %d"),\
@@ -467,6 +472,8 @@ void PluginsManager::relayNppMessages(UINT Message, WPARAM wParam, LPARAM lParam
 		{
 			try {
 				_pluginInfos[i]->_pMessageProc(Message, wParam, lParam);
+			} catch(std::exception e) {
+				::MessageBoxA(NULL, e.what(), "Exception", MB_OK);
 			} catch (...) {
 				TCHAR funcInfo[128];
 				generic_sprintf(funcInfo, 128, TEXT("relayNppMessages(UINT Message : %d, WPARAM wParam : %d, LPARAM lParam : %d)"), Message, wParam, lParam);
@@ -490,6 +497,8 @@ bool PluginsManager::relayPluginMessages(UINT Message, WPARAM wParam, LPARAM lPa
 			{
 				try {
 					_pluginInfos[i]->_pMessageProc(Message, wParam, lParam);
+				} catch(std::exception e) {
+					::MessageBoxA(NULL, e.what(), "Exception", MB_OK);
 				} catch (...) {
 					TCHAR funcInfo[128];
 					generic_sprintf(funcInfo, 128, TEXT("relayPluginMessages(UINT Message : %d, WPARAM wParam : %d, LPARAM lParam : %d)"), Message, wParam, lParam);

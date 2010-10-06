@@ -106,7 +106,7 @@ void GoToLineDlg::init( HINSTANCE hInst, HWND hParent, ScintillaEditView **ppEdi
 {
 	Window::init(hInst, hParent);
 	if (!ppEditView)
-		throw int(9900);
+		throw std::runtime_error("GoToLineDlg::init : ppEditView is null.");
 	_ppEditView = ppEditView;
 }
 

@@ -2082,7 +2082,7 @@ void FindReplaceDlg::init( HINSTANCE hInst, HWND hParent, ScintillaEditView **pp
 	Window::init(hInst, hParent);
 	if (!ppEditView)
 	{
-		throw int(9900);
+		throw std::runtime_error("FindIncrementDlg::init : ppEditView is null.");
 	}
 	_ppEditView = ppEditView;
 }
@@ -2343,7 +2343,8 @@ void FindIncrementDlg::init(HINSTANCE hInst, HWND hParent, FindReplaceDlg *pFRDl
 {
 	Window::init(hInst, hParent);
 	if (!pFRDlg)
-		throw int(9910);
+		throw std::runtime_error("FindIncrementDlg::init : Parameter pFRDlg is null");
+
 	_pFRDlg = pFRDlg;
 	create(IDD_INCREMENT_FIND, isRTL);
 	_isRTL = isRTL;

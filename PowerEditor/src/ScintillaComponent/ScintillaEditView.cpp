@@ -152,8 +152,7 @@ void ScintillaEditView::init(HINSTANCE hInst, HWND hParent)
 {
 	if (!_hLib)
 	{
-		MessageBox( NULL, TEXT("Can not load the dynamic library"), TEXT("SCINTILLA ERROR : "), MB_OK | MB_ICONSTOP);
-		throw int(106901);
+		throw std::runtime_error("ScintillaEditView::init : SCINTILLA ERROR - Can not load the dynamic library");
 	}
 
 	Window::init(hInst, hParent);
@@ -170,8 +169,7 @@ void ScintillaEditView::init(HINSTANCE hInst, HWND hParent)
 
 	if (!_hSelf)
 	{
-		systemMessage(TEXT("System Error"));
-		throw int(106901);
+		throw std::runtime_error("ScintillaEditView::init : CreateWindowEx() function return null");
 	}
 
 	_pScintillaFunc = (SCINTILLA_FUNC)::SendMessage(_hSelf, SCI_GETDIRECTFUNCTION, 0, 0);
@@ -179,10 +177,14 @@ void ScintillaEditView::init(HINSTANCE hInst, HWND hParent)
 
     s_userDefineDlg.init(_hInst, _hParent, this);
 
-	if (!_pScintillaFunc || !_pScintillaPtr)
+	if (!_pScintillaFunc)
 	{
-		systemMessage(TEXT("System Err"));
-		throw int(106901);
+		throw std::runtime_error("ScintillaEditView::init : SCI_GETDIRECTFUNCTION message failed");
+	}
+
+	if (!_pScintillaPtr)
+	{
+		throw std::runtime_error("ScintillaEditView::init : SCI_GETDIRECTPOINTER message failed");
 	}
 
     execute(SCI_SETMARGINMASKN, _SC_MARGIN_FOLDER, SC_MASK_FOLDERS);

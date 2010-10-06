@@ -88,8 +88,7 @@ void SplitterContainer::create(Window *pWin0, Window *pWin1, int splitterSize,
 
 		if (!::RegisterClass(&splitterContainerClass))
 		{
-			systemMessage(TEXT("System Err"));
-			throw int(98);
+			throw std::runtime_error(" SplitterContainer::create : RegisterClass() function failed");
 		}
 		_isRegistered = true;
 	}
@@ -108,8 +107,7 @@ void SplitterContainer::create(Window *pWin0, Window *pWin1, int splitterSize,
 
 	if (!_hSelf)
 	{
-		systemMessage(TEXT("System Err"));
-		throw int(777);
+		throw std::runtime_error(" SplitterContainer::create : CreateWindowEx() function return null");
 	}
 }
 

@@ -33,7 +33,7 @@ void ColumnEditorDlg::init(HINSTANCE hInst, HWND hParent, ScintillaEditView **pp
 {
 	Window::init(hInst, hParent);
 	if (!ppEditView)
-		throw int(9900);
+		throw std::runtime_error("StaticDialog::init : ppEditView is null.");
 	_ppEditView = ppEditView;
 }
 

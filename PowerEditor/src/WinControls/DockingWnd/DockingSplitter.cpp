@@ -88,8 +88,7 @@ void DockingSplitter::init(HINSTANCE hInst, HWND hWnd, HWND hMessage, UINT flags
 
 		if (!::RegisterClass(&wc))
 		{
-			systemMessage(TEXT("System Err"));
-			throw int(98);
+			throw std::runtime_error("DockingSplitter::init : RegisterClass() function failed");
 		}
 		else if (flags & DMS_HORIZONTAL)
 		{
@@ -108,8 +107,7 @@ void DockingSplitter::init(HINSTANCE hInst, HWND hWnd, HWND hMessage, UINT flags
 
 	if (!_hSelf)
 	{
-		systemMessage(TEXT("System Err"));
-		throw int(777);
+		throw std::runtime_error("DockingSplitter::init : CreateWindowEx() function return null");
 	}
 }
 
