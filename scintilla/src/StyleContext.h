@@ -22,9 +22,7 @@ class StyleContext {
 	Accessor &styler;
 	unsigned int endPos;
 	// NPPSTART Joce 08/09/09 LintCleanup
-	const StyleContext& operator=(const StyleContext&) {
-		return *this;
-	}
+	const StyleContext& operator=(const StyleContext&);
 	// NPPEND
 	void GetNextChar(unsigned int pos) {
 		chNext = static_cast<unsigned char>(styler.SafeGetCharAt(pos+1));
@@ -74,7 +72,7 @@ public:
 	void Complete() {
 		styler.ColourTo(currentPos - 1, state);
 	}
-	bool More() {
+	bool More() const {
 		return currentPos < endPos;
 	}
 	void Forward() {
@@ -117,10 +115,10 @@ public:
 	int GetRelative(int n) {
 		return static_cast<unsigned char>(styler.SafeGetCharAt(currentPos+n));
 	}
-	bool Match(char ch0) {
+	bool Match(char ch0) const {
 		return ch == static_cast<unsigned char>(ch0);
 	}
-	bool Match(char ch0, char ch1) {
+	bool Match(char ch0, char ch1) const {
 		return (ch == static_cast<unsigned char>(ch0)) && (chNext == static_cast<unsigned char>(ch1));
 	}
 	bool Match(const char *s) {

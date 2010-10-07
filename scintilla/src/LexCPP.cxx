@@ -488,14 +488,14 @@ static void FoldCppDoc(unsigned int startPos, int length, int initStyle,
 	}
 }
 
-static const char * const cppWordLists[] = {
+static const char *const cppWordLists[] = {
             "Primary keywords and identifiers",
             "Secondary keywords and identifiers",
             "Documentation comment keywords",
             "Unused",
             "Global classes and typedefs",
             0,
-        };
+};
 
 static void ColouriseCppDocSensitive(unsigned int startPos, int length, int initStyle, WordList *keywordlists[],
                                      Accessor &styler) {

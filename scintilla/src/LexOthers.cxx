@@ -42,6 +42,10 @@ static bool Is1To9(char ch) {
 	return (ch >= '1') && (ch <= '9');
 }
 
+static bool IsAlphabetic(int ch) {
+	return isascii(ch) && isalpha(ch);
+}
+
 static inline bool AtEOL(Accessor &styler, unsigned int i) {
 	return (styler[i] == '\n') ||
 	       ((styler[i] == '\r') && (styler.SafeGetCharAt(i + 1) != '\n'));
@@ -106,7 +110,7 @@ static void ColouriseBatchLine(
 		}
 		return;
 	// Check for Drive Change (Drive Change is internal command) - return if found
-	} else if ((isalpha(lineBuffer[offset])) &&
+	} else if ((IsAlphabetic(lineBuffer[offset])) &&
 		(lineBuffer[offset + 1] == ':') &&
 		((isspacechar(lineBuffer[offset + 2])) ||
 		(((lineBuffer[offset + 2] == '\\')) &&
@@ -966,17 +970,17 @@ static int RecogniseErrorListLine(const char *lineBuffer, unsigned int lengthLin
 	} else if (strstart(lineBuffer, "Warning ")) {
 		// Borland warning message
 		return SCE_ERR_BORLAND;
-	} else if (strstr(lineBuffer, "at line " ) &&
-	           (strstr(lineBuffer, "at line " ) < (lineBuffer + lengthLine)) &&
+	} else if (strstr(lineBuffer, "at line ") &&
+	        (strstr(lineBuffer, "at line ") < (lineBuffer + lengthLine)) &&
 	           strstr(lineBuffer, "file ") &&
 	           (strstr(lineBuffer, "file ") < (lineBuffer + lengthLine))) {
 		// Lua 4 error message
 		return SCE_ERR_LUA;
-	} else if (strstr(lineBuffer, " at " ) &&
-	           (strstr(lineBuffer, " at " ) < (lineBuffer + lengthLine)) &&
+	} else if (strstr(lineBuffer, " at ") &&
+	        (strstr(lineBuffer, " at ") < (lineBuffer + lengthLine)) &&
 	           strstr(lineBuffer, " line ") &&
 	           (strstr(lineBuffer, " line ") < (lineBuffer + lengthLine)) &&
-	           (strstr(lineBuffer, " at " ) < (strstr(lineBuffer, " line ")))) {
+	        (strstr(lineBuffer, " at ") < (strstr(lineBuffer, " line ")))) {
 		// perl error message
 		return SCE_ERR_PERL;
 	} else if ((memcmp(lineBuffer, "   at ", 6) == 0) &&
@@ -1070,7 +1074,7 @@ static int RecogniseErrorListLine(const char *lineBuffer, unsigned int lengthLin
 						numstep = 1; // ch was ' ', handle as if it's a delphi errorline, only add 1 to i.
 					else
 						numstep = 2; // otherwise add 2.
-					for (j = i + numstep; j < lengthLine && isalpha(lineBuffer[j]) && chPos < sizeof(word) - 1; j++)
+					for (j = i + numstep; j < lengthLine && IsAlphabetic(lineBuffer[j]) && chPos < sizeof(word) - 1; j++)
 						word[chPos++] = lineBuffer[j];
 					word[chPos] = 0;
 					if (!CompareCaseInsensitive(word, "error") || !CompareCaseInsensitive(word, "warning") ||
@@ -1257,13 +1261,13 @@ static void ColouriseLatexDoc(unsigned int startPos, int length, int initStyle,
 	styler.ColourTo(lengthDoc-1, state);
 }
 
-static const char * const batchWordListDesc[] = {
+static const char *const batchWordListDesc[] = {
 	"Internal Commands",
 	"External Commands",
 	0
 };
 
-static const char * const emptyWordListDesc[] = {
+static const char *const emptyWordListDesc[] = {
 	0
 };
 

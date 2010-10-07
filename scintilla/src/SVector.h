@@ -31,7 +31,7 @@ class SVector {
 			newSize += allocSize;
 		else
 			newSize = (newSize * 3) / 2;
-		int* newv = new int[newSize];
+		int *newv = new int[newSize];
 		size = newSize;
         unsigned int i=0;
 		for (; i<len; i++) {
@@ -60,7 +60,7 @@ public:
 		size = 0;
 		if (other.Length() > 0) {
 			SizeTo(other.Length());
-			for (int i=0;i<other.Length();i++)
+			for (int i=0; i<other.Length(); i++)
 				v[i] = other.v[i];
 			len = other.Length();
 		}
@@ -74,7 +74,7 @@ public:
 			size = 0;
 			if (other.Length() > 0) {
 				SizeTo(other.Length());
-				for (int i=0;i<other.Length();i++)
+				for (int i=0; i<other.Length(); i++)
 					v[i] = other.v[i];
 				len = other.Length();
 			}

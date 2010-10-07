@@ -97,6 +97,13 @@ void Style::Clear(ColourDesired fore_, ColourDesired back_, int size_,
 	else
 		font.Release();
 	aliasOfDefaultFont = false;
+	sizeZoomed = 2;
+	lineHeight = 2;
+	ascent = 1;
+	descent = 1;
+	externalLeading = 0;
+	aveCharWidth = 1;
+	spaceWidth = 1;
 }
 
 void Style::ClearTo(const Style &source) {
@@ -131,7 +138,7 @@ bool Style::EquivalentFontTo(const Style *other) const {
 	return strcmp(fontName, other->fontName) == 0;
 }
 
-void Style::Realise(Surface &surface, int zoomLevel, Style *defaultStyle, bool extraFontFlag) {
+void Style::Realise(Surface &surface, int zoomLevel, Style *defaultStyle, int extraFontFlag) {
 	sizeZoomed = size + zoomLevel;
 	if (sizeZoomed <= 2)	// Hangs if sizeZoomed <= 1
 		sizeZoomed = 2;

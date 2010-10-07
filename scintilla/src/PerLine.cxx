@@ -365,6 +365,7 @@ void LineAnnotation::Init() {
 
 void LineAnnotation::InsertLine(int line) {
 	if (annotations.Length()) {
+		annotations.EnsureLength(line);
 		annotations.Insert(line, 0);
 	}
 }
@@ -423,7 +424,7 @@ void LineAnnotation::SetText(int line, const char *text) {
 			delete []annotations[line];
 		}
 		annotations[line] = AllocateAnnotation(strlen(text), style);
-		AnnotationHeader *pah = reinterpret_cast<AnnotationHeader*>(annotations[line]);
+		AnnotationHeader *pah = reinterpret_cast<AnnotationHeader *>(annotations[line]);
 		pah->style = static_cast<short>(style);
 		pah->length = strlen(text);
 		pah->lines = static_cast<short>(NumberLines(text));

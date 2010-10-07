@@ -366,7 +366,7 @@ static void FoldMySQLDoc(unsigned int startPos, int length, int initStyle, WordL
           // Not really a standard, but we add support for single line comments
           // with special curly braces syntax as foldable comments too.
           // MySQL needs -- comments to be followed by space or control char
-          if (styler.Match(startPos, "--"))
+          if (styler.Match(i, "--"))
           {
             char chNext2 = styler.SafeGetCharAt(i + 2);
             char chNext3 = styler.SafeGetCharAt(i + 3);
@@ -399,12 +399,12 @@ static void FoldMySQLDoc(unsigned int startPos, int length, int initStyle, WordL
         // Reserved and other keywords.
         if (style != stylePrev)
         {
-          bool beginFound = MatchIgnoreCase(styler, startPos, "begin");
-          bool ifFound = MatchIgnoreCase(styler, startPos, "if");
-          bool thenFound = MatchIgnoreCase(styler, startPos, "then");
-          bool whileFound = MatchIgnoreCase(styler, startPos, "while");
-          bool loopFound = MatchIgnoreCase(styler, startPos, "loop");
-          bool repeatFound = MatchIgnoreCase(styler, startPos, "repeat");
+          bool beginFound = MatchIgnoreCase(styler, i, "begin");
+          bool ifFound = MatchIgnoreCase(styler, i, "if");
+          bool thenFound = MatchIgnoreCase(styler, i, "then");
+          bool whileFound = MatchIgnoreCase(styler, i, "while");
+          bool loopFound = MatchIgnoreCase(styler, i, "loop");
+          bool repeatFound = MatchIgnoreCase(styler, i, "repeat");
 
           if (!foldOnlyBegin && endFound && (ifFound || whileFound || loopFound))
           {
@@ -418,7 +418,7 @@ static void FoldMySQLDoc(unsigned int startPos, int length, int initStyle, WordL
             // will be increased later, if not, then at eol.
           }
           else
-            if (!foldOnlyBegin && MatchIgnoreCase(styler, startPos, "else"))
+            if (!foldOnlyBegin && MatchIgnoreCase(styler, i, "else"))
             {
               levelNext--;
               elseFound = true;
@@ -435,7 +435,7 @@ static void FoldMySQLDoc(unsigned int startPos, int length, int initStyle, WordL
                 if (ifFound)
                   elseFound = false;
                 else
-                  if (MatchIgnoreCase(styler, startPos, "when"))
+                  if (MatchIgnoreCase(styler, i, "when"))
                     whenFound = true;
                   else
                   {
@@ -450,7 +450,7 @@ static void FoldMySQLDoc(unsigned int startPos, int length, int initStyle, WordL
                           levelNext++;
                       }
                       else
-                        if (MatchIgnoreCase(styler, startPos, "end"))
+                        if (MatchIgnoreCase(styler, i, "end"))
                         {
                           // Multiple "end" in a row are counted multiple times!
                           if (endFound)

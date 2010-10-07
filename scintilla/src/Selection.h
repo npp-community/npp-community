@@ -74,6 +74,12 @@ struct SelectionSegment {
 	bool Empty() const {
 		return start == end;
 	}
+	void Extend(SelectionPosition p) {
+		if (start > p)
+			start = p;
+		if (end < p)
+			end = p;
+	}
 };
 
 struct SelectionRange {
@@ -141,6 +147,11 @@ public:
 	int MainCaret() const;
 	int MainAnchor() const;
 	SelectionRange &Rectangular();
+	SelectionSegment Limits() const;
+	// This is for when you want to move the caret in response to a
+	// user direction command - for rectangular selections, use the range
+	// that covers all selected text otherwise return the main selection.
+	SelectionSegment LimitsForRectangularElseMain() const;
 	size_t Count() const;
 	size_t Main() const;
 	void SetMain(size_t r);

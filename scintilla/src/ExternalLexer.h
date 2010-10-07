@@ -23,7 +23,7 @@ typedef void (EXT_LEXER_DECL *ExtLexerFunction)(unsigned int lexer, unsigned int
                   char *words[], WindowID window, char *props);
 typedef void (EXT_LEXER_DECL *ExtFoldFunction)(unsigned int lexer, unsigned int startPos, int length, int initStyle,
                   char *words[], WindowID window, char *props);
-typedef void* (EXT_LEXER_DECL *GetLexerFunction)(unsigned int Index);
+typedef void*(EXT_LEXER_DECL *GetLexerFunction)(unsigned int Index);
 typedef int (EXT_LEXER_DECL *GetLexerCountFn)();
 typedef void (EXT_LEXER_DECL *GetLexerNameFn)(unsigned int Index, char *name, int buflength);
 
@@ -38,10 +38,11 @@ protected:
 	char name[100];
 public:
 	ExternalLexerModule(int language_, LexerFunction fnLexer_,
-		const char *languageName_=0, LexerFunction fnFolder_=0) : LexerModule(language_, fnLexer_, 0, fnFolder_){
+		const char *languageName_=0, LexerFunction fnFolder_=0) : LexerModule(language_, fnLexer_, 0, fnFolder_) {
 		strncpy(name, languageName_, sizeof(name));
+		name[sizeof(name)-1] = '\0';
 		languageName = name;
-	};
+	}
 	virtual void Lex(unsigned int startPos, int lengthDoc, int initStyle,
 					WordList *keywordlists[], Accessor &styler) const;
 	virtual void Fold(unsigned int startPos, int lengthDoc, int initStyle,
@@ -63,7 +64,7 @@ class LexerLibrary {
 	LexerMinder		*last;
 
 public:
-	LexerLibrary(const char* ModuleName);
+	LexerLibrary(const char *ModuleName);
 	~LexerLibrary();
 	void Release();
 
@@ -79,14 +80,14 @@ public:
 	static LexerManager *GetInstance();
 	static void DeleteInstance();
 
-	void Load(const char* path);
+	void Load(const char *path);
 	void Clear();
 
 private:
 	LexerManager();
 	static LexerManager *theInstance;
 
-	void LoadLexerLibrary(const char* module);
+	void LoadLexerLibrary(const char *module);
 	LexerLibrary *first;
 	LexerLibrary *last;
 };

@@ -31,7 +31,7 @@ using namespace Scintilla;
 #endif
 
 static inline bool IsGAPOperator(char ch) {
-	if (isalnum(ch)) return false;
+	if (isascii(ch) && isalnum(ch)) return false;
 	if (ch == '+' || ch == '-' || ch == '*' || ch == '/' ||
 		ch == '^' || ch == ',' || ch == '!' || ch == '.' ||
 		ch == '=' || ch == '<' || ch == '>' || ch == '(' ||

@@ -163,6 +163,10 @@ static void ColourisePyDoc(unsigned int startPos, int length, int initStyle,
 	if (styler.GetPropertyInt("lexer.python.strings.b", 1))
 		allowedLiterals = static_cast<literalsAllowed>(allowedLiterals | litB);
 
+	// property lexer.python.strings.over.newline
+	//      Set to 1 to allow strings to span newline characters.
+	bool stringsOverNewline = styler.GetPropertyInt("lexer.python.strings.over.newline") != 0;
+
 	initStyle = initStyle & 31;
 	if (initStyle == SCE_P_STRINGEOL) {
 		initStyle = SCE_P_DEFAULT;
@@ -209,7 +213,7 @@ static void ColourisePyDoc(unsigned int startPos, int length, int initStyle,
 			}
 			lineCurrent++;
 			if ((sc.state == SCE_P_STRING) || (sc.state == SCE_P_CHARACTER)) {
-				if (inContinuedString) {
+				if (inContinuedString || stringsOverNewline) {
 					inContinuedString = false;
 				} else {
 					sc.ChangeState(SCE_P_STRINGEOL);
@@ -539,7 +543,7 @@ static void FoldPyDoc(unsigned int startPos, int length, int /*initStyle - unuse
 		}
 
 		// Set fold header on non-quote/non-comment line
-		if (!quote && !comment && !(indentCurrent & SC_FOLDLEVELWHITEFLAG) ) {
+		if (!quote && !comment && !(indentCurrent & SC_FOLDLEVELWHITEFLAG)) {
 			if ((indentCurrent & SC_FOLDLEVELNUMBERMASK) < (indentNext & SC_FOLDLEVELNUMBERMASK))
 				lev |= SC_FOLDLEVELHEADERFLAG;
 		}
@@ -559,7 +563,7 @@ static void FoldPyDoc(unsigned int startPos, int length, int /*initStyle - unuse
 	//styler.SetLevel(lineCurrent, indentCurrent);
 }
 
-static const char * const pythonWordListDesc[] = {
+static const char *const pythonWordListDesc[] = {
 	"Keywords",
 	"Highlighted identifiers",
 	0
