@@ -500,6 +500,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\LexMarkdown.cxx"
+					>
+				</File>
+				<File
 					RelativePath="..\src\LexMatlab.cxx"
 					>
 				</File>
@@ -716,6 +720,10 @@
 			</File>
 			<File
 				RelativePath="..\src\ExternalLexer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\FontQuality.h"
 				>
 			</File>
 			<File
