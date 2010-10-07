@@ -72,11 +72,13 @@ void Notepad_plus::command(int id)
 			break;
 
 		case IDM_FILE_CLOSE:
-			fileClose();
+			if (fileClose())
+                checkDocState();
 			break;
 
 		case IDM_FILE_DELETE:
-			fileDelete();
+			if (fileDelete())
+                checkDocState();
 			break;
 
 		case IDM_FILE_RENAME:
@@ -85,10 +87,12 @@ void Notepad_plus::command(int id)
 
 		case IDM_FILE_CLOSEALL:
 			fileCloseAll();
+            checkDocState();
 			break;
 
 		case IDM_FILE_CLOSEALL_BUT_CURRENT :
 			fileCloseAllButCurrent();
+            checkDocState();
 			break;
 
 		case IDM_FILE_SAVE :
@@ -1660,7 +1664,7 @@ void Notepad_plus::command(int id)
 
 		case IDM_HOMESWEETHOME :
 		{
-			::ShellExecute(NULL, TEXT("open"), TEXT("http://notepad-plus.sourceforge.net/"), NULL, NULL, SW_SHOWNORMAL);
+			::ShellExecute(NULL, TEXT("open"), TEXT("http://notepad-plus-plus.org/"), NULL, NULL, SW_SHOWNORMAL);
 			break;
 		}
 		case IDM_PROJECTPAGE :
