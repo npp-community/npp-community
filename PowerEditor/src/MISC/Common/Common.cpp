@@ -30,20 +30,6 @@ static int __stdcall BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM, LPARAM pDa
 	return 0;
 };
 
-void systemMessage(const TCHAR *title)
-{
-  LPVOID lpMsgBuf;
-  FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                 NULL,
-				 ::GetLastError(),
-                 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-                 (LPTSTR) &lpMsgBuf,
-                 0,
-                 NULL );// Process any inserts in lpMsgBuf.
-  MessageBox( NULL, (LPTSTR)lpMsgBuf, title, MB_OK | MB_ICONSTOP);
-  ::LocalFree(lpMsgBuf);
-}
-
 void printInt(int int2print)
 {
 	TCHAR str[32];
