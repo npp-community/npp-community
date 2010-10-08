@@ -3282,14 +3282,9 @@ void NppParameters::feedGUIParameters(TiXmlNode *node)
 
 		else if (!lstrcmp(nm, TEXT("ScintillaPrimaryView")))
 		{
-			feedScintillaParam(SCIV_PRIMARY, element);
+			feedScintillaParam(element);
 		}
-		/*
-		else if (!lstrcmp(nm, TEXT("ScintillaSecondaryView")))
-		{
-			feedScintillaParam(SCIV_SECOND, element);
-		}
-		*/
+
 		else if (!lstrcmp(nm, TEXT("Backup")))
 		{
 			int i;
@@ -3444,7 +3439,7 @@ void NppParameters::feedGUIParameters(TiXmlNode *node)
 	}
 }
 
-void NppParameters::feedScintillaParam(bool whichOne, TiXmlNode *node)
+void NppParameters::feedScintillaParam(TiXmlNode *node)
 {
     TiXmlElement *element = node->ToElement();
 
@@ -3453,9 +3448,9 @@ void NppParameters::feedScintillaParam(bool whichOne, TiXmlNode *node)
 	if (nm)
 	{
 		if (!lstrcmp(nm, TEXT("show")))
-			_svp[whichOne]._lineNumberMarginShow = true;
+			_svp._lineNumberMarginShow = true;
 		else if (!lstrcmp(nm, TEXT("hide")))
-			_svp[whichOne]._lineNumberMarginShow = false;
+			_svp._lineNumberMarginShow = false;
 	}
 
 	// Bookmark Margin
@@ -3464,9 +3459,9 @@ void NppParameters::feedScintillaParam(bool whichOne, TiXmlNode *node)
 	{
 
 		if (!lstrcmp(nm, TEXT("show")))
-			_svp[whichOne]._bookMarkMarginShow = true;
+			_svp._bookMarkMarginShow = true;
 		else if (!lstrcmp(nm, TEXT("hide")))
-			_svp[whichOne]._bookMarkMarginShow = false;
+			_svp._bookMarkMarginShow = false;
 	}
 /*
 	// doc change state Margin
@@ -3475,9 +3470,9 @@ void NppParameters::feedScintillaParam(bool whichOne, TiXmlNode *node)
 	{
 
 		if (!lstrcmp(nm, TEXT("show")))
-			_svp[whichOne]._docChangeStateMarginShow = true;
+			_svp._docChangeStateMarginShow = true;
 		else if (!lstrcmp(nm, TEXT("hide")))
-			_svp[whichOne]._docChangeStateMarginShow = false;
+			_svp._docChangeStateMarginShow = false;
 	}
 */
     // Indent GuideLine
@@ -3485,9 +3480,9 @@ void NppParameters::feedScintillaParam(bool whichOne, TiXmlNode *node)
 	if (nm)
 	{
 		if (!lstrcmp(nm, TEXT("show")))
-			_svp[whichOne]._indentGuideLineShow = true;
+			_svp._indentGuideLineShow = true;
 		else if (!lstrcmp(nm, TEXT("hide")))
-			_svp[whichOne]._indentGuideLineShow= false;
+			_svp._indentGuideLineShow= false;
 	}
 
     // Folder Mark Style
@@ -3495,15 +3490,15 @@ void NppParameters::feedScintillaParam(bool whichOne, TiXmlNode *node)
 	if (nm)
 	{
 		if (!lstrcmp(nm, TEXT("box")))
-			_svp[whichOne]._folderStyle = FOLDER_STYLE_BOX;
+			_svp._folderStyle = FOLDER_STYLE_BOX;
 		else if (!lstrcmp(nm, TEXT("circle")))
-			_svp[whichOne]._folderStyle = FOLDER_STYLE_CIRCLE;
+			_svp._folderStyle = FOLDER_STYLE_CIRCLE;
 		else if (!lstrcmp(nm, TEXT("arrow")))
-			_svp[whichOne]._folderStyle = FOLDER_STYLE_ARROW;
+			_svp._folderStyle = FOLDER_STYLE_ARROW;
 		else if (!lstrcmp(nm, TEXT("simple")))
-			_svp[whichOne]._folderStyle = FOLDER_STYLE_SIMPLE;
+			_svp._folderStyle = FOLDER_STYLE_SIMPLE;
 		else if (!lstrcmp(nm, TEXT("none")))
-			_svp[whichOne]._folderStyle = FOLDER_STYLE_NONE;
+			_svp._folderStyle = FOLDER_STYLE_NONE;
 	}
 
 	// Line Wrap method
@@ -3511,11 +3506,11 @@ void NppParameters::feedScintillaParam(bool whichOne, TiXmlNode *node)
 	if (nm)
 	{
 		if (!lstrcmp(nm, TEXT("default")))
-			_svp[whichOne]._lineWrapMethod = LINEWRAP_DEFAULT;
+			_svp._lineWrapMethod = LINEWRAP_DEFAULT;
 		else if (!lstrcmp(nm, TEXT("aligned")))
-			_svp[whichOne]._lineWrapMethod = LINEWRAP_ALIGNED;
+			_svp._lineWrapMethod = LINEWRAP_ALIGNED;
 		else if (!lstrcmp(nm, TEXT("indent")))
-			_svp[whichOne]._lineWrapMethod = LINEWRAP_INDENT;
+			_svp._lineWrapMethod = LINEWRAP_INDENT;
 	}
 
     // Current Line Highlighting State
@@ -3523,9 +3518,9 @@ void NppParameters::feedScintillaParam(bool whichOne, TiXmlNode *node)
 	if (nm)
 	{
 		if (!lstrcmp(nm, TEXT("show")))
-			_svp[whichOne]._currentLineHilitingShow = true;
+			_svp._currentLineHilitingShow = true;
 		else if (!lstrcmp(nm, TEXT("hide")))
-			_svp[whichOne]._currentLineHilitingShow = false;
+			_svp._currentLineHilitingShow = false;
 	}
 
     // Current wrap symbol visibility State
@@ -3533,9 +3528,9 @@ void NppParameters::feedScintillaParam(bool whichOne, TiXmlNode *node)
 	if (nm)
 	{
 		if (!lstrcmp(nm, TEXT("show")))
-			_svp[whichOne]._wrapSymbolShow = true;
+			_svp._wrapSymbolShow = true;
 		else if (!lstrcmp(nm, TEXT("hide")))
-			_svp[whichOne]._wrapSymbolShow = false;
+			_svp._wrapSymbolShow = false;
 	}
 
 	// Do Wrap
@@ -3543,9 +3538,9 @@ void NppParameters::feedScintillaParam(bool whichOne, TiXmlNode *node)
 	if (nm)
 	{
 		if (!lstrcmp(nm, TEXT("yes")))
-			_svp[whichOne]._doWrap = true;
+			_svp._doWrap = true;
 		else if (!lstrcmp(nm, TEXT("no")))
-			_svp[whichOne]._doWrap = false;
+			_svp._doWrap = false;
 	}
 
 	// Do Edge
@@ -3553,24 +3548,30 @@ void NppParameters::feedScintillaParam(bool whichOne, TiXmlNode *node)
 	if (nm)
 	{
 		if (!lstrcmp(nm, TEXT("background")))
-			_svp[whichOne]._edgeMode = EDGE_BACKGROUND;
+			_svp._edgeMode = EDGE_BACKGROUND;
 		else if (!lstrcmp(nm, TEXT("line")))
-			_svp[whichOne]._edgeMode = EDGE_LINE;
+			_svp._edgeMode = EDGE_LINE;
 		else
-			_svp[whichOne]._edgeMode = EDGE_NONE;
+			_svp._edgeMode = EDGE_NONE;
 	}
 
 	int val;
 	nm = element->Attribute(TEXT("edgeNbColumn"), &val);
 	if (nm)
 	{
-		_svp[whichOne]._edgeNbColumn = val;
+		_svp._edgeNbColumn = val;
 	}
 
 	nm = element->Attribute(TEXT("zoom"), &val);
 	if (nm)
 	{
-		_svp[whichOne]._zoom = val;
+		_svp._zoom = val;
+	}
+
+	nm = element->Attribute(TEXT("zoom2"), &val);
+	if (nm)
+	{
+		_svp._zoom2 = val;
 	}
 
 	// White Space visibility State
@@ -3578,9 +3579,9 @@ void NppParameters::feedScintillaParam(bool whichOne, TiXmlNode *node)
 	if (nm)
 	{
 		if (!lstrcmp(nm, TEXT("show")))
-			_svp[whichOne]._whiteSpaceShow = true;
+			_svp._whiteSpaceShow = true;
 		else if (!lstrcmp(nm, TEXT("hide")))
-			_svp[whichOne]._whiteSpaceShow = false;
+			_svp._whiteSpaceShow = false;
 	}
 
 	// EOL visibility State
@@ -3588,9 +3589,9 @@ void NppParameters::feedScintillaParam(bool whichOne, TiXmlNode *node)
 	if (nm)
 	{
 		if (!lstrcmp(nm, TEXT("show")))
-			_svp[whichOne]._eolShow = true;
+			_svp._eolShow = true;
 		else if (!lstrcmp(nm, TEXT("hide")))
-			_svp[whichOne]._eolShow = false;
+			_svp._eolShow = false;
 	}
 }
 
@@ -3679,11 +3680,11 @@ void NppParameters::feedDockingManager(TiXmlNode *node)
 	}
 }
 
-bool NppParameters::writeScintillaParams(const ScintillaViewParams & svp, bool whichOne)
+bool NppParameters::writeScintillaParams(const ScintillaViewParams & svp)
 {
 	if (!_pXmlUserDoc) return false;
 
-	const TCHAR *pViewName = (whichOne == SCIV_PRIMARY)?TEXT("ScintillaPrimaryView"):TEXT("ScintillaSecondaryView");
+	const TCHAR *pViewName = TEXT("ScintillaPrimaryView");
 	TiXmlNode *nppRoot = _pXmlUserDoc->FirstChild(TEXT("NotepadPlus"));
 	if (!nppRoot) return false;
 
@@ -3720,6 +3721,7 @@ bool NppParameters::writeScintillaParams(const ScintillaViewParams & svp, bool w
 	(scintNode->ToElement())->SetAttribute(TEXT("edge"), edgeStr);
 	(scintNode->ToElement())->SetAttribute(TEXT("edgeNbColumn"), svp._edgeNbColumn);
 	(scintNode->ToElement())->SetAttribute(TEXT("zoom"), svp._zoom);
+	(scintNode->ToElement())->SetAttribute(TEXT("zoom2"), svp._zoom2);
 	(scintNode->ToElement())->SetAttribute(TEXT("whiteSpaceShow"), svp._whiteSpaceShow?TEXT("show"):TEXT("hide"));
 	(scintNode->ToElement())->SetAttribute(TEXT("eolShow"), svp._eolShow?TEXT("show"):TEXT("hide"));
 

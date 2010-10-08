@@ -1457,7 +1457,7 @@ LRESULT Notepad_plus::process(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			    saveFindHistory();
 
 			    _lastRecentFileList->saveLRFL();
-			    saveScintillaParams(SCIV_PRIMARY);
+			    saveScintillaParams();
 			    saveGUIParams();
 			    saveUserDefineLangs();
 			    saveShortcuts();

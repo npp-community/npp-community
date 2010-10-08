@@ -65,9 +65,6 @@ enum CopyData
 	COPYDATA_FILENAMESW = 2
 };
 
-#define SCIV_PRIMARY false
-#define SCIV_SECOND true
-
 extern const TCHAR fontSizeStrs[14][3];
 
 extern const TCHAR LINEDRAW_FONT[];

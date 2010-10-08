@@ -359,6 +359,7 @@ struct ScintillaViewParams
 	int _edgeMode;
 	int _edgeNbColumn;
 	int _zoom;
+	int _zoom2;
 	bool _whiteSpaceShow;
 	bool _eolShow;
 
@@ -755,8 +756,8 @@ public:
 
 	int getNbMaxFile() const {return _nbMaxFile;};
 
-    const ScintillaViewParams & getSVP(bool whichOne) const {
-        return _svp[whichOne];
+    const ScintillaViewParams & getSVP() const {
+        return _svp;
     };
 
 	bool writeNbHistoryFile(int nb);
@@ -766,7 +767,7 @@ public:
 	TiXmlNode * getChildElementByAttribut(TiXmlNode *pere, const TCHAR *childName,\
 										  const TCHAR *attributName, const TCHAR *attributVal) const;
 
-	bool writeScintillaParams(const ScintillaViewParams & svp, bool whichOne);
+	bool writeScintillaParams(const ScintillaViewParams & svp);
 
 	bool writeGUIParams();
 
@@ -1029,7 +1030,7 @@ private:
 	std::vector<TiXmlDocument *> _pXmlExternalLexerDoc;
 
 	NppGUI _nppGUI;
-	ScintillaViewParams _svp[2];
+	ScintillaViewParams _svp;
 
 	std::vector<Lang *> _langList;
 	std::vector<generic_string> _LRFileList;
@@ -1133,7 +1134,7 @@ private:
 	void feedGUIParameters(TiXmlNode *node);
 	void feedKeyWordsParameters(TiXmlNode *node);
 	void feedFileListParameters(TiXmlNode *node);
-    void feedScintillaParam(bool whichOne, TiXmlNode *node);
+    void feedScintillaParam(TiXmlNode *node);
 	void feedDockingManager(TiXmlNode *node);
 	void feedFindHistoryParameters(TiXmlNode *node);
 
