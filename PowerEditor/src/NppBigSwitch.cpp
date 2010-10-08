@@ -423,6 +423,12 @@ LRESULT Notepad_plus::process(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		}
 		break;
 
+		case NPPM_GETCURRENTNATIVELANGENCODING:
+		{
+			return _nativeLangSpeaker->getLangEncoding();
+		}
+		break;
+
 		case NPPM_INTERNAL_DOCORDERCHANGED :
 		{
 			BufferID id = _pEditView->getCurrentBufferID();

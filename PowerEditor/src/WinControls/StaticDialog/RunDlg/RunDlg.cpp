@@ -23,6 +23,7 @@
 #include "WinControls/shortcut/shortcut.h"
 #include "Parameters.h"
 #include "WinControls/StaticDialog/RunDlg/RunDlg_rc.h"
+#include "menuCmdID.h"
 
 const TCHAR fullCurrentPath[] = TEXT("FULL_CURRENT_PATH");
 const TCHAR currentDirectory[] = TEXT("CURRENT_DIRECTORY");
@@ -244,6 +245,7 @@ BOOL CALLBACK RunDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lParam*/
 					}
 					return TRUE;
 				}
+
 				case IDC_BUTTON_SAVE :
 				{
 					std::vector<UserCommand> & theUserCmds = (NppParameters::getInstance())->getUserCommandList();
@@ -266,10 +268,26 @@ BOOL CALLBACK RunDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lParam*/
 
 						theUserCmds.push_back(uc);
 						::InsertMenu(hRunMenu, posBase + nbCmd, MF_BYPOSITION, cmdID, uc.toMenuItemString().c_str());
+
+                        if (nbCmd == 0)
+                        {
+                            // Insert the separator and modify/delete command
+			                ::InsertMenu(hRunMenu, posBase + nbCmd + 1, MF_BYPOSITION, (unsigned int)-1, 0);
+                            const char * nativeLangShortcutMapperRun = (NppParameters::getInstance())->getNativeLangMenuStringA(IDM_SETTING_SHORTCUT_MAPPER_RUN);
+                            const char * shortcutMapperRunStr = nativeLangShortcutMapperRun?nativeLangShortcutMapperRun:"Modify Shortcut/Delete Command...";
+#ifdef UNICODE
+		                    WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
+                            const wchar_t * shortcutMapperRunStrW = wmc->char2wchar(shortcutMapperRunStr, ::SendMessage(_hParent, NPPM_GETCURRENTNATIVELANGENCODING, 0, 0));
+		                    ::InsertMenu(hRunMenu, posBase + nbCmd + 2, MF_BYCOMMAND, IDM_SETTING_SHORTCUT_MAPPER_RUN, shortcutMapperRunStrW);
+#else
+		                    ::InsertMenu(hRunMenu, posBase + nbCmd + 2, MF_BYCOMMAND, IDM_SETTING_SHORTCUT_MAPPER_RUN, shortcutMapperRunStr);
+#endif
+                        }
 						(NppParameters::getInstance())->getAccelerator()->updateShortcuts();
 					}
 					return TRUE;
 				}
+
 				case IDC_BUTTON_FILE_BROWSER :
 				{
 					FileDialog fd(_hSelf, _hInst);

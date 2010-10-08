@@ -388,7 +388,9 @@
     #define    IDM_SETTING_REMEMBER_LAST_SESSION    (IDM_SETTING + 10)
     #define    IDM_SETTING_PREFERENCE               (IDM_SETTING + 11)
     #define    IDM_SETTING_AUTOCNBCHAR              (IDM_SETTING + 15)
-	#define	   IDM_SETTING_MENU_WHEEL               (IDM_SETTING + 16)
+    #define	   IDM_SETTING_SHORTCUT_MAPPER_MACRO	(IDM_SETTING + 16)
+	#define	   IDM_SETTING_SHORTCUT_MAPPER_RUN		(IDM_SETTING + 17)
+	#define	   IDM_SETTING_MENU_WHEEL               (IDM_SETTING + 18)
 
 #define    IDM_EXECUTE  (IDM + 9000)
 
