@@ -182,7 +182,6 @@ class ScintillaEditView : public Window
 	friend class Finder;
 public:
 	ScintillaEditView();
-
 	virtual ~ScintillaEditView();
 	virtual void init(HINSTANCE hInst, HWND hParent);
 
@@ -240,7 +239,7 @@ public:
 	void marginClick(int position, int modifiers);
 	void setMakerStyle(folderStyle style);
 
-	folderStyle getFolderStyle() {return _folderStyle;};
+	void setWrapMode(lineWrapMethod method);
 	void showWSAndTab(bool willBeShowed = true);
 	void showEOL(bool willBeShowed = true);
 	bool isEolVisible();
@@ -359,8 +358,7 @@ protected:
 	//Store the current buffer so it can be retrieved later
 	BufferID _currentBufferID;
 	Buffer * _currentBuffer;
-	folderStyle _folderStyle;
-	NppParameters *_pParameter;
+    NppParameters *_pParameter;
 	int _codepage;
 	bool _lineNumbersShown;
 	bool _wrapRestoreNeeded;

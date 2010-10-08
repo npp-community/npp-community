@@ -548,7 +548,7 @@ LRESULT Notepad_plus::process(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			{
 				if ((lParam == 1) || (lParam == 2))
 				{
-					specialCmd(LOWORD(wParam), lParam);
+					specialCmd(LOWORD(wParam));
 				}
 				else
 					command(LOWORD(wParam));
@@ -1458,7 +1458,6 @@ LRESULT Notepad_plus::process(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 			    _lastRecentFileList->saveLRFL();
 			    saveScintillaParams(SCIV_PRIMARY);
-			    saveScintillaParams(SCIV_SECOND);
 			    saveGUIParams();
 			    saveUserDefineLangs();
 			    saveShortcuts();

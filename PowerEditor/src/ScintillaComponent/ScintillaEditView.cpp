@@ -1103,7 +1103,12 @@ void ScintillaEditView::defineDocType(LangType typeDoc)
 		}
 	}
 
-	showMargin(_SC_MARGIN_FOLDER, isNeededFolderMargin(typeDoc));
+	ScintillaViewParams & svp = (ScintillaViewParams &)NppParameters::getInstance()->getSVP(SCIV_PRIMARY);
+	if (svp._folderStyle != FOLDER_STYLE_NONE)
+	{
+		showMargin(_SC_MARGIN_FOLDER, isNeededFolderMargin(typeDoc));
+	}
+
 	switch (typeDoc)
 	{
 		case L_C :
@@ -2031,8 +2036,9 @@ void ScintillaEditView::performGlobalStyles()
 		foldfgColor = style._bgColor;
 		foldbgColor = style._fgColor;
 	}
+	ScintillaViewParams & svp = (ScintillaViewParams &)_pParameter->getSVP(SCIV_PRIMARY);
 	for (int j = 0 ; j < NB_FOLDER_STATE ; j++)
-        defineMarker(_markersArray[FOLDER_TYPE][j], _markersArray[_folderStyle][j], foldfgColor, foldbgColor);
+		defineMarker(_markersArray[FOLDER_TYPE][j], _markersArray[svp._folderStyle][j], foldfgColor, foldbgColor);
 /*
 	COLORREF unsavedChangebgColor = liteRed;
 	i = stylers.getStylerIndexByName(TEXT("Unsaved change marker"));
@@ -2908,11 +2914,17 @@ void ScintillaEditView::reapplyHotspotStyles()
 }
 
 ScintillaEditView::ScintillaEditView() :
-	_pScintillaFunc(NULL),_pScintillaPtr(NULL),_callWindowProc(NULL),
-	_currentBufferID(BUFFER_INVALID), _currentBuffer(NULL),
-	_folderStyle(FOLDER_STYLE_BOX), _pParameter(NULL), _codepage(CP_ACP),
-	_lineNumbersShown(false), _wrapRestoreNeeded(false),
-	_currentHotspotStyleMap(NULL), _currentHotspotOriginMap(NULL)
+	_pScintillaFunc(NULL),
+	_pScintillaPtr(NULL),
+	_callWindowProc(NULL),
+	_currentBufferID(BUFFER_INVALID),
+	_currentBuffer(NULL),
+	_pParameter(NULL),
+	_codepage(CP_ACP),
+	_lineNumbersShown(false),
+	_wrapRestoreNeeded(false),
+	_currentHotspotStyleMap(NULL),
+	_currentHotspotOriginMap(NULL)
 {
 	++_refCount;
 }
@@ -3010,11 +3022,44 @@ bool ScintillaEditView::hasMarginShowed( int whichMargin )
 
 void ScintillaEditView::setMakerStyle( folderStyle style )
 {
-	if (_folderStyle == style)
-		return;
-	_folderStyle = style;
+	bool display;
+	if (style == FOLDER_STYLE_NONE)
+	{
+		style = FOLDER_STYLE_BOX;
+		display = false;
+	}
+	else
+	{
+		display = true;
+	}
 	for (int i = 0 ; i < NB_FOLDER_STATE ; i++)
 		defineMarker(_markersArray[FOLDER_TYPE][i], _markersArray[style][i], white, grey);
+	showMargin(ScintillaEditView::_SC_MARGIN_FOLDER, display);
+}
+
+void ScintillaEditView::setWrapMode(lineWrapMethod method)
+{
+	int mode = SC_WRAPINDENT_FIXED;
+
+	switch (method)
+	{
+		case LINEWRAP_ALIGNED:
+		{
+			mode = SC_WRAPINDENT_SAME;
+		} break;
+
+		case LINEWRAP_INDENT:
+		{
+			mode = SC_WRAPINDENT_INDENT;
+		} break;
+
+		default: // LINEWRAP_DEFAULT
+		{
+			mode = SC_WRAPINDENT_FIXED;
+		} break;
+	}
+
+	execute(SCI_SETWRAPINDENTMODE, mode);
 }
 
 void ScintillaEditView::showWSAndTab( bool willBeShowed )

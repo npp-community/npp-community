@@ -360,8 +360,7 @@ LRESULT Notepad_plus::init(HWND hwnd)
 	_mainWindowStatus = WindowMainActive;
 	_activeView = MAIN_VIEW;
 
-	const ScintillaViewParams & svp1 = pNppParam->getSVP(SCIV_PRIMARY);
-	const ScintillaViewParams & svp2 = pNppParam->getSVP(SCIV_SECOND);
+    const ScintillaViewParams & svp = pNppParam->getSVP(SCIV_PRIMARY);
 
 	int tabBarStatus = nppGUI._tabStatus;
 	_toReduceTabBar = ((tabBarStatus & TAB_REDUCE) != 0);
@@ -378,13 +377,13 @@ LRESULT Notepad_plus::init(HWND hwnd)
 	_invisibleEditView->wrap(false); // Make sure no slow down
 
 	// Configuration of 2 scintilla views
-	_mainEditView->showMargin(ScintillaEditView::_SC_MARGIN_LINENUMBER, svp1._lineNumberMarginShow);
-	_subEditView->showMargin(ScintillaEditView::_SC_MARGIN_LINENUMBER, svp2._lineNumberMarginShow);
-	_mainEditView->showMargin(ScintillaEditView::_SC_MARGIN_SYMBOL, svp1._bookMarkMarginShow);
-	_subEditView->showMargin(ScintillaEditView::_SC_MARGIN_SYMBOL, svp2._bookMarkMarginShow);
+	_mainEditView->showMargin(ScintillaEditView::_SC_MARGIN_LINENUMBER, svp._lineNumberMarginShow);
+	_subEditView->showMargin(ScintillaEditView::_SC_MARGIN_LINENUMBER, svp._lineNumberMarginShow);
+	_mainEditView->showMargin(ScintillaEditView::_SC_MARGIN_SYMBOL, svp._bookMarkMarginShow);
+	_subEditView->showMargin(ScintillaEditView::_SC_MARGIN_SYMBOL, svp._bookMarkMarginShow);
 
-	_mainEditView->showIndentGuideLine(svp1._indentGuideLineShow);
-	_subEditView->showIndentGuideLine(svp2._indentGuideLineShow);
+	_mainEditView->showIndentGuideLine(svp._indentGuideLineShow);
+	_subEditView->showIndentGuideLine(svp._indentGuideLineShow);
 
 	::SendMessage(hwnd, NPPM_INTERNAL_SETCARETWIDTH, 0, 0);
 	::SendMessage(hwnd, NPPM_INTERNAL_SETCARETBLINKRATE, 0, 0);
@@ -392,39 +391,43 @@ LRESULT Notepad_plus::init(HWND hwnd)
 	_configStyleDlg->init(_pPublicInterface->getHinst(), hwnd);
 	_preferenceDlg->init(_pPublicInterface->getHinst(), hwnd);
 
-	//Marker Margin config
-	_mainEditView->setMakerStyle(svp1._folderStyle);
-	_subEditView->setMakerStyle(svp2._folderStyle);
+    //Marker Margin config
+    _mainEditView->setMakerStyle(svp._folderStyle);
+    _subEditView->setMakerStyle(svp._folderStyle);
 
-	_mainEditView->execute(SCI_SETCARETLINEVISIBLE, svp1._currentLineHilitingShow);
-	_subEditView->execute(SCI_SETCARETLINEVISIBLE, svp2._currentLineHilitingShow);
+	//Line wrap method
+	_mainEditView->setWrapMode(svp._lineWrapMethod);
+    _subEditView->setWrapMode(svp._lineWrapMethod);
+
+	_mainEditView->execute(SCI_SETCARETLINEVISIBLE, svp._currentLineHilitingShow);
+	_subEditView->execute(SCI_SETCARETLINEVISIBLE, svp._currentLineHilitingShow);
 
 	_mainEditView->execute(SCI_SETCARETLINEVISIBLEALWAYS, true);
 	_subEditView->execute(SCI_SETCARETLINEVISIBLEALWAYS, true);
 
-	_mainEditView->wrap(svp1._doWrap);
-	_subEditView->wrap(svp2._doWrap);
+	_mainEditView->wrap(svp._doWrap);
+	_subEditView->wrap(svp._doWrap);
 
-	_mainEditView->execute(SCI_SETEDGECOLUMN, svp1._edgeNbColumn);
-	_mainEditView->execute(SCI_SETEDGEMODE, svp1._edgeMode);
-	_subEditView->execute(SCI_SETEDGECOLUMN, svp2._edgeNbColumn);
-	_subEditView->execute(SCI_SETEDGEMODE, svp2._edgeMode);
+	_mainEditView->execute(SCI_SETEDGECOLUMN, svp._edgeNbColumn);
+	_mainEditView->execute(SCI_SETEDGEMODE, svp._edgeMode);
+	_subEditView->execute(SCI_SETEDGECOLUMN, svp._edgeNbColumn);
+	_subEditView->execute(SCI_SETEDGEMODE, svp._edgeMode);
 
-	_mainEditView->showEOL(svp1._eolShow);
-	_subEditView->showEOL(svp2._eolShow);
+	_mainEditView->showEOL(svp._eolShow);
+	_subEditView->showEOL(svp._eolShow);
 
-	_mainEditView->showWSAndTab(svp1._whiteSpaceShow);
-	_subEditView->showWSAndTab(svp2._whiteSpaceShow);
+	_mainEditView->showWSAndTab(svp._whiteSpaceShow);
+	_subEditView->showWSAndTab(svp._whiteSpaceShow);
 
-	_mainEditView->showWrapSymbol(svp1._wrapSymbolShow);
-	_subEditView->showWrapSymbol(svp2._wrapSymbolShow);
+	_mainEditView->showWrapSymbol(svp._wrapSymbolShow);
+	_subEditView->showWrapSymbol(svp._wrapSymbolShow);
 
 	_mainEditView->performGlobalStyles();
 	_subEditView->performGlobalStyles();
 
 	_zoomOriginalValue = _pEditView->execute(SCI_GETZOOM);
-	_mainEditView->execute(SCI_SETZOOM, svp1._zoom);
-	_subEditView->execute(SCI_SETZOOM, svp2._zoom);
+	_mainEditView->execute(SCI_SETZOOM, svp._zoom);
+	_subEditView->execute(SCI_SETZOOM, svp._zoom);
 
 	EnableMouseWheelZoom(nppGUI._enableMouseWheelZoom);
 
@@ -2110,35 +2113,6 @@ void Notepad_plus::setUniModeText()
 	_statusBar->setText(uniModeTextString.c_str(), STATUSBAR_UNICODE_TYPE);
 }
 
-int Notepad_plus::getFolderMarginStyle() const
-{
-    if (::GetMenuState(_mainMenuHandle, IDM_VIEW_FOLDERMAGIN_SIMPLE, MF_BYCOMMAND) == MF_CHECKED)
-        return IDM_VIEW_FOLDERMAGIN_SIMPLE;
-
-    if (::GetMenuState(_mainMenuHandle, IDM_VIEW_FOLDERMAGIN_ARROW, MF_BYCOMMAND) == MF_CHECKED)
-        return IDM_VIEW_FOLDERMAGIN_ARROW;
-
-    if (::GetMenuState(_mainMenuHandle, IDM_VIEW_FOLDERMAGIN_CIRCLE, MF_BYCOMMAND) == MF_CHECKED)
-        return IDM_VIEW_FOLDERMAGIN_CIRCLE;
-
-    if (::GetMenuState(_mainMenuHandle, IDM_VIEW_FOLDERMAGIN_BOX, MF_BYCOMMAND) == MF_CHECKED)
-        return IDM_VIEW_FOLDERMAGIN_BOX;
-
-	return 0;
-}
-
-int Notepad_plus::getFolderMaginStyleIDFrom(folderStyle fStyle) const
-{
-    switch (fStyle)
-    {
-        case FOLDER_STYLE_SIMPLE : return IDM_VIEW_FOLDERMAGIN_SIMPLE;
-        case FOLDER_STYLE_ARROW : return IDM_VIEW_FOLDERMAGIN_ARROW;
-        case FOLDER_STYLE_CIRCLE : return IDM_VIEW_FOLDERMAGIN_CIRCLE;
-        case FOLDER_STYLE_BOX : return IDM_VIEW_FOLDERMAGIN_BOX;
-		default : return FOLDER_TYPE;
-    }
-}
-
 
 void Notepad_plus::charAdded(TCHAR chAdded)
 {
@@ -2291,39 +2265,43 @@ void Notepad_plus::MaintainIndentation(TCHAR ch)
 		}
 	}
 }
-void Notepad_plus::specialCmd(int id, int param)
+void Notepad_plus::specialCmd(int id/*, int param*/)
 {
-	if ((param != 1) && (param != 2)) return;
+	//if ((param != 1) && (param != 2)) return;
 
 	NppParameters *pNppParam = NppParameters::getInstance();
-	ScintillaEditView *pEditView = (param == 1)?_mainEditView:_subEditView;
+	//ScintillaEditView *pEditView = (param == 1)?_mainEditView:_subEditView;
 
 	switch (id)
 	{
         case IDM_VIEW_LINENUMBER:
         case IDM_VIEW_SYMBOLMARGIN:
-		//case IDM_VIEW_DOCCHANGEMARGIN:
-        case IDM_VIEW_FOLDERMAGIN:
+		case IDM_VIEW_DOCCHANGEMARGIN:
         {
             int margin;
             if (id == IDM_VIEW_LINENUMBER)
                 margin = ScintillaEditView::_SC_MARGIN_LINENUMBER;
-            else if (id == IDM_VIEW_SYMBOLMARGIN)
+            else //if (id == IDM_VIEW_SYMBOLMARGIN)
                 margin = ScintillaEditView::_SC_MARGIN_SYMBOL;
 			/*
             else if (id == IDM_VIEW_DOCCHANGEMARGIN)
 			{
 				margin = ScintillaEditView::_SC_MARGIN_MODIFMARKER;
 			}
-			*/
+
 			else
-				margin = ScintillaEditView::_SC_MARGIN_FOLDER;
-
-            if (pEditView->hasMarginShowed(margin))
-                pEditView->showMargin(margin, false);
+				margin = ScintillaEditView::_SC_MARGE_FOLDER;
+*/
+			if (_mainEditView->hasMarginShowed(margin))
+			{
+                _mainEditView->showMargin(margin, false);
+				_subEditView->showMargin(margin, false);
+			}
             else
-                pEditView->showMargin(margin);
-
+			{
+				_mainEditView->showMargin(margin);
+                _subEditView->showMargin(margin);
+			}
 			break;
         }
 
@@ -2331,20 +2309,23 @@ void Notepad_plus::specialCmd(int id, int param)
         case IDM_VIEW_FOLDERMAGIN_ARROW:
         case IDM_VIEW_FOLDERMAGIN_CIRCLE:
         case IDM_VIEW_FOLDERMAGIN_BOX:
+		case IDM_VIEW_FOLDERMAGIN:
         {
-            int checkedID = getFolderMarginStyle();
-            if (checkedID == id) return;
             folderStyle fStyle = (id == IDM_VIEW_FOLDERMAGIN_SIMPLE)?FOLDER_STYLE_SIMPLE:\
-                ((id == IDM_VIEW_FOLDERMAGIN_ARROW)?FOLDER_STYLE_ARROW:\
-                ((id == IDM_VIEW_FOLDERMAGIN_CIRCLE)?FOLDER_STYLE_CIRCLE:FOLDER_STYLE_BOX));
-            pEditView->setMakerStyle(fStyle);
+								 (id == IDM_VIEW_FOLDERMAGIN_ARROW)?FOLDER_STYLE_ARROW:\
+								 (id == IDM_VIEW_FOLDERMAGIN_CIRCLE)?FOLDER_STYLE_CIRCLE:\
+								 (id == IDM_VIEW_FOLDERMAGIN)?FOLDER_STYLE_NONE:FOLDER_STYLE_BOX;
+
+            _mainEditView->setMakerStyle(fStyle);
+			_subEditView->setMakerStyle(fStyle);
             break;
         }
 
 		case IDM_VIEW_CURLINE_HILITING:
 		{
             COLORREF colour = pNppParam->getCurLineHilitingColour();
-			pEditView->setCurrentLineHiLiting(!_pEditView->isCurrentLineHiLiting(), colour);
+			_mainEditView->setCurrentLineHiLiting(!_pEditView->isCurrentLineHiLiting(), colour);
+			_subEditView->setCurrentLineHiLiting(!_pEditView->isCurrentLineHiLiting(), colour);
 			break;
 		}
 
@@ -2368,7 +2349,8 @@ void Notepad_plus::specialCmd(int id, int param)
 				default :
 					mode = EDGE_NONE;
 			}
-			pEditView->execute(SCI_SETEDGEMODE, mode);
+			_mainEditView->execute(SCI_SETEDGEMODE, mode);
+			_subEditView->execute(SCI_SETEDGEMODE, mode);
 			break;
 		}
 
@@ -2376,7 +2358,8 @@ void Notepad_plus::specialCmd(int id, int param)
 		{
 			assert(_preferenceDlg);
 			ValueDlg nbColumnEdgeDlg;
-			ScintillaViewParams & svp = (ScintillaViewParams &)pNppParam->getSVP(param == 1?SCIV_PRIMARY:SCIV_SECOND);
+			//ScintillaViewParams & svp = (ScintillaViewParams &)pNppParam->getSVP(param == 1?SCIV_PRIMARY:SCIV_SECOND);
+			ScintillaViewParams & svp = (ScintillaViewParams &)pNppParam->getSVP(SCIV_PRIMARY);
 			nbColumnEdgeDlg.init(_pPublicInterface->getHinst(), _preferenceDlg->getHSelf(), svp._edgeNbColumn, TEXT("Nb of column:"));
 			nbColumnEdgeDlg.setNBNumber(3);
 
@@ -2388,8 +2371,38 @@ void Notepad_plus::specialCmd(int id, int param)
 			if (size != -1)
 			{
 				svp._edgeNbColumn = size;
-				pEditView->execute(SCI_SETEDGECOLUMN, size);
+				_mainEditView->execute(SCI_SETEDGECOLUMN, size);
+				_subEditView->execute(SCI_SETEDGECOLUMN, size);
 			}
+			break;
+		}
+
+		case IDM_VIEW_LWDEF:
+		case IDM_VIEW_LWALIGN:
+		case IDM_VIEW_LWINDENT:
+		{
+			int mode = SC_WRAPINDENT_FIXED;
+
+			switch (id)
+			{
+				case IDM_VIEW_LWALIGN:
+				{
+					mode = SC_WRAPINDENT_SAME;
+				} break;
+
+				case IDM_VIEW_LWINDENT:
+				{
+					mode = SC_WRAPINDENT_INDENT;
+				} break;
+
+				default: // case IDM_VIEW_LWALIGN:
+				{
+					mode = SC_WRAPINDENT_FIXED;
+				} break;
+			}
+
+			_mainEditView->execute(SCI_SETWRAPINDENTMODE, mode);
+			_subEditView->execute(SCI_SETWRAPINDENTMODE, mode);
 			break;
 		}
 
@@ -3265,18 +3278,8 @@ void Notepad_plus::bookmarkClearAll() const
 	_pEditView->execute(SCI_MARKERDELETEALL, MARK_BOOKMARK);
 }
 
-void Notepad_plus::dynamicCheckMenuAndTB() const
+void Notepad_plus::staticCheckMenuAndTB() const
 {
-	assert(_toolBar);
-
-	// Visibility of 3 margins
-    checkMenuItem(IDM_VIEW_LINENUMBER, _pEditView->hasMarginShowed(ScintillaEditView::_SC_MARGIN_LINENUMBER));
-    checkMenuItem(IDM_VIEW_SYMBOLMARGIN, _pEditView->hasMarginShowed(ScintillaEditView::_SC_MARGIN_SYMBOL));
-    checkMenuItem(IDM_VIEW_FOLDERMAGIN, _pEditView->hasMarginShowed(ScintillaEditView::_SC_MARGIN_FOLDER));
-
-	// Folder margin style
-	checkFolderMarginStyleMenu(getFolderMaginStyleIDFrom(_pEditView->getFolderStyle()));
-
 	// Visibility of invisible characters
 	bool wsTabShow = _pEditView->isInvisibleCharsShown();
 	bool eolShow = _pEditView->isEolVisible();
@@ -3310,25 +3313,19 @@ void Notepad_plus::dynamicCheckMenuAndTB() const
 	checkMenuItem(IDM_VIEW_INDENT_GUIDE, b);
 	_toolBar->setCheck(IDM_VIEW_INDENT_GUIDE, b);
 
-	// Edge Line
-	int mode = int(_pEditView->execute(SCI_GETEDGEMODE));
-	checkMenuItem(IDM_VIEW_EDGEBACKGROUND, (MF_BYCOMMAND | ((mode == EDGE_NONE)||(mode == EDGE_LINE))?MF_UNCHECKED:MF_CHECKED) != 0);
-	checkMenuItem(IDM_VIEW_EDGELINE, (MF_BYCOMMAND | ((mode == EDGE_NONE)||(mode == EDGE_BACKGROUND))?MF_UNCHECKED:MF_CHECKED) != 0);
-
-	// Current Line Highlighting
-	checkMenuItem(IDM_VIEW_CURLINE_HILITING, _pEditView->isCurrentLineHiLiting());
 
 	// Wrap
 	b = _pEditView->isWrap();
 	checkMenuItem(IDM_VIEW_WRAP, b);
 	_toolBar->setCheck(IDM_VIEW_WRAP, b);
 	checkMenuItem(IDM_VIEW_WRAP_SYMBOL, _pEditView->isWrapSymbolVisible());
+}
 
+void Notepad_plus::dynamicCheckMenuAndTB() const
+{
 	//Format conversion
 	enableConvertMenuItems(_pEditView->getCurrentBuffer()->getFormat());
-	checkUnicodeMenuItems(/*_pEditView->getCurrentBuffer()->getUnicodeMode()*/);
-
-	//Syncronized scrolling
+	checkUnicodeMenuItems();
 }
 
 void Notepad_plus::enableConvertMenuItems(formatType f) const
@@ -3640,23 +3637,8 @@ bool Notepad_plus::doStreamComment()
 
 bool Notepad_plus::saveScintillaParams(bool whichOne)
 {
-	ScintillaViewParams svp;
-	ScintillaEditView *pView = (whichOne == SCIV_PRIMARY)?_mainEditView:_subEditView;
-
-	svp._lineNumberMarginShow = pView->hasMarginShowed(ScintillaEditView::_SC_MARGIN_LINENUMBER);
-	svp._bookMarkMarginShow = pView->hasMarginShowed(ScintillaEditView::_SC_MARGIN_SYMBOL);
-	//svp._docChangeStateMarginShow = pView->hasMarginShowed(ScintillaEditView::_SC_MARGIN_MODIFMARKER);
-	svp._indentGuideLineShow = pView->isShownIndentGuide();
-	svp._folderStyle = pView->getFolderStyle();
-	svp._currentLineHilitingShow = pView->isCurrentLineHiLiting();
-	svp._wrapSymbolShow = pView->isWrapSymbolVisible();
-	svp._doWrap = pView->isWrap();
-	svp._edgeMode = int(pView->execute(SCI_GETEDGEMODE));
-	svp._edgeNbColumn = int(pView->execute(SCI_GETEDGECOLUMN));
-	svp._zoom = int(pView->execute(SCI_GETZOOM));
-	svp._whiteSpaceShow = pView->isInvisibleCharsShown();
-	svp._eolShow = pView->isEolVisible();
-
+	NppParameters * pNppParam = NppParameters::getInstance();
+	ScintillaViewParams & svp = (ScintillaViewParams &)pNppParam->getSVP(SCIV_PRIMARY);
 	return (NppParameters::getInstance())->writeScintillaParams(svp, whichOne);
 }
 
@@ -3722,7 +3704,6 @@ bool Notepad_plus::switchToFile(BufferID id)
 	if (i != -1)
 	{
 		switchEditViewTo(iView);
-		//_pDocTab->activateAt(i);
 		activateBuffer(id, currentView());
 		return true;
 	}
@@ -4241,7 +4222,7 @@ void Notepad_plus::getCurrentOpenedFiles(Session & in_session)
 
 			sessionFileInfo sfi(buf->getFullPathName(), langName, buf->getEncoding(), buf->getPosition(_mainEditView));
 
-			//_mainEditView.activateBuffer(buf->getID());
+			//_mainEditView->activateBuffer(buf->getID());
 			_invisibleEditView->execute(SCI_SETDOCPOINTER, 0, buf->getDocument());
 			int maxLine = _invisibleEditView->execute(SCI_GETLINECOUNT);
 
@@ -4854,16 +4835,10 @@ void Notepad_plus::EnableMouseWheelZoom(bool enable)
 	_fileEditView->execute(SCI_SETWHEELZOOMING, enable);
 }
 
-void Notepad_plus::checkFolderMarginStyleMenu(int id2Check) const
-{
-	::CheckMenuRadioItem(_mainMenuHandle, IDM_VIEW_FOLDERMAGIN_SIMPLE, IDM_VIEW_FOLDERMAGIN_BOX, id2Check, MF_BYCOMMAND);
-}
-
 void Notepad_plus::checkMenuItem(int itemID, bool willBeChecked) const
 {
 	::CheckMenuItem(_mainMenuHandle, itemID, MF_BYCOMMAND | (willBeChecked?MF_CHECKED:MF_UNCHECKED));
 }
-
 
 bool Notepad_plus::reloadLang()
 {

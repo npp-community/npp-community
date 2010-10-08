@@ -330,17 +330,28 @@ struct NppGUI
 struct ScintillaViewParams
 {
 	ScintillaViewParams() :
-		_lineNumberMarginShow(true), _bookMarkMarginShow(true),
-		_folderStyle(FOLDER_STYLE_BOX), _indentGuideLineShow(true),
-	    _currentLineHilitingShow(true), _wrapSymbolShow(false), _doWrap(false),
-	    _edgeMode(EDGE_NONE), _edgeNbColumn(0),
-		_zoom(0), _whiteSpaceShow(false), _eolShow(false)
+		_lineNumberMarginShow(true),
+		_bookMarkMarginShow(true),
+		_folderStyle(FOLDER_STYLE_BOX),
+		_lineWrapMethod(LINEWRAP_ALIGNED),
+		_foldMarginShow(true),
+		_indentGuideLineShow(true),
+	    _currentLineHilitingShow(true),
+		_wrapSymbolShow(false),
+		_doWrap(false),
+	    _edgeMode(EDGE_NONE),
+		_edgeNbColumn(0),
+		_zoom(0),
+		_whiteSpaceShow(false),
+		_eolShow(false)
 	{}
 
 	bool _lineNumberMarginShow;
 	bool _bookMarkMarginShow;
 	//bool _docChangeStateMarginShow;
-	folderStyle  _folderStyle; //"simple", TEXT("arrow"), TEXT("circle") and "box"
+	folderStyle  _folderStyle; //"simple", "arrow", "circle", "box" and "none"
+	lineWrapMethod _lineWrapMethod;
+	bool _foldMarginShow;
 	bool _indentGuideLineShow;
 	bool _currentLineHilitingShow;
 	bool _wrapSymbolShow;

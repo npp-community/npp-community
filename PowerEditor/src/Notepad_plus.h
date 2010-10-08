@@ -359,7 +359,7 @@ private:
 
 
 	BOOL notify(SCNotification *notification);
-	void specialCmd(int id, int param);
+	void specialCmd(int id);
 	void command(int id);
 
 //Document management
@@ -422,6 +422,7 @@ private:
 	void checkModifiedDocument();
 
     void getMainClientRect(RECT & rc) const;
+	void staticCheckMenuAndTB() const;
 	void dynamicCheckMenuAndTB() const;
 	void enableConvertMenuItems(formatType f) const;
 	void checkUnicodeMenuItems() const;
@@ -438,10 +439,6 @@ private:
     void setLanguage(LangType langType);
 	enum LangType menuID2LangType(int cmdID);
 
-    int getFolderMarginStyle() const;
-
-	void checkFolderMarginStyleMenu(int id2Check) const;
-    int getFolderMaginStyleIDFrom(folderStyle fStyle) const;
 	void checkMenuItem(int itemID, bool willBeChecked) const;
 	void charAdded(TCHAR chAdded);
 	void MaintainIndentation(TCHAR ch);
