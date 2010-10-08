@@ -19,7 +19,6 @@
 #include "ScintillaComponent/AutoCompletion.h"
 #include "ScintillaComponent/FunctionCallTip.h"
 #include "ScintillaComponent/ScintillaEditView.h"
-#include "TinyXML/tinyxml.h"
 #include "ScintillaComponent/Buffer.h"
 #include "Parameters.h"
 

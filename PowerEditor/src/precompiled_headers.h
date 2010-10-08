@@ -83,6 +83,12 @@
 #include "Scintilla.h"
 #include "SciLexer.h"
 
+// TinyXML
+#include "TinyXML/tinyXmlA/tinystrA.h"
+#include "TinyXML/tinystr.h"
+#include "TinyXML/tinyXmlA/tinyxmlA.h"
+#include "TinyXML/tinyxml.h"
+
 // Power Editor
 #include "MISC/Common/CommonGenerics.h"
 #include "MISC/Debug/npp_debug.h"

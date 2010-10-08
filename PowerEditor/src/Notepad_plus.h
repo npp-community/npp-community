@@ -26,14 +26,6 @@
 #include "Parameters_def.h"
 #endif
 
-#ifndef SCINTILLACOMPONENT_SCINTILLAREF_H
-#include "ScintillaComponent/ScintillaRef.h"
-#endif
-
-#ifndef WINCONTROLS_WINDOW_H
-#include "WinControls/Window.h"
-#endif
-
 #ifndef MISC_PLUGINSMANAGER_NOTEPADPLUSMSGS_H
 #include "MISC/PluginsManager/Notepad_plus_msgs.h"
 #endif

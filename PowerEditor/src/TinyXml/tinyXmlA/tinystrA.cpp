@@ -26,8 +26,6 @@ distribution.
 
 #ifndef TIXMLA_USE_STL
 
-#include "tinystrA.h"
-
 // TiXmlStringA constructor, based on a C string
 TiXmlStringA::TiXmlStringA (const char* instring)
 {

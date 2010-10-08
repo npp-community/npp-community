@@ -23,7 +23,6 @@ distribution.
 */
 
 #include "precompiled_headers.h"
-#include "tinyxml.h"
 
 //#define DEBUG_PARSER
 

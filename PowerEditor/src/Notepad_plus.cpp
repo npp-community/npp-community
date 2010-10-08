@@ -65,8 +65,6 @@
 
 #include "ScintillaComponent/Buffer.h"
 
-#include "TinyXML/tinyXmlA/tinyxmlA.h"
-#include "TinyXML/tinyxml.h"
 #include "Parameters.h"
 
 #include "MISC/Common/npp_session.h"

@@ -18,8 +18,6 @@
 #include "precompiled_headers.h"
 #include "MISC/PluginsManager/PluginsManager.h"
 
-#include "TinyXML/tinyxml.h"
-
 #include "Parameters.h"
 #include "resource.h"
 

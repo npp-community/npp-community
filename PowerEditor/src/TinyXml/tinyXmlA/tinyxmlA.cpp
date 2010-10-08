@@ -23,7 +23,6 @@ distribution.
 */
 
 #include "precompiled_headers.h"
-#include "tinyxmlA.h"
 
 bool TiXmlBaseA::condenseWhiteSpace = true;
 

@@ -34,8 +34,6 @@
 #include "ScintillaComponent/UserDefineDialog.h"
 #include "ScintillaComponent/UserDefineResource.h"
 
-#include "TinyXML/tinyXmlA/tinyxmlA.h"
-
 #include "EncodingMapper.h"
 #include "lastRecentFileList.h"
 #include "Parameters.h"

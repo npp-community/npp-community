@@ -23,8 +23,6 @@ distribution.
 */
 #include "precompiled_headers.h"
 
-#include "tinyxmlA.h"
-
 //#define DEBUG_PARSER
 
 // Note tha "PutString" hardcodes the same list. This
