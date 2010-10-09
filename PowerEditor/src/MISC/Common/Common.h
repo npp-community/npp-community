@@ -89,6 +89,9 @@ private:
 	const WcharMbcsConvertor& operator= (const WcharMbcsConvertor&);
 };
 
+#define MACRO_RECORDING_IN_PROGRESS 1
+#define MACRO_RECORDING_HAS_STOPPED 2
+
 #define ERROR_MSG_SIZE 1024
 
 #if _MSC_VER > 1400 // MS Compiler > VS 2005

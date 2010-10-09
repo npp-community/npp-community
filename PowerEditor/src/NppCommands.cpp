@@ -53,6 +53,24 @@
 #include "Notepad_plus_Window.h"
 #include "Notepad_plus.h"
 
+void Notepad_plus::macroPlayback(Macro macro)
+{
+	_pEditView->execute(SCI_BEGINUNDOACTION);
+
+	for (Macro::iterator step = macro.begin(); step != macro.end(); step++)
+	{
+		if (step->isPlayable())
+		{
+			step->PlayBack(this->_pPublicInterface, _pEditView);
+		}
+		else
+		{
+			_findReplaceDlg->execSavedCommand(step->message, step->lParameter, step->sParameter);
+		}
+	}
+
+	_pEditView->execute(SCI_ENDUNDOACTION);
+}
 void Notepad_plus::command(int id)
 {
 	switch (id)
@@ -198,12 +216,7 @@ void Notepad_plus::command(int id)
 		case IDM_MACRO_PLAYBACKRECORDEDMACRO:
 			if (!_recordingMacro) // if we're not currently recording, then playback the recorded keystrokes
 			{
-				_pEditView->execute(SCI_BEGINUNDOACTION);
-
-				for (Macro::iterator step = _macro.begin(); step != _macro.end(); step++)
-					step->PlayBack(this->_pPublicInterface, _pEditView);
-
-				_pEditView->execute(SCI_ENDUNDOACTION);
+				macroPlayback(_macro);
 			}
 			break;
 
@@ -1960,14 +1973,7 @@ void Notepad_plus::command(int id)
 			{
 				int i = id - ID_MACRO;
 				std::vector<MacroShortcut> & theMacros = (NppParameters::getInstance())->getMacroList();
-				Macro macro = theMacros[i].getMacro();
-				_pEditView->execute(SCI_BEGINUNDOACTION);
-
-				for (Macro::iterator step = macro.begin(); step != macro.end(); step++)
-					step->PlayBack(this->_pPublicInterface, _pEditView);
-
-				_pEditView->execute(SCI_ENDUNDOACTION);
-
+				macroPlayback(theMacros[i].getMacro());
 			}
 			else if ((id >= ID_USER_CMD) && (id < ID_USER_CMD_LIMIT))
 			{

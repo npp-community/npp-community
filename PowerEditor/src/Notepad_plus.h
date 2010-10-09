@@ -215,6 +215,8 @@ public:
 
 
 	bool addCurrentMacro();
+	void macroPlayback(Macro);
+
     void loadLastSession();
 	bool loadSession(Session* session);
 

@@ -1718,7 +1718,7 @@ void NppParameters::getActions(TiXmlNode *node, Macro & macro)
 	{
 		int type;
 		const TCHAR *typeStr = (childNode->ToElement())->Attribute(TEXT("type"), &type);
-		if ((!typeStr) || (type > 2))
+		if ((!typeStr) || (type > 3)) // JOCE: Magic number: fix this.
 			continue;
 
 		int msg = 0;
@@ -1733,7 +1733,7 @@ void NppParameters::getActions(TiXmlNode *node, Macro & macro)
 		const TCHAR *sParam = (childNode->ToElement())->Attribute(TEXT("sParam"));
 		if (!sParam)
 			sParam = TEXT("");
-		recordedMacroStep step(type, msg, wParam, lParam, sParam);
+		recordedMacroStep step(msg, wParam, lParam, sParam, type);
 		if (step.isValid())
 			macro.push_back(step);
 

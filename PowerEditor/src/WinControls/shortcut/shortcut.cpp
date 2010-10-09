@@ -16,14 +16,18 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "WinControls/shortcut/shortcut.h"
-#include "Parameters.h"
-#include "ScintillaComponent/ScintillaEditView.h"
-#include "resource.h"
-#include "Notepad_plus_Window.h"
 #include "WinControls/shortcut/shortcutRc.h"
 
+// JOCE: Dependencies from WinControls on Scintilla component seems wrong.
+#include "ScintillaComponent/ScintillaEditView.h"
+#include "ScintillaComponent/FindReplaceDlg_rc.h"
+
+#include "resource.h"
+#include "Notepad_plus_Window.h"
+#include "Parameters.h"
 #include "keys.h"
+
+#include "WinControls/shortcut/shortcut.h"
 
 struct KeyIDNAME {
 	const TCHAR * name;
@@ -689,6 +693,10 @@ recordedMacroStep::recordedMacroStep(int iMessage, long wParam, long lParam)
 			case SCI_STYLESETFONT :
 			case SCI_SEARCHNEXT :
 			case SCI_SEARCHPREV :
+			case IDFINDWHAT:
+			case IDREPLACEWITH:
+			case IDD_FINDINFILES_DIR_COMBO:
+			case IDD_FINDINFILES_FILTERS_COMBO:
 				sParameter = *reinterpret_cast<TCHAR *>(lParameter);
 				MacroType = mtUseSParameter;
 				lParameter = 0;

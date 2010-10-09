@@ -47,7 +47,7 @@ void RunMacroDlg::initMacroList()
 
 	::SendDlgItemMessage(_hSelf, IDC_MACRO_COMBO, CB_RESETCONTENT, 0, 0);
 
-	if (::SendMessage(_hParent, WM_ISCURRENTMACRORECORDED, 0, 0))
+	if (::SendMessage(_hParent, WM_GETCURRENTMACROSTATUS, 0, 0) == MACRO_RECORDING_HAS_STOPPED)
 		::SendDlgItemMessage(_hSelf, IDC_MACRO_COMBO, CB_ADDSTRING, 0, (LPARAM)TEXT("Current recorded macro"));
 
 	for (size_t i = 0 ; i < macroList.size() ; i++)
@@ -55,12 +55,6 @@ void RunMacroDlg::initMacroList()
 
 	::SendDlgItemMessage(_hSelf, IDC_MACRO_COMBO, CB_SETCURSEL, 0, 0);
 	m_macroIndex = 0;
-}
-
-int RunMacroDlg::getMacro2Exec() const
-{
-	bool isCurMacroPresent = ::SendMessage(_hParent, WM_ISCURRENTMACRORECORDED, 0, 0) == TRUE;
-	return isCurMacroPresent?(m_macroIndex - 1):m_macroIndex;
 }
 
 BOOL CALLBACK RunMacroDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lParam*/)
@@ -161,4 +155,10 @@ void RunMacroDlg::check(int id)
 bool RunMacroDlg::isCheckedOrNot(int checkControlID) const
 {
 	return (BST_CHECKED == ::SendMessage(::GetDlgItem(_hSelf, checkControlID), BM_GETCHECK, 0, 0));
+}
+
+int RunMacroDlg::getMacro2Exec() const
+{
+	bool isCurMacroPresent = ::SendMessage(_hParent, WM_GETCURRENTMACROSTATUS, 0, 0) == MACRO_RECORDING_HAS_STOPPED;
+	return isCurMacroPresent?(m_macroIndex - 1):m_macroIndex;
 }
