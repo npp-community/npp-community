@@ -19,8 +19,6 @@
 #include "ScintillaComponent/FunctionCallTip.h"
 #include "ScintillaComponent/ScintillaEditView.h"
 
-#include "TinyXML/tinyxml.h"
-
 struct Token {
 	// JOCE: move to generic_string
 	TCHAR * token;

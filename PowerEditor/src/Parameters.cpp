@@ -16,8 +16,6 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "TinyXML/tinyXmlA/tinystrA.h"
-#include "TinyXML/tinyxml.h"
 
 #include "Parameters.h"
 #include "WinControls/OpenSaveFileDialog/FileDialog.h"

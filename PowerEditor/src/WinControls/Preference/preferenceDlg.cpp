@@ -17,8 +17,6 @@
 
 #include "precompiled_headers.h"
 
-#include "TinyXML/tinyxml.h"
-
 #include "WinControls/Preference/preferenceDlg.h"
 #include "ValueDlg.h"
 

@@ -17,8 +17,6 @@
 
 #include "precompiled_headers.h"
 
-#include "TinyXML/tinyXmlA/tinyxmlA.h"
-
 #include "MISC/PluginsManager/PluginsManager.h"
 #include "MISC/Process/Process.h"
 
