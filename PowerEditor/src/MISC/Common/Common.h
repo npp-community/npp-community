@@ -63,26 +63,68 @@ public:
 	static WcharMbcsConvertor * getInstance();
 	static void destroyInstance();
 
-	const wchar_t * char2wchar(const char *mbStr, UINT codepage);
+	const wchar_t * char2wchar(const char *mbStr, UINT codepage, int lenIn=-1, int *pLenOut=NULL, int *pBytesNotProcessed=NULL);
 	const wchar_t * char2wchar(const char *mbcs2Convert, UINT codepage, int *mstart, int *mend);
-	const char * wchar2char(const wchar_t *wcStr, UINT codepage);
+	const char * wchar2char(const wchar_t *wcStr, UINT codepage, int lenIn=-1, int *pLenOut=NULL);
 	const char * wchar2char(const wchar_t *wcStr, UINT codepage, long *mstart, long *mend);
 
-	const char * encode(UINT fromCodepage, UINT toCodepage, const char *txt2Encode) {
-        const wchar_t * strW = char2wchar(txt2Encode, fromCodepage);
-        return wchar2char(strW, toCodepage);
+	const char * encode(UINT fromCodepage, UINT toCodepage, const char *txt2Encode, int lenIn=-1, int *pLenOut=NULL, int *pBytesNotProcessed=NULL) {
+		int lenWc = 0;
+        const wchar_t * strW = char2wchar(txt2Encode, fromCodepage, lenIn, &lenWc, pBytesNotProcessed);
+        return wchar2char(strW, toCodepage, lenWc, pLenOut);
     };
 
 protected:
-	WcharMbcsConvertor();
-	~WcharMbcsConvertor();
-
+	WcharMbcsConvertor(){}
+	~WcharMbcsConvertor(){}
 	static WcharMbcsConvertor * _pSelf;
 
-	char *_multiByteStr;
-	size_t _multiByteAllocLen;
-	wchar_t *_wideCharStr;
-	size_t _wideCharAllocLen;
+	template <class T>
+	class StringBuffer {
+	public:
+		StringBuffer() : _str(0), _allocLen(0) {}
+		~StringBuffer()
+		{
+			if(_str)
+			{
+				delete [] _str;
+			}
+		}
+
+		void sizeTo(size_t size)
+		{
+			if(_allocLen < size)
+			{
+				if(_allocLen)
+				{
+					delete[] _str;
+				}
+				_allocLen = max(size, initSize);
+				_str = new T[_allocLen];
+			}
+		}
+
+		void empty()
+		{
+			static T nullStr = 0; // routines may return an empty string, with null terminator, without allocating memory; a pointer to this null character will be returned in that case
+			if(_allocLen == 0)
+			{
+				_str = &nullStr;
+			}
+			else
+			{
+				_str[0] = 0;
+			}
+		}
+
+	protected:
+		static const int initSize = 1024;
+		size_t _allocLen;
+		T* _str;
+	};
+
+	StringBuffer<char> _multiByteStr;
+	StringBuffer<wchar_t> _wideCharStr;
 
 private:
 	// Since there's no public ctor, we need to void the default assignment operator.
