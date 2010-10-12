@@ -18,23 +18,22 @@
 //#include <string>
 //#include <vector>
 
+#undef _WIN32_WINNT
 //#define _WIN32_WINNT  0x0500
 //#include <windows.h>
 //#include <commctrl.h>
 //#include <richedit.h>
 //#include <windowsx.h>
+
+//#include "ILexer.h"
+//#include "Scintilla.h"
+//#include "SciLexer.h"
+
+//#include "LexerModule.h"
 // NPPEND
 
 #include "Platform.h"
 
-#include "Scintilla.h"
-#ifdef SCI_LEXER
-#include "SciLexer.h"
-#include "PropSet.h"
-#include "PropSetSimple.h"
-#include "Accessor.h"
-#include "KeyWords.h"
-#endif
 #include "SplitVector.h"
 #include "Partitioning.h"
 #include "RunStyles.h"
@@ -1332,6 +1331,12 @@ public:
 			size_t nUtf16Mixed = ::MultiByteToWideChar(65001, 0, mixed, lenMixed,
 				&utf16Mixed[0], utf16Mixed.size());
 
+			if (nUtf16Mixed == 0) {
+				// Failed to convert -> bad UTF-8
+				folded[0] = '\0';
+				return 1;
+			}
+
 			if (nUtf16Mixed * 4 > utf16Folded.size()) {	// Maximum folding expansion factor of 4
 				utf16Folded.resize(nUtf16Mixed * 4 + 8);
 			}
@@ -2062,7 +2067,7 @@ void ScintillaWin::GetIntelliMouseParameters() {
 
 void ScintillaWin::CopyToClipboard(const SelectionText &selectedText) {
 	if (!::OpenClipboard(MainHWND()))
-		return ;
+		return;
 	::EmptyClipboard();
 
 	GlobalMemory uniText;

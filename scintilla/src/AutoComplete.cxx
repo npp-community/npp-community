@@ -10,11 +10,13 @@
 //#include <stdlib.h>
 //#include <string.h>
 //#include <stdio.h>
+//#include <assert.h>
+
+//#include "CharacterSet.h"
 // NPPEND
 
 #include "Platform.h"
 
-#include "CharClassify.h"
 #include "AutoComplete.h"
 
 #ifdef SCI_NAMESPACE

@@ -67,5 +67,23 @@
 #include <zmouse.h>
 #include <ole2.h>
 
+// Scintilla specific
+#include "ILexer.h"
+#include "Scintilla.h"
+#include "SciLexer.h"
+
+// Lexlib
+#include "LexAccessor.h"
+#include "Accessor.h"
+#include "CharacterSet.h"
+#include "PropSetSimple.h"
+#include "LexerBase.h"
+#include "LexerModule.h"
+#include "LexerNoExceptions.h"
+#include "LexerSimple.h"
+#include "OptionSet.h"
+#include "StyleContext.h"
+#include "WordList.h"
+
 #endif // PRECOMPILED_HEADERS_H
 

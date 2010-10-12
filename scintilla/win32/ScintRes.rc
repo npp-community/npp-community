@@ -19,7 +19,7 @@
 #endif
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION	2, 1, 2, 0
+FILEVERSION	2, 2, 0, 0
 PRODUCTVERSION	GEN_VER_DIGITAL_VERSION
 FILEFLAGSMASK	0x3fL
 FILEFLAGS (VER_DEBUG|GEN_VER_PATCHED_FLAG|GEN_VER_PRERELEASE_FLAG|GEN_VER_PRIVATE_FLAG|VS_FF_SPECIALBUILD)
@@ -37,7 +37,7 @@ BEGIN
 		BEGIN
 			VALUE	"CompanyName",	"Neil Hodgson neilh@scintilla.org\0"
 			VALUE	"FileDescription",	"Notepad++ CR modified Scintilla.DLL\0"
-			VALUE	"FileVersion",	"2.12\0"
+			VALUE	"FileVersion",	"2.20\0"
 			VALUE	"InternalName",	"Scintilla\0"
 			VALUE	"LegalCopyright",	"Copyright 1998-2010 by Neil Hodgson\0"
 			VALUE	"OriginalFilename",	"Scintilla.DLL\0"
