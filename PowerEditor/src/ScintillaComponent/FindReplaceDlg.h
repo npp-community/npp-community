@@ -86,7 +86,7 @@ struct FindOption
 		_doMarkLine(false),
 		_doStyleFoundToken(false),
 		_isInSelection(false),
-		_isRecursive(false),
+		_isRecursive(true),
 		_isInHiddenDir(false)
 	{}
 };
