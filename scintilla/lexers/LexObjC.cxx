@@ -45,6 +45,14 @@ static inline bool IsAWordStart(const int ch) {
 	return (ch < 0x80) && (isalnum(ch) || ch == '_');
 }
 
+inline bool IsASpace(unsigned int ch) {
+    return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
+}
+
+static inline bool IsADigit(char ch) {
+	return isascii(ch) && isdigit(ch);
+}
+
 static inline bool IsADoxygenChar(const int ch) {
 	return (islower(ch) || ch == '$' || ch == '@' ||
 	        ch == '\\' || ch == '&' || ch == '<' ||

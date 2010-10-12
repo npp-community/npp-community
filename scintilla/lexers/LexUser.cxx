@@ -44,18 +44,17 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //#define KEYWORD_BOXHEADER 1
 //#define KEYWORD_FOLDCONTRACTED 2
 // NPPEND
-/*
-const char EOString = '\0';
-const char EOLine = '\n';
-const char EOWord = ' ';
-*/
-// NPPSTART Joce 06/16/09 Scintilla_clean_precomp
-// Changed the type to int (as it was always what was passed anyway)
-// and cast the value in the function.
-static bool isInOpList(WordList & opList, int in_op)
+
+static inline bool IsADigit(char ch) {
+	return isascii(ch) && isdigit(ch);
+}
+
+static inline bool isspacechar(unsigned char ch) {
+	return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
+}
+
+static bool isInOpList(WordList & opList, char op)
 {
-	char op = (char)in_op;
-// NPPEND
 	for (int i = 0 ; i < opList.len ; i++)
 		if (op == *(opList.words[i]))
 			return true;
@@ -67,11 +66,6 @@ static bool isInOpList(WordList & opList, int in_op)
 //static int cmpString(const void *a1, const void *a2) {
 //	// Can't work out the correct incantation to use modern casts here
 //	return strcmp(*(char**)(a1), *(char**)(a2));
-//}
-//
-//static int cmpStringNoCase(const void *a1, const void *a2) {
-//	// Can't work out the correct incantation to use modern casts here
-//	return CompareCaseInsensitive(*(char**)(a1), *(char**)(a2));
 //}
 // NPPEND
 
@@ -487,7 +481,7 @@ static void ColouriseUserDoc(unsigned int startPos, int length, int initStyle, W
 			chPrevNonWhite = ' ';
 			visibleChars = 0;
 		}
-		if (!IsASpace(sc.ch)) {
+		if (!isspacechar(sc.ch)) {
 			chPrevNonWhite = sc.ch;
 			visibleChars++;
 		}

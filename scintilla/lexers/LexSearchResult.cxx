@@ -29,6 +29,8 @@
 //#include <vector>
 //#include <assert.h>
 //
+//#include "Platform.h"
+//
 //#include "ILexer.h"
 //#include "LexAccessor.h"
 //#include "Accessor.h"
