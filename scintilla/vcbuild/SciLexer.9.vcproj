@@ -715,11 +715,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\CellBuffer.h"
+				RelativePath="..\src\Catalogue.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\CharacterSet.h"
+				RelativePath="..\src\CellBuffer.h"
 				>
 			</File>
 			<File
@@ -826,19 +826,11 @@
 				Name="include"
 				>
 				<File
-					RelativePath="..\include\Accessor.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\KeyWords.h"
+					RelativePath="..\include\ILexer.h"
 					>
 				</File>
 				<File
 					RelativePath="..\include\Platform.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\PropSet.h"
 					>
 				</File>
 				<File
@@ -851,14 +843,6 @@
 				</File>
 				<File
 					RelativePath="..\include\ScintillaWidget.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\SString.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\WindowAccessor.h"
 					>
 				</File>
 			</Filter>
