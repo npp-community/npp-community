@@ -117,6 +117,8 @@ protected:
 			}
 		}
 
+		operator T*() { return _str; }
+
 	protected:
 		static const int initSize = 1024;
 		size_t _allocLen;
