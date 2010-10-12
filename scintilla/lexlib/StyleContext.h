@@ -76,6 +76,7 @@ public:
 	}
 	void Complete() {
 		styler.ColourTo(currentPos - 1, state);
+		styler.Flush();
 	}
 	bool More() const {
 		return currentPos < endPos;

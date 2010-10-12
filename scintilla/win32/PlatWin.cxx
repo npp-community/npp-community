@@ -1329,7 +1329,6 @@ class ListBoxX : public ListBox {
 	int NcHitTest(WPARAM, LPARAM) const;
 	void CentreItem(int);
 	void Paint(HDC);
-	void Erase(HDC);
 	static LRESULT PASCAL ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 
 	static const Point ItemInset;	// Padding around whole item
