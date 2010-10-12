@@ -14,7 +14,9 @@
 
 #include "Platform.h"
 
-#include "Scintilla.h"
+// NPPSTART Joce 10/11/10 Scintilla_precomp_headers
+//#include "Scintilla.h"
+// NPPEND
 
 #include "Selection.h"
 

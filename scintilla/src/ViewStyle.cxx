@@ -12,7 +12,9 @@
 
 #include "Platform.h"
 
-#include "Scintilla.h"
+// NPPSTART Joce 10/11/10 Scintilla_precomp_headers
+//#include "Scintilla.h"
+// NPPEND
 #include "SplitVector.h"
 #include "Partitioning.h"
 #include "RunStyles.h"

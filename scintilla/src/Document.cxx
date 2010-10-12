@@ -12,15 +12,15 @@
 //#include <stdio.h>
 //#include <ctype.h>
 //#include <assert.h>
-
-#include "ILexer.h"
-#include "Scintilla.h"
-
-#include "CharacterSet.h"
+//
+//#include "ILexer.h"
+//#include "Scintilla.h"
+//
+//#include "CharacterSet.h"
+//
+//#include <string>
+//#include <vector>
 // NPPEND
-
-#include <string>
-#include <vector>
 
 // With Borland C++ 5.5, including <string> includes Windows.h leading to defining
 // FindText to FindTextA which makes calls here to Document::FindText fail.

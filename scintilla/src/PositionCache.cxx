@@ -11,14 +11,15 @@
 //#include <string.h>
 //#include <stdio.h>
 //#include <ctype.h>
+//
+//#include <string>
+//#include <vector>
 // NPPEND
-
-#include <string>
-#include <vector>
-
 #include "Platform.h"
 
-#include "Scintilla.h"
+// NPPSTART Joce 10/11/10 Scintilla_precomp_headers
+//#include "Scintilla.h"
+// NPPEND
 
 #include "SplitVector.h"
 #include "Partitioning.h"
@@ -33,7 +34,9 @@
 #include "ViewStyle.h"
 #include "CharClassify.h"
 #include "Decoration.h"
-#include "ILexer.h"
+// NPPSTART Joce 10/11/10 Scintilla_precomp_headers
+//#include "ILexer.h"
+// NPPEND
 #include "Document.h"
 #include "Selection.h"
 #include "PositionCache.h"

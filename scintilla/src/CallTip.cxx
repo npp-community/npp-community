@@ -13,7 +13,9 @@
 
 #include "Platform.h"
 
-#include "Scintilla.h"
+// NPPSTART Joce 10/11/10 Scintilla_precomp_headers
+//#include "Scintilla.h"
+// NPPEND
 #include "CallTip.h"
 
 // NPPSTART Joce 06/09/09 Scintilla_precomp_headers

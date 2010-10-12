@@ -57,7 +57,9 @@ using namespace Scintilla;
 /*
 	(actually seems to work!)
 */
-#include <string>
+// NPPSTART Joce 10/11/10 Scintilla_precomp_headers
+//#include <string>
+// NPPEND
 #include "WindowAccessor.h"
 #include "ExternalLexer.h"
 

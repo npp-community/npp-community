@@ -63,7 +63,6 @@
 #include <windowsx.h>
 #include <imm.h>
 
-#include <commctrl.h>
 #include <zmouse.h>
 #include <ole2.h>
 
