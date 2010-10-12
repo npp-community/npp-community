@@ -50,7 +50,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include,..\src"
+				AdditionalIncludeDirectories="..\include;..\src;..\lexlib"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;SCILEXER7_EXPORTS;SCI_LEXER;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -159,7 +159,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\include,..\src"
+				AdditionalIncludeDirectories="..\include;..\src;..\lexlib"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SCILEXER7_EXPORTS;SCI_LEXER;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -250,6 +250,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\Catalogue.cxx"
+				>
+			</File>
+			<File
 				RelativePath="..\src\CellBuffer.cxx"
 				>
 			</File>
@@ -270,10 +274,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\DocumentAccessor.cxx"
-				>
-			</File>
-			<File
 				RelativePath="..\src\Editor.cxx"
 				>
 			</File>
@@ -287,10 +287,6 @@
 			</File>
 			<File
 				RelativePath="..\src\KeyMap.cxx"
-				>
-			</File>
-			<File
-				RelativePath="..\src\KeyWords.cxx"
 				>
 			</File>
 			<File
@@ -326,10 +322,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\src\PropSet.cxx"
-				>
-			</File>
-			<File
 				RelativePath="..\src\RESearch.cxx"
 				>
 			</File>
@@ -350,10 +342,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\StyleContext.cxx"
-				>
-			</File>
-			<File
 				RelativePath="..\src\UniConversion.cxx"
 				>
 			</File>
@@ -362,338 +350,338 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\WindowAccessor.cxx"
-				>
-			</File>
-			<File
 				RelativePath="..\src\XPM.cxx"
 				>
 			</File>
 			<Filter
-				Name="Lexer"
+				Name="lexers"
 				>
 				<File
-					RelativePath="..\src\LexAbaqus.cxx"
+					RelativePath="..\lexers\LexAbaqus.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexAda.cxx"
+					RelativePath="..\lexers\LexAda.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexAPDL.cxx"
+					RelativePath="..\lexers\LexAPDL.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexAsm.cxx"
+					RelativePath="..\lexers\LexAsm.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexAsn1.cxx"
+					RelativePath="..\lexers\LexAsn1.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexASY.cxx"
+					RelativePath="..\lexers\LexASY.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexAU3.cxx"
+					RelativePath="..\lexers\LexAU3.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexAVE.cxx"
+					RelativePath="..\lexers\LexAVE.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexBaan.cxx"
+					RelativePath="..\lexers\LexBaan.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexBash.cxx"
+					RelativePath="..\lexers\LexBash.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexBasic.cxx"
+					RelativePath="..\lexers\LexBasic.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexBullant.cxx"
+					RelativePath="..\lexers\LexBullant.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexCaml.cxx"
+					RelativePath="..\lexers\LexCaml.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexCLW.cxx"
+					RelativePath="..\lexers\LexCLW.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexCmake.cxx"
+					RelativePath="..\lexers\LexCmake.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexCOBOL.cxx"
+					RelativePath="..\lexers\LexCOBOL.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexConf.cxx"
+					RelativePath="..\lexers\LexConf.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexCPP.cxx"
+					RelativePath="..\lexers\LexCPP.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexCrontab.cxx"
+					RelativePath="..\lexers\LexCrontab.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexCsound.cxx"
+					RelativePath="..\lexers\LexCsound.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexCSS.cxx"
+					RelativePath="..\lexers\LexCSS.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexD.cxx"
+					RelativePath="..\lexers\LexD.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexEiffel.cxx"
+					RelativePath="..\lexers\LexEiffel.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexErlang.cxx"
+					RelativePath="..\lexers\LexErlang.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexEScript.cxx"
+					RelativePath="..\lexers\LexEScript.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexFlagship.cxx"
+					RelativePath="..\lexers\LexFlagship.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexForth.cxx"
+					RelativePath="..\lexers\LexForth.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexFortran.cxx"
+					RelativePath="..\lexers\LexFortran.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexGAP.cxx"
+					RelativePath="..\lexers\LexGAP.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexGui4Cli.cxx"
+					RelativePath="..\lexers\LexGui4Cli.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexHaskell.cxx"
+					RelativePath="..\lexers\LexHaskell.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexHTML.cxx"
+					RelativePath="..\lexers\LexHTML.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexInno.cxx"
+					RelativePath="..\lexers\LexInno.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexKix.cxx"
+					RelativePath="..\lexers\LexKix.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexLisp.cxx"
+					RelativePath="..\lexers\LexLisp.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexLout.cxx"
+					RelativePath="..\lexers\LexLout.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexLua.cxx"
+					RelativePath="..\lexers\LexLua.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexMagik.cxx"
+					RelativePath="..\lexers\LexMagik.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexMarkdown.cxx"
+					RelativePath="..\lexers\LexMarkdown.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexMatlab.cxx"
+					RelativePath="..\lexers\LexMatlab.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexMetapost.cxx"
+					RelativePath="..\lexers\LexMetapost.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexMMIXAL.cxx"
+					RelativePath="..\lexers\LexMMIXAL.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexMPT.cxx"
+					RelativePath="..\lexers\LexMPT.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexMSSQL.cxx"
+					RelativePath="..\lexers\LexMSSQL.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexMySQL.cxx"
+					RelativePath="..\lexers\LexMySQL.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexNimrod.cxx"
+					RelativePath="..\lexers\LexNimrod.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexNsis.cxx"
+					RelativePath="..\lexers\LexNsis.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexObjC.cxx"
+					RelativePath="..\lexers\LexObjC.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexOpal.cxx"
+					RelativePath="..\lexers\LexOpal.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexOthers.cxx"
+					RelativePath="..\lexers\LexOthers.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexPascal.cxx"
+					RelativePath="..\lexers\LexPascal.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexPB.cxx"
+					RelativePath="..\lexers\LexPB.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexPerl.cxx"
+					RelativePath="..\lexers\LexPerl.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexPLM.cxx"
+					RelativePath="..\lexers\LexPLM.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexPOV.cxx"
+					RelativePath="..\lexers\LexPOV.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexPowerPro.cxx"
+					RelativePath="..\lexers\LexPowerPro.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexPowerShell.cxx"
+					RelativePath="..\lexers\LexPowerShell.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexProgress.cxx"
+					RelativePath="..\lexers\LexProgress.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexPS.cxx"
+					RelativePath="..\lexers\LexPS.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexPython.cxx"
+					RelativePath="..\lexers\LexPython.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexR.cxx"
+					RelativePath="..\lexers\LexR.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexRebol.cxx"
+					RelativePath="..\lexers\LexRebol.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexRuby.cxx"
+					RelativePath="..\lexers\LexRuby.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexScriptol.cxx"
+					RelativePath="..\lexers\LexScriptol.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexSearchResult.cxx"
+					RelativePath="..\lexers\LexSearchResult.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexSmalltalk.cxx"
+					RelativePath="..\lexers\LexSmalltalk.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexSML.cxx"
+					RelativePath="..\lexers\LexSML.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexSorcus.cxx"
+					RelativePath="..\lexers\LexSorcus.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexSpecman.cxx"
+					RelativePath="..\lexers\LexSpecman.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexSpice.cxx"
+					RelativePath="..\lexers\LexSpice.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexSQL.cxx"
+					RelativePath="..\lexers\LexSQL.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexTACL.cxx"
+					RelativePath="..\lexers\LexTACL.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexTADS3.cxx"
+					RelativePath="..\lexers\LexTADS3.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexTAL.cxx"
+					RelativePath="..\lexers\LexTAL.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexTCL.cxx"
+					RelativePath="..\lexers\LexTCL.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexTeX.cxx"
+					RelativePath="..\lexers\LexTeX.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexUser.cxx"
+					RelativePath="..\lexers\LexTxt2tags.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexVB.cxx"
+					RelativePath="..\lexers\LexUser.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexVerilog.cxx"
+					RelativePath="..\lexers\LexVB.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexVHDL.cxx"
+					RelativePath="..\lexers\LexVerilog.cxx"
 					>
 				</File>
 				<File
-					RelativePath="..\src\LexYAML.cxx"
+					RelativePath="..\lexers\LexVHDL.cxx"
+					>
+				</File>
+				<File
+					RelativePath="..\lexers\LexYAML.cxx"
 					>
 				</File>
 			</Filter>
@@ -706,6 +694,64 @@
 				</File>
 				<File
 					RelativePath="..\win32\ScintillaWin.cxx"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="lexlib"
+				>
+				<File
+					RelativePath="..\lexlib\Accessor.cxx"
+					>
+				</File>
+				<File
+					RelativePath="..\lexlib\CharacterSet.cxx"
+					>
+				</File>
+				<File
+					RelativePath="..\lexlib\LexerBase.cxx"
+					>
+				</File>
+				<File
+					RelativePath="..\lexlib\LexerModule.cxx"
+					>
+				</File>
+				<File
+					RelativePath="..\lexlib\LexerNoExceptions.cxx"
+					>
+				</File>
+				<File
+					RelativePath="..\lexlib\LexerSimple.cxx"
+					>
+				</File>
+				<File
+					RelativePath="..\lexlib\PropSetSimple.cxx"
+					>
+				</File>
+				<File
+					RelativePath="..\lexlib\StyleContext.cxx"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\lexlib\WordList.cxx"
 					>
 				</File>
 			</Filter>
@@ -777,11 +823,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\CellBuffer.h"
+				RelativePath="..\src\Catalogue.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\CharacterSet.h"
+				RelativePath="..\src\CellBuffer.h"
 				>
 			</File>
 			<File
@@ -798,10 +844,6 @@
 			</File>
 			<File
 				RelativePath="..\src\Document.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\DocumentAccessor.h"
 				>
 			</File>
 			<File
@@ -869,10 +911,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\StyleContext.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\SVector.h"
 				>
 			</File>
@@ -893,22 +931,14 @@
 				>
 			</File>
 			<Filter
-				Name="Include"
+				Name="include"
 				>
 				<File
-					RelativePath="..\include\Accessor.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\KeyWords.h"
+					RelativePath="..\include\ILexer.h"
 					>
 				</File>
 				<File
 					RelativePath="..\include\Platform.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\PropSet.h"
 					>
 				</File>
 				<File
@@ -923,20 +953,60 @@
 					RelativePath="..\include\ScintillaWidget.h"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="win32"
+				>
 				<File
-					RelativePath="..\include\SString.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\WindowAccessor.h"
+					RelativePath="..\win32\PlatformRes.h"
 					>
 				</File>
 			</Filter>
 			<Filter
-				Name="Win32"
+				Name="lexlib"
 				>
 				<File
-					RelativePath="..\win32\PlatformRes.h"
+					RelativePath="..\lexlib\Accessor.h"
+					>
+				</File>
+				<File
+					RelativePath="..\lexlib\CharacterSet.h"
+					>
+				</File>
+				<File
+					RelativePath="..\lexlib\LexAccessor.h"
+					>
+				</File>
+				<File
+					RelativePath="..\lexlib\LexerBase.h"
+					>
+				</File>
+				<File
+					RelativePath="..\lexlib\LexerModule.h"
+					>
+				</File>
+				<File
+					RelativePath="..\lexlib\LexerNoExceptions.h"
+					>
+				</File>
+				<File
+					RelativePath="..\lexlib\LexerSimple.h"
+					>
+				</File>
+				<File
+					RelativePath="..\lexlib\OptionSet.h"
+					>
+				</File>
+				<File
+					RelativePath="..\lexlib\PropSetSimple.h"
+					>
+				</File>
+				<File
+					RelativePath="..\lexlib\StyleContext.h"
+					>
+				</File>
+				<File
+					RelativePath="..\lexlib\WordList.h"
 					>
 				</File>
 			</Filter>
