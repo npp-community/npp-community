@@ -765,7 +765,8 @@ void ScintillaEditView::setCppLexer(LangType langType)
 	execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("fold.comment"), reinterpret_cast<LPARAM>("1"));
 	execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("fold.preprocessor"), reinterpret_cast<LPARAM>("1"));
 
-	// "#if 1 //" make CppLexer crash, so we disable it.
+	// Disable track preprocessor to avoid incorrect detection.
+	// In the most of cases, the symbols are defined outside of file.
 	execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("lexer.cpp.track.preprocessor"), reinterpret_cast<LPARAM>("0"));
 }
 
@@ -876,6 +877,12 @@ void ScintillaEditView::setObjCLexer(LangType langType)
 	execute(SCI_SETKEYWORDS, 2, (LPARAM)doxygenKeyWords);
 	execute(SCI_SETKEYWORDS, 3, (LPARAM)objCDirective);
 	execute(SCI_SETKEYWORDS, 4, (LPARAM)objCQualifier);
+
+	execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("fold"), reinterpret_cast<LPARAM>("1"));
+	execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("fold.compact"), reinterpret_cast<LPARAM>("0"));
+
+	execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("fold.comment"), reinterpret_cast<LPARAM>("1"));
+	execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("fold.preprocessor"), reinterpret_cast<LPARAM>("1"));
 }
 
 void ScintillaEditView::setKeywords(LangType langType, const char *keywords, int index)
@@ -970,7 +977,6 @@ void ScintillaEditView::setLexer(int lexerID, LangType langType, int whichList)
 	execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("fold.compact"), reinterpret_cast<LPARAM>("0"));
 
 	execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("fold.comment"), reinterpret_cast<LPARAM>("1"));
-	execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("fold.preprocessor"), reinterpret_cast<LPARAM>("1"));
 }
 
 void ScintillaEditView::makeStyle(LangType language, const TCHAR **keywordArray)
@@ -3365,7 +3371,8 @@ void ScintillaEditView::setIniLexer()
 	execute(SCI_SETLEXER, SCLEX_PROPERTIES);
 	execute(SCI_STYLESETEOLFILLED, SCE_PROPS_SECTION, true);
 	makeStyle(L_INI);
-}
+	execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("fold"), reinterpret_cast<LPARAM>("1"));
+	execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("fold.compact"), reinterpret_cast<LPARAM>("0"));}
 
 void ScintillaEditView::setSqlLexer()
 {
@@ -3386,6 +3393,7 @@ void ScintillaEditView::setVBLexer()
 void ScintillaEditView::setPascalLexer()
 {
 	setLexer(SCLEX_PASCAL, L_PASCAL, LIST_0);
+	execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("fold.preprocessor"), reinterpret_cast<LPARAM>("1"));
 }
 
 void ScintillaEditView::setPerlLexer()
@@ -3474,6 +3482,7 @@ void ScintillaEditView::setKixLexer()
 void ScintillaEditView::setAutoItLexer()
 {
 	setLexer(SCLEX_AU3, L_AU3, LIST_0 | LIST_1 | LIST_2 | LIST_3 | LIST_4 | LIST_5 | LIST_6);
+	execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("fold.preprocessor"), reinterpret_cast<LPARAM>("1"));
 }
 
 void ScintillaEditView::setCamlLexer()
@@ -3489,6 +3498,7 @@ void ScintillaEditView::setAdaLexer()
 void ScintillaEditView::setVerilogLexer()
 {
 	setLexer(SCLEX_VERILOG, L_VERILOG, LIST_0 | LIST_1);
+	execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("fold.preprocessor"), reinterpret_cast<LPARAM>("1"));
 }
 
 void ScintillaEditView::setMatlabLexer()
