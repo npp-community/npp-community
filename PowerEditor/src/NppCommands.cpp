@@ -925,6 +925,10 @@ void Notepad_plus::command(int id)
 			_mainEditView->showWSAndTab(isChecked);
 			_subEditView->showEOL(false);
 			_subEditView->showWSAndTab(isChecked);
+
+            ScintillaViewParams & svp = (ScintillaViewParams &)(NppParameters::getInstance())->getSVP();
+            svp._whiteSpaceShow = isChecked;
+            svp._eolShow = false;
 			break;
 		}
 		case IDM_VIEW_EOL:
@@ -941,6 +945,10 @@ void Notepad_plus::command(int id)
 			_subEditView->showEOL(isChecked);
 			_mainEditView->showWSAndTab(false);
 			_subEditView->showWSAndTab(false);
+
+            ScintillaViewParams & svp = (ScintillaViewParams &)(NppParameters::getInstance())->getSVP();
+            svp._whiteSpaceShow = false;
+            svp._eolShow = isChecked;
 			break;
 		}
 		case IDM_VIEW_ALL_CHARACTERS:
@@ -955,6 +963,10 @@ void Notepad_plus::command(int id)
 			_mainEditView->showInvisibleChars(isChecked);
 			_subEditView->showInvisibleChars(isChecked);
 			_toolBar->setCheck(IDM_VIEW_ALL_CHARACTERS, isChecked);
+
+            ScintillaViewParams & svp = (ScintillaViewParams &)(NppParameters::getInstance())->getSVP();
+            svp._whiteSpaceShow = isChecked;
+            svp._eolShow = isChecked;
 			break;
 		}
 
@@ -967,6 +979,9 @@ void Notepad_plus::command(int id)
 			_subEditView->showIndentGuideLine(!_pEditView->isShownIndentGuide());
             _toolBar->setCheck(IDM_VIEW_INDENT_GUIDE, _pEditView->isShownIndentGuide());
 			checkMenuItem(IDM_VIEW_INDENT_GUIDE, _pEditView->isShownIndentGuide());
+
+            ScintillaViewParams & svp = (ScintillaViewParams &)(NppParameters::getInstance())->getSVP();
+            svp._indentGuideLineShow = _pEditView->isShownIndentGuide();
 			break;
 		}
 
@@ -980,6 +995,9 @@ void Notepad_plus::command(int id)
 			_subEditView->wrap(isWraped);
             _toolBar->setCheck(IDM_VIEW_WRAP, isWraped);
 			checkMenuItem(IDM_VIEW_WRAP, isWraped);
+
+            ScintillaViewParams & svp = (ScintillaViewParams &)(NppParameters::getInstance())->getSVP();
+            svp._doWrap = isWraped;
 			break;
 		}
 		case IDM_VIEW_WRAP_SYMBOL:
@@ -989,6 +1007,9 @@ void Notepad_plus::command(int id)
 			_mainEditView->showWrapSymbol(!_pEditView->isWrapSymbolVisible());
 			_subEditView->showWrapSymbol(!_pEditView->isWrapSymbolVisible());
 			checkMenuItem(IDM_VIEW_WRAP_SYMBOL, _pEditView->isWrapSymbolVisible());
+
+            ScintillaViewParams & svp = (ScintillaViewParams &)(NppParameters::getInstance())->getSVP();
+            svp._wrapSymbolShow = _pEditView->isWrapSymbolVisible();
 			break;
 		}
 
