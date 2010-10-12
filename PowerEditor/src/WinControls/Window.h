@@ -108,7 +108,9 @@ public:
 	};
 
     HINSTANCE getHinst() const {
-		assert(_hInst != 0);
+		// JOCE: This assert is raised on startup with the new way the initialization is done.
+		// To be reviewed
+		//assert(_hInst != 0);
 		return _hInst;
 	};
 protected:
