@@ -189,7 +189,7 @@ BufferID Notepad_plus::doOpen(const TCHAR *fileName, bool isReadOnly, int encodi
 			generic_string msg = TEXT("Cannot open file \"");
 			msg += longFileName;
 			msg += TEXT("\".");
-			::MessageBox(_pPublicInterface->getHSelf(), msg.c_str(), TEXT("ERR"), MB_OK);
+			::MessageBox(_pPublicInterface->getHSelf(), msg.c_str(), TEXT("ERROR"), MB_OK);
 			_isFileOpening = false;
 
 			scnN.nmhdr.code = NPPN_FILELOADFAILED;
