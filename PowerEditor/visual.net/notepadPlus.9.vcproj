@@ -389,6 +389,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\MISC\PluginsManager\IDAllocator.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\MISC\Exception\MiniDumper.h"
 					>
 				</File>
@@ -1403,6 +1407,10 @@
 			<Filter
 				Name="MISC"
 				>
+				<File
+					RelativePath="..\src\MISC\PluginsManager\IDAllocator.cpp"
+					>
+				</File>
 				<File
 					RelativePath="..\src\MISC\Exception\MiniDumper.cpp"
 					>

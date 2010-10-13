@@ -407,6 +407,10 @@
 				Name="MISC"
 				>
 				<File
+					RelativePath="..\src\MISC\PluginsManager\IDAllocator.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\MISC\Exception\MiniDumper.cpp"
 					>
 				</File>
@@ -866,6 +870,10 @@
 				>
 				<File
 					RelativePath="..\src\MISC\FileNameStringSplitter.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\MISC\PluginsManager\IDAllocator.h"
 					>
 				</File>
 				<File

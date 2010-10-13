@@ -16,6 +16,7 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
+#include "MISC/PluginsManager/IDAllocator.h"
 #include "MISC/PluginsManager/PluginsManager.h"
 
 #include "Parameters.h"
@@ -47,7 +48,12 @@ PluginInfo::~PluginInfo()
 		::FreeLibrary(_hLib);
 }
 
-
+PluginsManager::PluginsManager() :
+	_hPluginsMenu(NULL),
+	_isDisabled(false),
+	_dynamicIDAlloc(new IDAllocator(ID_PLUGINS_CMD_DYNAMIC, ID_PLUGINS_CMD_DYNAMIC_LIMIT))
+{
+}
 
 PluginsManager::~PluginsManager() {
 
@@ -56,6 +62,11 @@ PluginsManager::~PluginsManager() {
 
 	if (_hPluginsMenu)
 		DestroyMenu(_hPluginsMenu);
+
+	if (_dynamicIDAlloc)
+	{
+		delete _dynamicIDAlloc;
+	}
 }
 
 bool PluginsManager::unloadPlugin(int index, HWND nppHandle)
@@ -515,4 +526,23 @@ void PluginsManager::pluginCrashAlert(const TCHAR *pluginName, const TCHAR *func
 	msg += TEXT(" just crash in\r");
 	msg += funcSignature;
 	::MessageBox(NULL, msg.c_str(), TEXT(" just crash in\r"), MB_OK|MB_ICONSTOP);
+}
+
+bool PluginsManager::allocateCmdID(int numberRequired, int *start)
+{
+	bool retVal = true;
+
+	*start = _dynamicIDAlloc->allocate(numberRequired);
+
+	if (-1 == *start)
+	{
+		*start = 0;
+		retVal = false;
+	}
+	return retVal;
+}
+
+bool PluginsManager::inDynamicRange( int id )
+{
+	return _dynamicIDAlloc->isInRange(id);
 }

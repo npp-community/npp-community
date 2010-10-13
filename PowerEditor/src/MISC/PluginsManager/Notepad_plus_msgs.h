@@ -312,6 +312,15 @@ enum LangType {L_TEXT, L_PHP , L_C, L_CPP, L_CS, L_OBJC, L_JAVA, L_RC,\
 	// INT NPPM_GETCURRENTNATIVELANGENCODING(0, 0)
 	// returned value : the current native language enconding
 
+    #define NPPM_ALLOCATESUPPORTED   (NPPMSG + 80)
+    // returns TRUE if NPPM_ALLOCATECMDID is supported
+    // Use to identify if subclassing is necessary
+
+	#define NPPM_ALLOCATECMDID   (NPPMSG + 81)
+    // BOOL NPPM_ALLOCATECMDID(int numberRequested, int* startNumber)
+    // sets startNumber to the initial command ID if successful
+    // Returns: TRUE if successful, FALSE otherwise. startNumber will also be set to 0 if unsuccessful
+
 
 #define	RUNCOMMAND_USER    (WM_USER + 3000)
 	#define NPPM_GETFULLCURRENTPATH		(RUNCOMMAND_USER + FULL_CURRENT_PATH)
