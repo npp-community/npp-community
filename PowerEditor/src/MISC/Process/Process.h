@@ -23,71 +23,17 @@ enum progType {WIN32_PROG, CONSOLE_PROG};
 class Process
 {
 public:
-    Process(progType pt = WIN32_PROG);
-    Process(const TCHAR *cmd, const TCHAR *args, const TCHAR *cDir, progType pt = WIN32_PROG);
+    Process(const TCHAR *cmd, const TCHAR *args, const TCHAR *cDir)
+		:_command(cmd), _args(args), _curDir(cDir){};
 
-    BOOL run();
-
-	const TCHAR * getStdout() const {
-		return _stdoutStr.c_str();
-	};
-
-	const TCHAR * getStderr() const {
-		return _stderrStr.c_str();
-	};
-
-	int getExitCode() const {
-		return _exitCode;
-	};
-
-	bool hasStdout() {
-		return _stdoutStr != TEXT("");
-	};
-
-	bool hasStderr() {
-		return _stderrStr != TEXT("");
-	};
+	void run();
 
 protected:
-    progType _type;
-
-	// INPUTS
     generic_string _command;
 	generic_string _args;
 	generic_string _curDir;
-
-	// OUTPUTS
-	generic_string _stdoutStr;
-	generic_string _stderrStr;
-	int _exitCode;
-
-	// HANDLES
-    HANDLE _hPipeOutR;
-	HANDLE _hPipeErrR;
-	HANDLE _hProcess;
-	HANDLE _hProcessThread;
-
-	BOOL	_bProcessEnd;
-
-	static DWORD WINAPI staticListenerStdOut(void * myself){
-		((Process *)myself)->listenerStdOut();
-		return 0;
-	};
-	static DWORD WINAPI staticListenerStdErr(void * myself) {
-		((Process *)myself)->listenerStdErr();
-		return 0;
-	};
-	static DWORD WINAPI staticWaitForProcessEnd(void * myself) {
-		((Process *)myself)->waitForProcessEnd();
-		return 0;
-	};
-
-	void listenerStdOut();
-	void listenerStdErr();
-	void waitForProcessEnd();
-
-	void error(const TCHAR *txt2display, BOOL & returnCode, int errCode);
 };
+
 
 #endif //MISC_PROCESS_PROCESS_H
 
