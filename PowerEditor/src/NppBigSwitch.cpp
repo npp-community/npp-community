@@ -1696,6 +1696,9 @@ LRESULT Notepad_plus::process(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		case NPPM_ALLOCATECMDID:
 			return _pluginsManager->allocateCmdID(wParam, reinterpret_cast<int *>(lParam));
 
+		case NPPM_ALLOCATEMARKER:
+			return _pluginsManager->allocateMarker(wParam, reinterpret_cast<int *>(lParam));
+
 		case NPPM_HIDETABBAR :
 		{
 			bool hide = (lParam != 0);

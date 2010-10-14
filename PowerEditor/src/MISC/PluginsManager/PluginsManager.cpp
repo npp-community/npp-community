@@ -51,7 +51,8 @@ PluginInfo::~PluginInfo()
 PluginsManager::PluginsManager() :
 	_hPluginsMenu(NULL),
 	_isDisabled(false),
-	_dynamicIDAlloc(new IDAllocator(ID_PLUGINS_CMD_DYNAMIC, ID_PLUGINS_CMD_DYNAMIC_LIMIT))
+	_dynamicIDAlloc(new IDAllocator(ID_PLUGINS_CMD_DYNAMIC, ID_PLUGINS_CMD_DYNAMIC_LIMIT)),
+	_markerAlloc(new IDAllocator(MARKER_PLUGINS, MARKER_PLUGINS_LIMIT))
 {
 }
 
@@ -66,6 +67,11 @@ PluginsManager::~PluginsManager() {
 	if (_dynamicIDAlloc)
 	{
 		delete _dynamicIDAlloc;
+	}
+
+	if (_markerAlloc)
+	{
+		delete _markerAlloc;
 	}
 }
 
@@ -534,6 +540,18 @@ bool PluginsManager::allocateCmdID(int numberRequired, int *start)
 
 	*start = _dynamicIDAlloc->allocate(numberRequired);
 
+	if (-1 == *start)
+	{
+		*start = 0;
+		retVal = false;
+	}
+	return retVal;
+}
+
+bool PluginsManager::allocateMarker(int numberRequired, int *start)
+{
+	bool retVal = true;
+	*start = _markerAlloc->allocate(numberRequired);
 	if (-1 == *start)
 	{
 		*start = 0;

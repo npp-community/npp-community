@@ -87,6 +87,8 @@ public:
 	bool allocateCmdID(int numberRequired, int *start);
 	bool inDynamicRange(int id);
 
+	bool allocateMarker(int numberRequired, int *start);
+
 private:
 	NppData _nppData;
 	HMENU _hPluginsMenu;
@@ -95,6 +97,7 @@ private:
 	std::vector<PluginCommand> _pluginsCommands;
 	bool _isDisabled;
 	IDAllocator* _dynamicIDAlloc;
+	IDAllocator* _markerAlloc;
 
 	void pluginCrashAlert(const TCHAR *pluginName, const TCHAR *funcSignature);
 };

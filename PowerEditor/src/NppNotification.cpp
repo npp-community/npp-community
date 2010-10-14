@@ -417,7 +417,13 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 					bool isFirstTime = !_goToLineDlg->isCreated();
 					_goToLineDlg->doDialog(_nativeLangSpeaker->isRTL());
 					if (isFirstTime)
+					{
 						_nativeLangSpeaker->changeDlgLang(_goToLineDlg->getHSelf(), "GoToLine");
+					}
+				}
+				else if (lpnm->dwItemSpec == DWORD(STATUSBAR_DOC_SIZE))
+				{
+					command(IDM_VIEW_SUMMARY);
 				}
 			}
 			break;

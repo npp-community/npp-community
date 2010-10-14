@@ -1072,6 +1072,35 @@ void Notepad_plus::command(int id)
 		}
 		break;
 
+		case IDM_VIEW_SUMMARY:
+		{
+			generic_stringstream strStream;
+
+			Buffer * curBuf = _pEditView->getCurrentBuffer();
+			int fileLen = curBuf->getFileLength();
+
+			if (fileLen != -1)
+			{
+				strStream << TEXT("Full file path: ") << curBuf->getFullPathName() << std::endl
+						  << TEXT("Created: ") << curBuf->getFileTime(Buffer::ft_created) << std::endl
+						  << TEXT("Modified: ") << curBuf->getFileTime(Buffer::ft_modified) << std::endl
+						  << TEXT("File length (in byte): ") << fileLen << std::endl
+						  << std::endl;
+			}
+
+			UniMode um = _pEditView->getCurrentBuffer()->getUnicodeMode();
+
+			strStream << TEXT("Characters (without blanks): ") << getCurrentDocCharCount(um) << std::endl
+					  << TEXT("Current document length: ") << _pEditView->execute(SCI_GETLENGTH) << std::endl
+					  << TEXT("Total lines: ") << _pEditView->execute(SCI_GETLINECOUNT)  << std::endl
+					  << getSelectedCharNumber(um) << TEXT(" selected characters (")
+					  << getSelectedBytes() << TEXT(" bytes) in ")
+					  << getSelectedAreas() <<TEXT(" ranges") << std::endl;
+
+			::MessageBox(_pPublicInterface->getHSelf(), strStream.str().c_str(), TEXT("Summary"), MB_OK|MB_APPLMODAL);
+		}
+		break;
+
 		case IDM_EXECUTE:
 		{
 			assert(_runDlg);

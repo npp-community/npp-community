@@ -3204,6 +3204,11 @@ long ScintillaEditView::getCurrentColumnNumber() const
 
 long ScintillaEditView::getSelectedByteNumber() const
 {
+	// return -1 if it's multi-selection or rectangle selection
+	if ((execute(SCI_GETSELECTIONS) > 1) || execute(SCI_SELECTIONISRECTANGLE))
+	{
+		return -1;
+	}
 	long start = long(execute(SCI_GETSELECTIONSTART));
 	long end = long(execute(SCI_GETSELECTIONEND));
 	return (start < end)?end-start:start-end;
