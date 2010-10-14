@@ -46,6 +46,16 @@ void ColourPicker::init(HINSTANCE hInst, HWND parent)
 
 }
 
+void ColourPicker::destroy()
+{
+	if (_pColourPopup)
+	{
+		delete _pColourPopup;
+		_pColourPopup = NULL;
+	}
+	Window::destroy();
+}
+
 void ColourPicker::drawBackground(HDC hDC)
 {
     RECT rc;
@@ -110,6 +120,10 @@ LRESULT ColourPicker::runProc(UINT Message, WPARAM wParam, LPARAM lParam)
 				_pColourPopup->init(_hInst, _hSelf);
 				_pColourPopup->doDialog(p);
 			}
+			else
+			{
+				_pColourPopup->display(true);
+			}
             return TRUE;
         }
 		case WM_RBUTTONDOWN:
@@ -142,9 +156,7 @@ LRESULT ColourPicker::runProc(UINT Message, WPARAM wParam, LPARAM lParam)
             _currentColour = (COLORREF)wParam;
             redraw();
 
-			_pColourPopup->destroy();
-            delete _pColourPopup;
-			_pColourPopup = NULL;
+			_pColourPopup->display(false);
 			::SendMessage(_hParent, WM_COMMAND, MAKELONG(0, CPN_COLOURPICKED), (LPARAM)_hSelf);
             return TRUE;
         }
@@ -160,18 +172,8 @@ LRESULT ColourPicker::runProc(UINT Message, WPARAM wParam, LPARAM lParam)
         }
 
 		case WM_PICKUP_CANCEL :
-        case WM_DESTROY :
-        {
-            if (_pColourPopup)
-            {
-				_pColourPopup->destroy();
-                delete _pColourPopup;
-				_pColourPopup = NULL;
-
-                return TRUE;
-            }
-            break;
-        }
+			_pColourPopup->display(false);
+			return TRUE;
 
 		default :
 			return ::CallWindowProc(_buttonDefaultProc, _hSelf, Message, wParam, lParam);

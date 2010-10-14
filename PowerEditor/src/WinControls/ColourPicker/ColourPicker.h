@@ -39,6 +39,7 @@ public :
         //drawSelf();
     };
 
+	virtual void destroy();
 	COLORREF getColour() const {return _currentColour;};
 
 	bool isEnabled() {return _isEnabled;};
