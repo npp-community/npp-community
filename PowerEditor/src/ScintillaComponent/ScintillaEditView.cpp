@@ -1144,12 +1144,12 @@ void ScintillaEditView::defineDocType(LangType typeDoc)
 		case L_JAVA :
 		case L_RC :
 		case L_CS :
+		case L_FLASH :
 			setCppLexer(typeDoc); break;
 
 		case L_TCL :
             setTclLexer(); break;
 
-		case L_FLASH :
         case L_OBJC :
             setObjCLexer(typeDoc); break;
 
