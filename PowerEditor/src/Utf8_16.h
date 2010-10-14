@@ -147,7 +147,6 @@ public:
 protected:
 	UniMode m_eEncoding;
 	FILE* m_pFile;
-	utf16* m_pBuf;
 	ubyte* m_pNewBuf;
 	size_t m_nBufSize;
 	bool m_bFirstWrite;
