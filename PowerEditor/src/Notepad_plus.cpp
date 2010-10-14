@@ -2794,35 +2794,16 @@ size_t Notepad_plus::getSelectedBytes()
 	return result;
 }
 
-/*
-void Notepad_plus::updateStatusBar()
+int Notepad_plus::wordCount()
 {
-	assert(_statusBar);
-	if(!NppParameters::getInstance()->getNppGUI()._statusBarShow) return; // do not update if status bar not shown
-
-	UniMode u = _pEditView->getCurrentBuffer()->getUnicodeMode();
-    TCHAR strLnCol[64];
-
-	int areas = getSelectedAreas();
-	int sizeofChar = (isFormatUnicode(u)) ? 2 : 1;
-	wsprintf(strLnCol, TEXT("Ln : %d    Col : %d    Sel : %d (%d bytes) in %d ranges"),\
-        (_pEditView->getCurrentLineNumber() + 1), \
-		(_pEditView->getCurrentColumnNumber() + 1),\
-		getSelectedCharNumber(u), getSelectedBytes() * sizeofChar,\
-		areas);
-
-    _statusBar->setText(strLnCol, STATUSBAR_CUR_POS);
-
-	TCHAR strDonLen[64];
-	size_t numLines = _pEditView->execute(SCI_GETLINECOUNT);
-    wsprintf(strDonLen, TEXT("%d chars   %d bytes   %d lines"),\
-		getCurrentDocCharCount(numLines, u),\
-		_pEditView->execute(SCI_GETLENGTH) * sizeofChar + getBOMSize(u),\
-		numLines);
-	_statusBar->setText(strDonLen, STATUSBAR_DOC_SIZE);
-    _statusBar->setText(_pEditView->execute(SCI_GETOVERTYPE) ? TEXT("OVR") : TEXT("INS"), STATUSBAR_TYPING_MODE);
+	assert(_findReplaceDlg);
+    FindOption env;
+    env._str2Search = TEXT("[^ 	\\\\.,;:!?()+\\-\\*/=\\]\\[{}&~\"'`|@$%§<>\\^]+");
+	//printStr(env._str2Search.c_str());
+    env._searchType = FindRegex;
+    return _findReplaceDlg->processAll(ProcessCountAll, &env, true);
 }
-*/
+
 
 void Notepad_plus::updateStatusBar()
 {
@@ -4683,6 +4664,7 @@ void Notepad_plus::loadCommandlineParams(const TCHAR * commandLine, CmdLineParam
 		switchToFile(lastOpened);
 	}
 }
+
 
 void Notepad_plus::setFindReplaceFolderFilter(const TCHAR *dir, const TCHAR *filter)
 {

@@ -1091,8 +1091,9 @@ void Notepad_plus::command(int id)
 			UniMode um = _pEditView->getCurrentBuffer()->getUnicodeMode();
 
 			strStream << TEXT("Characters (without blanks): ") << getCurrentDocCharCount(um) << std::endl
+					  << TEXT("Words: ") << wordCount() << std::endl
+					  << TEXT("Lines: ") << _pEditView->execute(SCI_GETLINECOUNT) << std::endl
 					  << TEXT("Current document length: ") << _pEditView->execute(SCI_GETLENGTH) << std::endl
-					  << TEXT("Total lines: ") << _pEditView->execute(SCI_GETLINECOUNT)  << std::endl
 					  << getSelectedCharNumber(um) << TEXT(" selected characters (")
 					  << getSelectedBytes() << TEXT(" bytes) in ")
 					  << getSelectedAreas() <<TEXT(" ranges") << std::endl;
