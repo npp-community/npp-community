@@ -666,8 +666,8 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 		case SCN_ZOOM:
 			break;
 
-		case SCN_MACRORECORD:
-			_macro.push_back(recordedMacroStep(notification->message, notification->wParam, notification->lParam));
+	case SCN_MACRORECORD:
+		_macro.push_back(recordedMacroStep(notification->message, notification->wParam, notification->lParam, _pEditView->execute(SCI_GETCODEPAGE)));
 			break;
 
 		case SCN_PAINTED:
@@ -701,12 +701,12 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 			notifyView->execute(SCI_SETTARGETSTART, startPos);
 			notifyView->execute(SCI_SETTARGETEND, endPos);
 
-		int posFound = notifyView->execute(SCI_SEARCHINTARGET, strlen(URL_REG_EXPR), (LPARAM)URL_REG_EXPR);
-		if (posFound != -1)
-		{
-			startPos = int(notifyView->execute(SCI_GETTARGETSTART));
-			endPos = int(notifyView->execute(SCI_GETTARGETEND));
-		}
+			int posFound = notifyView->execute(SCI_SEARCHINTARGET, strlen(URL_REG_EXPR), (LPARAM)URL_REG_EXPR);
+			if (posFound != -1)
+			{
+				startPos = int(notifyView->execute(SCI_GETTARGETSTART));
+				endPos = int(notifyView->execute(SCI_GETTARGETEND));
+			}
 
 			TCHAR currentWord[MAX_PATH*2];
 			notifyView->getGenericText(currentWord, startPos, endPos);
