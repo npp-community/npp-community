@@ -854,6 +854,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\Utf8.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Utf8_16.h"
 				>
 			</File>
