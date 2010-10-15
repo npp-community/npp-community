@@ -347,10 +347,7 @@ private:
 	ScintillaCtrls _scintillaCtrls4Plugins;
 
 	std::vector<std::pair<int, int> > _hideLinesMarks;
-	StyleArray _hotspotStyles;
     bool _rememberThisSession; // always true. except -nosession is indicated on the launch time
-
-
 
 	BOOL notify(SCNotification *notification);
 	void specialCmd(int id);
