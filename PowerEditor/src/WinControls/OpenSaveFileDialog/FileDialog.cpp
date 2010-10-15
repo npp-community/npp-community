@@ -327,9 +327,14 @@ static BOOL CALLBACK fileDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 					HWND fnControl = ::GetDlgItem(hwnd, FileDialog::_dialogFileBoxId);
 					TCHAR fn[MAX_PATH];
 					::GetWindowText(fnControl, fn, MAX_PATH);
-					if (*fn == '\0')
-						return oldProc(hwnd, message, wParam, lParam);
 
+					// Check condition to have the compability of default behaviour
+					if (*fn == '\0' || ::PathIsDirectory(fn))
+					{
+						return oldProc(hwnd, message, wParam, lParam);
+					}
+
+					// Process
 					if (currentExt != TEXT(""))
 					{
 						generic_string fnExt = changeExt(fn, currentExt, false);
