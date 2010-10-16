@@ -1390,51 +1390,18 @@ bool NppParameters::loadSession(Session* session, const TCHAR *sessionFileName)
 	return loadOkay;
 }
 
-bool NppParameters::getSessionFromXmlTree(TiXmlDocument *pSessionDoc, Session *pSession)
+static void parseSessionView(TiXmlNode *viewRoot, size_t& ioActiveIndex, std::vector<sessionFileInfo>& sessionFiles)
 {
-	if ((pSessionDoc) && (!pSession))
-		return false;
-
-	TiXmlDocument **ppSessionDoc = &_pXmlSessionDoc;
-	Session *ptrSession = _session;
-
-	if (pSessionDoc)
+	if (viewRoot)
 	{
-		ppSessionDoc = &pSessionDoc;
-		ptrSession = pSession;
-	}
-
-	if (!*ppSessionDoc)
-		return false;
-
-	TiXmlNode *root = (*ppSessionDoc)->FirstChild(TEXT("NotepadPlus"));
-	if (!root)
-		return false;
-
-	TiXmlNode *sessionRoot = root->FirstChildElement(TEXT("Session"));
-	if (!sessionRoot)
-		return false;
-
-
-	TiXmlElement *actView = sessionRoot->ToElement();
-	size_t index;
-	const TCHAR *str = actView->Attribute(TEXT("activeView"), (int *)&index);
-	if (str)
-	{
-		(*ptrSession)._activeView = index;
-	}
-
-
-	TiXmlNode *mainviewRoot = sessionRoot->FirstChildElement(TEXT("mainView"));
-	if (mainviewRoot)
-	{
-		TiXmlElement *actIndex = mainviewRoot->ToElement();
-		str = actIndex->Attribute(TEXT("activeIndex"), (int *)&index);
+		size_t index;
+		TiXmlElement *actIndex = viewRoot->ToElement();
+		const TCHAR* str = actIndex->Attribute(TEXT("activeIndex"), (int *)&index);
 		if (str)
 		{
-			(*ptrSession)._activeMainIndex = index;
+			ioActiveIndex = index;
 		}
-		for (TiXmlNode *childNode = mainviewRoot->FirstChildElement(TEXT("File"));
+		for (TiXmlNode *childNode = viewRoot->FirstChildElement(TEXT("File"));
 			childNode ;
 			childNode = childNode->NextSibling(TEXT("File")) )
 		{
@@ -1466,62 +1433,71 @@ bool NppParameters::getSessionFromXmlTree(TiXmlDocument *pSessionDoc, Session *p
 						sfi.marks.push_back(lineNumber);
 					}
 				}
-				(*ptrSession)._mainViewFiles.push_back(sfi);
+				sessionFiles.push_back(sfi);
 			}
 		}
 	}
+}
+
+bool NppParameters::getSessionFromXmlTree(TiXmlDocument *pSessionDoc, Session *pSession)
+{
+	if ((pSessionDoc) && (!pSession))
+		return false;
+
+	TiXmlDocument **ppSessionDoc = &_pXmlSessionDoc;
+	Session *ptrSession = _session;
+
+	if (pSessionDoc)
+	{
+		ppSessionDoc = &pSessionDoc;
+		ptrSession = pSession;
+	}
+
+	if (!*ppSessionDoc)
+		return false;
+
+	TiXmlNode *root = (*ppSessionDoc)->FirstChild(TEXT("NotepadPlus"));
+	if (!root)
+		return false;
+
+	TiXmlNode *sessionRoot = root->FirstChildElement(TEXT("Session"));
+	if (!sessionRoot)
+		return false;
+
+	TiXmlNode *mainviewRoot = sessionRoot->FirstChildElement(TEXT("mainView"));
+	// JOCE: The code blocks for mainviewRoot and subviewRoot are almost identical. This can be factored.
+	parseSessionView(mainviewRoot, ptrSession->_activeMainIndex, ptrSession->_mainViewFiles);
 
 	TiXmlNode *subviewRoot = sessionRoot->FirstChildElement(TEXT("subView"));
-	if (subviewRoot)
+	// If the main view is empty, let's not fill the sub view. Let's fill the main view instead.
+	if (ptrSession->_mainViewFiles.size() > 0)
 	{
-		TiXmlElement *actIndex = subviewRoot->ToElement();
-		str = actIndex->Attribute(TEXT("activeIndex"), (int *)&index);
-		if (str)
-		{
-			(*ptrSession)._activeSubIndex = index;
-		}
-		for (TiXmlNode *childNode = subviewRoot->FirstChildElement(TEXT("File"));
-			childNode ;
-			childNode = childNode->NextSibling(TEXT("File")) )
-		{
-			const TCHAR *fileName = (childNode->ToElement())->Attribute(TEXT("filename"));
-			if (fileName)
-			{
-
-				Position position;
-				(childNode->ToElement())->Attribute(TEXT("firstVisibleLine"), &position._firstVisibleLine);
-				(childNode->ToElement())->Attribute(TEXT("xOffset"), &position._xOffset);
-				(childNode->ToElement())->Attribute(TEXT("startPos"), &position._startPos);
-				(childNode->ToElement())->Attribute(TEXT("endPos"), &position._endPos);
-				(childNode->ToElement())->Attribute(TEXT("selMode"), &position._selMode);
-				(childNode->ToElement())->Attribute(TEXT("scrollWidth"), &position._scrollWidth);
-
-				const TCHAR *langName;
-				langName = (childNode->ToElement())->Attribute(TEXT("lang"));
-				int encoding = -1;
-				(childNode->ToElement())->Attribute(TEXT("encoding"), &encoding);
-
-				sessionFileInfo sfi(fileName, langName, encoding, position);
-
-				for (TiXmlNode *markNode = childNode->FirstChildElement(TEXT("Mark"));
-					markNode ;
-					markNode = markNode->NextSibling(TEXT("Mark")))
-				{
-					int lineNumber;
-					const TCHAR *lineNumberStr = (markNode->ToElement())->Attribute(TEXT("line"), &lineNumber);
-					if (lineNumberStr)
-					{
-						sfi.marks.push_back(lineNumber);
-					}
-				}
-				(*ptrSession)._subViewFiles.push_back(sfi);
-			}
-		}
+		parseSessionView(subviewRoot, ptrSession->_activeSubIndex, ptrSession->_subViewFiles);
+	}
+	else
+	{
+		parseSessionView(subviewRoot, ptrSession->_activeMainIndex, ptrSession->_mainViewFiles);
 	}
 
+	// At this point, if _subViewFiles.size == 0, it means the active we will automatically be _mainViewFiles (idx 0)
+	if (ptrSession->_subViewFiles.size() == 0 )
+	{
+		ptrSession->_activeView = 0;
+	}
+	else
+	{
+		TiXmlElement *actView = sessionRoot->ToElement();
+		size_t index;
+		const TCHAR *str = actView->Attribute(TEXT("activeView"), (int *)&index);
+		if (str)
+		{
+			ptrSession->_activeView = index;
+		}
+	}
 
 	return true;
 }
+
 void NppParameters::feedFileListParameters(TiXmlNode *node)
 {
 	_nbMaxFile = 10;
