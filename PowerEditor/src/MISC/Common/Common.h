@@ -85,7 +85,7 @@ protected:
 		StringBuffer() : _str(0), _allocLen(0) {}
 		~StringBuffer()
 		{
-			if(_str)
+			if(_allocLen > 0)
 			{
 				delete [] _str;
 			}
@@ -95,7 +95,7 @@ protected:
 		{
 			if(_allocLen < size)
 			{
-				if(_allocLen)
+				if(_allocLen > 0)
 				{
 					delete[] _str;
 				}
