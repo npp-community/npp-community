@@ -342,6 +342,7 @@ struct ScintillaViewParams
 	    _edgeMode(EDGE_NONE),
 		_edgeNbColumn(0),
 		_zoom(0),
+		_zoom2(0),
 		_whiteSpaceShow(false),
 		_eolShow(false)
 	{}
