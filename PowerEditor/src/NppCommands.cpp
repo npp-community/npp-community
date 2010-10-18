@@ -1786,7 +1786,10 @@ void Notepad_plus::command(int id)
 			PathAppend(updaterFullPath, TEXT("gup.exe"));
 
 			generic_string param = TEXT("-verbose -v");
+			// nul char is expected in version strings.
+			//lint -e840 (Info -- Use of nul character in a string literal)
 			param += VERSION_VALUE;
+			//lint +e840
 			Process updater(updaterFullPath.c_str(), param.c_str(), updaterDir.c_str());
 
 			updater.run();

@@ -976,7 +976,10 @@ LRESULT Notepad_plus::process(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 
 		case NPPM_GETNPPVERSION:
 		{
+			// nul char is expected in version strings.
+			//lint -e840 (Info -- Use of nul character in a string literal)
 			const TCHAR * verStr = VERSION_VALUE;
+			//lint +e840
 			TCHAR mainVerStr[16];
 			TCHAR auxVerStr[16];
 			bool isDot = false;

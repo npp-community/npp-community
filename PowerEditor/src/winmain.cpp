@@ -348,7 +348,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 	generic_string updaterFullPath = updaterDir + TEXT("gup.exe");
 
 	generic_string version = TEXT("-v");
+	// nul char is expected in version strings.
+	//lint -e840 (Info -- Use of nul character in a string literal)
 	version += VERSION_VALUE;
+	//lint +e840
 
 	winVer curWinVer = getWinVersion();
 
