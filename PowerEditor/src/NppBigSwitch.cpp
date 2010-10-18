@@ -1431,7 +1431,7 @@ LRESULT Notepad_plus::process(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
             else
             {
                 if (_pTrayIco)
-                    _pTrayIco->doTrayIcon(REMOVE);
+                    _pTrayIco->doTrayIcon(TRAYICON_REMOVE);
 
 			    const NppGUI & nppgui = pNppParam->getNppGUI();
 			    Session currentSession;
@@ -1501,7 +1501,7 @@ LRESULT Notepad_plus::process(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 				if (!_pTrayIco)
 					_pTrayIco = new trayIconControler(_pPublicInterface->getHSelf(), IDI_M30ICON, IDC_MINIMIZED_TRAY, ::LoadIcon(_pPublicInterface->getHinst(), MAKEINTRESOURCE(IDI_M30ICON)), TEXT(""));
 
-				_pTrayIco->doTrayIcon(ADD);
+				_pTrayIco->doTrayIcon(TRAYICON_ADD);
 				::ShowWindow(hwnd, SW_HIDE);
 				return TRUE;
 			}
@@ -1533,7 +1533,7 @@ LRESULT Notepad_plus::process(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 					_pEditView->getFocus();
 					::ShowWindow(_pPublicInterface->getHSelf(), SW_SHOW);
 					if (!_pPublicInterface->isPrelaunch())
-						_pTrayIco->doTrayIcon(REMOVE);
+						_pTrayIco->doTrayIcon(TRAYICON_REMOVE);
 					::SendMessage(_pPublicInterface->getHSelf(), WM_SIZE, 0, 0);
 					return TRUE;
 

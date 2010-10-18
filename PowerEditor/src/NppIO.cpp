@@ -67,7 +67,7 @@ BufferID Notepad_plus::doOpen(const TCHAR *fileName, bool isReadOnly, int encodi
 			{
 				::ShowWindow(_pPublicInterface->getHSelf(), SW_SHOW);
 				if (!_pPublicInterface->isPrelaunch())
-					_pTrayIco->doTrayIcon(REMOVE);
+					_pTrayIco->doTrayIcon(TRAYICON_REMOVE);
 				::SendMessage(_pPublicInterface->getHSelf(), WM_SIZE, 0, 0);
 			}
 		}
@@ -150,7 +150,7 @@ BufferID Notepad_plus::doOpen(const TCHAR *fileName, bool isReadOnly, int encodi
 			{
 				::ShowWindow(_pPublicInterface->getHSelf(), SW_SHOW);
 				if (!_pPublicInterface->isPrelaunch())
-					_pTrayIco->doTrayIcon(REMOVE);
+					_pTrayIco->doTrayIcon(TRAYICON_REMOVE);
 				::SendMessage(_pPublicInterface->getHSelf(), WM_SIZE, 0, 0);
 			}
 		}

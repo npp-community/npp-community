@@ -33,9 +33,9 @@ trayIconControler::trayIconControler(HWND hwnd, UINT uID, UINT uCBMsg, HICON hic
 
 int trayIconControler::doTrayIcon(DWORD op)
 {
-  if ((op != ADD)&&(op != REMOVE)) return INCORRECT_OPERATION;
-  if (((_isIconShowed)&&(op == ADD))||((!_isIconShowed)&&(op == REMOVE)))
-    return OPERATION_INCOHERENT;
+  if ((op != TRAYICON_ADD)&&(op != TRAYICON_REMOVE)) return TRAYICON_INCORRECT_OPERATION;
+  if (((_isIconShowed)&&(op == TRAYICON_ADD))||((!_isIconShowed)&&(op == TRAYICON_REMOVE)))
+    return TRAYICON_OPERATION_INCOHERENT;
   ::Shell_NotifyIcon(op, &_nid);
   _isIconShowed = !_isIconShowed;
 

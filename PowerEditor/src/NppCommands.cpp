@@ -1998,7 +1998,7 @@ void Notepad_plus::command(int id)
 		case IDM_SYSTRAYPOPUP_CLOSE:
 		{
 			_pPublicInterface->setIsPrelaunch(false);
-			_pTrayIco->doTrayIcon(REMOVE);
+			_pTrayIco->doTrayIcon(TRAYICON_REMOVE);
 			if (!::IsWindowVisible(_pPublicInterface->getHSelf()))
 				::SendMessage(_pPublicInterface->getHSelf(), WM_CLOSE, 0,0);
 		}
