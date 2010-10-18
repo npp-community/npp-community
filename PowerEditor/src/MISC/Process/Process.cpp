@@ -21,7 +21,7 @@
 
 void Process::run()
 {
-	TCHAR *opVerb = TEXT("open");
+	const TCHAR *opVerb = TEXT("open");
 	winVer winVersion = getWinVersion();
 	if (winVersion == WV_VISTA || winVersion == WV_WIN7)
 		opVerb = TEXT("runas");
