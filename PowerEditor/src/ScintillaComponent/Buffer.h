@@ -310,7 +310,7 @@ public :
 	int getFileLength(); // return file length. -1 if file is not existing.
 
 	enum fileTimeType {ft_created, ft_modified, ft_accessed};
-	generic_string getFileTime(fileTimeType ftt);
+	generic_string getFileTime(fileTimeType ftt) const;
 
     Lang * getCurrentLang() const;
 private :

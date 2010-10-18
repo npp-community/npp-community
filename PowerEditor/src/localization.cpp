@@ -65,7 +65,10 @@ void NativeLangSpeaker::init(TiXmlDocumentA *nativeLangDocRootA, bool loadIfEngl
 				if (const char* rtlAttrib = element->Attribute("RTL"))
 				{
 					std::basic_string<char> rtl( rtlAttrib );
+					// It's all right here. It's used as intended.
+					//lint -e864 (Info -- Expression involving variable 'rtl' possibly depends on order of evaluation)
 					std::transform(rtl.begin(), rtl.end(), rtl.begin(), ::tolower);
+					//lint +e864
 					_isRTL = (rtl == "yes");
 				}
 

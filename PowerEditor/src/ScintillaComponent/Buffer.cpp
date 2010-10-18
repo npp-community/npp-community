@@ -210,7 +210,7 @@ int Buffer::getFileLength()
 	return -1;
 }
 
-generic_string Buffer::getFileTime(fileTimeType ftt)
+generic_string Buffer::getFileTime(fileTimeType ftt) const
 {
 	if (_currentStatus == DOC_UNNAMED)
 		return TEXT("");
