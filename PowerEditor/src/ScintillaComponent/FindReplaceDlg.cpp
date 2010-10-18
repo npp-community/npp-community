@@ -2266,7 +2266,8 @@ FindReplaceDlg::FindReplaceDlg() :
 	_fileNameLenMax(1024),
 	// JOCE: weird.  Probably assumes Unicode == wide char.
 	_uniFileName(new char[(_fileNameLenMax + 3) * 2]),
-	_tab(NULL)
+	_tab(NULL),
+	_hMsgParent(NULL)
 {
 	memset(&_findClosePos, 0, sizeof(RECT));
 	memset(&_replaceClosePos, 0, sizeof(RECT));

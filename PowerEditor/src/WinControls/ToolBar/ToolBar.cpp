@@ -27,9 +27,15 @@
 const int WS_TOOLBARSTYLE = WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | TBSTYLE_TOOLTIPS |TBSTYLE_FLAT | CCS_TOP | BTNS_AUTOSIZE | CCS_NOPARENTALIGN | CCS_NORESIZE | CCS_NODIVIDER;
 
 ToolBar::ToolBar():
-	_pTBB(NULL), _toolBarIcons(NULL), _state(TB_STANDARD),
-	_nrButtons(0), _nrDynButtons(0), _nrTotalButtons(0),
-	_nrCurrentButtons(0), _pRebar(NULL)
+	_pTBB(NULL),
+	_toolBarIcons(NULL),
+	_state(TB_STANDARD),
+	_nrButtons(0),
+	_nrDynButtons(0),
+	_nrTotalButtons(0),
+	_nrCurrentButtons(0),
+	_pRebar(NULL),
+	_toolIcons(NULL)
 {
 	memset(&_rbBand, 0, sizeof(REBARBANDINFO));
 }

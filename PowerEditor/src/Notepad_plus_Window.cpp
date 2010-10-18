@@ -34,7 +34,9 @@ const TCHAR Notepad_plus_Window::_className[32] = TEXT("Notepad++");
 HWND Notepad_plus_Window::gNppHWND = NULL;
 
 Notepad_plus_Window::Notepad_plus_Window() :
-	_notepad_plus_plus_core(new Notepad_plus())
+	_notepad_plus_plus_core(new Notepad_plus()),
+	_isPrelaunch(false),
+	_disablePluginsManager(false)
 {
 }
 
