@@ -1774,7 +1774,7 @@ void FindReplaceDlg::findAllIn(InWhat op)
 	if (doSetMarkingStruct)
 	{
 		// Send the address of _MarkingsStruct to the lexer
-		#define ptrword_bufsize sizeof(void*)*2+1
+		#define ptrword_bufsize (sizeof(void*)*2+1)
 		char ptrword[ptrword_bufsize];
 		sprintf_s(ptrword, ptrword_bufsize, "%p", &_pFinder->_MarkingsStruct);
 		//_pFinder->_scintView.execute(SCI_SETKEYWORDS, 0, (LPARAM) ptrword);
