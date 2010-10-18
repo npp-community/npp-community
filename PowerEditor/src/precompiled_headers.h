@@ -20,8 +20,10 @@
 
 #include "targetver.h"
 
-// Allow to track emplacement where leaked memory was allocated.
-#define _CRTDBG_MAP_ALLOC
+#ifndef SHIPPING
+	// Allow to track emplacement where leaked memory was allocated.
+	#define _CRTDBG_MAP_ALLOC
+#endif
 
 // C RunTime Header Files
 // The next two files need to stay in that order, and need to be the
@@ -51,9 +53,9 @@
 #include <sstream>
 
 // Needed to be able to detect the memory leaks created by calls to 'new'
-#ifdef _DEBUG
-#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
-#define new DEBUG_NEW
+#ifndef SHIPPING
+	#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
+	#define new DEBUG_NEW
 #endif
 
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
