@@ -423,7 +423,10 @@ void FileManager::init(Notepad_plus * pNotepadPlus, ScintillaEditView * pscratch
 	_pscratchTilla->execute(SCI_ADDREFDOCUMENT, 0, _scratchDocDefault);
 }
 
-void FileManager::checkFilesystemChanges() {
+void FileManager::checkFilesystemChanges()
+{
+	// Strange things are happening to the loop index variable, but I'm not touching this parsing code with a 10 foot pole.
+	//lint -e850 Info -- for loop index variable 'i' whose type category is 'integral' is modified in body of the for loop that began at 'line 427'
 	for(int i = int(_nrBufs -1) ; i >= 0 ; i--)
     {
         if (i >= int(_nrBufs))
@@ -435,7 +438,7 @@ void FileManager::checkFilesystemChanges() {
         }
         _buffers[i]->checkFileState();	//something has changed. Triggers update automatically
 	}
-
+	//lint +e850
 }
 
 int FileManager::getBufferIndexByID(BufferID id) {
