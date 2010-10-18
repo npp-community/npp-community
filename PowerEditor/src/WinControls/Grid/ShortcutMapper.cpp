@@ -364,7 +364,6 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 						assert(_babygrid);
 						const int row = _babygrid->getSelectedRow();
 						int shortcutIndex = row-1;
-						DWORD cmdID = 0;
 
 						// Menu data
 						size_t posBase = 0;
@@ -383,7 +382,6 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 							{
 								std::vector<MacroShortcut> & theMacros = nppParam->getMacroList();
 								std::vector<MacroShortcut>::iterator it = theMacros.begin();
-								cmdID = theMacros[shortcutIndex].getID();
 								theMacros.erase(it + shortcutIndex);
 								fillOutBabyGrid();
 
@@ -404,7 +402,6 @@ BOOL CALLBACK ShortcutMapper::run_dlgProc(UINT message, WPARAM wParam, LPARAM lP
 							{
 								std::vector<UserCommand> & theUserCmds = nppParam->getUserCommandList();
 								std::vector<UserCommand>::iterator it = theUserCmds.begin();
-								cmdID = theUserCmds[shortcutIndex].getID();
 								theUserCmds.erase(it + shortcutIndex);
 								fillOutBabyGrid();
 

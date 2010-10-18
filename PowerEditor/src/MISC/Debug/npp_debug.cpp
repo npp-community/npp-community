@@ -128,6 +128,8 @@ FuncGuard::~FuncGuard()
 
 void FuncGuard::printf(State printfState, const TCHAR* format, ...)
 {
+	// Lint has a problem with var args it seems.
+	//lint -e438 (Warning -- Last value assigned to variable 'args' (defined at line 138) not used)
 	if (printfState == Enabled)
 	{
 		if (_state == Enabled)
@@ -141,6 +143,7 @@ void FuncGuard::printf(State printfState, const TCHAR* format, ...)
 		g_debugOutput->flush();
 		va_end(args);
 	}
+	//lint +e438
 }
 
 void FuncGuard::indent()
