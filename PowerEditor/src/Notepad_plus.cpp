@@ -75,8 +75,6 @@
 #include "Notepad_plus_Window.h"
 
 enum tb_stat {tb_saved, tb_unsaved, tb_ro};
-#define DIR_LEFT true
-#define DIR_RIGHT false
 
 int docTabIconIDs[] = {IDI_SAVED_ICON, IDI_UNSAVED_ICON, IDI_READONLY_ICON};
 
