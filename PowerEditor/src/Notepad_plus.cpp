@@ -2727,7 +2727,7 @@ size_t Notepad_plus::getCurrentDocCharCount(UniMode u)
 		// Note that counting is not well defined for invalid UTF-8 characters.
 		// This method is O(filelength) regardless of the number of characters we count (due to SCI_GETCHARACTERPOINTER);
 		// it would not be appropriate for counting characters in a small selection.
-		size_t result = 0;
+		size_t result;
 
 		size_t endpos = _pEditView->execute(SCI_GETLENGTH);
 		unsigned char* buf = (unsigned char*)_pEditView->execute(SCI_GETCHARACTERPOINTER); // Scintilla doc sais the pointer can be invalidated by any other "execute"

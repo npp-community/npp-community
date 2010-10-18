@@ -554,8 +554,6 @@ void Gripper::doTabReordering(POINT pt)
 //
 void Gripper::drawRectangle(const POINT* pPt)
 {
-	HBRUSH hbrushOrig= NULL;
-	HBITMAP hbmOrig  = NULL;
 	RECT   rc	 = {0};
 	RECT   rcNew	 = {0};
 	RECT   rcOld	 = _rcPrev;
@@ -627,10 +625,10 @@ void Gripper::drawRectangle(const POINT* pPt)
 
 	HDC hdcMem= ::CreateCompatibleDC(_hdc);
 	HBITMAP hBm= ::CreateCompatibleBitmap(_hdc, rc.right, rc.bottom);
-	hbrushOrig= (HBRUSH)::SelectObject(hdcMem, hBm);
+	HBRUSH hbrushOrig= (HBRUSH)::SelectObject(hdcMem, hBm);
 
 	::SetBrushOrgEx(hdcMem, rc.left%8, rc.top%8, 0);
-	hbmOrig= (HBITMAP)::SelectObject(hdcMem, _hbrush);
+	HBITMAP hbmOrig= (HBITMAP)::SelectObject(hdcMem, _hbrush);
 
 	::BitBlt(hdcMem, 0, 0, rc.right, rc.bottom, _hdc, rc.left, rc.top, SRCCOPY);
 	if (_bPtOldValid)

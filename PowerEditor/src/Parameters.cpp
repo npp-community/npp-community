@@ -1973,13 +1973,11 @@ bool NppParameters::exportUDLToFile(int langIndex2export, generic_string fileNam
     TiXmlDocument *pNewXmlUserLangDoc = new TiXmlDocument(fileName2save);
     TiXmlNode *newRoot2export = pNewXmlUserLangDoc->InsertEndChild(TiXmlElement(TEXT("NotepadPlus")));
 
-    bool b = false;
-
     insertUserLang2Tree(newRoot2export, _userLangArray[langIndex2export]);
-    b = pNewXmlUserLangDoc->SaveFile();
+    bool result = pNewXmlUserLangDoc->SaveFile();
 
     delete pNewXmlUserLangDoc;
-    return b;
+    return result;
 }
 
 LangType NppParameters::getLangFromExt(const TCHAR *ext)
