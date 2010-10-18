@@ -1489,7 +1489,7 @@ LRESULT Notepad_plus::process(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		{
 			killAllChildren();
 			::PostQuitMessage(0);
-			_pPublicInterface->gNppHWND = NULL;
+			Notepad_plus_Window::gNppHWND = NULL;
 			return TRUE;
 		}
 

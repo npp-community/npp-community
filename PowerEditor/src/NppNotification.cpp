@@ -303,7 +303,7 @@ BOOL Notepad_plus::notify(SCNotification *notification)
 					HWND hWinParent = ::GetParent(hWin);
 					TCHAR className[MAX_PATH];
 					::GetClassName(hWinParent,className, sizeof(className));
-					if (lstrcmp(className,  _pPublicInterface->getClassName()) == 0 && hWinParent != _pPublicInterface->getHSelf()) // another Notepad++
+					if (lstrcmp(className,  Notepad_plus_Window::getClassName()) == 0 && hWinParent != _pPublicInterface->getHSelf()) // another Notepad++
 					{
 						int index = _pDocTab->getCurrentTabIndex();
 						BufferID bufferToClose = notifyDocTab->getBufferByIndex(index);

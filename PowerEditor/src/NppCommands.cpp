@@ -337,7 +337,7 @@ void Notepad_plus::command(int id)
 			TCHAR str[strSize];
 			_pEditView->getGenericSelectedText(str, strSize);
 			_findReplaceDlg->setSearchText(str);
-			_findReplaceDlg->_env->_str2Search = str;
+			FindReplaceDlg::_env->_str2Search = str;
 			setFindReplaceFolderFilter(NULL, NULL);
 			if (isFirstTime)
 				_nativeLangSpeaker->changeFindReplaceDlgLang(_findReplaceDlg);

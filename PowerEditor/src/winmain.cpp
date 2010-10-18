@@ -391,7 +391,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 		// mem leak check output for build-testing.
 		if (isLeakDetect)
 		{
-			::SendMessage(notepad_plus_plus.gNppHWND, WM_CLOSE, 0, 0);
+			::SendMessage(Notepad_plus_Window::gNppHWND, WM_CLOSE, 0, 0);
 			return 0;
 		};
 #endif

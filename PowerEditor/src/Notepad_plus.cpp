@@ -5010,7 +5010,7 @@ bool Notepad_plus::reloadLang()
         _nativeLangSpeaker->changeDlgLang(_colEditorDlg->getHSelf(), "ColumnEditor");
 	}
 
-	UserDefineDialog *udd = _pEditView->getUserDefineDlg();
+	UserDefineDialog *udd = ScintillaEditView::getUserDefineDlg();
 	if (udd && udd->isCreated())
 	{
 		_nativeLangSpeaker->changeUserDefineLang(udd);
