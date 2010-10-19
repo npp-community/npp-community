@@ -782,4 +782,48 @@ TEST(CompareNoCaseTest, CompareTwoDifferentStringsFirstBigger)
 	ASSERT_EQ(1, res);
 }
 
+//////////////////////////////////////////////////////////////////////////
+//
+// WcharMbcsConvertorTest
+//
+//////////////////////////////////////////////////////////////////////////
+
+TEST(WcharMbcsConvertorTest, TestStringBufferDeleteAfterEmpty)
+{
+	WcharMbcsConvertor::StringBuffer<char>* strBuffer = new WcharMbcsConvertor::StringBuffer<char>();
+	strBuffer->empty();
+	// This call never threw, but rather asserted. In any case, making sure it's
+	// called and the tests run fine and don't crash is already that.
+	ASSERT_NO_THROW(delete strBuffer);
+}
+
+TEST(WcharMbcsConvertorTest, TestStringBufferDeleteAfterSizeTo)
+{
+	WcharMbcsConvertor::StringBuffer<char>* strBuffer = new WcharMbcsConvertor::StringBuffer<char>();
+	strBuffer->sizeTo(1024);
+	// This call never threw, but rather asserted. In any case, making sure it's
+	// called and the tests run fine and don't crash is already that.
+	ASSERT_NO_THROW(delete strBuffer);
+}
+
+TEST(WcharMbcsConvertorTest, TestStringBufferDeleteAfterSizeToAndEmpty)
+{
+	WcharMbcsConvertor::StringBuffer<char>* strBuffer = new WcharMbcsConvertor::StringBuffer<char>();
+	strBuffer->sizeTo(1024);
+	strBuffer->empty();
+	// This call never threw, but rather asserted. In any case, making sure it's
+	// called and the tests run fine and don't crash is already that.
+	ASSERT_NO_THROW(delete strBuffer);
+}
+
+TEST(WcharMbcsConvertorTest, TestStringBufferDeleteAfterEmptyAndSizeTo)
+{
+	WcharMbcsConvertor::StringBuffer<char>* strBuffer = new WcharMbcsConvertor::StringBuffer<char>();
+	strBuffer->empty();
+	strBuffer->sizeTo(1024);
+	// This call never threw, but rather asserted. In any case, making sure it's
+	// called and the tests run fine and don't crash is already that.
+	ASSERT_NO_THROW(delete strBuffer);
+}
+
 #endif

@@ -74,11 +74,6 @@ public:
         return wchar2char(strW, toCodepage, lenWc, pLenOut);
     };
 
-protected:
-	WcharMbcsConvertor(){}
-	~WcharMbcsConvertor(){}
-	static WcharMbcsConvertor * _pSelf;
-
 	template <class T>
 	class StringBuffer {
 	public:
@@ -124,6 +119,11 @@ protected:
 		size_t _allocLen;
 		T* _str;
 	};
+
+protected:
+	WcharMbcsConvertor(){}
+	~WcharMbcsConvertor(){}
+	static WcharMbcsConvertor * _pSelf;
 
 	StringBuffer<char> _multiByteStr;
 	StringBuffer<wchar_t> _wideCharStr;
