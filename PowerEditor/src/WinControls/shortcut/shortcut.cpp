@@ -16,14 +16,18 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "WinControls/shortcut/shortcut.h"
-#include "Parameters.h"
-#include "ScintillaComponent/ScintillaEditView.h"
-#include "resource.h"
-#include "Notepad_plus.h"
 #include "WinControls/shortcut/shortcutRc.h"
 
+// JOCE: Dependencies from WinControls on Scintilla component seems wrong.
+#include "ScintillaComponent/ScintillaEditView.h"
+#include "ScintillaComponent/FindReplaceDlg_rc.h"
+
+#include "resource.h"
+#include "Notepad_plus_Window.h"
+#include "Parameters.h"
 #include "keys.h"
+
+#include "WinControls/shortcut/shortcut.h"
 
 struct KeyIDNAME {
 	const TCHAR * name;
@@ -340,7 +344,7 @@ void getNameStrFromCmd(INT cmd, generic_string & str)
 	else
 	{
 		// JOCE: Used only to get the class name.  We should move the class name elsewhere, where it brings less baggage with it.
-		HWND hNotepad_plus = ::FindWindow(Notepad_plus::getClassName(), NULL);
+		HWND hNotepad_plus = ::FindWindow(Notepad_plus_Window::getClassName(), NULL);
 		const int commandSize = 64;
 		TCHAR cmdName[commandSize];
 		int nbChar = ::GetMenuString((HMENU)::SendMessage(hNotepad_plus, NPPM_INTERNAL_GETMENU, 0, 0), cmd, cmdName, commandSize, MF_BYCOMMAND);
@@ -668,7 +672,7 @@ void Accelerator::reNew()
 	_hAccTable = ::CreateAcceleratorTable(_pAccelArray, _nbAccelItems);
 }
 
-recordedMacroStep::recordedMacroStep(int iMessage, long wParam, long lParam)
+recordedMacroStep::recordedMacroStep(int iMessage, long wParam, long lParam, int codepage)
 	: message(iMessage), wParameter(wParam), lParameter(lParam), MacroType(mtUseLParameter)
 {
 	if (lParameter) {
@@ -689,10 +693,29 @@ recordedMacroStep::recordedMacroStep(int iMessage, long wParam, long lParam)
 			case SCI_STYLESETFONT :
 			case SCI_SEARCHNEXT :
 			case SCI_SEARCHPREV :
-				sParameter = *reinterpret_cast<TCHAR *>(lParameter);
+			case IDFINDWHAT:
+			case IDREPLACEWITH:
+			case IDD_FINDINFILES_DIR_COMBO:
+			case IDD_FINDINFILES_FILTERS_COMBO:
+			{
+#ifdef UNICODE
+				char *ch = reinterpret_cast<char *>(lParameter);
+				TCHAR tch[2];
+				::MultiByteToWideChar(codepage, 0, ch, -1, tch, 2);
+				sParameter = *tch;
+#else
+				char ch = *reinterpret_cast<char *>(lParameter);
+				TCHAR tch = ch;
+				sParameter = tch;
+
+				// dummy call
+				codepage = 0;
+#endif
 				MacroType = mtUseSParameter;
 				lParameter = 0;
-				break;
+			}
+			break;
+
 
 			default : // for all other messages, use lParameter "as is"
 				break;
@@ -708,8 +731,19 @@ void recordedMacroStep::PlayBack(Window* pNotepad, ScintillaEditView *pEditView)
 	else
 	{
 		long lParam = lParameter;
+#ifdef UNICODE
+		char ansiBuffer[3];
+#endif
 		if (MacroType == mtUseSParameter)
-			lParam = reinterpret_cast<long>(sParameter.c_str());
+		{
+#ifdef UNICODE
+			::WideCharToMultiByte(pEditView->execute(SCI_GETCODEPAGE), 0, sParameter.c_str(), -1, ansiBuffer, 3, NULL, NULL);
+			lParam = reinterpret_cast<LPARAM>(ansiBuffer);
+#else
+			lParam = reinterpret_cast<LPARAM>(sParameter.c_str());
+#endif
+		}
+
 		pEditView->execute(message, wParameter, lParam);
 		if ( (message == SCI_SETTEXT)
 			|| (message == SCI_REPLACESEL)

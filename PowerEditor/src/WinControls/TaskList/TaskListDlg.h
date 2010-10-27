@@ -22,9 +22,6 @@
 #include "WinControls/StaticDialog/StaticDialog.h"
 #endif
 
-#define dirUp true
-#define dirDown false
-
 #define	TASKLIST_USER    (WM_USER + 8000)
 #define WM_GETTASKLISTINFO (TASKLIST_USER + 01)
 

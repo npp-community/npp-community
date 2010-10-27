@@ -123,8 +123,7 @@ void DockingManager::init(HINSTANCE hInst, HWND hWnd, Window ** ppWin)
 
 		if (!::RegisterClass(&clz))
 		{
-			systemMessage(TEXT("System Err"));
-			throw int(98);
+			throw std::runtime_error("DockingManager::init : RegisterClass() function failed");
 		}
 		_isRegistered = TRUE;
 	}
@@ -143,8 +142,7 @@ void DockingManager::init(HINSTANCE hInst, HWND hWnd, Window ** ppWin)
 
 	if (!_hSelf)
 	{
-		systemMessage(TEXT("System Err"));
-		throw int(777);
+		throw std::runtime_error("DockingManager::init : CreateWindowEx() function return null");
 	}
 
 	setClientWnd(ppWin);
@@ -170,8 +168,7 @@ void DockingManager::init(HINSTANCE hInst, HWND hWnd, Window ** ppWin)
 
 	if (!gWinCallHook)
 	{
-		systemMessage(TEXT("System Err"));
-		throw int(1000);
+		throw std::runtime_error("DockingManager::init : SetWindowsHookEx() function return null");
 	}
 
 	_dockData->hWnd = _hSelf;
@@ -204,7 +201,7 @@ LRESULT DockingManager::runProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 	{
 		case WM_NCACTIVATE:
 		{
-			/* activate/deactivate titlebar of toolbars */
+			// activate/deactivate titlebar of toolbars
 			for (size_t iCont = DOCKCONT_MAX; iCont < _vContainer.size(); iCont++)
 			{
 				::SendMessage(_vContainer[iCont]->getHSelf(), WM_NCACTIVATE, wParam, (LPARAM)-1);
@@ -224,20 +221,20 @@ LRESULT DockingManager::runProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 		}
 		case WM_DESTROY:
 		{
-			/* unregister window event hooking BEFORE EVERYTHING ELSE */
+			// unregister window event hooking BEFORE EVERYTHING ELSE
 			if (hWndServer == hwnd) {
 				UnhookWindowsHookEx(gWinCallHook);
 				gWinCallHook = NULL;
 				hWndServer = NULL;
 			}
 
-			/* destroy imagelist if it exists */
+			// destroy imagelist if it exists
 			if (_hImageList != NULL)
 			{
 				::ImageList_Destroy(_hImageList);
 			}
 
-			/* destroy containers */
+			// destroy containers
 			for (int i = _vContainer.size(); i > 0; i--)
 			{
 				_vContainer[i-1]->destroy();
@@ -251,13 +248,14 @@ LRESULT DockingManager::runProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 			if (::GetActiveWindow() != _hParent)
 				break;
 
-			/* set respective activate state */
+			// set respective activate state
 			for (int i = 0; i < DOCKCONT_MAX; i++)
 			{
 				_vContainer[i]->SetActive(IsChild(_vContainer[i]->getHSelf(), ::GetFocus()));
 			}
 			return TRUE;
 		}
+
 		case DMM_MOVE:
 		{
 			// Gripper will self delete on WM_DESTROY
@@ -266,9 +264,10 @@ LRESULT DockingManager::runProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 			pGripper->startGrip((DockingCont*)lParam, this);
 			break;
 		}
+
 		case DMM_MOVE_SPLITTER:
 		{
-			INT			offset = (INT)wParam;
+			int offset = (int)wParam;
 
 			for (int iCont = 0; iCont < DOCKCONT_MAX; iCont++)
 			{

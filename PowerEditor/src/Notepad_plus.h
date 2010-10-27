@@ -26,14 +26,6 @@
 #include "Parameters_def.h"
 #endif
 
-#ifndef SCINTILLACOMPONENT_SCINTILLAREF_H
-#include "ScintillaComponent/ScintillaRef.h"
-#endif
-
-#ifndef WINCONTROLS_WINDOW_H
-#include "WinControls/Window.h"
-#endif
-
 #ifndef MISC_PLUGINSMANAGER_NOTEPADPLUSMSGS_H
 #include "MISC/PluginsManager/Notepad_plus_msgs.h"
 #endif
@@ -53,6 +45,8 @@
 
 #define MENU 0x01
 #define TOOLBAR 0x02
+
+#define URL_REG_EXPR "[A-Za-z]+://[A-Za-z0-9_\\-\\+~.:?&@=/%#,;\\{\\}\\(\\)\\[\\]\\|\\*\\!\\\\]+"
 
 enum FileTransferMode {
 	TransferClone		= 0x01,
@@ -88,6 +82,7 @@ class WordStyleDlg;
 class PreferenceDlg;
 class WindowsMenu;
 class RunMacroDlg;
+class ButtonDlg;
 
 class ContextMenu;
 class StatusBar;
@@ -95,6 +90,7 @@ class ToolBar;
 class ReBar;
 
 class ScintillaEditView;
+class NativeLangSpeaker;
 class DocTabView;
 class IconList;
 class trayIconControler;
@@ -106,7 +102,6 @@ class AutoCompletion;
 class PluginsManager;
 class ShortcutMapper;
 
-
 struct TaskListInfo;
 
 struct tTbData;
@@ -117,17 +112,6 @@ class TiXmlNode;
 // Stuff from Parameters.h
 struct CmdLineParams;
 struct Session;
-
-static TiXmlNodeA * searchDlgNode(TiXmlNodeA *node, const char *dlgTagName);
-
-struct iconLocator {
-	int listIndex;
-	int iconIndex;
-	generic_string iconLocation;
-
-	iconLocator(int iList, int iIcon, const generic_string iconLoc)
-		: listIndex(iList), iconIndex(iIcon), iconLocation(iconLoc){};
-};
 
 struct VisibleGUIConf {
 	bool isPostIt;
@@ -156,27 +140,31 @@ struct VisibleGUIConf {
 };
 
 class FileDialog;
+class Notepad_plus_Window;
 
-class Notepad_plus : public Window {
-	enum comment_mode {cm_comment, cm_uncomment, cm_toggle};
+
+class Notepad_plus {
+
+friend class Notepad_plus_Window;
+
 public:
 	Notepad_plus();
 	virtual ~Notepad_plus();
-	//(Warning -- Member with different signature hides virtual member 'Window::init(struct HINSTANCE__ *, struct HWND__ *)'
-	//lint -e1411
-	void init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLine, CmdLineParams *cmdLineParams);
-	//lint +e1411
+	LRESULT init(HWND hwnd);
+	LRESULT process(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 	void killAllChildren();
+    /*
+    HWND getWindowHandle() const {
+        return _pPublicInterface->getHSelf();
+    };
+    */
 
-    static const TCHAR * getClassName() {
-		return _className;
-	};
+	enum comment_mode {cm_comment, cm_uncomment, cm_toggle};
 
 	void setTitle();
 	void getTaskListInfo(TaskListInfo *tli);
 
 	// For filtering the modeless Dialog message
-	bool isDlgsMsg(MSG *msg, bool unicodeSupported) const;
 
 // fileOperations
 	//The doXXX functions apply to a single buffer and dont need to worry about views, with the excpetion of doClose, since closing one view doesnt have to mean the document is gone
@@ -205,7 +193,7 @@ public:
 
 	bool isFileSession(const TCHAR * filename);
 	void filePrint(bool showDialog);
-	bool saveScintillaParams(bool whichOne);
+	bool saveScintillaParams();
 
 	bool saveGUIParams();
 	void saveDockingParams();
@@ -219,32 +207,20 @@ public:
 	bool fileLoadSession(const TCHAR *fn = NULL);
 	const TCHAR * fileSaveSession(size_t nbFile, TCHAR ** fileNames, const TCHAR *sessionFile2save);
 	const TCHAR * fileSaveSession(size_t nbFile = 0, TCHAR ** fileNames = NULL);
-
-	bool changeDlgLang(HWND hDlg, const char *dlgTagName, char *title = NULL, int titleBufLen = 0);
-	void changeFindReplaceDlgLang();
-	void changeConfigLang();
-	void changeUserDefineLang();
-	void changeMenuLang(generic_string & pluginsTrans, generic_string & windowTrans);
-	void changeLangTabContextMenu();
-	void changeLangTabDrapContextMenu();
-	void changePrefereceDlgLang();
-	void changeShortcutLang();
-	void changeShortcutmapperLang(ShortcutMapper * sm);
-
-	const TCHAR * getNativeTip(int btnID);
 	void changeToolBarIcons();
 
 	bool doBlockComment(comment_mode currCommentMode);
 	bool doStreamComment();
 	void doTrimTrailing();
 
-	HACCEL getAccTable() const;
 
 	bool addCurrentMacro();
-	void loadLastSession();
+	void macroPlayback(Macro);
+
+    void loadLastSession();
 	bool loadSession(Session* session);
 
-	bool emergency(generic_string emergencySavedDir);
+
 
 	void notifyBufferChanged(Buffer * buffer, int mask);
 	bool findInFiles();
@@ -252,24 +228,21 @@ public:
 	void setFindReplaceFolderFilter(const TCHAR *dir, const TCHAR *filters);
 	std::vector<generic_string> addNppComponents(const TCHAR *destDir, const TCHAR *extFilterName, const TCHAR *extFilter);
     int getHtmlXmlEncoding(const TCHAR *fileName) const;
+	HACCEL getAccTable() const;
+	bool emergency(generic_string emergencySavedDir);
 
-	static HWND gNppHWND;	//static handle to Notepad++ window, NULL if non-existant
 private:
-	static const TCHAR _className[32];
+	Notepad_plus_Window *_pPublicInterface;
     Window *_pMainWindow;
 	DockingManager* _dockingManager;
 
 	SmartHighlighter* _smartHighlighter;
 
-	TiXmlNode *_toolIcons;
-	TiXmlNodeA *_nativeLangA;
-
-	int _nativeLangEncoding;
-
-    DocTabView* _mainDocTab;
-    DocTabView* _subDocTab;
-    DocTabView* _pDocTab;
-	DocTabView* _pNonDocTab;
+    NativeLangSpeaker* _nativeLangSpeaker;
+    DocTabView*_mainDocTab;
+    DocTabView*_subDocTab;
+    DocTabView*_pDocTab;
+	DocTabView*_pNonDocTab;
 
     ScintillaEditView* _subEditView;
     ScintillaEditView* _mainEditView;
@@ -313,13 +286,12 @@ private:
 
 	LastRecentFileList* _lastRecentFileList;
 
-	std::vector<iconLocator> _customIconVect;
 
 	WindowsMenu* _windowsMenu;
 	HMENU _mainMenuHandle;
 
 	bool _sysMenuEntering;
-	bool _isPrelaunch;
+
 
 	// For FullScreen/PostIt features
 	VisibleGUIConf	_beforeSpecialView;
@@ -366,9 +338,8 @@ private:
 	Accelerator _accelerator;
 	ScintillaAccelerator _scintaccelerator;
 
-	PluginsManager* _pluginsManager;
-
-	bool _isRTL;
+	PluginsManager*_pluginsManager;
+    ButtonDlg* _restoreButton;
 
 	bool _isFileOpening;
 
@@ -376,14 +347,10 @@ private:
 	ScintillaCtrls _scintillaCtrls4Plugins;
 
 	std::vector<std::pair<int, int> > _hideLinesMarks;
-	StyleArray _hotspotStyles;
     bool _rememberThisSession; // always true. except -nosession is indicated on the launch time
 
-	static LRESULT CALLBACK Notepad_plus_Proc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
-	LRESULT runProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
-
 	BOOL notify(SCNotification *notification);
-	void specialCmd(int id, int param);
+	void specialCmd(int id);
 	void command(int id);
 
 //Document management
@@ -446,6 +413,7 @@ private:
 	void checkModifiedDocument();
 
     void getMainClientRect(RECT & rc) const;
+	void staticCheckMenuAndTB() const;
 	void dynamicCheckMenuAndTB() const;
 	void enableConvertMenuItems(formatType f) const;
 	void checkUnicodeMenuItems() const;
@@ -462,10 +430,6 @@ private:
     void setLanguage(LangType langType);
 	enum LangType menuID2LangType(int cmdID);
 
-    int getFolderMarginStyle() const;
-
-	void checkFolderMarginStyleMenu(int id2Check) const;
-    int getFolderMaginStyleIDFrom(folderStyle fStyle) const;
 	void checkMenuItem(int itemID, bool willBeChecked) const;
 	void charAdded(TCHAR chAdded);
 	void MaintainIndentation(TCHAR ch);
@@ -484,6 +448,7 @@ private:
 	void deleteMarkedLines();
 	void pasteToMarkedLines();
 	void deleteMarkedline(int ln);
+	void inverseMarks();
 	void replaceMarkedline(int ln, const TCHAR *str);
 	generic_string getMarkedLine(int ln);
 
@@ -495,9 +460,8 @@ private:
 
 	void updateStatusBar();
 	size_t getSelectedCharNumber(UniMode);
-	size_t getCurrentDocCharCount(size_t numLines, UniMode u);
+	size_t getCurrentDocCharCount(UniMode u);
 	int getSelectedAreas();
-	int _numSel;
 	size_t getSelectedBytes();
 	bool isFormatUnicode(UniMode);
 	int getBOMSize(UniMode);
@@ -506,7 +470,6 @@ private:
 	void autoCompFromCurrentFile(bool autoInsert = true);
 	void showFunctionComp();
 
-	void changeStyleCtrlsLang(HWND hDlg, int *idArray, const char **translatedText);
 	bool replaceAllFiles();
 	bool findInOpenedFiles();
 	bool findInCurrentFile();
@@ -538,6 +501,8 @@ private:
 
 	bool goToPreviousIndicator(int indicID2Search, bool isWrap = true) const;
 	bool goToNextIndicator(int indicID2Search, bool isWrap = true) const;
+	int wordCount();
 };
 
-#endif //NOTEPADPLUS_H
+
+#endif //NOTEPAD_PLUS_H

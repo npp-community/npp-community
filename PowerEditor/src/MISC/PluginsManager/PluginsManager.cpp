@@ -16,9 +16,8 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
+#include "MISC/PluginsManager/IDAllocator.h"
 #include "MISC/PluginsManager/PluginsManager.h"
-
-#include "TinyXML/tinyxml.h"
 
 #include "Parameters.h"
 #include "resource.h"
@@ -49,7 +48,13 @@ PluginInfo::~PluginInfo()
 		::FreeLibrary(_hLib);
 }
 
-
+PluginsManager::PluginsManager() :
+	_hPluginsMenu(NULL),
+	_isDisabled(false),
+	_dynamicIDAlloc(new IDAllocator(ID_PLUGINS_CMD_DYNAMIC, ID_PLUGINS_CMD_DYNAMIC_LIMIT)),
+	_markerAlloc(new IDAllocator(MARKER_PLUGINS, MARKER_PLUGINS_LIMIT))
+{
+}
 
 PluginsManager::~PluginsManager() {
 
@@ -58,6 +63,16 @@ PluginsManager::~PluginsManager() {
 
 	if (_hPluginsMenu)
 		DestroyMenu(_hPluginsMenu);
+
+	if (_dynamicIDAlloc)
+	{
+		delete _dynamicIDAlloc;
+	}
+
+	if (_markerAlloc)
+	{
+		delete _markerAlloc;
+	}
 }
 
 bool PluginsManager::unloadPlugin(int index, HWND nppHandle)
@@ -196,12 +211,12 @@ int PluginsManager::loadPlugin(const generic_string& pluginFilePath, std::vector
 				}
 			}
 
-			TiXmlDocument *_pXmlDoc = new TiXmlDocument(xmlPath);
+			TiXmlDocument *pXmlDoc = new TiXmlDocument(xmlPath);
 
-			if (!_pXmlDoc->LoadFile())
+			if (!pXmlDoc->LoadFile())
 			{
-				delete _pXmlDoc;
-				_pXmlDoc = NULL;
+				delete pXmlDoc;
+				pXmlDoc = NULL;
 				throw generic_string(generic_string(xmlPath) + TEXT(" failed to load."));
 			}
 
@@ -209,8 +224,8 @@ int PluginsManager::loadPlugin(const generic_string& pluginFilePath, std::vector
 				if (containers[x] != NULL)
 					nppParams->addExternalLangToEnd(containers[x]);
 
-			nppParams->getExternalLexerFromXmlTree(_pXmlDoc);
-			nppParams->getExternalLexerDoc()->push_back(_pXmlDoc);
+			nppParams->getExternalLexerFromXmlTree(pXmlDoc);
+			nppParams->getExternalLexerDoc()->push_back(pXmlDoc);
 #ifdef UNICODE
 			const char *pDllName = wmc->wchar2char(pluginFilePath.c_str(), CP_ACP);
 #else
@@ -221,9 +236,10 @@ int PluginsManager::loadPlugin(const generic_string& pluginFilePath, std::vector
 
 		_pluginInfos.push_back(pi);
         return (_pluginInfos.size() - 1);
-	}
-	catch(generic_string s)
-	{
+	} catch(std::exception e) {
+		::MessageBoxA(NULL, e.what(), "Exception", MB_OK);
+		return -1;
+	} catch(generic_string s) {
 		s += TEXT("\n\n");
 		s += USERMSG;
 		if (::MessageBox(NULL, s.c_str(), pluginFilePath.c_str(), MB_YESNO) == IDYES)
@@ -232,9 +248,7 @@ int PluginsManager::loadPlugin(const generic_string& pluginFilePath, std::vector
 		}
 		delete pi;
         return -1;
-	}
-	catch(...)
-	{
+	} catch(...) {
 		generic_string msg = TEXT("Fail loaded");
 		msg += TEXT("\n\n");
 		msg += USERMSG;
@@ -408,6 +422,8 @@ void PluginsManager::runPluginCommand(size_t i)
 		{
 			try {
 				_pluginsCommands[i]._pFunc();
+			} catch(std::exception e) {
+				::MessageBoxA(NULL, e.what(), "PluginsManager::runPluginCommand Exception", MB_OK);
 			} catch (...) {
 				TCHAR funcInfo[128];
 				generic_sprintf(funcInfo, 128, TEXT("runPluginCommand(size_t i : %d)"), i);
@@ -428,6 +444,8 @@ void PluginsManager::runPluginCommand(const TCHAR *pluginName, int commandID)
 			{
 				try {
 					_pluginsCommands[i]._pFunc();
+				} catch(std::exception e) {
+					::MessageBoxA(NULL, e.what(), "Exception", MB_OK);
 				} catch (...) {
 					TCHAR funcInfo[128];
 					generic_sprintf(funcInfo, 128, TEXT("runPluginCommand(const TCHAR *pluginName : %s, int commandID : %d)"), pluginName, commandID);
@@ -449,6 +467,8 @@ void PluginsManager::notify(SCNotification *notification)
 			SCNotification scNotif = *notification;
 			try {
 				_pluginInfos[i]->_pBeNotified(&scNotif);
+			} catch(std::exception e) {
+				::MessageBoxA(NULL, e.what(), "Exception", MB_OK);
 			} catch (...) {
 				TCHAR funcInfo[128];
 				generic_sprintf(funcInfo, 128, TEXT("notify(SCNotification *notification) : \r notification->nmhdr.code == %d\r notification->nmhdr.hwndFrom == %d\r notification->nmhdr.idFrom == %d"),\
@@ -467,6 +487,8 @@ void PluginsManager::relayNppMessages(UINT Message, WPARAM wParam, LPARAM lParam
 		{
 			try {
 				_pluginInfos[i]->_pMessageProc(Message, wParam, lParam);
+			} catch(std::exception e) {
+				::MessageBoxA(NULL, e.what(), "Exception", MB_OK);
 			} catch (...) {
 				TCHAR funcInfo[128];
 				generic_sprintf(funcInfo, 128, TEXT("relayNppMessages(UINT Message : %d, WPARAM wParam : %d, LPARAM lParam : %d)"), Message, wParam, lParam);
@@ -490,6 +512,8 @@ bool PluginsManager::relayPluginMessages(UINT Message, WPARAM wParam, LPARAM lPa
 			{
 				try {
 					_pluginInfos[i]->_pMessageProc(Message, wParam, lParam);
+				} catch(std::exception e) {
+					::MessageBoxA(NULL, e.what(), "Exception", MB_OK);
 				} catch (...) {
 					TCHAR funcInfo[128];
 					generic_sprintf(funcInfo, 128, TEXT("relayPluginMessages(UINT Message : %d, WPARAM wParam : %d, LPARAM lParam : %d)"), Message, wParam, lParam);
@@ -508,4 +532,35 @@ void PluginsManager::pluginCrashAlert(const TCHAR *pluginName, const TCHAR *func
 	msg += TEXT(" just crash in\r");
 	msg += funcSignature;
 	::MessageBox(NULL, msg.c_str(), TEXT(" just crash in\r"), MB_OK|MB_ICONSTOP);
+}
+
+bool PluginsManager::allocateCmdID(int numberRequired, int *start)
+{
+	bool retVal = true;
+
+	*start = _dynamicIDAlloc->allocate(numberRequired);
+
+	if (-1 == *start)
+	{
+		*start = 0;
+		retVal = false;
+	}
+	return retVal;
+}
+
+bool PluginsManager::allocateMarker(int numberRequired, int *start)
+{
+	bool retVal = true;
+	*start = _markerAlloc->allocate(numberRequired);
+	if (-1 == *start)
+	{
+		*start = 0;
+		retVal = false;
+	}
+	return retVal;
+}
+
+bool PluginsManager::inDynamicRange( int id )
+{
+	return _dynamicIDAlloc->isInRange(id);
 }

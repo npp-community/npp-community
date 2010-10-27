@@ -93,6 +93,8 @@ public:
 	};
 
 	HWND getHSelf() const {
+		// JOCE: This assert is raised on startup with the new way the initialization is done.
+		// To be reviewed
 		//assert(_hSelf);
 		return _hSelf;
 	};
@@ -106,11 +108,9 @@ public:
 	};
 
     HINSTANCE getHinst() const {
-		if (!_hInst)
-		{
-			::MessageBox(NULL, TEXT("_hInst == NULL"), TEXT("class Window"), MB_OK);
-			throw int(1999);
-		}
+		// JOCE: This assert is raised on startup with the new way the initialization is done.
+		// To be reviewed
+		//assert(_hInst != 0);
 		return _hInst;
 	};
 protected:

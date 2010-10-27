@@ -16,18 +16,26 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "precompiled_headers.h"
-#include "WinControls/ToolBar/Toolbar.h"
-#include "WinControls/shortcut/shortcut.h"
-#include "WinControls/ImageListSet/ImageListSet.h"
+
 #include "MISC/PluginsManager/Notepad_plus_msgs.h"
 
+#include "WinControls/shortcut/shortcut.h"
+#include "WinControls/ImageListSet/ImageListSet.h"
+
+#include "WinControls/ToolBar/Toolbar.h"
 
 const int WS_TOOLBARSTYLE = WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | TBSTYLE_TOOLTIPS |TBSTYLE_FLAT | CCS_TOP | BTNS_AUTOSIZE | CCS_NOPARENTALIGN | CCS_NORESIZE | CCS_NODIVIDER;
 
 ToolBar::ToolBar():
-	_pTBB(NULL), _toolBarIcons(NULL), _state(TB_STANDARD),
-	_nrButtons(0), _nrDynButtons(0), _nrTotalButtons(0),
-	_nrCurrentButtons(0), _pRebar(NULL)
+	_pTBB(NULL),
+	_toolBarIcons(NULL),
+	_state(TB_STANDARD),
+	_nrButtons(0),
+	_nrDynButtons(0),
+	_nrTotalButtons(0),
+	_nrCurrentButtons(0),
+	_pRebar(NULL),
+	_toolIcons(NULL)
 {
 	memset(&_rbBand, 0, sizeof(REBARBANDINFO));
 }
@@ -35,6 +43,74 @@ ToolBar::ToolBar():
 ToolBar::~ToolBar()
 {
 	ToolBar::destroy();
+}
+
+void ToolBar::initTheme(TiXmlDocument *toolIconsDocRoot)
+{
+	assert(toolIconsDocRoot);
+	// JOCE: Check if we could use XPath style accessors with TinyXML.
+    _toolIcons =  toolIconsDocRoot->FirstChild(TEXT("NotepadPlus"));
+	if (_toolIcons)
+	{
+		_toolIcons = _toolIcons->FirstChild(TEXT("ToolBarIcons"));
+		if (_toolIcons)
+		{
+			_toolIcons = _toolIcons->FirstChild(TEXT("Theme"));
+			if (_toolIcons)
+			{
+				const TCHAR *themeDir = (_toolIcons->ToElement())->Attribute(TEXT("pathPrefix"));
+
+				for (TiXmlNode *childNode = _toolIcons->FirstChildElement(TEXT("Icon"));
+					 childNode ;
+					 childNode = childNode->NextSibling(TEXT("Icon")))
+				{
+					int iIcon;
+					const TCHAR *res = (childNode->ToElement())->Attribute(TEXT("id"), &iIcon);
+					if (res)
+					{
+						TiXmlNode *grandChildNode = childNode->FirstChildElement(TEXT("normal"));
+						if (grandChildNode)
+						{
+							TiXmlNode *valueNode = grandChildNode->FirstChild();
+							if (valueNode)
+							{
+								generic_string locator = themeDir?themeDir:TEXT("");
+
+								locator += valueNode->Value();
+								_customIconVect.push_back(iconLocator(0, iIcon, locator));
+							}
+						}
+
+						grandChildNode = childNode->FirstChildElement(TEXT("hover"));
+						if (grandChildNode)
+						{
+							TiXmlNode *valueNode = grandChildNode->FirstChild();
+							if (valueNode)
+							{
+								generic_string locator = themeDir?themeDir:TEXT("");
+
+								locator += valueNode->Value();
+								_customIconVect.push_back(iconLocator(1, iIcon, locator));
+							}
+						}
+
+						grandChildNode = childNode->FirstChildElement(TEXT("disabled"));
+						if (grandChildNode)
+						{
+							TiXmlNode *valueNode = grandChildNode->FirstChild();
+							if (valueNode)
+							{
+								generic_string locator = themeDir?themeDir:TEXT("");
+
+								locator += valueNode->Value();
+								_customIconVect.push_back(iconLocator(2, iIcon, locator));
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 bool ToolBar::init( HINSTANCE hInst, HWND hParent, toolBarStatusType type,
@@ -113,7 +189,8 @@ bool ToolBar::init( HINSTANCE hInst, HWND hParent, toolBarStatusType type,
 	return true;
 }
 
-void ToolBar::destroy() {
+void ToolBar::destroy()
+{
 	if (_pRebar) {
 		_pRebar->removeBand(_rbBand.wID);
 		_pRebar = NULL;
@@ -134,7 +211,8 @@ void ToolBar::destroy() {
 	Window::destroy();
 };
 
-int ToolBar::getWidth() const {
+int ToolBar::getWidth() const
+{
 	RECT btnRect;
 	int totalWidth = 0;
 	for(size_t i = 0; i < _nrCurrentButtons; i++) {
@@ -144,7 +222,8 @@ int ToolBar::getWidth() const {
 	return totalWidth;
 }
 
-int ToolBar::getHeight() const {
+int ToolBar::getHeight() const
+{
 	DWORD size = (DWORD)SendMessage(_hSelf, TB_GETBUTTONSIZE, 0, 0);
     DWORD padding = (DWORD)SendMessage(_hSelf, TB_GETPADDING, 0,0);
 	int totalHeight = HIWORD(size) + HIWORD(padding);
@@ -152,7 +231,8 @@ int ToolBar::getHeight() const {
 	return totalHeight;
 }
 
-void ToolBar::reduce() {
+void ToolBar::reduce()
+{
 	if (_state == TB_SMALL)
 		return;
 
@@ -163,7 +243,8 @@ void ToolBar::reduce() {
 	Window::redraw();
 }
 
-void ToolBar::enlarge() {
+void ToolBar::enlarge()
+{
 	if (_state == TB_LARGE)
 		return;
 
@@ -174,7 +255,8 @@ void ToolBar::enlarge() {
 	Window::redraw();
 }
 
-void ToolBar::setToUglyIcons() {
+void ToolBar::setToUglyIcons()
+{
 	if (_state == TB_STANDARD)
 		return;
 	bool recreate = true;
@@ -183,17 +265,29 @@ void ToolBar::setToUglyIcons() {
 	Window::redraw();
 }
 
-bool ToolBar::getCheckState(int ID2Check) const {
+bool ToolBar::getCheckState(int ID2Check) const
+{
 	return bool(::SendMessage(_hSelf, TB_GETSTATE, (WPARAM)ID2Check, 0) & TBSTATE_CHECKED);
 }
 
-void ToolBar::setCheck(int ID2Check, bool willBeChecked) const {
+void ToolBar::setCheck(int ID2Check, bool willBeChecked) const
+{
 	::SendMessage(_hSelf, TB_CHECKBUTTON, (WPARAM)ID2Check, (LPARAM)MAKELONG(willBeChecked, 0));
 }
 
-bool ToolBar::changeIcons(int whichLst, int iconIndex, const TCHAR *iconLocation) {
+bool ToolBar::changeIcons()
+{
+	if (!_toolIcons)
+		return false;
+	for (int i = 0 ; i < int(_customIconVect.size()) ; i++)
+		changeIcons(_customIconVect[i].listIndex, _customIconVect[i].iconIndex, (_customIconVect[i].iconLocation).c_str());
+	return true;
+}
+
+bool ToolBar::changeIcons(int whichLst, int iconIndex, const TCHAR *iconLocation)
+{
 	return _toolBarIcons->replaceIcon(whichLst, iconIndex, iconLocation);
-};
+}
 
 void ToolBar::reset(bool create)
 {
@@ -229,8 +323,7 @@ void ToolBar::reset(bool create)
 
 	if (!_hSelf)
 	{
-		systemMessage(TEXT("System Err"));
-		throw int(9);
+		throw std::runtime_error("ToolBar::reset : CreateWindowEx() function return null");
 	}
 
 	if (_state != TB_STANDARD)

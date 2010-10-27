@@ -12,7 +12,9 @@
 
 #include "Platform.h"
 
-#include "Scintilla.h"
+// NPPSTART Joce 10/11/10 Scintilla_precomp_headers
+//#include "Scintilla.h"
+// NPPEND
 #include "XPM.h"
 #include "LineMarker.h"
 
@@ -34,7 +36,7 @@ void LineMarker::SetXPM(const char *textForm) {
 	markType = SC_MARK_PIXMAP;
 }
 
-void LineMarker::SetXPM(const char * const *linesForm) {
+void LineMarker::SetXPM(const char *const *linesForm) {
 	delete pxpm;
 	pxpm = new XPM(linesForm);
 	markType = SC_MARK_PIXMAP;

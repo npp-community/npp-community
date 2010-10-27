@@ -38,11 +38,22 @@ typedef struct {
 	HICON		hIcon;			// icon for toolbar
 } tDynamicList;
 
+struct iconLocator {
+	int listIndex;
+	int iconIndex;
+	generic_string iconLocation;
+
+	iconLocator(int iList, int iIcon, const generic_string iconLoc)
+		: listIndex(iList), iconIndex(iIcon), iconLocation(iconLoc){};
+};
+
 // Forward declarations
 class ReBar;
 struct ToolBarButtonUnit;
 struct toolbarIcons;
 class ToolBarIcons;
+class TiXmlDocument;
+class TiXmlNode;
 
 class ToolBar : public Window
 {
@@ -50,6 +61,7 @@ public :
 	ToolBar();
 	~ToolBar();
 
+    void initTheme(TiXmlDocument *toolIconsDocRoot);
 	virtual bool init(HINSTANCE hInst, HWND hParent, toolBarStatusType type,
 		ToolBarButtonUnit *buttonUnitArray, int arraySize);
 
@@ -73,6 +85,8 @@ public :
 		return _state;
 	};
 
+    bool changeIcons();
+
 	bool changeIcons(int whichLst, int iconIndex, const TCHAR *iconLocation);
 
 	void registerDynBtn(UINT message, toolbarIcons* hBmp);
@@ -92,6 +106,8 @@ private :
 	size_t _nrCurrentButtons;
 	ReBar * _pRebar;
 	REBARBANDINFO _rbBand;
+    std::vector<iconLocator> _customIconVect;
+    TiXmlNode *_toolIcons;
 
 	void setDefaultImageList();
 	void setHotImageList();

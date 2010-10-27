@@ -280,13 +280,15 @@ BEGIN
         MENUITEM "Find in Files...",            IDM_SEARCH_FINDINFILES
         MENUITEM "Find &Next",                  IDM_SEARCH_FINDNEXT
         MENUITEM "Find &Previous",              IDM_SEARCH_FINDPREV
+        MENUITEM "Select and Find Next",        IDM_SEARCH_SETANDFINDNEXT
+        MENUITEM "Select and Find Previous",    IDM_SEARCH_SETANDFINDPREV
         MENUITEM "Find (Volatile) Next",        IDM_SEARCH_VOLATILE_FINDNEXT
         MENUITEM "Find (Volatile) Previous",    IDM_SEARCH_VOLATILE_FINDPREV
         MENUITEM "&Replace...",                 IDM_SEARCH_REPLACE
         MENUITEM "&Incremental Search",         IDM_SEARCH_FINDINCREMENT
-        MENUITEM "Found Results Window",        IDM_FOCUS_ON_FOUND_RESULTS
-        MENUITEM "Next Found Result",           IDM_SEARCH_GOTONEXTFOUND
-        MENUITEM "Previous Found Result",       IDM_SEARCH_GOTOPREVFOUND
+        MENUITEM "Search Results Window",       IDM_FOCUS_ON_FOUND_RESULTS
+        MENUITEM "Next Search Result",          IDM_SEARCH_GOTONEXTFOUND
+        MENUITEM "Previous Search Result",      IDM_SEARCH_GOTOPREVFOUND
         MENUITEM "&Go to...",                   IDM_SEARCH_GOTOLINE
         MENUITEM "Go to Matching Brace",        IDM_SEARCH_GOTOMATCHINGBRACE
         MENUITEM SEPARATOR
@@ -326,16 +328,19 @@ BEGIN
             MENUITEM "5th Style",      IDM_SEARCH_GONEXTMARKER5
             MENUITEM "Find Style",     IDM_SEARCH_GONEXTMARKER_DEF
         END
-
-        MENUITEM SEPARATOR
-        MENUITEM "Toggle Bookmark" ,                       IDM_SEARCH_TOGGLE_BOOKMARK
-        MENUITEM "Next Bookmark",                          IDM_SEARCH_NEXT_BOOKMARK
-        MENUITEM "Previous Bookmark",                      IDM_SEARCH_PREV_BOOKMARK
-        MENUITEM "Clear All Bookmarks",                    IDM_SEARCH_CLEAR_BOOKMARKS
-        MENUITEM "Cut Bookmarked Lines",                   IDM_SEARCH_CUTMARKEDLINES
-        MENUITEM "Copy Bookmarked Lines",                  IDM_SEARCH_COPYMARKEDLINES
-        MENUITEM "Paste to (Replace) Bookmarked Lines",    IDM_SEARCH_PASTEMARKEDLINES
-        MENUITEM "Delete Bookmarked Lines",                IDM_SEARCH_DELETEMARKEDLINES
+		MENUITEM SEPARATOR
+        POPUP "Bookmark"
+        BEGIN
+			MENUITEM "Toggle Bookmark" ,                       IDM_SEARCH_TOGGLE_BOOKMARK
+			MENUITEM "Next Bookmark",                          IDM_SEARCH_NEXT_BOOKMARK
+			MENUITEM "Previous Bookmark",                      IDM_SEARCH_PREV_BOOKMARK
+			MENUITEM "Clear All Bookmarks",                    IDM_SEARCH_CLEAR_BOOKMARKS
+			MENUITEM "Cut Bookmarked Lines",                   IDM_SEARCH_CUTMARKEDLINES
+			MENUITEM "Copy Bookmarked Lines",                  IDM_SEARCH_COPYMARKEDLINES
+			MENUITEM "Paste to (Replace) Bookmarked Lines",    IDM_SEARCH_PASTEMARKEDLINES
+			MENUITEM "Delete Bookmarked Lines",                IDM_SEARCH_DELETEMARKEDLINES
+			MENUITEM "Inverse Bookmark",                       IDM_SEARCH_INVERSEMARKS
+        END
     END
 
     POPUP "&View"
@@ -356,8 +361,8 @@ BEGIN
         END
         POPUP "Zoom"
         BEGIN
-            MENUITEM "Zoom &In (Ctrl-Mouse Wheel Up)",       IDM_VIEW_ZOOMIN
-            MENUITEM "Zoom &Out (Ctrl-Mouse Wheel Down)",    IDM_VIEW_ZOOMOUT
+            MENUITEM "Zoom &In (Ctrl+Mouse Wheel Up)",       IDM_VIEW_ZOOMIN
+            MENUITEM "Zoom &Out (Ctrl+Mouse Wheel Down)",    IDM_VIEW_ZOOMOUT
             MENUITEM "Restore Default Zoom",                 IDM_VIEW_ZOOMRESTORE
         END
         POPUP "Move/Clone Current Document"
@@ -368,7 +373,7 @@ BEGIN
             MENUITEM "Open in New Instance",    IDM_VIEW_LOAD_IN_NEW_INSTANCE
         END
         MENUITEM "Word wrap",                   IDM_VIEW_WRAP
-        MENUITEM "Focus on Other View",         IDM_VIEW_SWITCHTO_OTHER_VIEW
+        MENUITEM "Focus on Another View",         IDM_VIEW_SWITCHTO_OTHER_VIEW
         MENUITEM "Hide Lines",                  IDM_VIEW_HIDELINES
         MENUITEM "User-Defined Dialogue...",    IDM_VIEW_USER_DLG
         MENUITEM SEPARATOR
@@ -398,7 +403,8 @@ BEGIN
             MENUITEM "7",    IDM_VIEW_UNFOLD_7
             MENUITEM "8",    IDM_VIEW_UNFOLD_8
         END
-
+        MENUITEM SEPARATOR
+			MENUITEM "Summary...",	IDM_VIEW_SUMMARY
         MENUITEM SEPARATOR
         MENUITEM "Synchronize Vertical Scrolling",      IDM_VIEW_SYNSCROLLV
         MENUITEM "Synchronize Horizontal Scrolling",    IDM_VIEW_SYNSCROLLH
@@ -558,6 +564,7 @@ BEGIN
         MENUITEM "INNO",                  IDM_LANG_INNO
         MENUITEM "Java",                  IDM_LANG_JAVA
         MENUITEM "Javascript",            IDM_LANG_JS
+        MENUITEM "JSP",                   IDM_LANG_JSP
         MENUITEM "KIXtart",               IDM_LANG_KIX
         MENUITEM "LISP",                  IDM_LANG_LISP
         MENUITEM "Lua",                   IDM_LANG_LUA
@@ -578,7 +585,7 @@ BEGIN
         MENUITEM "R",                     IDM_LANG_R
         MENUITEM "Resource file",         IDM_LANG_RC
         MENUITEM "Ruby",                  IDM_LANG_RUBY
-        MENUITEM "Shell",                 IDM_LANG_SH
+        MENUITEM "Shell",                 IDM_LANG_BASH
         MENUITEM "Scheme",                IDM_LANG_SCHEME
         MENUITEM "Smalltalk",             IDM_LANG_SMALLTALK
         MENUITEM "SQL",                   IDM_LANG_SQL
@@ -632,6 +639,7 @@ BEGIN
     BEGIN
         MENUITEM "Java",                  IDM_LANG_JAVA
         MENUITEM "Javascript",            IDM_LANG_JS
+        MENUITEM "JSP",                   IDM_LANG_JSP
     END
     MENUITEM "KIXtart",                   IDM_LANG_KIX
     POPUP "L"
@@ -670,7 +678,7 @@ BEGIN
     END
     POPUP "S"
     BEGIN
-        MENUITEM "Shell",                 IDM_LANG_SH
+        MENUITEM "Shell",                 IDM_LANG_BASH
         MENUITEM "Scheme",                IDM_LANG_SCHEME
         MENUITEM "Smalltalk",             IDM_LANG_SMALLTALK
         MENUITEM "SQL",                   IDM_LANG_SQL
@@ -719,7 +727,7 @@ BEGIN
 
     POPUP "&Help"
 	BEGIN
-		MENUITEM "Help content",                IDM_HELP
+		MENUITEM "Help Content",                IDM_HELP
 		MENUITEM SEPARATOR
 		MENUITEM "NpWiki++ (Online Help)",      IDM_ONLINEHELP
 		MENUITEM "Notepad++ Forum",             IDM_FORUM
@@ -752,9 +760,9 @@ CAPTION "About"
 FONT 8, TEXT("MS Shell Dlg"), 0, 0, 0x1
 BEGIN
 	CONTROL         "",IDI_M30ICON,"Static",SS_OWNERDRAW,21,8,32,32
-	LTEXT           "Notepad++ Community Release",IDC_STATIC,50,4,110,8
-	LTEXT           GEN_VER_VERSION_STRING, IDC_STATIC,50,14,166,8
-	EDITTEXT        IDC_BUILD_DATETIME,49,24,166,8, ES_READONLY | NOT WS_BORDER
+	LTEXT           "Notepad++ Community Release",IDC_STATIC,60,4,110,8
+	LTEXT           GEN_VER_VERSION_STRING, IDC_STATIC,60,14,166,8
+	EDITTEXT        IDC_BUILD_DATETIME,58,24,166,8, ES_READONLY | NOT WS_BORDER
 	LTEXT           "Community:",IDC_STATIC,21,40,55,8
 	LTEXT           "Notepad++ CR Members",IDC_AUTHOR_NAME,78,40,80,8
 	LTEXT           "Project Page:",IDC_STATIC,21,52,55,8
@@ -790,6 +798,13 @@ FONT 8, TEXT("MS Shell Dlg"), 0, 0, 0x1
 BEGIN
     LTEXT             "STATIC :",IDC_VALUE_STATIC,6,4,45,8
     EDITTEXT        IDC_VALUE_EDIT,49,2,18,14,ES_NUMBER,WS_EX_DLGMODALFRAME
+END
+
+IDD_BUTTON_DLG DIALOGEX 0, 0, 12, 10
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "+",IDC_RESTORE_BUTTON,0,0,12,10
 END
 
 // xp style

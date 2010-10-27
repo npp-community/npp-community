@@ -18,13 +18,13 @@
 #ifndef MISC_PLUGINSMANAGER_NOTEPADPLUSMSGS_H
 #define MISC_PLUGINSMANAGER_NOTEPADPLUSMSGS_H
 
-enum LangType {L_TXT, L_PHP , L_C, L_CPP, L_CS, L_OBJC, L_JAVA, L_RC,\
-			   L_HTML, L_XML, L_MAKEFILE, L_PASCAL, L_BATCH, L_INI, L_NFO, L_USER,\
+enum LangType {L_TEXT, L_PHP , L_C, L_CPP, L_CS, L_OBJC, L_JAVA, L_RC,\
+			   L_HTML, L_XML, L_MAKEFILE, L_PASCAL, L_BATCH, L_INI, L_ASCII, L_USER,\
 			   L_ASP, L_SQL, L_VB, L_JS, L_CSS, L_PERL, L_PYTHON, L_LUA,\
 			   L_TEX, L_FORTRAN, L_BASH, L_FLASH, L_NSIS, L_TCL, L_LISP, L_SCHEME,\
 			   L_ASM, L_DIFF, L_PROPS, L_PS, L_RUBY, L_SMALLTALK, L_VHDL, L_KIX, L_AU3,\
 			   L_CAML, L_ADA, L_VERILOG, L_MATLAB, L_HASKELL, L_INNO, L_SEARCHRESULT,\
-			   L_CMAKE, L_YAML, L_COBOL, L_GUI4CLI, L_D, L_POWERSHELL, L_R,\
+			   L_CMAKE, L_YAML, L_COBOL, L_GUI4CLI, L_D, L_POWERSHELL, L_R, L_JSP,\
 			   // The end of enumated language type, so it should be always at the end
 			   L_EXTERNAL};
 
@@ -117,7 +117,7 @@ enum LangType {L_TXT, L_PHP , L_C, L_CPP, L_CS, L_OBJC, L_JAVA, L_RC,\
 	//BOOL NPPM_SWITCHTOFILE(0, TCHAR *filePathName2switch)
 
 	#define NPPM_SAVECURRENTFILE (NPPMSG + 38)
-	//NPPM_SAVECURRENTFILE(0, 0)
+	//BOOL NPPM_SAVECURRENTFILE(0, 0)
 
 	#define NPPM_SAVEALLFILES	(NPPMSG + 39)
 	//BOOL NPPM_SAVEALLFILES(0, 0)
@@ -304,6 +304,28 @@ enum LangType {L_TXT, L_PHP , L_C, L_CPP, L_CS, L_OBJC, L_JAVA, L_RC,\
 	// BOOL NPPM_DOOPEN(0, const TCHAR *fullPathName2Open)
 	// fullPathName2Open indicates the full file path name to be opened.
 	// The return value is TRUE (1) if the operation is successful, otherwise FALSE (0).
+
+	#define NPPM_SAVECURRENTFILEAS (NPPMSG + 78)
+	// BOOL NPPM_SAVECURRENTFILEAS (BOOL asCopy, const TCHAR* filename)
+
+    #define NPPM_GETCURRENTNATIVELANGENCODING (NPPMSG + 79)
+	// INT NPPM_GETCURRENTNATIVELANGENCODING(0, 0)
+	// returned value : the current native language enconding
+
+    #define NPPM_ALLOCATESUPPORTED   (NPPMSG + 80)
+    // returns TRUE if NPPM_ALLOCATECMDID is supported
+    // Use to identify if subclassing is necessary
+
+	#define NPPM_ALLOCATECMDID   (NPPMSG + 81)
+    // BOOL NPPM_ALLOCATECMDID(int numberRequested, int* startNumber)
+    // sets startNumber to the initial command ID if successful
+    // Returns: TRUE if successful, FALSE otherwise. startNumber will also be set to 0 if unsuccessful
+
+	#define NPPM_ALLOCATEMARKER  (NPPMSG + 82)
+    // BOOL NPPM_ALLOCATEMARKER(int numberRequested, int* startNumber)
+    // sets startNumber to the initial command ID if successful
+    // Allocates a marker number to a plugin
+    // Returns: TRUE if successful, FALSE otherwise. startNumber will also be set to 0 if unsuccessful
 
 #define	RUNCOMMAND_USER    (WM_USER + 3000)
 	#define NPPM_GETFULLCURRENTPATH		(RUNCOMMAND_USER + FULL_CURRENT_PATH)

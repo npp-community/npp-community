@@ -330,6 +330,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\localization.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\localizationString.h"
 				>
 			</File>
@@ -339,6 +343,10 @@
 			</File>
 			<File
 				RelativePath="..\src\Notepad_plus.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Notepad_plus_Window.h"
 				>
 			</File>
 			<File
@@ -362,6 +370,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\Utf8.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Utf8_16.h"
 				>
 			</File>
@@ -378,6 +390,10 @@
 				>
 				<File
 					RelativePath="..\src\MISC\FileNameStringSplitter.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\MISC\PluginsManager\IDAllocator.h"
 					>
 				</File>
 				<File
@@ -792,6 +808,10 @@
 				</File>
 				<File
 					RelativePath="..\src\icons\allChars_on.ico"
+					>
+				</File>
+				<File
+					RelativePath="..\src\icons\chameleon.ico"
 					>
 				</File>
 				<File
@@ -1305,7 +1325,31 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\localization.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Notepad_plus.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Notepad_plus_Window.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\NppBigSwitch.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\NppCommands.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\NppIO.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\NppNotification.cpp"
 				>
 			</File>
 			<File
@@ -1367,6 +1411,10 @@
 			<Filter
 				Name="MISC"
 				>
+				<File
+					RelativePath="..\src\MISC\PluginsManager\IDAllocator.cpp"
+					>
+				</File>
 				<File
 					RelativePath="..\src\MISC\Exception\MiniDumper.cpp"
 					>

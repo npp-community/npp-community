@@ -33,7 +33,7 @@ class ShortcutMapper : public StaticDialog {
 public:
 	ShortcutMapper();
 	~ShortcutMapper();
-	//void init(HINSTANCE hInst, HWND parent) {};
+	void init(HINSTANCE hInst, HWND parent, GridState initState = STATE_MENU);
 	void destroy();
 	void doDialog(bool isRTL = false);
 	void getClientRect(RECT & rc) const {

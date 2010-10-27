@@ -75,6 +75,8 @@ typedef void * SCINTILLA_PTR;
 #define WM_FINDINFILES			  	(SCINTILLA_USER + 9)
 #define WM_REPLACEINFILES		  	(SCINTILLA_USER + 10)
 #define WM_FINDALL_INCURRENTDOC	  	(SCINTILLA_USER + 11)
+#define WM_FRSAVE_INT	  	(SCINTILLA_USER + 12)
+#define WM_FRSAVE_STR	  	(SCINTILLA_USER + 13)
 
 #define NB_FOLDER_STATE 7
 
@@ -182,7 +184,6 @@ class ScintillaEditView : public Window
 	friend class Finder;
 public:
 	ScintillaEditView();
-
 	virtual ~ScintillaEditView();
 	virtual void init(HINSTANCE hInst, HWND hParent);
 
@@ -205,7 +206,7 @@ public:
 	char * getWordOnCaretPos(char * txt, int size);
 	TCHAR * getGenericWordOnCaretPos(TCHAR * txt, int size);
 	TCHAR * getGenericSelectedText(TCHAR * txt, int size, bool expand = true);
-	int searchInTarget(const TCHAR * Text2Find, int fromPos, int toPos) const;
+	int searchInTarget(const TCHAR * Text2Find, int lenOfText2Find, int fromPos, int toPos) const;
 	void appandGenericText(const TCHAR * text2Append) const;
 	void addGenericText(const TCHAR * text2Append) const;
 	void addGenericText(const TCHAR * text2Append, long *mstart, long *mend) const;
@@ -240,7 +241,7 @@ public:
 	void marginClick(int position, int modifiers);
 	void setMakerStyle(folderStyle style);
 
-	folderStyle getFolderStyle() {return _folderStyle;};
+	void setWrapMode(lineWrapMethod method);
 	void showWSAndTab(bool willBeShowed = true);
 	void showEOL(bool willBeShowed = true);
 	bool isEolVisible();
@@ -359,8 +360,7 @@ protected:
 	//Store the current buffer so it can be retrieved later
 	BufferID _currentBufferID;
 	Buffer * _currentBuffer;
-	folderStyle _folderStyle;
-	NppParameters *_pParameter;
+    NppParameters *_pParameter;
 	int _codepage;
 	bool _lineNumbersShown;
 	bool _wrapRestoreNeeded;
@@ -400,7 +400,7 @@ protected:
 	void setUserLexer(const TCHAR *userLangName = NULL);
 	void setExternalLexer(LangType typeDoc);
 	void setEmbeddedJSLexer();
-	void setPhpEmbeddedLexer();
+	void setEmbeddedPhpLexer();
 	void setEmbeddedAspLexer();
 
 	//Simple lexers

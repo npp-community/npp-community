@@ -41,8 +41,7 @@ void StatusBar::init(HINSTANCE hInst, HWND hParent, int nbParts)
 
 	if (!_hSelf)
 	{
-		systemMessage(TEXT("System Err"));
-		throw int(9);
+		throw std::runtime_error("StatusBar::init : CreateWindowEx() function return null");
 	}
 
     _nbParts = nbParts;

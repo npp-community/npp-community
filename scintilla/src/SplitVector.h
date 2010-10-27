@@ -137,7 +137,7 @@ public:
 		}
 	}
 
-	T& operator[](int position) const {
+	T &operator[](int position) const {
 		PLATFORM_ASSERT(position >= 0 && position < lengthBody);
 		if (position < part1Length) {
 			return body[position];
@@ -240,7 +240,7 @@ public:
 		DeleteRange(0, lengthBody);
 	}
 
-	T* BufferPointer() {
+	T *BufferPointer() {
 		RoomFor(1);
 		GapTo(lengthBody);
 		body[lengthBody] = 0;

@@ -18,10 +18,10 @@
 ; Define the application name
 !define APPNAME "Notepad++"
 
-!define APPVERSION "5.6.2"
-!define APPNAMEANDVERSION "Notepad++ v5.6.2"
+!define APPVERSION "5.8.2"
+!define APPNAMEANDVERSION "Notepad++ v5.8.2"
 !define VERSION_MAJOR 5
-!define VERSION_MINOR 62
+!define VERSION_MINOR 81
 
 !define APPWEBSITE "http://notepad-plus.sourceforge.net/"
 
@@ -29,7 +29,7 @@
 Name "${APPNAMEANDVERSION}"
 InstallDir "$PROGRAMFILES\Notepad++"
 InstallDirRegKey HKLM "Software\${APPNAME}" ""
-OutFile "..\bin\npp.5.6.2.Installer.exe"
+OutFile ".\build\npp.5.8.2.Installer.exe"
 
 ; GetWindowsVersion
  ;
@@ -212,8 +212,8 @@ FunctionEnd
   !insertmacro MUI_LANGUAGE "Afrikaans"
   !insertmacro MUI_LANGUAGE "Uzbek"
   !insertmacro MUI_LANGUAGE "Macedonian"
+  !insertmacro MUI_LANGUAGE "Latvian"
 
-  ;!insertmacro MUI_LANGUAGE "Latvian"
   ;!insertmacro MUI_LANGUAGE "Estonian"
   ; !insertmacro MUI_LANGUAGE "Mongolian"
   ;!insertmacro MUI_LANGUAGE "Breton"
@@ -283,9 +283,7 @@ LangString langFileName ${LANG_UKRAINIAN} "ukrainian.xml"
 LangString langFileName ${LANG_HEBREW} "hebrew.xml"
 LangString langFileName ${LANG_NORWEGIANNYNORSK} "nynorsk.xml"
 LangString langFileName ${LANG_NORWEGIAN} "norwegian.xml"
-
 LangString langFileName ${LANG_THAI} "thai.xml"
-
 LangString langFileName ${LANG_ARABIC} "arabic.xml"
 LangString langFileName ${LANG_FINNISH} "finnish.xml"
 LangString langFileName ${LANG_LITHUANIAN} "lithuanian.xml"
@@ -295,26 +293,19 @@ LangString langFileName ${LANG_GALICIAN} "galician.xml"
 LangString langFileName ${LANG_SLOVENIAN} "slovenian.xml"
 LangString langFileName ${LANG_SLOVAK} "slovak.xml"
 LangString langFileName ${LANG_DANISH} "danish.xml"
-
-
-
 LangString langFileName ${LANG_BULGARIAN} "bulgarian.xml"
 LangString langFileName ${LANG_INDONESIAN} "indonesian.xml"
 LangString langFileName ${LANG_ALBANIAN} "albanian.xml"
 LangString langFileName ${LANG_CROATIAN} "croatian.xml"
-
 LangString langFileName ${LANG_BASQUE} "basque.xml"
-
 LangString langFileName ${LANG_BELARUSIAN} "belarusian.xml"
 LangString langFileName ${LANG_SERBIAN} "serbian.xml"
 LangString langFileName ${LANG_MALAY} "malay.xml"
 LangString langFileName ${LANG_LUXEMBOURGISH} "luxembourgish.xml"
-
 LangString langFileName ${LANG_AFRIKAANS} "afrikaans.xml"
-
 LangString langFileName ${LANG_UZBEK} "uzbek.xml"
-
 LangString langFileName ${LANG_MACEDONIAN} "macedonian.xml"
+LangString langFileName ${LANG_LATVIAN} "Latvian.xml"
 
 
 ;--------------------------------
@@ -325,6 +316,7 @@ LangString langFileName ${LANG_MACEDONIAN} "macedonian.xml"
 Section /o "Don't use %APPDATA%" makeLocal
 	StrCpy $IS_LOCAL "1"
 SectionEnd
+
 
 Var UPDATE_PATH
 
@@ -418,7 +410,7 @@ GLOBAL_INST:
 	Delete "$SMPROGRAMS\Notepad++\readme.lnk"
 	Delete "$SMPROGRAMS\Notepad++\Uninstall.lnk"
 	CreateDirectory "$SMPROGRAMS\Notepad++"
-	CreateShortCut "$SMPROGRAMS\Notepad++\Uninstall.lnk" "$INSTDIR\uninstall.exe"
+	;CreateShortCut "$SMPROGRAMS\Notepad++\Uninstall.lnk" "$INSTDIR\uninstall.exe"
 
 
 	;clean
@@ -472,6 +464,11 @@ GLOBAL_INST:
 		Rename "$INSTDIR\plugins\NppPlugin_ChangeMarker.dll" "$INSTDIR\plugins\disabled\NppPlugin_ChangeMarker.dll"
 		Delete "$INSTDIR\plugins\NppPlugin_ChangeMarker.dll"
 
+	IfFileExists "$INSTDIR\plugins\QuickText.UNI.dll" 0 +4
+		MessageBox MB_OK "Due to the stabilty issue,$\n\QuickText.UNI.dll will be moved to the directory $\"disabled$\"" /SD IDOK
+		Rename "$INSTDIR\plugins\QuickText.UNI.dll" "$INSTDIR\plugins\disabled\QuickText.UNI.dll"
+		Delete "$INSTDIR\plugins\QuickText.UNI.dll"
+
 
 
 
@@ -485,10 +482,6 @@ GLOBAL_INST:
 		Delete "$INSTDIR\NppShell.dll"
 
 
-
-
-
-
 	; detect the right of
 	UserInfo::GetAccountType
 	Pop $1
@@ -497,9 +490,8 @@ GLOBAL_INST:
 	SetShellVarContext all
 	; add all the npp shortcuts for all user or current user
 	CreateDirectory "$SMPROGRAMS\Notepad++"
-	CreateShortCut "$DESKTOP\Notepad++.lnk" "$INSTDIR\notepad++.exe"
 	CreateShortCut "$SMPROGRAMS\Notepad++\Notepad++.lnk" "$INSTDIR\notepad++.exe"
-	CreateShortCut "$SMPROGRAMS\Notepad++\readme.lnk" "$INSTDIR\readme.txt"
+	;CreateShortCut "$SMPROGRAMS\Notepad++\readme.lnk" "$INSTDIR\readme.txt"
 	SetShellVarContext current
 	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\notepad++.exe" "" "$INSTDIR\notepad++.exe"
 SectionEnd
@@ -521,102 +513,102 @@ SubSection "Auto-completion Files" autoCompletionComponent
 
 	Section C
 		SetOutPath "$INSTDIR\plugins\APIs"
-		File "..\bin\plugins\APIs\c.xml"
+		File ".\APIs\c.xml"
 	SectionEnd
 
 	Section C++
 		SetOutPath "$INSTDIR\plugins\APIs"
-		File "..\bin\plugins\APIs\cpp.xml"
+		File ".\APIs\cpp.xml"
 	SectionEnd
 
 	Section Java
 		SetOutPath "$INSTDIR\plugins\APIs"
-		File "..\bin\plugins\APIs\java.xml"
+		File ".\APIs\java.xml"
 	SectionEnd
 
 	Section C#
 		SetOutPath "$INSTDIR\plugins\APIs"
-		File "..\bin\plugins\APIs\cs.xml"
+		File ".\APIs\cs.xml"
 	SectionEnd
 
 	Section HTML
 		SetOutPath "$INSTDIR\plugins\APIs"
-		File "..\bin\plugins\APIs\html.xml"
+		File ".\APIs\html.xml"
 	SectionEnd
 
 	Section RC
 		SetOutPath "$INSTDIR\plugins\APIs"
-		File "..\bin\plugins\APIs\rc.xml"
+		File ".\APIs\rc.xml"
 	SectionEnd
 
 	Section SQL
 		SetOutPath "$INSTDIR\plugins\APIs"
-		File "..\bin\plugins\APIs\sql.xml"
+		File ".\APIs\sql.xml"
 	SectionEnd
 
 	Section PHP
 		SetOutPath "$INSTDIR\plugins\APIs"
-		File "..\bin\plugins\APIs\php.xml"
+		File ".\APIs\php.xml"
 	SectionEnd
 
 	Section CSS
 		SetOutPath "$INSTDIR\plugins\APIs"
-		File "..\bin\plugins\APIs\css.xml"
+		File ".\APIs\css.xml"
 	SectionEnd
 
 	Section VB
 		SetOutPath "$INSTDIR\plugins\APIs"
-		File "..\bin\plugins\APIs\vb.xml"
+		File ".\APIs\vb.xml"
 	SectionEnd
 
 	Section Perl
 		SetOutPath "$INSTDIR\plugins\APIs"
-		File "..\bin\plugins\APIs\perl.xml"
+		File ".\APIs\perl.xml"
 	SectionEnd
 
 	Section JavaScript
 		SetOutPath "$INSTDIR\plugins\APIs"
-		File "..\bin\plugins\APIs\javascript.xml"
+		File ".\APIs\javascript.xml"
 	SectionEnd
 
 	Section Python
 		SetOutPath "$INSTDIR\plugins\APIs"
-		File "..\bin\plugins\APIs\python.xml"
+		File ".\APIs\python.xml"
 	SectionEnd
 
 	Section ActionScript
 		SetOutPath "$INSTDIR\plugins\APIs"
-		File "..\bin\plugins\APIs\actionscript.xml"
+		File ".\APIs\actionscript.xml"
 	SectionEnd
 
 	Section LISP
 		SetOutPath "$INSTDIR\plugins\APIs"
-		File "..\bin\plugins\APIs\lisp.xml"
+		File ".\APIs\lisp.xml"
 	SectionEnd
 
 	Section VHDL
 		SetOutPath "$INSTDIR\plugins\APIs"
-		File "..\bin\plugins\APIs\vhdl.xml"
+		File ".\APIs\vhdl.xml"
 	SectionEnd
 
 	Section TeX
 		SetOutPath "$INSTDIR\plugins\APIs"
-		File "..\bin\plugins\APIs\tex.xml"
+		File ".\APIs\tex.xml"
 	SectionEnd
 
 	Section DocBook
 		SetOutPath "$INSTDIR\plugins\APIs"
-		File "..\bin\plugins\APIs\xml.xml"
+		File ".\APIs\xml.xml"
 	SectionEnd
 
 	Section NSIS
 		SetOutPath "$INSTDIR\plugins\APIs"
-		File "..\bin\plugins\APIs\nsis.xml"
+		File ".\APIs\nsis.xml"
 	SectionEnd
 
 	Section CMAKE
 		SetOutPath "$INSTDIR\plugins\APIs"
-		File "..\bin\plugins\APIs\cmake.xml"
+		File ".\APIs\cmake.xml"
 	SectionEnd
 SubSectionEnd
 
@@ -639,83 +631,51 @@ SubSection "Plugins" Plugins
 		File "..\bin\plugins\doc\NPPTextFXdemo.TXT"
 	SectionEnd
 
-
+/*    Work, but it's not used by many people
 	Section "NppNetNote" NppNetNote
 		Delete "$INSTDIR\plugins\NppNetNote.dll"
 		SetOutPath "$INSTDIR\plugins"
 		File "..\bin\plugins\NppNetNote.dll"
 	SectionEnd
-
+*/
 
 	Section "Spell-Checker" SpellChecker
 		Delete "$INSTDIR\plugins\SpellChecker.dll"
 		SetOutPath "$INSTDIR\plugins"
 		File "..\bin\plugins\SpellChecker.dll"
 	SectionEnd
-
-	Section "NppExec" NppExec
-		Delete "$INSTDIR\plugins\NppExec.dll"
-		SetOutPath "$INSTDIR\plugins"
-		File "..\bin\plugins\NppExec.dll"
-		SetOutPath "$INSTDIR\plugins\doc"
-		File "..\bin\plugins\doc\NppExec.txt"
-		File "..\bin\plugins\doc\NppExec_Manual.chm"
-		File "..\bin\plugins\doc\NppExec_TechInfo.txt"
-	SectionEnd
-
+/*
 	Section "MIME Tools" MIMETools
 		Delete "$INSTDIR\plugins\NppTools.dll"
 		Delete "$INSTDIR\plugins\mimeTools.dll"
 		SetOutPath "$INSTDIR\plugins"
 		File "..\bin\plugins\mimeTools.dll"
 	SectionEnd
-/*
-	Section "FTP synchronize" FTP_synchronize
-		Delete "$INSTDIR\plugins\FTP_synchronizeA.dll"
-		SetOutPath "$INSTDIR\plugins"
-		File "..\bin\plugins\FTP_synchronize.dll"
-		SetOutPath "$INSTDIR\plugins\doc"
-		File "..\bin\plugins\doc\FTP_synchonize.ReadMe.txt"
-	SectionEnd
 */
+	Section "Npp FTP" NppFTP
+		Delete "$INSTDIR\plugins\NppFTP.dll"
+		SetOutPath "$INSTDIR\plugins"
+		File "..\bin\plugins\NppFTP.dll"
+		SetOutPath "$INSTDIR\plugins\doc\NppFTP"
+		File "..\bin\plugins\doc\NppFTP\license_NppFTP.txt"
+		File "..\bin\plugins\doc\NppFTP\license_libssh.txt"
+		File "..\bin\plugins\doc\NppFTP\license_OpenSSL.txt"
+		File "..\bin\plugins\doc\NppFTP\license_TiXML.txt"
+		File "..\bin\plugins\doc\NppFTP\license_ZLIB.txt"
+		File "..\bin\plugins\doc\NppFTP\license_UTCP.htm"
+		File "..\bin\plugins\doc\NppFTP\Readme.txt"
+	SectionEnd
+
 	Section "NppExport" NppExport
 		Delete "$INSTDIR\plugins\NppExport.dll"
 		SetOutPath "$INSTDIR\plugins"
 		File "..\bin\plugins\NppExport.dll"
 	SectionEnd
 /*
-	Section "ComparePlugin" ComparePlugin
-		Delete "$INSTDIR\plugins\ComparePlugin.dll"
+	Section "Select 'N' Launch" SelectNLaunch
+		Delete "$INSTDIR\plugins\SelectNLaunch.dll"
 		SetOutPath "$INSTDIR\plugins"
-		File "..\bin\plugins\ComparePlugin.dll"
-	SectionEnd
-
-
-	Section "NppAutoIndent" NppAutoIndent
-		Delete "$INSTDIR\plugins\NppAutoIndent.dll"
-		SetOutPath "$INSTDIR\plugins"
-		File "..\bin\plugins\NppAutoIndent.dll"
-
-		StrCmp $IS_LOCAL "1" 0 NOT_LOCAL
-			SetOutPath "$INSTDIR\plugins\Config\"
-			goto LOCAL
-	NOT_LOCAL:
-			SetOutPath "$APPDATA\Notepad++\plugins\Config\"
-	LOCAL:
-		File "..\bin\plugins\Config\NppAutoIndent.ini"
-
-	SectionEnd
-
-	Section "Document Monitor" DocMonitor
-		Delete "$INSTDIR\plugins\docMonitor.dll"
-		SetOutPath "$INSTDIR\plugins"
-		File "..\bin\plugins\docMonitor.dll"
-	SectionEnd
-
-	Section "Change Markers" ChangeMarkers
-		Delete "$INSTDIR\plugins\NppPlugin_ChangeMarker.dll"
-		SetOutPath "$INSTDIR\plugins"
-		File "..\bin\plugins\NppPlugin_ChangeMarker.dll"
+		File "..\bin\plugins\SelectNLaunch.dll"
 	SectionEnd
 */
 	Section "Compare Plugin" ComparePlugin
@@ -731,83 +691,92 @@ SubSection "Plugins" Plugins
 		SetOutPath "$INSTDIR\updater"
 		File "..\bin\updater\gpup.exe"
 	SectionEnd
+/*
+	Section "Light Explorer" LightExplorer
+		Delete "$INSTDIR\plugins\LightExplorer.dll"
+		SetOutPath "$INSTDIR\plugins"
+		File "..\bin\plugins\LightExplorer.dll"
+	SectionEnd
+*/
+
 SubSectionEnd
 
 SubSection "Themes" Themes
 	SetOverwrite off
 	Section "Black Board" BlackBoard
 		SetOutPath "$INSTDIR\themes"
-		File "..\bin\themes\Black board.xml"
+		File ".\themes\Black board.xml"
 	SectionEnd
 
 	Section "Choco" Choco
 		SetOutPath "$INSTDIR\themes"
-		File "..\bin\themes\Choco.xml"
+		File ".\themes\Choco.xml"
 	SectionEnd
 
 	Section "Hello Kitty" HelloKitty
 		SetOutPath "$INSTDIR\themes"
-		File "..\bin\themes\Hello Kitty.xml"
+		File ".\themes\Hello Kitty.xml"
 	SectionEnd
 
 	Section "Mono Industrial" MonoIndustrial
 		SetOutPath "$INSTDIR\themes"
-		File "..\bin\themes\Mono Industrial.xml"
+		File ".\themes\Mono Industrial.xml"
 	SectionEnd
 
 	Section "Monokai" Monokai
 		SetOutPath "$INSTDIR\themes"
-		File "..\bin\themes\Monokai.xml"
+		File ".\themes\Monokai.xml"
 	SectionEnd
 
 	Section "Obsidian" Obsidian
 		SetOutPath "$INSTDIR\themes"
-		File "..\bin\themes\Obsidian.xml"
+		File ".\themes\Obsidian.xml"
 	SectionEnd
 
 	Section "Plastic Code Wrap" PlasticCodeWrap
 		SetOutPath "$INSTDIR\themes"
-		File "..\bin\themes\Plastic Code Wrap.xml"
+		File ".\themes\Plastic Code Wrap.xml"
 	SectionEnd
 
 	Section "Ruby Blue" RubyBlue
 		SetOutPath "$INSTDIR\themes"
-		File "..\bin\themes\Ruby Blue.xml"
+		File ".\themes\Ruby Blue.xml"
 	SectionEnd
 
 	Section "Twilight" Twilight
 		SetOutPath "$INSTDIR\themes"
-		File "..\bin\themes\Twilight.xml"
+		File ".\themes\Twilight.xml"
 	SectionEnd
 
 	Section "Vibrant Ink" VibrantInk
 		SetOutPath "$INSTDIR\themes"
-		File "..\bin\themes\Vibrant Ink.xml"
+		File ".\themes\Vibrant Ink.xml"
 	SectionEnd
 
 	Section "Deep Black" DeepBlack
 		SetOutPath "$INSTDIR\themes"
-		File "..\bin\themes\Deep Black.xml"
+		File ".\themes\Deep Black.xml"
 	SectionEnd
 
 	Section "vim Dark Blue" vimDarkBlue
 		SetOutPath "$INSTDIR\themes"
-		File "..\bin\themes\vim Dark Blue.xml"
+		File ".\themes\vim Dark Blue.xml"
 	SectionEnd
 
 	Section "Bespin" Bespin
 		SetOutPath "$INSTDIR\themes"
-		File "..\bin\themes\Bespin.xml"
+		File ".\themes\Bespin.xml"
 	SectionEnd
 
 	Section "Zenburn" Zenburn
 		SetOutPath "$INSTDIR\themes"
-		File "..\bin\themes\Zenburn.xml"
+		File ".\themes\Zenburn.xml"
 	SectionEnd
 
 SubSectionEnd
 
 Section /o "As default html viewer" htmlViewer
+	SetOverwrite on
 	SetOutPath "$INSTDIR\"
 	File "..\bin\nppIExplorerShell.exe"
 	WriteRegStr HKLM "SOFTWARE\Microsoft\Internet Explorer\View Source Editor\Editor Name" "" "$INSTDIR\nppIExplorerShell.exe"
@@ -816,6 +785,7 @@ SectionEnd
 InstType "o"
 
 Section "Auto-Updater" AutoUpdater
+	SetOverwrite on
 	SetOutPath "$INSTDIR\updater"
 	File "..\bin\updater\GUP.exe"
 	File "..\bin\updater\libcurl.dll"
@@ -823,7 +793,11 @@ Section "Auto-Updater" AutoUpdater
 	File "..\bin\updater\License.txt"
 	File "..\bin\updater\gpl.txt"
 	File "..\bin\updater\readme.txt"
-	File "..\bin\updater\getDownLoadUrl.php"
+SectionEnd
+
+
+Section /o "Create Shortcut on Desktop" shortcutOnDesktop
+	CreateShortCut "$DESKTOP\Notepad++.lnk" "$INSTDIR\notepad++.exe"
 SectionEnd
 
 ;--------------------------------
@@ -1006,8 +980,27 @@ SubSection un.Plugins
 		RMDir "$INSTDIR\plugins\"
 	SectionEnd
 
+	Section un.NppFTP
+		Delete "$INSTDIR\plugins\NppFTP.dll"
+
+		Delete "$INSTDIR\plugins\doc\NppFTP\license_NppFTP.txt"
+		Delete "$INSTDIR\plugins\doc\NppFTP\license_libssh.txt"
+		Delete "$INSTDIR\plugins\doc\NppFTP\license_OpenSSL.txt"
+		Delete "$INSTDIR\plugins\doc\NppFTP\license_TiXML.txt"
+		Delete "$INSTDIR\plugins\doc\NppFTP\license_ZLIB.txt"
+		Delete "$INSTDIR\plugins\doc\NppFTP\license_UTCP.htm"
+		Delete "$INSTDIR\plugins\doc\NppFTP\Readme.txt"
+
+		RMDir "$INSTDIR\plugins\"
+	SectionEnd
+
 	Section un.NppExport
 		Delete "$INSTDIR\plugins\NppExport.dll"
+		RMDir "$INSTDIR\plugins\"
+	SectionEnd
+
+	Section un.SelectNLaunch
+		Delete "$INSTDIR\plugins\SelectNLaunch.dll"
 		RMDir "$INSTDIR\plugins\"
 	SectionEnd
 
@@ -1018,7 +1011,7 @@ SubSection un.Plugins
 	SectionEnd
 
 
-	Section un.FileBrowserLite
+	Section un.LightExplorer
 		Delete "$INSTDIR\plugins\LightExplorer.dll"
 		Delete "$INSTDIR\lightExplorer.ini"
 		RMDir "$INSTDIR\plugins\"

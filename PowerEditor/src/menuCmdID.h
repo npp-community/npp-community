@@ -151,6 +151,9 @@
     #define    IDM_SEARCH_GOTONEXTFOUND	       (IDM_SEARCH + 46)
     #define    IDM_SEARCH_GOTOPREVFOUND	       (IDM_SEARCH + 47)
 
+    #define    IDM_SEARCH_SETANDFINDNEXT       (IDM_SEARCH + 48)
+    #define    IDM_SEARCH_SETANDFINDPREV       (IDM_SEARCH + 49)
+    #define    IDM_SEARCH_INVERSEMARKS         (IDM_SEARCH + 50)
 
 #define IDM_VIEW    (IDM + 4000)
     //#define    IDM_VIEW_TOOLBAR_HIDE            (IDM_VIEW + 1)
@@ -198,6 +201,10 @@
     #define    IDM_VIEW_DRAWTABBAR_VERTICAL       (IDM_VIEW + 43)
     #define    IDM_VIEW_DRAWTABBAR_MULTILINE      (IDM_VIEW + 44)
     #define    IDM_VIEW_DOCCHANGEMARGIN           (IDM_VIEW + 45)
+    #define    IDM_VIEW_LWDEF					  (IDM_VIEW + 46)
+    #define    IDM_VIEW_LWALIGN					  (IDM_VIEW + 47)
+    #define    IDM_VIEW_LWINDENT				  (IDM_VIEW + 48)
+    #define    IDM_VIEW_SUMMARY 				  (IDM_VIEW + 49)
 
     #define    IDM_VIEW_FOLD                      (IDM_VIEW + 50)
         #define    IDM_VIEW_FOLD_1    (IDM_VIEW_FOLD + 1)
@@ -293,6 +300,8 @@
     #define    IDM_FORMAT_KOI8R_CYRILLIC    (IDM_FORMAT_ENCODE + 48)
     #define    IDM_FORMAT_ENCODE_END        IDM_FORMAT_KOI8R_CYRILLIC
 
+    //#define    IDM_FORMAT_CONVERT           200
+
 #define    IDM_LANG    (IDM + 6000)
     #define    IDM_LANGSTYLE_CONFIG_DLG    (IDM_LANG + 1)
     #define    IDM_LANG_C                  (IDM_LANG + 2)
@@ -320,7 +329,7 @@
     #define    IDM_LANG_LUA                (IDM_LANG + 24)
     #define    IDM_LANG_TEX                (IDM_LANG + 25)
     #define    IDM_LANG_FORTRAN            (IDM_LANG + 26)
-    #define    IDM_LANG_SH                 (IDM_LANG + 27)
+    #define    IDM_LANG_BASH               (IDM_LANG + 27)
     #define    IDM_LANG_FLASH              (IDM_LANG + 28)
     #define    IDM_LANG_NSIS               (IDM_LANG + 29)
     #define    IDM_LANG_TCL                (IDM_LANG + 30)
@@ -348,6 +357,7 @@
     #define    IDM_LANG_GUI4CLI            (IDM_LANG + 52)
     #define    IDM_LANG_POWERSHELL         (IDM_LANG + 53)
     #define    IDM_LANG_R                  (IDM_LANG + 54)
+    #define    IDM_LANG_JSP                (IDM_LANG + 55)
 
     #define    IDM_LANG_EXTERNAL           (IDM_LANG + 65)
     #define    IDM_LANG_EXTERNAL_LIMIT     (IDM_LANG + 79)
@@ -379,7 +389,9 @@
     #define    IDM_SETTING_REMEMBER_LAST_SESSION    (IDM_SETTING + 10)
     #define    IDM_SETTING_PREFERENCE               (IDM_SETTING + 11)
     #define    IDM_SETTING_AUTOCNBCHAR              (IDM_SETTING + 15)
-	#define	   IDM_SETTING_MENU_WHEEL               (IDM_SETTING + 16)
+    #define	   IDM_SETTING_SHORTCUT_MAPPER_MACRO	(IDM_SETTING + 16)
+	#define	   IDM_SETTING_SHORTCUT_MAPPER_RUN		(IDM_SETTING + 17)
+	#define	   IDM_SETTING_MENU_WHEEL               (IDM_SETTING + 18)
 
 #define    IDM_EXECUTE  (IDM + 9000)
 

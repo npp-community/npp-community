@@ -20,14 +20,6 @@
 
 class ScintillaEditView;
 
-struct RangeToFormat {
-	HDC hdc;
-	HDC hdcTarget;
-	RECT rc;
-	RECT rcPage;
-	CharacterRange chrg;
-};
-
 class Printer
 {
 public :

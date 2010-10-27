@@ -39,7 +39,7 @@ const int LF = 0x0A;
 
 Buffer::Buffer( FileManager * pManager, BufferID id, Document doc, DocFileStatus type, const TCHAR *fileName ) :
 _pManager(pManager), _canNotify(false), _references(0), _id(id),
-_doc(doc), _lang(L_TXT), _isDirty(false), _encoding(-1),
+_doc(doc), _lang(L_TEXT), _isDirty(false), _encoding(-1),
 _isUserReadOnly(false), _needLexer(false), //new buffers do not need lexing, Scintilla takes care of that
 _currentStatus(type), _timeStamp(0), _isFileReadOnly(false),
 _fileName(NULL), _needReloading(false), _recentTag(-1)
@@ -118,7 +118,7 @@ void Buffer::setFileName(const TCHAR *fn, LangType defaultLang)
 		}
 	}
 
-	if (newLang == defaultLang || newLang == L_TXT)	//language can probably be refined
+	if (newLang == defaultLang || newLang == L_TEXT)	//language can probably be refined
 	{
 		if ((!generic_stricmp(_fileName, TEXT("makefile"))) || (!generic_stricmp(_fileName, TEXT("GNUmakefile"))))
 			newLang = L_MAKEFILE;
@@ -192,6 +192,48 @@ bool Buffer::checkFileState() {	//returns true if the status has been changed (i
 	}
 	return false;
 }
+
+int Buffer::getFileLength()
+{
+	if (_currentStatus == DOC_UNNAMED)
+		return -1;
+
+	struct _stat buf;
+
+	if (PathFileExists(_fullPathName.c_str()))
+	{
+		if (!generic_stat(_fullPathName.c_str(), &buf))
+		{
+			return buf.st_size;
+		}
+	}
+	return -1;
+}
+
+generic_string Buffer::getFileTime(fileTimeType ftt) const
+{
+	if (_currentStatus == DOC_UNNAMED)
+		return TEXT("");
+
+	struct _stat buf;
+
+	if (PathFileExists(_fullPathName.c_str()))
+	{
+		if (!generic_stat(_fullPathName.c_str(), &buf))
+		{
+			time_t rawtime = ftt==ft_created?buf.st_ctime:ftt==ft_modified?buf.st_mtime:buf.st_atime;
+			tm timeinfo;
+			localtime_s(&timeinfo, &rawtime);
+			const int temBufLen = 64;
+			TCHAR tmpbuf[temBufLen];
+
+			generic_strftime(tmpbuf, temBufLen, TEXT("%Y-%m-%d %H:%M:%S"), &timeinfo);
+			return tmpbuf;
+		}
+	}
+	return TEXT("");
+}
+
 
 void Buffer::setPosition(const Position & pos, ScintillaEditView * identifier) {
 	int index = indexOfReference(identifier);
@@ -381,11 +423,23 @@ void FileManager::init(Notepad_plus * pNotepadPlus, ScintillaEditView * pscratch
 	_pscratchTilla->execute(SCI_ADDREFDOCUMENT, 0, _scratchDocDefault);
 }
 
-void FileManager::checkFilesystemChanges() {
-	for(size_t i = 0; i < _nrBufs; i++) {
-		_buffers[i]->checkFileState();	//something has changed. Triggers update automatically
+// Strange things are happening to the loop index variable, but I'm not touching this parsing code with a 10 foot pole.
+//lint -e850
+void FileManager::checkFilesystemChanges()
+{
+	for(int i = int(_nrBufs -1) ; i >= 0 ; i--)
+    {
+        if (i >= int(_nrBufs))
+        {
+            if (_nrBufs == 0)
+                return;
+
+            i = _nrBufs - 1;
+        }
+        _buffers[i]->checkFileState();	//something has changed. Triggers update automatically
 	}
 }
+//lint +e850
 
 int FileManager::getBufferIndexByID(BufferID id) {
 	for(size_t i = 0; i < _nrBufs; i++) {
@@ -437,7 +491,7 @@ BufferID FileManager::loadFile(const TCHAR * filename, Document doc, int encodin
 	Utf8_16_Read UnicodeConvertor;	//declare here so we can get information after loading is done
 
 	formatType format;
-	bool res = loadFileData(doc, fullpath, &UnicodeConvertor, L_TXT, encoding, &format);
+	bool res = loadFileData(doc, fullpath, &UnicodeConvertor, L_TEXT, encoding, &format);
 	if (res)
 	{
 		Buffer * newBuf = new Buffer(this, _nextBufferID, doc, DOC_REGULAR, fullpath);
@@ -477,11 +531,12 @@ BufferID FileManager::loadFile(const TCHAR * filename, Document doc, int encodin
 			}
 			buf->setUnicodeMode(um);
 		}
-		else
+		else // encoding != -1
 		{
-			buf->setUnicodeMode(uniCookie);
+            // Test if encoding is set to UTF8 w/o BOM (usually for utf8 indicator of xml or html)
+            buf->setEncoding((encoding == SC_CP_UTF8)?-1:encoding);
+            buf->setUnicodeMode(uniCookie);
 			buf->setFormat(format);
-			buf->setEncoding(encoding);
 		}
 		//determine buffer properties
 		_nextBufferID++;
@@ -598,24 +653,27 @@ bool FileManager::saveBuffer(BufferID id, const TCHAR * filename, bool isCopy) {
 	{
 		_pscratchTilla->execute(SCI_SETDOCPOINTER, 0, buffer->_doc);	//generate new document
 
-		char data[blockSize + 1];
 		int lengthDoc = _pscratchTilla->getCurrentDocLen();
-		for (int i = 0; i < lengthDoc; i += blockSize)
+		char* buf = (char*)_pscratchTilla->execute(SCI_GETCHARACTERPOINTER);	//to get characters directly from Scintilla buffer
+		if (encoding == -1) //no special encoding; can be handled directly by Utf8_16_Write
 		{
-			int grabSize = lengthDoc - i;
-			if (grabSize > blockSize)
-				grabSize = blockSize;
+			UnicodeConvertor.fwrite(buf, lengthDoc);
+		}
+		else
+		{
+			WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
+			int grabSize;
+			for (int i = 0; i < lengthDoc; i += grabSize)
+			{
+				grabSize = lengthDoc - i;
+				if (grabSize > blockSize)
+					grabSize = blockSize;
 
-			_pscratchTilla->getText(data, i, i + grabSize);
-			if (encoding != -1)
-			{
-				WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
-				const char *newData = wmc->encode(SC_CP_UTF8, encoding, data);
-				UnicodeConvertor.fwrite(newData, strlen(newData));
-			}
-			else
-			{
-				UnicodeConvertor.fwrite(data, grabSize);
+				int newDataLen = 0;
+				int incompleteMultibyteChar = 0;
+				const char *newData = wmc->encode(SC_CP_UTF8, encoding, buf+i, grabSize, &newDataLen, &incompleteMultibyteChar);
+				grabSize -= incompleteMultibyteChar;
+				UnicodeConvertor.fwrite(newData, newDataLen);
 			}
 		}
 		UnicodeConvertor.fclose();
@@ -682,16 +740,31 @@ BufferID FileManager::bufferFromDocument(Document doc, bool dontIncrease, bool d
 	return id;
 }
 
-bool FileManager::loadFileData(Document doc, const TCHAR * filename, Utf8_16_Read * UnicodeConvertor, LangType language, int encoding, formatType *pFormat)
+bool FileManager::loadFileData(Document doc, const TCHAR * filename, Utf8_16_Read * UnicodeConvertor, LangType language, int & encoding, formatType *pFormat)
 {
 	const int blockSize = 128 * 1024;	//128 kB
-	char data[blockSize+1];
+	char data[blockSize+8];
 	FILE *fp = NULL;
 	generic_fopen(fp,filename, TEXT("rb"));
 	if (!fp)
 		return false;
 
+	//Get file size
+	_fseeki64 (fp , 0 , SEEK_END);
+	unsigned __int64 fileSize =_ftelli64(fp);
+	rewind(fp);
+	// size/6 is the normal room Scintilla keeps for editing, but here we limit it to 1MiB when loading (maybe we want to load big files without editing them too much)
+	unsigned __int64 bufferSizeRequested = fileSize + min(1<<20,fileSize/6);
+	// As a 32bit application, we cannot allocate 2 buffer of more than INT_MAX size (it takes the whole address space)
+	if(bufferSizeRequested > INT_MAX)
+	{
+		::MessageBox(NULL, TEXT("File is too big to be opened by Notepad++"), TEXT("File open problem"), MB_OK|MB_APPLMODAL);
+		fclose(fp);
+		return false;
+	}
+
 	//Setup scratchtilla for new filedata
+	_pscratchTilla->execute(SCI_SETSTATUS, SC_STATUS_OK); // reset error status
 	_pscratchTilla->execute(SCI_SETDOCPOINTER, 0, doc);
 	bool ro = _pscratchTilla->execute(SCI_GETREADONLY) != 0;
 	if (ro)
@@ -725,18 +798,51 @@ bool FileManager::loadFileData(Document doc, const TCHAR * filename, Utf8_16_Rea
 
 	bool success = true;
 	int format = -1;
-	__try {
+	__try
+	{
+		// First allocate enough memory for the whole file (this will reduce memory copy during loading)
+		_pscratchTilla->execute(SCI_ALLOCATE, WPARAM(bufferSizeRequested));
+		if(_pscratchTilla->execute(SCI_GETSTATUS) != SC_STATUS_OK)
+		{
+			throw;
+		}
+
 		size_t lenFile = 0;
 		size_t lenConvert = 0;	//just in case conversion results in 0, but file not empty
+		bool isFirstTime = true;
+		int incompleteMultibyteChar = 0;
 
-		do {
-			lenFile = fread(data, 1, blockSize, fp);
+		do
+		{
+			lenFile = fread(data+incompleteMultibyteChar, 1, blockSize-incompleteMultibyteChar, fp) + incompleteMultibyteChar;
+
+            // check if file contain any BOM
+            if (isFirstTime)
+            {
+                if (Utf8_16_Read::determineEncoding((unsigned char *)data, lenFile) != uni8Bit)
+                {
+                    // if file contains any BOM, then encoding will be erased,
+                    // and the document will be interpreted as UTF
+                    encoding = -1;
+                }
+                isFirstTime = false;
+            }
+
 			if (encoding != -1)
 			{
-				data[lenFile] = '\0';
-				WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
-				const char *newData = wmc->encode(encoding, SC_CP_UTF8, data);
-				_pscratchTilla->execute(SCI_APPENDTEXT, strlen(newData), (LPARAM)newData);
+				if (encoding == SC_CP_UTF8)
+				{
+					// Pass through UTF-8 (this does not check validity of characters, thus inserting a multi-byte character in two halfs is working)
+					_pscratchTilla->execute(SCI_APPENDTEXT, lenFile, (LPARAM)data);
+				}
+				else
+				{
+					WcharMbcsConvertor *wmc = WcharMbcsConvertor::getInstance();
+					int newDataLen = 0;
+					const char *newData = wmc->encode(encoding, SC_CP_UTF8, data, lenFile, &newDataLen, &incompleteMultibyteChar);
+					_pscratchTilla->execute(SCI_APPENDTEXT, newDataLen, (LPARAM)newData);
+				}
+
 				if (format == -1)
 					format = getEOLFormatForm(data);
 			}
@@ -746,9 +852,20 @@ bool FileManager::loadFileData(Document doc, const TCHAR * filename, Utf8_16_Rea
 				_pscratchTilla->execute(SCI_APPENDTEXT, lenConvert, (LPARAM)(UnicodeConvertor->getNewBuf()));
 			}
 
+			if(_pscratchTilla->execute(SCI_GETSTATUS) != SC_STATUS_OK)
+			{
+				throw;
+			}
+
+			if(incompleteMultibyteChar != 0)
+			{
+				// copy bytes to next buffer
+				memcpy(data, data+blockSize-incompleteMultibyteChar, incompleteMultibyteChar);
+			}
+
 		} while (lenFile > 0);
-	} __except(filter(GetExceptionCode())) {
-		printStr(TEXT("File is too big to be opened by Notepad++"));
+	} __except(EXCEPTION_EXECUTE_HANDLER) {  //TODO: should filter correctly for other exceptions; the old filter(GetExceptionCode(), GetExceptionInformation()) was only catching access violations
+		::MessageBox(NULL, TEXT("File is too big to be opened by Notepad++"), TEXT("File open problem"), MB_OK|MB_APPLMODAL);
 		success = false;
 	}
 

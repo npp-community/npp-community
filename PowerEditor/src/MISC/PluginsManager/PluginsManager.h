@@ -22,13 +22,16 @@
 #include "MISC/PluginsManager/PluginInterface.h"
 #endif
 
+// Forward declarations
+class IDAllocator;
+
 typedef BOOL (__cdecl * PFUNCISUNICODE)();
 
 struct PluginCommand {
 	generic_string _pluginName;
 	int _funcID;
 	PFUNCPLUGINCMD _pFunc;
-	PluginCommand(const TCHAR *pluginName, int funcID, PFUNCPLUGINCMD pFunc): _funcID(funcID), _pFunc(pFunc), _pluginName(pluginName){};
+	PluginCommand(const TCHAR *pluginName, int funcID, PFUNCPLUGINCMD pFunc): _funcID(funcID), _pFunc(pFunc), _pluginName(pluginName){}
 };
 
 struct PluginInfo {
@@ -52,11 +55,11 @@ struct PluginInfo {
 
 class PluginsManager {
 public:
-	PluginsManager() : _hPluginsMenu(NULL), _isDisabled(false) {};
+	PluginsManager();
 	~PluginsManager();
 	void init(const NppData & nppData) {
 		_nppData = nppData;
-	};
+	}
 
     int loadPlugin(const generic_string& pluginFilePath, std::vector<generic_string> & dll2Remove);
 	bool loadPlugins(const TCHAR *dir = NULL);
@@ -76,10 +79,15 @@ public:
 
 	HMENU getMenuHandle() {
 		return _hPluginsMenu;
-	};
+	}
 
 	void disable() {_isDisabled = true;};
-	bool hasPlugins(){return (_pluginInfos.size()!= 0);};
+	bool hasPlugins(){return (_pluginInfos.size()!= 0);}
+
+	bool allocateCmdID(int numberRequired, int *start);
+	bool inDynamicRange(int id);
+
+	bool allocateMarker(int numberRequired, int *start);
 
 private:
 	NppData _nppData;
@@ -88,6 +96,8 @@ private:
 	std::vector<PluginInfo *> _pluginInfos;
 	std::vector<PluginCommand> _pluginsCommands;
 	bool _isDisabled;
+	IDAllocator* _dynamicIDAlloc;
+	IDAllocator* _markerAlloc;
 
 	void pluginCrashAlert(const TCHAR *pluginName, const TCHAR *funcSignature);
 };

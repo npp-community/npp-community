@@ -27,15 +27,15 @@ class CallTip {
 	bool useStyleCallTip;   // if true, STYLE_CALLTIP should be used
 
 	// Private so CallTip objects can not be copied
-	CallTip(const CallTip &) {}
+	CallTip(const CallTip &);
 	// NPPSTART Joce 08/09/09 LintCleanup
-	const CallTip &operator=(const CallTip &) { return *this; }
+	const CallTip &operator=(const CallTip &);
 	// NPPEND
 	void DrawChunk(Surface *surface, int &x, const char *s,
 		int posStart, int posEnd, int ytext, PRectangle rcClient,
 		bool highlight, bool draw);
 	int PaintContents(Surface *surfaceWindow, bool draw);
-	bool IsTabCharacter(char c);
+	bool IsTabCharacter(char c) const;
 	int NextTabPos(int x);
 
 public:

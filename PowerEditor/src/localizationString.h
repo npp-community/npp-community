@@ -64,7 +64,8 @@ LocalizationSwitcher::LocalizationDefinition localizationDefs[] = {
 	{TEXT("Euskara"), TEXT("basque.xml")},
 	{TEXT("Español argentina"), TEXT("spanish_ar.xml")},
 	{TEXT("Беларуская мова"), TEXT("belarusian.xml")},
-	{TEXT("Cрпски језик"), TEXT("serbian.xml")},
+	{TEXT("Srpski"), TEXT("serbian.xml")},
+	{TEXT("Cрпски"), TEXT("serbianCyrillic.xml")},
 	{TEXT("Bahasa Melayu"), TEXT("malay.xml")},
 	{TEXT("Lëtzebuergesch"), TEXT("luxembourgish.xml")},
 	{TEXT("Tagalog"), TEXT("tagalog.xml")},
@@ -73,6 +74,9 @@ LocalizationSwitcher::LocalizationDefinition localizationDefs[] = {
 	{TEXT("O‘zbekcha"), TEXT("uzbek.xml")},
 	{TEXT("Ўзбекча"), TEXT("uzbekCyrillic.xml")},
 	{TEXT("Кыргыз тили"), TEXT("kyrgyz.xml")},
-	{TEXT("Македонски јазик"), TEXT("macedonian.xml")}
+	{TEXT("Македонски јазик"), TEXT("macedonian.xml")},
+	{TEXT("latviešu valoda"), TEXT("latvian.xml")},
+	{TEXT("தமிழ்"), TEXT("tamil.xml")},
+	{TEXT("Azərbaycan dili"), TEXT("azerbaijani.xml")}
 };
 #endif LOCALIZATIONSTRING_H

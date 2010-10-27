@@ -18,20 +18,20 @@
 #ifndef MISC_COMMON_COMMON_H
 #define MISC_COMMON_COMMON_H
 
+#define dirUp true
+#define dirDown false
+
 #define NPP_CP_WIN_1252           1252
 #define NPP_CP_DOS_437            437
 #define NPP_CP_BIG5               950
 
 void folderBrowser(HWND parent, int outputCtrlID, const TCHAR *defaultStr = NULL);
 
-void systemMessage(const TCHAR *title);
-//DWORD ShortToLongPathName(LPCTSTR lpszShortPath, LPTSTR lpszLongPath, DWORD cchBuffer);
 void printInt(int int2print);
 void printStr(const TCHAR *str2print);
 
 void writeLog(const TCHAR *logFileName, const char *log2write);
 int filter(unsigned int code);
-//int getCpFromStringValue(const char * encodingStr);
 generic_string purgeMenuItemString(const TCHAR * menuItemStr, bool keepAmpersand = false);
 std::vector<generic_string> tokenizeString(const generic_string & tokenString, const char delim);
 
@@ -63,31 +63,78 @@ public:
 	static WcharMbcsConvertor * getInstance();
 	static void destroyInstance();
 
-	const wchar_t * char2wchar(const char *mbStr, UINT codepage);
+	const wchar_t * char2wchar(const char *mbStr, UINT codepage, int lenIn=-1, int *pLenOut=NULL, int *pBytesNotProcessed=NULL);
 	const wchar_t * char2wchar(const char *mbcs2Convert, UINT codepage, int *mstart, int *mend);
-	const char * wchar2char(const wchar_t *wcStr, UINT codepage);
+	const char * wchar2char(const wchar_t *wcStr, UINT codepage, int lenIn=-1, int *pLenOut=NULL);
 	const char * wchar2char(const wchar_t *wcStr, UINT codepage, long *mstart, long *mend);
 
-	const char * encode(UINT fromCodepage, UINT toCodepage, const char *txt2Encode) {
-        const wchar_t * strW = char2wchar(txt2Encode, fromCodepage);
-        return wchar2char(strW, toCodepage);
+	const char * encode(UINT fromCodepage, UINT toCodepage, const char *txt2Encode, int lenIn=-1, int *pLenOut=NULL, int *pBytesNotProcessed=NULL) {
+		int lenWc = 0;
+        const wchar_t * strW = char2wchar(txt2Encode, fromCodepage, lenIn, &lenWc, pBytesNotProcessed);
+        return wchar2char(strW, toCodepage, lenWc, pLenOut);
     };
 
-protected:
-	WcharMbcsConvertor();
-	~WcharMbcsConvertor();
+	template <class T>
+	class StringBuffer {
+	public:
+		StringBuffer() : _str(0), _allocLen(0) {}
+		~StringBuffer()
+		{
+			if(_allocLen > 0)
+			{
+				delete [] _str;
+			}
+		}
 
+		void sizeTo(size_t size)
+		{
+			if(_allocLen < size)
+			{
+				if(_allocLen > 0)
+				{
+					delete[] _str;
+				}
+				_allocLen = max(size, initSize);
+				_str = new T[_allocLen];
+			}
+		}
+
+		void empty()
+		{
+			static T nullStr = 0; // routines may return an empty string, with null terminator, without allocating memory; a pointer to this null character will be returned in that case
+			if(_allocLen == 0)
+			{
+				_str = &nullStr;
+			}
+			else
+			{
+				_str[0] = 0;
+			}
+		}
+
+		operator T*() { return _str; }
+
+	protected:
+		static const int initSize = 1024;
+		size_t _allocLen;
+		T* _str;
+	};
+
+protected:
+	WcharMbcsConvertor(){}
+	~WcharMbcsConvertor(){}
 	static WcharMbcsConvertor * _pSelf;
 
-	char *_multiByteStr;
-	size_t _multiByteAllocLen;
-	wchar_t *_wideCharStr;
-	size_t _wideCharAllocLen;
+	StringBuffer<char> _multiByteStr;
+	StringBuffer<wchar_t> _wideCharStr;
 
 private:
 	// Since there's no public ctor, we need to void the default assignment operator.
 	const WcharMbcsConvertor& operator= (const WcharMbcsConvertor&);
 };
+
+#define MACRO_RECORDING_IN_PROGRESS 1
+#define MACRO_RECORDING_HAS_STOPPED 2
 
 #define ERROR_MSG_SIZE 1024
 

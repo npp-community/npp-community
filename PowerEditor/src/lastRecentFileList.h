@@ -76,6 +76,7 @@ private:
 	HMENU _hMenu;
 	int _posBase;
 	int _idBase;
+	// JOCE: Should be std::vector instead.
 	bool* _idFreeArray;
 	bool _hasSeparators;
 	bool _locked;

@@ -17,7 +17,7 @@
 
 #include "precompiled_headers.h"
 
-#include "Notepad_plus.h"
+#include "Notepad_plus_Window.h"
 #include "MISC/Process/Process.h"
 
 #include "MISC/Exception/Win32Exception.h"	//Win32 exception
@@ -52,12 +52,20 @@ void parseCommandLine(TCHAR * commandLine, ParamVector & paramVector) {
 	}
 	//while this is not really DBCS compliant, space and quote are in the lower 127 ASCII range
 	while(commandLine[0] && commandLine[0] != stopChar)
+    {
 		commandLine++;
-	commandLine++;	//advance past stopChar
+    }
+
+    // For unknown reason, the following command :
+    // c:\NppDir>notepad++
+    // (without quote) will give string "notepad++\0notepad++\0"
+    // To avoid the unexpected behaviour we check the end of string before increasing the pointer
+    if (commandLine[0] != '\0')
+	    commandLine++;	//advance past stopChar
+
 	//kill remaining spaces
 	while(commandLine[0] == TEXT(' '))
 		commandLine++;
-
 
 	bool isFile = checkSingleFile(commandLine);	//if the commandline specifies only a file, open it as such
 	if (isFile) {
@@ -149,6 +157,7 @@ int getNumberFromParam(char paramName, ParamVector & params, bool & isParamePres
 #define FLAG_NOSESSION TEXT("-nosession")
 #define FLAG_NOTABBAR TEXT("-notabbar")
 #define FLAG_SYSTRAY TEXT("-systemtray")
+#define FLAG_LOADINGTIME TEXT("-loadingtime")
 #define FLAG_HELP TEXT("--help")
 
 #ifndef SHIPPING
@@ -175,9 +184,10 @@ notepad++ [--help] [-multiInst] [-noPlugins] [-lLanguage] [-nLineNumber] [-cColu
     -notabbar : Launch Notepad++ without tabbar\n\
     -ro : Launch Notepad++ and make the file to open read only\n\
     -systemtray : Launch Notepad++ directly in system tray\n\
+	-loadingTime : Display Notepad++ loading time\n\
     fullFilePathName : file name to open (absolute or relative path name)\n\
 ")
-void doException(Notepad_plus & notepad_plus_plus);
+void doException(Notepad_plus_Window & notepad_plus_plus);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*nCmdShow*/)
 {
@@ -231,6 +241,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 	cmdLineParams._isReadOnly = isInList(FLAG_READONLY, params);
 	cmdLineParams._isNoSession = isInList(FLAG_NOSESSION, params);
 	cmdLineParams._isPreLaunch = isInList(FLAG_SYSTRAY, params);
+	cmdLineParams._showLoadingTime = isInList(FLAG_LOADINGTIME, params);
 	cmdLineParams._langType = getLangTypeFromParam(params);
 	cmdLineParams._line2go = getNumberFromParam('n', params, isParamePresent);
     cmdLineParams._column2go = getNumberFromParam('c', params, isParamePresent);
@@ -280,11 +291,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 
 	if ((!isMultiInst) && (!TheFirstOne))
 	{
-		HWND hNotepad_plus = ::FindWindow(Notepad_plus::getClassName(), NULL);
+		HWND hNotepad_plus = ::FindWindow(Notepad_plus_Window::getClassName(), NULL);
 		for (int i = 0 ;!hNotepad_plus && i < 5 ; i++)
 		{
 			Sleep(100);
-			hNotepad_plus = ::FindWindow(Notepad_plus::getClassName(), NULL);
+			hNotepad_plus = ::FindWindow(Notepad_plus_Window::getClassName(), NULL);
 		}
 
 		if (hNotepad_plus)
@@ -327,7 +338,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 	}
 
 	pNppParameters->load();
-	Notepad_plus notepad_plus_plus;
+	Notepad_plus_Window notepad_plus_plus;
 
 	NppGUI & nppGui = pNppParameters->getNppGUI();
 
@@ -337,7 +348,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 	generic_string updaterFullPath = updaterDir + TEXT("gup.exe");
 
 	generic_string version = TEXT("-v");
+	// nul char is expected in version strings.
+	//lint -e840 (Info -- Use of nul character in a string literal)
 	version += VERSION_VALUE;
+	//lint +e840
 
 	winVer curWinVer = getWinVersion();
 
@@ -353,7 +367,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 			doUpdate = false;
 	}
 
-	// Vista/Win7 UAC de mes couilles!!!
+	// Vista/Win7 UAC issue
 	bool isVista = (curWinVer >= WV_VISTA);
 
 	if (!winSupported)
@@ -366,8 +380,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 
 		// Update next update date
 		if (nppGui._autoUpdateOpt._intervalDays < 0) // Make sure interval days value is positive
+		{
 			nppGui._autoUpdateOpt._intervalDays = 0 - nppGui._autoUpdateOpt._intervalDays;
-			nppGui._autoUpdateOpt._nextUpdateDate = Date(nppGui._autoUpdateOpt._intervalDays);
+		}
+		nppGui._autoUpdateOpt._nextUpdateDate = Date(nppGui._autoUpdateOpt._intervalDays);
 	}
 
 	MSG msg;
@@ -380,7 +396,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 		// mem leak check output for build-testing.
 		if (isLeakDetect)
 		{
-			::SendMessage(notepad_plus_plus.gNppHWND, WM_CLOSE, 0, 0);
+			::SendMessage(Notepad_plus_Window::gNppHWND, WM_CLOSE, 0, 0);
 			return 0;
 		};
 #endif
@@ -405,45 +421,35 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 			}
 		}
 	} catch(int i) {
-		if (i == 106901)
-			::MessageBox(NULL, TEXT("Scintilla.init is failed!"), TEXT("Notepad++ Exception: 106901"), MB_OK);
-		else {
-			TCHAR str[50] = TEXT("God Damned Exception : ");
-			TCHAR code[10];
-			wsprintf(code, TEXT("%d"), i);
-			::MessageBox(Notepad_plus::gNppHWND, lstrcat(str, code), TEXT("Notepad++ Exception"), MB_OK);
-			doException(notepad_plus_plus);
-		}
+		TCHAR str[50] = TEXT("God Damned Exception : ");
+		TCHAR code[10];
+		wsprintf(code, TEXT("%d"), i);
+		::MessageBox(Notepad_plus_Window::gNppHWND, lstrcat(str, code), TEXT("Int Exception"), MB_OK);
+		doException(notepad_plus_plus);
+	} catch(std::runtime_error & ex) {
+		::MessageBoxA(Notepad_plus_Window::gNppHWND, ex.what(), "Runtime Exception", MB_OK);
+		doException(notepad_plus_plus);
 	} catch (const Win32Exception & ex) {
 		TCHAR message[1024];	//TODO: sane number
 		wsprintf(message, TEXT("An exception occured. Notepad++ cannot recover and must be shut down.\r\nThe exception details are as follows:\r\n")
-#ifdef UNICODE
-			TEXT("Code:\t0x%08X\r\nType:\t%S\r\nException address: 0x%08X"),
-#else
-			TEXT("Code:\t0x%08X\r\nType:\t%s\r\nException address: 0x%08X"),
-#endif
-			ex.code(), ex.what(), ex.where());
-		::MessageBox(Notepad_plus::gNppHWND, message, TEXT("Win32Exception"), MB_OK | MB_ICONERROR);
+		TEXT("Code:\t0x%08X\r\nType:\t%S\r\nException address: 0x%08X"), ex.code(), ex.what(), ex.where());
+		::MessageBox(Notepad_plus_Window::gNppHWND, message, TEXT("Win32Exception"), MB_OK | MB_ICONERROR);
 		mdump.writeDump(ex.info());
 		doException(notepad_plus_plus);
-	} catch(std::exception ex) {
-#ifdef UNICODE
-		const wchar_t * text = WcharMbcsConvertor::getInstance()->char2wchar(ex.what(), CP_ACP);
-		::MessageBox(Notepad_plus::gNppHWND, text, TEXT("C++ Exception"), MB_OK);
-#else
-		::MessageBox(Notepad_plus::gNppHWND, ex.what(), TEXT("C++ Exception"), MB_OK);
-#endif
+	} catch(std::exception & ex) {
+		::MessageBoxA(Notepad_plus_Window::gNppHWND, ex.what(), "General Exception", MB_OK);
 		doException(notepad_plus_plus);
 	} catch(...) {	//this shouldnt ever have to happen
+		::MessageBoxA(Notepad_plus_Window::gNppHWND, "An exception that we did not yet found its name is just caught", "Unknown Exception", MB_OK);
 		doException(notepad_plus_plus);
 	}
 
 	return (UINT)msg.wParam;
 }
 
-void doException(Notepad_plus & notepad_plus_plus) {
+void doException(Notepad_plus_Window & notepad_plus_plus) {
 	Win32Exception::removeHandler();	//disable exception handler after excpetion, we dont want corrupt data structurs to crash the exception handler
-	::MessageBox(Notepad_plus::gNppHWND, TEXT("Notepad++ will attempt to save any unsaved data. However, dataloss is very likely."), TEXT("Recovery initiating"), MB_OK | MB_ICONINFORMATION);
+	::MessageBox(Notepad_plus_Window::gNppHWND, TEXT("Notepad++ will attempt to save any unsaved data. However, dataloss is very likely."), TEXT("Recovery initiating"), MB_OK | MB_ICONINFORMATION);
 
 	TCHAR tmpDir[1024];
 	GetTempPath(1024, tmpDir);
@@ -454,8 +460,8 @@ void doException(Notepad_plus & notepad_plus_plus) {
 	if (res) {
 		generic_string displayText = TEXT("Notepad++ was able to successfully recover some unsaved documents, or nothing to be saved could be found.\r\nYou can find the results at :\r\n");
 		displayText += emergencySavedDir;
-		::MessageBox(Notepad_plus::gNppHWND, displayText.c_str(), TEXT("Recovery success"), MB_OK | MB_ICONINFORMATION);
+		::MessageBox(Notepad_plus_Window::gNppHWND, displayText.c_str(), TEXT("Recovery success"), MB_OK | MB_ICONINFORMATION);
 	} else {
-		::MessageBox(Notepad_plus::gNppHWND, TEXT("Unfortunatly, Notepad++ was not able to save your work. We are sorry for any lost data."), TEXT("Recovery failure"), MB_OK | MB_ICONERROR);
+		::MessageBox(Notepad_plus_Window::gNppHWND, TEXT("Unfortunatly, Notepad++ was not able to save your work. We are sorry for any lost data."), TEXT("Recovery failure"), MB_OK | MB_ICONERROR);
 	}
 }

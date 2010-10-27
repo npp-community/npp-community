@@ -253,6 +253,7 @@ const char bitarr[] = { 1, 2, 4, 8, 16, 32, 64, '\200' };
  */
 
 RESearch::RESearch(CharClassify *charClassTable) {
+	failure = 0;
 	charClass = charClassTable;
 	Init();
 }
@@ -423,6 +424,7 @@ int RESearch::GetBackslashExpression(
 				ChSet(static_cast<unsigned char>(c));
 			}
 		}
+		break;
 	case 'w':
 		for (c = 0; c < MAXCHR; c++) {
 			if (iswordc(static_cast<unsigned char>(c))) {
@@ -525,7 +527,7 @@ const char *RESearch::Compile(const char *pattern, int length, bool caseSensitiv
 						if (*(p+1) != ']') {
 							c1 = prevChar + 1;
 							i++;
-							c2 = *++p;
+							c2 = static_cast<unsigned char>(*++p);
 							if (c2 == '\\') {
 								if (!*(p+1))	// End of RE
 									return badpat("Missing ]");
@@ -580,7 +582,7 @@ const char *RESearch::Compile(const char *pattern, int length, bool caseSensitiv
 						prevChar = -1;
 					}
 				} else {
-					prevChar = *p;
+					prevChar = static_cast<unsigned char>(*p);
 					ChSetWithCase(*p, caseSensitive);
 				}
 				i++;

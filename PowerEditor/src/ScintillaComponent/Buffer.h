@@ -42,7 +42,7 @@ typedef sptr_t Document;
 enum DocFileStatus{
 	DOC_REGULAR = 0x01,	//should not be combined with anything
 	DOC_UNNAMED = 0x02,	//not saved (new ##)
-	DOC_DELETED = 0x04, //doesnt exist in environment anymore, but not DOC_UNNAMED
+	DOC_DELETED = 0x04, //doesn't exist in environment anymore, but not DOC_UNNAMED
 	DOC_MODIFIED = 0x08	//File in environment has changed
 };
 
@@ -133,7 +133,7 @@ private:
 	BufferID _nextBufferID;
 	size_t _nrBufs;
 
-	bool loadFileData(Document doc, const TCHAR * filename, Utf8_16_Read * UnicodeConvertor, LangType language, int encoding = -1, formatType *pFormat = NULL);
+	bool loadFileData(Document doc, const TCHAR * filename, Utf8_16_Read * UnicodeConvertor, LangType language, int & encoding, formatType *pFormat = NULL);
 };
 
 #define MainFileManager FileManager::getInstance()
@@ -154,7 +154,7 @@ public :
 	// this method 1. copies the file name
 	//             2. determinates the language from the ext of file name
 	//             3. gets the last modified time
-	void setFileName(const TCHAR *fn, LangType defaultLang = L_TXT);
+	void setFileName(const TCHAR *fn, LangType defaultLang = L_TEXT);
 
 	const TCHAR * getFullPathName() const {
 		return _fullPathName.c_str();
@@ -237,6 +237,7 @@ public :
 
 	void setEncoding(int encoding) {
 		_encoding = encoding;
+        doNotify(BufferChangeUnicode | BufferChangeDirty);
 	};
 
 	DocFileStatus getStatus() const {
@@ -305,6 +306,11 @@ public :
 	int docLength() const {
 		return _pManager->docLength(_id);
 	};
+
+	int getFileLength(); // return file length. -1 if file is not existing.
+
+	enum fileTimeType {ft_created, ft_modified, ft_accessed};
+	generic_string getFileTime(fileTimeType ftt) const;
 
     Lang * getCurrentLang() const;
 private :

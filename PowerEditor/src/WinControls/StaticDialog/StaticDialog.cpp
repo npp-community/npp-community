@@ -111,8 +111,6 @@ void StaticDialog::create(int dialogID, bool isRTL)
 
 	if (!_hSelf)
 	{
-		//systemMessage(TEXT("StaticDialog"));
-		//throw int(666);
 		return;
 	}
 

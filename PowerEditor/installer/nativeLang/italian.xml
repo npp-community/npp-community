@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252" ?>
 <!--
-	Italian translation for Notepad++ 5.6.1
-	Last modified Mon, December 8th, 2009 09:30 GMT by Luca Leonardi.
+	Italian translation for Notepad++ 5.8
+	Last modified Tue, September 22th, 2010 18:30 GMT by Luca Leonardi.
 	Please e-mail errors, suggestions etc. to ices_eyes(at)users.sourceforge.net.
 	For updates, see https://sourceforge.net/forum/message.php?msg_id=4588171
 -->
@@ -32,10 +32,11 @@
 					<Item posX = "1" posY = "13" name = "Commenta/Decommenta"/>
 					<Item posX = "1" posY = "14" name = "Auto-completamento"/>
 					<Item posX = "1" posY = "15" name = "Converti carattere di fine linea"/>
-					<Item posX = "2" posY = "14" name = "Segna tutti"/>
-					<Item posX = "2" posY = "15" name = "Rimuvi marcatura"/>
-					<Item posX = "2" posY = "16" name = "Salta su"/>
-					<Item posX = "2" posY = "17" name = "Salta giù"/>
+					<Item posX = "2" posY = "16" name = "Segna tutti"/>
+					<Item posX = "2" posY = "17" name = "Rimuovi marcatura"/>
+					<Item posX = "2" posY = "18" name = "Salta su"/>
+					<Item posX = "2" posY = "19" name = "Salta giù"/>
+                    <Item posX = "2" posY = "21" name = "Segnalibri"/>
 					<Item posX = "3" posY = "4" name = "Mostra simboli"/>
 					<Item posX = "3" posY = "5" name = "Zoom"/>
 					<Item posX = "3" posY = "6" name = "Sposta/Clona documento corrente"/>
@@ -161,6 +162,9 @@
 					<Item id = "43045" name = "Finestra risultati di ricerca"/>
 					<Item id = "43046" name = "Risultato di ricerca successivo"/>
 					<Item id = "43047" name = "Risultato di ricerca precedente"/>
+					<Item id = "43048" name = "Seleziona e trova successivo"/>
+					<Item id = "43049" name = "Seleziona e trova precedente"/>
+                    <Item id = "43050" name = "Inverti segnalibri"/>
 					<Item id = "44009" name = "Post-it"/>
                     <Item id = "44010" name = "Comprimi tutte le strutture"/>
                     <Item id = "44011" name = "Finestra impostazioni personalizzate"/>
@@ -181,6 +185,7 @@
                     <Item id = "44036" name = "Sincronizza scorrimento orizzontale"/>
                     <Item id = "44041" name = "Mostra simbolo di wrap"/>
 					<Item id = "44042" name = "Nascondi righe"/>
+                    <Item id = "44049" name = "Sommario..."/>
 					<Item id = "44072" name = "Attiva altra vista"/>
                     <Item id = "45001" name = "Formato Windows"/>
                     <Item id = "45002" name = "Formato UNIX"/>
@@ -217,6 +222,9 @@
 					<Item id = "48006" name = "Importa Tema/i ..." />
 					<Item id = "48009" name = "Tasti di scelta rapida..."/>
                     <Item id = "48011" name = "Preferenze..."/>
+                    <Item id = "48016" name="Modifica Scorciatoie/Elimina Macro..."/>
+                    <Item id = "48017" name="Modifica Scorciatoie/Elimina Comando..."/>
+
 					<Item id = "49000" name = "E&amp;segui..."/>
                     <Item id = "50000" name = "Completa funzione"/>
                     <Item id = "50001" name = "Completa parola"/>
@@ -339,6 +347,8 @@
 				<Item id = "20009" name = "Estensione:"/>
 				<Item id = "20011" name = "Trasparenza"/>
 				<Item id = "20012" name = "Ignora maiuscole/minuscole"/>
+				<Item id = "20015" name = "Importa..."/>
+				<Item id = "20016" name = "Esporta..."/>
 				<Item id = "0" name = "Colore"/>
 				<Item id = "1" name = "Carattere"/>
 				<Item id = "2" name = "Sfondo"/>
@@ -434,6 +444,11 @@
 					<Item id = "6214" name = "Evidenzia la riga corrente"/>
 					<Item id = "6224" name = "Impostazioni selezione multipla"/>
 					<Item id = "6225" name = "Abilita (Ctrl+Click/selezione)"/>
+                    <Item id = "6226" name = "Nessuno"/>
+                    <Item id = "6227" name = "A capo automatico"/>
+                    <Item id = "6228" name = "Default"/>
+                    <Item id = "6229" name = "Allineato"/>
+                    <Item id = "6230" name = "Indentato"/>
                 </Scintillas>
 				<NewDoc title = "Nuovo documento/Directory predefinita">
 					<Item id = "6401" name = "Formato"/>

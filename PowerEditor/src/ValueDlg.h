@@ -24,6 +24,8 @@
 
 #define DEFAULT_NB_NUMBER 2
 
+// JOCE: Needs to be moved in WinControls somewhere.
+
 class ValueDlg : public StaticDialog
 {
 public :
@@ -49,7 +51,27 @@ private :
     int _defaultValue;
 	generic_string _name;
 	POINT _p;
-
 };
 
-#endif // VALUEDLG_H
+// 0 : sans fullscreen
+// 1 : fullscreen
+// 2 : postit
+#define buttonStatus_hidden 0
+#define buttonStatus_fullscreen 1
+#define buttonStatus_postit 2
+
+class ButtonDlg : public StaticDialog
+{
+public :
+    ButtonDlg();
+    void doDialog(bool isRTL = false);
+    int getButtonStatus() const;
+    void setButtonStatus(int buttonStatus);
+    void display(bool toShow = true) const;
+
+protected :
+	BOOL CALLBACK run_dlgProc(UINT Message, WPARAM wParam, LPARAM);
+    int _buttonStatus;
+};
+
+#endif //VALUEDLG_H

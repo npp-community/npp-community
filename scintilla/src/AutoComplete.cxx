@@ -10,11 +10,13 @@
 //#include <stdlib.h>
 //#include <string.h>
 //#include <stdio.h>
+//#include <assert.h>
+
+//#include "CharacterSet.h"
 // NPPEND
 
 #include "Platform.h"
 
-#include "CharClassify.h"
 #include "AutoComplete.h"
 
 #ifdef SCI_NAMESPACE
@@ -46,7 +48,7 @@ AutoComplete::~AutoComplete() {
 	}
 }
 
-bool AutoComplete::Active() {
+bool AutoComplete::Active() const {
 	return active;
 }
 
@@ -85,7 +87,7 @@ void AutoComplete::SetSeparator(char separator_) {
 	separator = separator_;
 }
 
-char AutoComplete::GetSeparator() {
+char AutoComplete::GetSeparator() const {
 	return separator;
 }
 
@@ -93,7 +95,7 @@ void AutoComplete::SetTypesep(char separator_) {
 	typesep = separator_;
 }
 
-char AutoComplete::GetTypesep() {
+char AutoComplete::GetTypesep() const {
 	return typesep;
 }
 

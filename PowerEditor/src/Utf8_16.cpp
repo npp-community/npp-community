@@ -234,6 +234,30 @@ void Utf8_16_Read::determineEncoding()
 	}
 }
 
+UniMode Utf8_16_Read::determineEncoding(const unsigned char *buf, int bufLen)
+{
+    // detect UTF-16 big-endian with BOM
+	if (bufLen > 1 && buf[0] == k_Boms[uni16BE][0] && buf[1] == k_Boms[uni16BE][1])
+	{
+		return uni16BE;
+	}
+
+    // detect UTF-16 little-endian with BOM
+    if (bufLen > 1 && buf[0] == k_Boms[uni16LE][0] && buf[1] == k_Boms[uni16LE][1])
+	{
+		return uni16LE;
+	}
+
+    // detect UTF-8 with BOM
+	if (bufLen > 2 && buf[0] == k_Boms[uniUTF8][0] &&
+		buf[1] == k_Boms[uniUTF8][1] && buf[2] == k_Boms[uniUTF8][2])
+	{
+		return uniUTF8;
+	}
+
+    return uni8Bit;
+}
+
 
 // ==================================================================
 
@@ -241,7 +265,6 @@ Utf8_16_Write::Utf8_16_Write()
 {
 	m_eEncoding = uni8Bit;
 	m_pFile = NULL;
-	m_pBuf = NULL;
 	m_pNewBuf = NULL;
 	m_bFirstWrite = true;
 	m_nBufSize = 0;
@@ -304,26 +327,25 @@ size_t Utf8_16_Write::fwrite(const void* p, size_t _size)
         case uni16LE_NoBOM:
         case uni16BE:
         case uni16LE: {
-            if (_size > m_nBufSize)
-            {
-                m_nBufSize = _size;
-				if (m_pBuf != NULL)
-					delete [] m_pBuf;
-                m_pBuf = NULL;
-                m_pBuf = new utf16[_size + 1];
-            }
+			// JOCE: Nice 64KB static alloc. Can we do otherwise????
+			static const int bufSize = 64*1024;
+			utf16 buf[bufSize];
 
             Utf8_Iter iter8;
             iter8.set(static_cast<const ubyte*>(p), _size, m_eEncoding);
 
-            utf16* pCur = m_pBuf;
-
-            for (; iter8; ++iter8) {
+            int bufIndex = 0;
+            while (iter8) {
                 if (iter8.canGet()) {
-                    *pCur++ = iter8.get();
+                    buf[bufIndex++] = iter8.get();
                 }
+				++iter8;
+				if(bufIndex == bufSize || !iter8) {
+					if(!::fwrite(buf, bufIndex*sizeof(utf16), 1, m_pFile)) return 0;
+					bufIndex = 0;
+				}
             }
-            ret = ::fwrite(m_pBuf, (const char*)pCur - (const char*)m_pBuf, 1, m_pFile);
+            ret = 1;
             break;
         }
         default:

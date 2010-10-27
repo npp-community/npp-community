@@ -83,6 +83,7 @@ struct CmdLineParams {
 	bool _isNoSession;
 	bool _isNoTab;
 	bool _isPreLaunch;
+	bool _showLoadingTime;
 
 	int _line2go;
     int _column2go;
@@ -96,7 +97,8 @@ struct CmdLineParams {
 
 	LangType _langType;
 	CmdLineParams() : _isNoPlugin(false), _isReadOnly(false), _isNoSession(false), _isNoTab(false),
-        _line2go(-1), _column2go(-1), _isPointXValid(false), _isPointYValid(false), _langType(L_EXTERNAL)
+        _isPreLaunch(false), _showLoadingTime(false), _line2go(-1), _column2go(-1), _isPointXValid(false),
+        _isPointYValid(false), _langType(L_EXTERNAL)
     {
         _point.x = 0;
         _point.y = 0;
@@ -167,7 +169,7 @@ struct NewDocDefaultSettings
 	UniMode _encoding;
 	bool _openAnsiAsUtf8;
 	LangType _lang;
-	NewDocDefaultSettings():_format(WIN_FORMAT), _encoding(uni8Bit), _openAnsiAsUtf8(false), _lang(L_TXT){};
+	NewDocDefaultSettings():_format(WIN_FORMAT), _encoding(uni8Bit), _openAnsiAsUtf8(false), _lang(L_TEXT){};
 };
 
 struct LangMenuItem {
@@ -328,17 +330,29 @@ struct NppGUI
 struct ScintillaViewParams
 {
 	ScintillaViewParams() :
-		_lineNumberMarginShow(true), _bookMarkMarginShow(true),
-		_folderStyle(FOLDER_STYLE_BOX), _indentGuideLineShow(true),
-	    _currentLineHilitingShow(true), _wrapSymbolShow(false), _doWrap(false),
-	    _edgeMode(EDGE_NONE), _edgeNbColumn(0),
-		_zoom(0), _whiteSpaceShow(false), _eolShow(false)
+		_lineNumberMarginShow(true),
+		_bookMarkMarginShow(true),
+		_folderStyle(FOLDER_STYLE_BOX),
+		_lineWrapMethod(LINEWRAP_ALIGNED),
+		_foldMarginShow(true),
+		_indentGuideLineShow(true),
+	    _currentLineHilitingShow(true),
+		_wrapSymbolShow(false),
+		_doWrap(false),
+	    _edgeMode(EDGE_NONE),
+		_edgeNbColumn(0),
+		_zoom(0),
+		_zoom2(0),
+		_whiteSpaceShow(false),
+		_eolShow(false)
 	{}
 
 	bool _lineNumberMarginShow;
 	bool _bookMarkMarginShow;
 	//bool _docChangeStateMarginShow;
-	folderStyle  _folderStyle; //"simple", TEXT("arrow"), TEXT("circle") and "box"
+	folderStyle  _folderStyle; //"simple", "arrow", "circle", "box" and "none"
+	lineWrapMethod _lineWrapMethod;
+	bool _foldMarginShow;
 	bool _indentGuideLineShow;
 	bool _currentLineHilitingShow;
 	bool _wrapSymbolShow;
@@ -346,6 +360,7 @@ struct ScintillaViewParams
 	int _edgeMode;
 	int _edgeNbColumn;
 	int _zoom;
+	int _zoom2;
 	bool _whiteSpaceShow;
 	bool _eolShow;
 
@@ -354,9 +369,6 @@ struct ScintillaViewParams
 #define NB_LIST 20
 // JOCE: There's no longer a reason to keep around the NB_MAX_* below now that we use std::vectors.
 #define NB_MAX_LRF_FILE 30
-#define NB_MAX_USER_LANG 30
-#define NB_MAX_EXTERNAL_LANG 30
-#define LANG_NAME_LEN 32
 
 #define NB_MAX_FINDHISTORY_FIND    30
 #define NB_MAX_FINDHISTORY_REPLACE 30
@@ -380,7 +392,7 @@ struct Lang
 	int _tabSize;
 
 	Lang():
-		_langID(L_TXT),
+		_langID(L_TEXT),
 		_defaultExtList(NULL),
 		_pCommentLineSymbol(NULL),
 		_pCommentStart(NULL),
@@ -510,6 +522,7 @@ private:
 class ExternalLangContainer
 {
 public:
+	// JOCE: Change to generic_string
 	TCHAR _name[MAX_EXTERNAL_LEXER_NAME_LEN];
 	TCHAR _desc[MAX_EXTERNAL_LEXER_DESC_LEN];
 
@@ -744,8 +757,8 @@ public:
 
 	int getNbMaxFile() const {return _nbMaxFile;};
 
-    const ScintillaViewParams & getSVP(bool whichOne) const {
-        return _svp[whichOne];
+    const ScintillaViewParams & getSVP() const {
+        return _svp;
     };
 
 	bool writeNbHistoryFile(int nb);
@@ -755,7 +768,7 @@ public:
 	TiXmlNode * getChildElementByAttribut(TiXmlNode *pere, const TCHAR *childName,\
 										  const TCHAR *attributName, const TCHAR *attributVal) const;
 
-	bool writeScintillaParams(const ScintillaViewParams & svp, bool whichOne);
+	bool writeScintillaParams(const ScintillaViewParams & svp);
 
 	bool writeGUIParams();
 
@@ -800,18 +813,28 @@ public:
 		return NULL;
 	}
 
-	int getNbExternalLang() const {return _nbExternalLang;};
-	int getExternalLangIndexFromName(const TCHAR *externalLangName) const {
-		for (int i = 0 ; i < _nbExternalLang ; i++)
+	int getNbExternalLang() const {return (int)_externalLangArray.size();};
+	int getExternalLangIndexFromName(const TCHAR *externalLangName) const
+	{
+		int i = 0;
+		for (std::vector<ExternalLangContainer*>::const_iterator it = _externalLangArray.begin(), end = _externalLangArray.end();
+			it != end;
+			++it)
 		{
-			if (!lstrcmp(externalLangName, _externalLangArray[i]->_name))
+			if ((*it)->_name == externalLangName)
+			{
 				return i;
+			}
+			else
+			{
+				i++;
+			}
 		}
 		return -1;
 	};
 	ExternalLangContainer & getELCFromIndex(int i) {return *_externalLangArray[i];};
 
-	bool ExternalLangHasRoom() const {return _nbExternalLang < NB_MAX_EXTERNAL_LANG;};
+	bool ExternalLangHasRoom() const {return true;}
 
 	void getExternalLexerFromXmlTree(TiXmlDocument *doc);
 	std::vector<TiXmlDocument *> * getExternalLexerDoc() { return &_pXmlExternalLexerDoc;};
@@ -870,13 +893,8 @@ public:
 		if ((!newName) || (!newName[0]))
 			return true;
 
-		for (int i = 0 ; i < _nbExternalLang ; i++)
-		{
-			if (!lstrcmp(_externalLangArray[i]->_name, newName))
-				return true;
-		}
-		return false;
-	};
+		return getExternalLangIndexFromName(newName) != -1;
+	}
 
 	int addExternalLangToEnd(ExternalLangContainer * externalLang);
 
@@ -987,6 +1005,8 @@ public:
     };
 
     PluginList & getPluginList() {return _pluginList;};
+    bool importUDLFromFile(generic_string sourceFile);
+    bool exportUDLToFile(int langIndex2export, generic_string fileName2save);
 
 private:
     NppParameters();
@@ -1004,12 +1024,14 @@ private:
 	TiXmlDocument* _pXmlSessionDoc;
 	TiXmlDocument* _pXmlBlacklistDoc;
 
+	std::vector<TiXmlDocument*> _importedUDL;
+
 	TiXmlDocumentA *_pXmlNativeLangDocA;
 
 	std::vector<TiXmlDocument *> _pXmlExternalLexerDoc;
 
 	NppGUI _nppGUI;
-	ScintillaViewParams _svp[2];
+	ScintillaViewParams _svp;
 
 	std::vector<Lang *> _langList;
 	std::vector<generic_string> _LRFileList;
@@ -1020,9 +1042,8 @@ private:
 	std::vector<UserLangContainer *> _userLangArray;
 
 	generic_string _userDefineLangPath;
-	// JOCE use a std::vector instead!
-	ExternalLangContainer *_externalLangArray[NB_MAX_EXTERNAL_LANG];
-	int _nbExternalLang;
+	// JOCE: These seem to be allocated in PluginsManager.cpp
+	std::vector<ExternalLangContainer*> _externalLangArray;
 
 	CmdLineParams _cmdLineParams;
 
@@ -1097,7 +1118,11 @@ private:
 	void getLangKeywordsFromXmlTree();
 	bool getUserParametersFromXmlTree();
 	bool getUserStylersFromXmlTree();
-	bool getUserDefineLangsFromXmlTree();
+	bool getUserDefineLangsFromXmlTree(TiXmlDocument *tixmldoc);
+    bool getUserDefineLangsFromXmlTree() {
+        return getUserDefineLangsFromXmlTree(_pXmlUserLangDoc);
+    };
+
 	bool getShortcutsFromXmlTree();
 
 	bool getMacrosFromXmlTree();
@@ -1110,14 +1135,14 @@ private:
 	void feedGUIParameters(TiXmlNode *node);
 	void feedKeyWordsParameters(TiXmlNode *node);
 	void feedFileListParameters(TiXmlNode *node);
-    void feedScintillaParam(bool whichOne, TiXmlNode *node);
+    void feedScintillaParam(TiXmlNode *node);
 	void feedDockingManager(TiXmlNode *node);
 	void feedFindHistoryParameters(TiXmlNode *node);
 
 	bool feedStylerArray(TiXmlNode *node);
     void getAllWordStyles(TCHAR *lexerName, TiXmlNode *lexerNode);
 
-	void feedUserLang(TiXmlNode *node);
+	bool feedUserLang(TiXmlNode *node);
 
 	void feedShortcut(TiXmlNode *node);
 	void feedMacros(TiXmlNode *node);

@@ -18,23 +18,22 @@
 //#include <string>
 //#include <vector>
 
+#undef _WIN32_WINNT
 //#define _WIN32_WINNT  0x0500
 //#include <windows.h>
 //#include <commctrl.h>
 //#include <richedit.h>
 //#include <windowsx.h>
+
+//#include "ILexer.h"
+//#include "Scintilla.h"
+//#include "SciLexer.h"
+
+//#include "LexerModule.h"
 // NPPEND
 
 #include "Platform.h"
 
-#include "Scintilla.h"
-#ifdef SCI_LEXER
-#include "SciLexer.h"
-#include "PropSet.h"
-#include "PropSetSimple.h"
-#include "Accessor.h"
-#include "KeyWords.h"
-#endif
 #include "SplitVector.h"
 #include "Partitioning.h"
 #include "RunStyles.h"
@@ -98,11 +97,7 @@ extern bool IsNT();
 extern void Platform_Initialise(void *hInstance);
 extern void Platform_Finalise();
 
-/** TOTAL_CONTROL ifdef surrounds code that will only work when ScintillaWin
- * is derived from ScintillaBase (all features) rather than directly from Editor
- * (lightweight editor).
- */
-#define TOTAL_CONTROL
+typedef BOOL (WINAPI *TrackMouseEventSig)(LPTRACKMOUSEEVENT);
 
 // GCC has trouble with the standard COM ABI so do it the old C way with explicit vtables.
 
@@ -115,11 +110,13 @@ using namespace Scintilla;
 
 class ScintillaWin; 	// Forward declaration for COM interface subobjects
 
+typedef void VFunction(void);
+
 /**
  */
 class FormatEnumerator {
 public:
-	void **vtbl;
+	VFunction **vtbl;
 	int ref;
 	int pos;
 	CLIPFORMAT formats[2];
@@ -131,7 +128,7 @@ public:
  */
 class DropSource {
 public:
-	void **vtbl;
+	VFunction **vtbl;
 	ScintillaWin *sci;
 	DropSource();
 };
@@ -140,7 +137,7 @@ public:
  */
 class DataObject {
 public:
-	void **vtbl;
+	VFunction **vtbl;
 	ScintillaWin *sci;
 	DataObject();
 };
@@ -149,7 +146,7 @@ public:
  */
 class DropTarget {
 public:
-	void **vtbl;
+	VFunction **vtbl;
 	ScintillaWin *sci;
 	DropTarget();
 };
@@ -162,6 +159,8 @@ class ScintillaWin :
 	bool lastKeyDownConsumed;
 
 	bool capturedMouse;
+	bool trackedMouseLeave;
+	TrackMouseEventSig TrackMouseEventFn;
 
 	unsigned int linesPerScroll;	///< Intellimouse support
 	int wheelDelta; ///< Wheel delta from roll
@@ -181,9 +180,12 @@ class ScintillaWin :
 	static HINSTANCE hInstance;
 
 	ScintillaWin(HWND hwnd);
-	ScintillaWin(const ScintillaWin &) : ScintillaBase() {}
+	ScintillaWin(const ScintillaWin &);
 	virtual ~ScintillaWin();
-	const ScintillaWin &operator=(const ScintillaWin &) { return *this; }
+	// NPPSTART Joce 10/06/10 Lint_Cleanup
+	ScintillaWin &operator=(const ScintillaWin &);
+	// NPPEND
+
 
 	virtual void Initialise();
 	virtual void Finalise();
@@ -202,12 +204,14 @@ class ScintillaWin :
 	virtual void StartDrag();
 	sptr_t WndPaint(uptr_t wParam);
 	sptr_t HandleComposition(uptr_t wParam, sptr_t lParam);
+	UINT CodePageOfDocument();
 	virtual bool ValidCodePage(int codePage) const;
 	virtual sptr_t DefWndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
 	virtual bool SetIdle(bool on);
 	virtual void SetTicking(bool on);
 	virtual void SetMouseCapture(bool on);
 	virtual bool HaveMouseCapture();
+	virtual void SetTrackMouseLeaveEvent(bool on);
 	virtual bool PaintContains(PRectangle rc);
 	virtual void ScrollText(int linesToMove);
 	virtual void UpdateSystemCaret();
@@ -219,6 +223,8 @@ class ScintillaWin :
 	virtual int GetCtrlID();
 	virtual void NotifyParent(SCNotification scn);
 	virtual void NotifyDoubleClick(Point pt, bool shift, bool ctrl, bool alt);
+	virtual CaseFolder *CaseFolderForEncoding();
+	virtual std::string CaseMapString(const std::string &s, int caseMapping);
 	virtual void Copy();
 	virtual void CopyAllowLine();
 	virtual bool CanPaste();
@@ -269,12 +275,6 @@ public:
 	/// Implement important part of IDataObject
 	STDMETHODIMP GetData(FORMATETC *pFEIn, STGMEDIUM *pSTM);
 
-	// External Lexers
-#ifdef SCI_LEXER
-	void SetLexerLanguage(const char *languageName);
-	void SetLexer(uptr_t wParam);
-#endif
-
 	static bool Register(HINSTANCE hInstance_);
 	static bool Unregister();
 
@@ -303,6 +303,9 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 	lastKeyDownConsumed = false;
 
 	capturedMouse = false;
+	trackedMouseLeave = false;
+	TrackMouseEventFn = 0;
+
 	linesPerScroll = 0;
 	wheelDelta = 0;   // Wheel delta from roll
 
@@ -343,6 +346,18 @@ void ScintillaWin::Initialise() {
 	// no effect.  If the app hasnt, we really shouldnt ask them to call
 	// it just so this internal feature works.
 	hrOle = ::OleInitialize(NULL);
+
+	// Find TrackMouseEvent which is available on Windows > 95
+	HMODULE user32 = ::GetModuleHandle(TEXT("user32.dll"));
+	TrackMouseEventFn = (TrackMouseEventSig)::GetProcAddress(user32, "TrackMouseEvent");
+	if (TrackMouseEventFn == NULL) {
+		// Windows 95 has an emulation in comctl32.dll:_TrackMouseEvent
+		HMODULE commctrl32 = ::LoadLibrary(TEXT("comctl32.dll"));
+		if (commctrl32 != NULL) {
+			TrackMouseEventFn = (TrackMouseEventSig)
+				::GetProcAddress(commctrl32, "_TrackMouseEvent");
+		}
+	}
 }
 
 void ScintillaWin::Finalise() {
@@ -488,7 +503,7 @@ LRESULT ScintillaWin::WndPaint(uptr_t wParam) {
 		hRgnUpdate = 0;
 	}
 
-	if(!IsOcxCtrl)
+	if (!IsOcxCtrl)
 		::EndPaint(MainHWND(), pps);
 	if (paintState == paintAbandoned) {
 		// Painting area was insufficient to cover new styling or brace highlight positions
@@ -576,6 +591,10 @@ static unsigned int SciMessageFromEM(unsigned int iMessage) {
 }
 
 static UINT CodePageFromCharSet(DWORD characterSet, UINT documentCodePage) {
+	if (documentCodePage == SC_CP_UTF8) {
+		// The system calls here are a little slow so avoid if known case.
+		return SC_CP_UTF8;
+	}
 	CHARSETINFO ci = { 0, 0, { { 0, 0, 0, 0 }, { 0, 0 } } };
 	BOOL bci = ::TranslateCharsetInfo((DWORD*)characterSet,
 		&ci, TCI_SRCCHARSET);
@@ -593,6 +612,10 @@ static UINT CodePageFromCharSet(DWORD characterSet, UINT documentCodePage) {
 	return cp;
 }
 
+UINT ScintillaWin::CodePageOfDocument() {
+	return CodePageFromCharSet(vs.styles[STYLE_DEFAULT].characterSet, pdoc->dbcsCodePage);
+}
+
 sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	try {
 		//Platform::DebugPrintf("S M:%x WP:%x L:%x\n", iMessage, wParam, lParam);
@@ -607,9 +630,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			break;
 
 		case WM_COMMAND:
-#ifdef TOTAL_CONTROL
 			Command(LoWord(wParam));
-#endif
 			break;
 
 		case WM_PAINT:
@@ -695,7 +716,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		case SC_WIN_IDLE:
 			// wParam=dwTickCountInitial, or 0 to initialize.  lParam=bSkipUserInputTest
 			if (idler.state) {
-				if (lParam || (WAIT_TIMEOUT==MsgWaitForMultipleObjects(0,0,0,0, QS_INPUT|QS_HOTKEY))) {
+				if (lParam || (WAIT_TIMEOUT == MsgWaitForMultipleObjects(0, 0, 0, 0, QS_INPUT|QS_HOTKEY))) {
 					if (Idle()) {
 						// User input was given priority above, but all events do get a turn.  Other
 						// messages, notifications, etc. will get interleaved with the idle messages.
@@ -732,21 +753,27 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			//	Platform::IsKeyDown(VK_SHIFT),
 			//	Platform::IsKeyDown(VK_CONTROL),
 			//	Platform::IsKeyDown(VK_MENU));
+			::SetFocus(MainHWND());
 			ButtonDown(Point::FromLong(lParam), ::GetMessageTime(),
 				(wParam & MK_SHIFT) != 0,
 				(wParam & MK_CONTROL) != 0,
 				Platform::IsKeyDown(VK_MENU));
-			::SetFocus(MainHWND());
 			}
 			break;
 
-        case WM_MBUTTONDOWN:
+		case WM_MBUTTONDOWN:
             ::SetFocus(MainHWND());
             break;
 
 		case WM_MOUSEMOVE:
+			SetTrackMouseLeaveEvent(true);
 			ButtonMove(Point::FromLong(lParam));
 			break;
+
+		case WM_MOUSELEAVE:
+			SetTrackMouseLeaveEvent(false);
+			MouseLeave();
+			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 
 		case WM_LBUTTONUP:
 			ButtonUp(Point::FromLong(lParam),
@@ -796,8 +823,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 						UTF8FromUTF16(wcs, 1, utfval, len);
 						AddCharUTF(utfval, len);
 					} else {
-						UINT cpDest = CodePageFromCharSet(
-							vs.styles[STYLE_DEFAULT].characterSet, pdoc->dbcsCodePage);
+						UINT cpDest = CodePageOfDocument();
 						char inBufferCP[20];
 						int size = ::WideCharToMultiByte(cpDest,
 							0, wcs, 1, inBufferCP, sizeof(inBufferCP) - 1, 0, 0);
@@ -868,7 +894,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 				HWND wThis = MainHWND();
 				HWND wCT = reinterpret_cast<HWND>(ct.wCallTip.GetID());
 				if (!wParam ||
-					!(::IsChild(wThis,wOther) || (wOther == wCT))) {
+					!(::IsChild(wThis, wOther) || (wOther == wCT))) {
 					SetFocusState(false);
 					DestroySystemCaret();
 				}
@@ -917,7 +943,6 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			}
 
 		case WM_CONTEXTMENU:
-#ifdef TOTAL_CONTROL
 			if (displayPopupMenu) {
 				Point pt = Point::FromLong(lParam);
 				if ((pt.x == -1) && (pt.y == -1)) {
@@ -930,7 +955,6 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 				ContextMenu(pt);
 				return 0;
 			}
-#endif
 			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 
 		case WM_INPUTLANGCHANGE:
@@ -1044,14 +1068,14 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 
 #ifdef SCI_LEXER
 		case SCI_LOADLEXERLIBRARY:
-			LexerManager::GetInstance()->Load(reinterpret_cast<const char*>(lParam));
+			LexerManager::GetInstance()->Load(reinterpret_cast<const char *>(lParam));
 			break;
 #endif
 
 		default:
 			return ScintillaBase::WndProc(iMessage, wParam, lParam);
 		}
-	} catch (std::bad_alloc&) {
+	} catch (std::bad_alloc &) {
 		errorStatus = SC_STATUS_BADALLOC;
 	} catch (...) {
 		errorStatus = SC_STATUS_FAILURE;
@@ -1117,6 +1141,17 @@ bool ScintillaWin::HaveMouseCapture() {
 	//return capturedMouse && (::GetCapture() == MainHWND());
 }
 
+void ScintillaWin::SetTrackMouseLeaveEvent(bool on) {
+	if (on && TrackMouseEventFn && !trackedMouseLeave) {
+		TRACKMOUSEEVENT tme;
+		tme.cbSize = sizeof(tme);
+		tme.dwFlags = TME_LEAVE;
+		tme.hwndTrack = MainHWND();
+		TrackMouseEventFn(&tme);
+	}
+	trackedMouseLeave = on;
+}
+
 bool ScintillaWin::PaintContains(PRectangle rc) {
 	bool contains = true;
 	if ((paintState == painting) && (!rc.Empty())) {
@@ -1170,7 +1205,7 @@ bool ScintillaWin::GetScrollInfo(int nBar, LPSCROLLINFO lpsi) {
 // Change the scroll position but avoid repaint if changing to same value
 void ScintillaWin::ChangeScrollPos(int barType, int pos) {
 	SCROLLINFO sci = {
-		sizeof(sci),0,0,0,0,0,0
+		sizeof(sci), 0, 0, 0, 0, 0, 0
 	};
 	sci.fMask = SIF_POS;
 	GetScrollInfo(barType, &sci);
@@ -1192,7 +1227,7 @@ void ScintillaWin::SetHorizontalScrollPos() {
 bool ScintillaWin::ModifyScrollBars(int nMax, int nPage) {
 	bool modified = false;
 	SCROLLINFO sci = {
-		sizeof(sci),0,0,0,0,0,0
+		sizeof(sci), 0, 0, 0, 0, 0, 0
 	};
 	sci.fMask = SIF_PAGE | SIF_RANGE;
 	GetScrollInfo(SB_VERT, &sci);
@@ -1276,6 +1311,211 @@ void ScintillaWin::NotifyDoubleClick(Point pt, bool shift, bool ctrl, bool alt) 
 			  MAKELPARAM(pt.x, pt.y));
 }
 
+class CaseFolderUTF8 : public CaseFolderTable {
+	// Allocate the expandable storage here so that it does not need to be reallocated
+	// for each call to Fold.
+	std::vector<wchar_t> utf16Mixed;
+	std::vector<wchar_t> utf16Folded;
+public:
+	CaseFolderUTF8() {
+		StandardASCII();
+	}
+	virtual size_t Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) {
+		if ((lenMixed == 1) && (sizeFolded > 0)) {
+			folded[0] = mapping[static_cast<unsigned char>(mixed[0])];
+			return 1;
+		} else {
+			if (lenMixed > utf16Mixed.size()) {
+				utf16Mixed.resize(lenMixed + 8);
+			}
+			size_t nUtf16Mixed = ::MultiByteToWideChar(65001, 0, mixed, lenMixed,
+				&utf16Mixed[0], utf16Mixed.size());
+
+			if (nUtf16Mixed == 0) {
+				// Failed to convert -> bad UTF-8
+				folded[0] = '\0';
+				return 1;
+			}
+
+			if (nUtf16Mixed * 4 > utf16Folded.size()) {	// Maximum folding expansion factor of 4
+				utf16Folded.resize(nUtf16Mixed * 4 + 8);
+			}
+			int lenFlat = ::LCMapStringW(LOCALE_SYSTEM_DEFAULT,
+				LCMAP_LINGUISTIC_CASING | LCMAP_LOWERCASE,
+				&utf16Mixed[0], nUtf16Mixed, &utf16Folded[0], utf16Folded.size());
+
+			size_t lenOut = UTF8Length(&utf16Folded[0], lenFlat);
+			if (lenOut < sizeFolded) {
+				UTF8FromUTF16(&utf16Folded[0], lenFlat, folded, lenOut);
+				return lenOut;
+			} else {
+				return 0;
+			}
+		}
+	}
+};
+
+class CaseFolderDBCS : public CaseFolderTable {
+	// Allocate the expandable storage here so that it does not need to be reallocated
+	// for each call to Fold.
+	std::vector<wchar_t> utf16Mixed;
+	std::vector<wchar_t> utf16Folded;
+	UINT cp;
+public:
+	CaseFolderDBCS(UINT cp_) : cp(cp_) {
+		StandardASCII();
+	}
+	virtual size_t Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) {
+		if ((lenMixed == 1) && (sizeFolded > 0)) {
+			folded[0] = mapping[static_cast<unsigned char>(mixed[0])];
+			return 1;
+		} else {
+			if (lenMixed > utf16Mixed.size()) {
+				utf16Mixed.resize(lenMixed + 8);
+			}
+			size_t nUtf16Mixed = ::MultiByteToWideChar(cp, 0, mixed, lenMixed,
+				&utf16Mixed[0], utf16Mixed.size());
+
+			if (nUtf16Mixed == 0) {
+				// Failed to convert -> bad input
+				folded[0] = '\0';
+				return 1;
+			}
+
+			if (nUtf16Mixed * 4 > utf16Folded.size()) {	// Maximum folding expansion factor of 4
+				utf16Folded.resize(nUtf16Mixed * 4 + 8);
+			}
+			int lenFlat = ::LCMapStringW(LOCALE_SYSTEM_DEFAULT,
+				LCMAP_LINGUISTIC_CASING | LCMAP_LOWERCASE,
+				&utf16Mixed[0], nUtf16Mixed, &utf16Folded[0], utf16Folded.size());
+
+			size_t lenOut = ::WideCharToMultiByte(cp, 0,
+				&utf16Folded[0], lenFlat,
+				NULL, 0, NULL, 0);
+
+			if (lenOut < sizeFolded) {
+				::WideCharToMultiByte(cp, 0,
+					&utf16Folded[0], lenFlat,
+					folded, lenOut, NULL, 0);
+				return lenOut;
+			} else {
+				return 0;
+			}
+		}
+	}
+};
+
+CaseFolder *ScintillaWin::CaseFolderForEncoding() {
+	UINT cpDest = CodePageOfDocument();
+	if (cpDest == SC_CP_UTF8) {
+		return new CaseFolderUTF8();
+	} else {
+		if (pdoc->dbcsCodePage == 0) {
+			CaseFolderTable *pcf = new CaseFolderTable();
+			pcf->StandardASCII();
+			// Only for single byte encodings
+			UINT cpDoc = CodePageOfDocument();
+			for (int i=0x80; i<0x100; i++) {
+				char sCharacter[2] = "A";
+				sCharacter[0] = static_cast<char>(i);
+				wchar_t wCharacter[20];
+				unsigned int lengthUTF16 = ::MultiByteToWideChar(cpDoc, 0, sCharacter, 1,
+					wCharacter, sizeof(wCharacter)/sizeof(wCharacter[0]));
+				if (lengthUTF16 == 1) {
+					wchar_t wLower[20];
+					int charsConverted = ::LCMapStringW(LOCALE_SYSTEM_DEFAULT,
+						LCMAP_LINGUISTIC_CASING | LCMAP_LOWERCASE,
+						wCharacter, lengthUTF16, wLower, sizeof(wLower)/sizeof(wLower[0]));
+					char sCharacterLowered[20];
+					unsigned int lengthConverted = ::WideCharToMultiByte(cpDoc, 0,
+						wLower, charsConverted,
+						sCharacterLowered, sizeof(sCharacterLowered), NULL, 0);
+					if ((lengthConverted == 1) && (sCharacter[0] != sCharacterLowered[0])) {
+						pcf->SetTranslation(sCharacter[0], sCharacterLowered[0]);
+					}
+				}
+			}
+			return pcf;
+		} else {
+			return new CaseFolderDBCS(cpDest);
+		}
+	}
+}
+
+std::string ScintillaWin::CaseMapString(const std::string &s, int caseMapping) {
+	if (s.size() == 0)
+		return std::string();
+
+	if (caseMapping == cmSame)
+		return s;
+
+	UINT cpDoc = CodePageOfDocument();
+
+	unsigned int lengthUTF16 = ::MultiByteToWideChar(cpDoc, 0, s.c_str(), s.size(), NULL, 0);
+	if (lengthUTF16 == 0)	// Failed to convert
+		return s;
+
+	DWORD mapFlags = LCMAP_LINGUISTIC_CASING |
+		((caseMapping == cmUpper) ? LCMAP_UPPERCASE : LCMAP_LOWERCASE);
+
+	// Many conversions performed by search function are short so optimize this case.
+	enum { shortSize=20 };
+
+	if (s.size() > shortSize) {
+		// Use dynamic allocations for long strings
+
+		// Change text to UTF-16
+		std::vector<wchar_t> vwcText(lengthUTF16);
+		::MultiByteToWideChar(cpDoc, 0, s.c_str(), s.size(), &vwcText[0], lengthUTF16);
+
+		// Change case
+		int charsConverted = ::LCMapStringW(LOCALE_SYSTEM_DEFAULT, mapFlags,
+			&vwcText[0], lengthUTF16, NULL, 0);
+		std::vector<wchar_t> vwcConverted(charsConverted);
+		::LCMapStringW(LOCALE_SYSTEM_DEFAULT, mapFlags,
+			&vwcText[0], lengthUTF16, &vwcConverted[0], charsConverted);
+
+		// Change back to document encoding
+		unsigned int lengthConverted = ::WideCharToMultiByte(cpDoc, 0,
+			&vwcConverted[0], vwcConverted.size(),
+			NULL, 0, NULL, 0);
+		std::vector<char> vcConverted(lengthConverted);
+		::WideCharToMultiByte(cpDoc, 0,
+			&vwcConverted[0], vwcConverted.size(),
+			&vcConverted[0], vcConverted.size(), NULL, 0);
+
+		return std::string(&vcConverted[0], vcConverted.size());
+
+	} else {
+		// Use static allocations for short strings as much faster
+		// A factor of 15 for single character strings
+
+		// Change text to UTF-16
+		wchar_t vwcText[shortSize];
+		::MultiByteToWideChar(cpDoc, 0, s.c_str(), s.size(), vwcText, lengthUTF16);
+
+		// Change case
+		int charsConverted = ::LCMapStringW(LOCALE_SYSTEM_DEFAULT, mapFlags,
+			vwcText, lengthUTF16, NULL, 0);
+		// Full mapping may produce up to 3 characters per input character
+		wchar_t vwcConverted[shortSize*3];
+		::LCMapStringW(LOCALE_SYSTEM_DEFAULT, mapFlags, vwcText, lengthUTF16,
+			vwcConverted, charsConverted);
+
+		// Change back to document encoding
+		unsigned int lengthConverted = ::WideCharToMultiByte(cpDoc, 0,
+			vwcConverted, charsConverted,
+			NULL, 0, NULL, 0);
+		// Each UTF-16 code unit may need up to 3 bytes in UTF-8
+		char vcConverted[shortSize * 3 * 3];
+		::WideCharToMultiByte(cpDoc, 0,
+			vwcConverted, charsConverted,
+			vcConverted, lengthConverted, NULL, 0);
+
+		return std::string(vcConverted, lengthConverted);
+	}
+}
+
 void ScintillaWin::Copy() {
 	//Platform::DebugPrintf("Copy\n");
 	if (!sel.Empty()) {
@@ -1332,7 +1572,7 @@ public:
 	void SetClip(UINT uFormat) {
 		::SetClipboardData(uFormat, Unlock());
 	}
-	operator bool() {
+	operator bool() const {
 		return ptr != 0;
 	}
 	SIZE_T Size() {
@@ -1363,10 +1603,7 @@ void ScintillaWin::InsertPasteText(const char *text, int len, SelectionPosition 
 				SetEmptySelection(sel.MainCaret() + len);
 			}
 		} else {
-			selStart = SelectionPosition(InsertSpace(selStart.Position(), selStart.VirtualSpace()));
-			if (pdoc->InsertString(selStart.Position(), text, len)) {
-				SetEmptySelection(selStart.Position() + len);
-			}
+			InsertPaste(selStart, text, len);
 		}
 		delete []convertedText;
 	}
@@ -1378,7 +1615,9 @@ void ScintillaWin::Paste() {
 	UndoGroup ug(pdoc);
 	bool isLine = SelectionEmpty() && (::IsClipboardFormatAvailable(cfLineSelect) != 0);
 	ClearSelection();
-	SelectionPosition selStart = sel.Range(sel.Main()).Start();
+	SelectionPosition selStart = sel.IsRectangular() ?
+		sel.Rectangular().Start() :
+		sel.Range(sel.Main()).Start();
 	bool isRectangular = ::IsClipboardFormatAvailable(cfColumnSelect) != 0;
 
 	// Always use CF_UNICODETEXT if available
@@ -1397,8 +1636,7 @@ void ScintillaWin::Paste() {
 			} else {
 				// CF_UNICODETEXT available, but not in Unicode mode
 				// Convert from Unicode to current Scintilla code page
-				UINT cpDest = CodePageFromCharSet(
-					vs.styles[STYLE_DEFAULT].characterSet, pdoc->dbcsCodePage);
+				UINT cpDest = CodePageOfDocument();
 				len = ::WideCharToMultiByte(cpDest, 0, uptr, -1,
 				                            NULL, 0, NULL, NULL) - 1; // subtract 0 terminator
 				putf = new char[len + 1];
@@ -1455,7 +1693,6 @@ void ScintillaWin::Paste() {
 }
 
 void ScintillaWin::CreateCallTipWindow(PRectangle) {
-#ifdef TOTAL_CONTROL
 	if (!ct.wCallTip.Created()) {
 		ct.wCallTip = ::CreateWindow(callClassName, TEXT("ACallTip"),
 					     WS_POPUP, 100, 100, 150, 20,
@@ -1464,11 +1701,9 @@ void ScintillaWin::CreateCallTipWindow(PRectangle) {
 					     this);
 		ct.wDraw = ct.wCallTip;
 	}
-#endif
 }
 
 void ScintillaWin::AddToPopUp(const char *label, int cmd, bool enabled) {
-#ifdef TOTAL_CONTROL
 	HMENU hmenuPopup = reinterpret_cast<HMENU>(popup.GetID());
 	if (!label[0])
 		::AppendMenuA(hmenuPopup, MF_SEPARATOR, 0, "");
@@ -1476,41 +1711,11 @@ void ScintillaWin::AddToPopUp(const char *label, int cmd, bool enabled) {
 		::AppendMenuA(hmenuPopup, MF_STRING, cmd, label);
 	else
 		::AppendMenuA(hmenuPopup, MF_STRING | MF_DISABLED | MF_GRAYED, cmd, label);
-#endif
 }
 
 void ScintillaWin::ClaimSelection() {
 	// Windows does not have a primary selection
 }
-
-#ifdef SCI_LEXER
-
-/*
-
-  Initial Windows-Only implementation of the external lexer
-  system in ScintillaWin class. Intention is to create a LexerModule
-  subclass (?) to have lex and fold methods which will call out to their
-  relevant DLLs...
-
-*/
-
-void ScintillaWin::SetLexer(uptr_t wParam) {
-	lexLanguage = wParam;
-	lexCurrent = LexerModule::Find(lexLanguage);
-	if (!lexCurrent)
-		lexCurrent = LexerModule::Find(SCLEX_NULL);
-}
-
-void ScintillaWin::SetLexerLanguage(const char *languageName) {
-	lexLanguage = SCLEX_CONTAINER;
-	lexCurrent = LexerModule::Find(languageName);
-	if (!lexCurrent)
-		lexCurrent = LexerModule::Find(SCLEX_NULL);
-	if (lexCurrent)
-		lexLanguage = lexCurrent->GetLanguage();
-}
-
-#endif
 
 /// Implement IUnknown
 
@@ -1575,14 +1780,14 @@ STDMETHODIMP FormatEnumerator_Clone(FormatEnumerator *fe, IEnumFORMATETC **ppenu
 	                                       reinterpret_cast<void **>(ppenum));
 }
 
-static void *vtFormatEnumerator[] = {
-	(void *)(FormatEnumerator_QueryInterface),
-	(void *)(FormatEnumerator_AddRef),
-	(void *)(FormatEnumerator_Release),
-	(void *)(FormatEnumerator_Next),
-	(void *)(FormatEnumerator_Skip),
-	(void *)(FormatEnumerator_Reset),
-	(void *)(FormatEnumerator_Clone)
+static VFunction *vtFormatEnumerator[] = {
+	(VFunction *)(FormatEnumerator_QueryInterface),
+	(VFunction *)(FormatEnumerator_AddRef),
+	(VFunction *)(FormatEnumerator_Release),
+	(VFunction *)(FormatEnumerator_Next),
+	(VFunction *)(FormatEnumerator_Skip),
+	(VFunction *)(FormatEnumerator_Reset),
+	(VFunction *)(FormatEnumerator_Clone)
 };
 
 FormatEnumerator::FormatEnumerator(int pos_, CLIPFORMAT formats_[], int formatsLen_) {
@@ -1590,7 +1795,7 @@ FormatEnumerator::FormatEnumerator(int pos_, CLIPFORMAT formats_[], int formatsL
 	ref = 0;   // First QI adds first reference...
 	pos = pos_;
 	formatsLen = formatsLen_;
-	for (int i=0;i<formatsLen;i++)
+	for (int i=0; i<formatsLen; i++)
 		formats[i] = formats_[i];
 }
 
@@ -1618,12 +1823,12 @@ STDMETHODIMP DropSource_GiveFeedback(DropSource *, DWORD) {
 	return DRAGDROP_S_USEDEFAULTCURSORS;
 }
 
-static void *vtDropSource[] = {
-	(void *)(DropSource_QueryInterface),
-	(void *)(DropSource_AddRef),
-	(void *)(DropSource_Release),
-	(void *)(DropSource_QueryContinueDrag),
-	(void *)(DropSource_GiveFeedback)
+static VFunction *vtDropSource[] = {
+	(VFunction *)(DropSource_QueryInterface),
+	(VFunction *)(DropSource_AddRef),
+	(VFunction *)(DropSource_Release),
+	(VFunction *)(DropSource_QueryContinueDrag),
+	(VFunction *)(DropSource_GiveFeedback)
 };
 
 DropSource::DropSource() {
@@ -1713,7 +1918,7 @@ STDMETHODIMP DataObject_EnumFormatEtc(DataObject *pd, DWORD dwDirection, IEnumFO
 		}
 		return FormatEnumerator_QueryInterface(pfe, IID_IEnumFORMATETC,
 											   reinterpret_cast<void **>(ppEnum));
-	} catch (std::bad_alloc&) {
+	} catch (std::bad_alloc &) {
 		pd->sci->errorStatus = SC_STATUS_BADALLOC;
 		return E_OUTOFMEMORY;
 	} catch (...) {
@@ -1737,19 +1942,19 @@ STDMETHODIMP DataObject_EnumDAdvise(DataObject *, IEnumSTATDATA **) {
 	return E_FAIL;
 }
 
-static void *vtDataObject[] = {
-	(void *)(DataObject_QueryInterface),
-	(void *)(DataObject_AddRef),
-	(void *)(DataObject_Release),
-	(void *)(DataObject_GetData),
-	(void *)(DataObject_GetDataHere),
-	(void *)(DataObject_QueryGetData),
-	(void *)(DataObject_GetCanonicalFormatEtc),
-	(void *)(DataObject_SetData),
-	(void *)(DataObject_EnumFormatEtc),
-	(void *)(DataObject_DAdvise),
-	(void *)(DataObject_DUnadvise),
-	(void *)(DataObject_EnumDAdvise)
+static VFunction *vtDataObject[] = {
+	(VFunction *)(DataObject_QueryInterface),
+	(VFunction *)(DataObject_AddRef),
+	(VFunction *)(DataObject_Release),
+	(VFunction *)(DataObject_GetData),
+	(VFunction *)(DataObject_GetDataHere),
+	(VFunction *)(DataObject_QueryGetData),
+	(VFunction *)(DataObject_GetCanonicalFormatEtc),
+	(VFunction *)(DataObject_SetData),
+	(VFunction *)(DataObject_EnumFormatEtc),
+	(VFunction *)(DataObject_DAdvise),
+	(VFunction *)(DataObject_DUnadvise),
+	(VFunction *)(DataObject_EnumDAdvise)
 };
 
 DataObject::DataObject() {
@@ -1805,14 +2010,14 @@ STDMETHODIMP DropTarget_Drop(DropTarget *dt, LPDATAOBJECT pIDataSource, DWORD gr
 	return E_FAIL;
 }
 
-static void *vtDropTarget[] = {
-	(void *)(DropTarget_QueryInterface),
-	(void *)(DropTarget_AddRef),
-	(void *)(DropTarget_Release),
-	(void *)(DropTarget_DragEnter),
-	(void *)(DropTarget_DragOver),
-	(void *)(DropTarget_DragLeave),
-	(void *)(DropTarget_Drop)
+static VFunction *vtDropTarget[] = {
+	(VFunction *)(DropTarget_QueryInterface),
+	(VFunction *)(DropTarget_AddRef),
+	(VFunction *)(DropTarget_Release),
+	(VFunction *)(DropTarget_DragEnter),
+	(VFunction *)(DropTarget_DragOver),
+	(VFunction *)(DropTarget_DragLeave),
+	(VFunction *)(DropTarget_Drop)
 };
 
 DropTarget::DropTarget() {
@@ -1843,7 +2048,7 @@ void ScintillaWin::ImeStartComposition() {
 			// Since the style creation code has been made platform independent,
 			// The logfont for the IME is recreated here.
 			int styleHere = (pdoc->StyleAt(sel.MainCaret())) & 31;
-			LOGFONTA lf = {0,0,0,0,0,0,0,0,0,0,0,0,0, ""};
+			LOGFONTA lf = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ""};
 			int sizeZoomed = vs.styles[styleHere].size + vs.zoomLevel;
 			if (sizeZoomed <= 2)	// Hangs if sizeZoomed <= 1
 				sizeZoomed = 2;
@@ -1879,7 +2084,7 @@ void ScintillaWin::AddCharBytes(char b0, char b1) {
 
 	int inputCodePage = InputCodePage();
 	if (inputCodePage && IsUnicodeMode()) {
-		char utfval[4]="\0\0\0";
+		char utfval[4] = "\0\0\0";
 		char ansiChars[3];
 		wchar_t wcs[2];
 		if (b0) {	// Two bytes from IME
@@ -1914,7 +2119,7 @@ void ScintillaWin::GetIntelliMouseParameters() {
 
 void ScintillaWin::CopyToClipboard(const SelectionText &selectedText) {
 	if (!::OpenClipboard(MainHWND()))
-		return ;
+		return;
 	::EmptyClipboard();
 
 	GlobalMemory uniText;
@@ -1931,10 +2136,11 @@ void ScintillaWin::CopyToClipboard(const SelectionText &selectedText) {
 		// Convert to Unicode using the current Scintilla code page
 		UINT cpSrc = CodePageFromCharSet(
 					selectedText.characterSet, selectedText.codePage);
-		uniText.Allocate(2 * selectedText.len);
+		int uLen = ::MultiByteToWideChar(cpSrc, 0, selectedText.s, selectedText.len, 0, 0);
+		uniText.Allocate(2 * uLen);
 		if (uniText) {
 			::MultiByteToWideChar(cpSrc, 0, selectedText.s, selectedText.len,
-				static_cast<wchar_t *>(uniText.ptr), selectedText.len);
+				static_cast<wchar_t *>(uniText.ptr), uLen);
 		}
 	}
 
@@ -2206,7 +2412,7 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
 
 		SetDragPosition(SelectionPosition(invalidPosition));
 
-		STGMEDIUM medium={0,{0},0};
+		STGMEDIUM medium = {0, {0}, 0};
 
 		char *data = 0;
 		bool dataAllocated = false;
@@ -2228,8 +2434,7 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
 				// Default Scintilla behavior in Unicode mode
 				// CF_UNICODETEXT available, but not in Unicode mode
 				// Convert from Unicode to current Scintilla code page
-				UINT cpDest = CodePageFromCharSet(
-					vs.styles[STYLE_DEFAULT].characterSet, pdoc->dbcsCodePage);
+				UINT cpDest = CodePageOfDocument();
 				int tlen = ::WideCharToMultiByte(cpDest, 0, udata, -1,
 					NULL, 0, NULL, NULL) - 1; // subtract 0 terminator
 				data = new char[tlen + 1];
@@ -2246,6 +2451,16 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
 			if (SUCCEEDED(hr) && medium.hGlobal) {
 				data = static_cast<char *>(::GlobalLock(medium.hGlobal));
 			}
+		}
+
+		if (data && convertPastes) {
+			// Convert line endings of the drop into our local line-endings mode
+			int len = strlen(data);
+			char *convertedText = Document::TransformLineEnds(&len, data, len, pdoc->eolMode);
+			if (dataAllocated)
+				delete []data;
+			data = convertedText;
+			dataAllocated = true;
 		}
 
 		if (!data) {
@@ -2388,7 +2603,7 @@ bool ScintillaWin::Unregister() {
 bool ScintillaWin::HasCaretSizeChanged() {
 	if (
 		( (0 != vs.caretWidth) && (sysCaretWidth != vs.caretWidth) )
-		|| (0 != vs.lineHeight) && (sysCaretHeight != vs.lineHeight)
+		|| ((0 != vs.lineHeight) && (sysCaretHeight != vs.lineHeight))
 		) {
 		return true;
 	}
@@ -2489,7 +2704,7 @@ sptr_t PASCAL ScintillaWin::CTWndProc(
 				sciThis->CallTipClick();
 				return 0;
 			} else if (iMessage == WM_SETCURSOR) {
-				::SetCursor(::LoadCursor(NULL,IDC_ARROW));
+				::SetCursor(::LoadCursor(NULL, IDC_ARROW));
 				return 0;
 			} else if (iMessage == WM_NCHITTEST) {
 				return HTCAPTION;
@@ -2553,7 +2768,7 @@ sptr_t PASCAL ScintillaWin::SWndProc(
 
 // This function is externally visible so it can be called from container when building statically.
 // Must be called once only.
-bool Scintilla_RegisterClasses(void *hInstance) {
+int Scintilla_RegisterClasses(void *hInstance) {
 	Platform_Initialise(hInstance);
 	bool result = ScintillaWin::Register(reinterpret_cast<HINSTANCE>(hInstance));
 #ifdef SCI_LEXER
@@ -2563,7 +2778,7 @@ bool Scintilla_RegisterClasses(void *hInstance) {
 }
 
 // This function is externally visible so it can be called from container when building statically.
-bool Scintilla_ReleaseResources() {
+int Scintilla_ReleaseResources() {
 	bool result = ScintillaWin::Unregister();
 	Platform_Finalise();
 	return result;

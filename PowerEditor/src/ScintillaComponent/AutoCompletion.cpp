@@ -19,7 +19,6 @@
 #include "ScintillaComponent/AutoCompletion.h"
 #include "ScintillaComponent/FunctionCallTip.h"
 #include "ScintillaComponent/ScintillaEditView.h"
-#include "TinyXML/tinyxml.h"
 #include "ScintillaComponent/Buffer.h"
 #include "Parameters.h"
 
@@ -36,7 +35,7 @@ static bool isInList(generic_string word, const std::vector<generic_string> & wo
 };
 
 AutoCompletion::AutoCompletion(ScintillaEditView * pEditView) :
-	_funcCompletionActive(false), _pEditView(pEditView), _curLang(L_TXT),
+	_funcCompletionActive(false), _pEditView(pEditView), _curLang(L_TEXT),
 	_XmlFile(NULL), _pXmlKeyword(NULL), _activeCompletion(CompletionNone),
 	_ignoreCase(true), _keyWords(TEXT("")), _funcCalltip(new FunctionCallTip(pEditView))
 {
@@ -115,7 +114,7 @@ bool AutoCompletion::showWordComplete(bool autoInsert)
 
 	_pEditView->execute(SCI_SETSEARCHFLAGS, flags);
 	std::vector<generic_string> wordArray;
-	int posFind = _pEditView->searchInTarget(expr.c_str(), 0, docLength);
+	int posFind = _pEditView->searchInTarget(expr.c_str(), expr.length(), 0, docLength);
 
 	while (posFind != -1)
 	{
@@ -133,7 +132,7 @@ bool AutoCompletion::showWordComplete(bool autoInsert)
 				if (!isInList(w, wordArray))
 					wordArray.push_back(w);
 		}
-		posFind = _pEditView->searchInTarget(expr.c_str(), wordEnd, docLength);
+		posFind = _pEditView->searchInTarget(expr.c_str(), expr.length(), wordEnd, docLength);
 	}
 	if (wordArray.size() == 0) return false;
 
@@ -333,7 +332,7 @@ const TCHAR * AutoCompletion::getApiFileName() {
 		return NppParameters::getInstance()->getELCFromIndex(_curLang - L_EXTERNAL)._name;
 
 	if (_curLang > L_EXTERNAL)
-        _curLang = L_TXT;
+        _curLang = L_TEXT;
 
 	return ScintillaEditView::langNames[_curLang].lexerName;
 

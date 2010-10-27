@@ -219,8 +219,9 @@ TCHAR * FileDialog::doOpenSingleFileDlg()
 			::GetCurrentDirectory(MAX_PATH, dir);
 			params->setWorkingDir(dir);
 		}
-	}
-	catch(...) {
+	} catch(std::exception e) {
+		::MessageBoxA(NULL, e.what(), "Exception", MB_OK);
+	} catch(...) {
 		::MessageBox(NULL, TEXT("GetSaveFileName crashes!!!"), TEXT(""), MB_OK);
 	}
 
@@ -298,8 +299,9 @@ TCHAR * FileDialog::doSaveDlg()
 			::GetCurrentDirectory(MAX_PATH, dir);
 			params->setWorkingDir(dir);
 		}
-	}
-	catch(...) {
+	} catch(std::exception e) {
+		::MessageBoxA(NULL, e.what(), "Exception", MB_OK);
+	} catch(...) {
 		::MessageBox(NULL, TEXT("GetSaveFileName crashes!!!"), TEXT(""), MB_OK);
 	}
 
@@ -325,9 +327,14 @@ static BOOL CALLBACK fileDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 					HWND fnControl = ::GetDlgItem(hwnd, FileDialog::_dialogFileBoxId);
 					TCHAR fn[MAX_PATH];
 					::GetWindowText(fnControl, fn, MAX_PATH);
-					if (*fn == '\0')
-						return oldProc(hwnd, message, wParam, lParam);
 
+					// Check condition to have the compability of default behaviour
+					if (*fn == '\0' || ::PathIsDirectory(fn))
+					{
+						return oldProc(hwnd, message, wParam, lParam);
+					}
+
+					// Process
 					if (currentExt != TEXT(""))
 					{
 						generic_string fnExt = changeExt(fn, currentExt, false);

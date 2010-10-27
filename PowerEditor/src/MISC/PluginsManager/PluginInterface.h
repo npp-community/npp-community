@@ -27,6 +27,11 @@ const int nbChar = 64;
 typedef const TCHAR * (__cdecl * PFUNCGETNAME)();
 
 struct NppData {
+	NppData() :
+		_nppHandle(NULL),
+		_scintillaMainHandle(NULL),
+		_scintillaSecondHandle(NULL)
+	{}
 	HWND _nppHandle;
 	HWND _scintillaMainHandle;
 	HWND _scintillaSecondHandle;

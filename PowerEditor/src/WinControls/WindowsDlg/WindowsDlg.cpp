@@ -17,8 +17,6 @@
 
 #include "precompiled_headers.h"
 
-#include "TinyXML/tinyXmlA/tinystrA.h"
-
 #include "WinControls/WindowsDlg/WindowsDlg.h"
 #include "WinControls/WindowsDlg/WindowsDlgRc.h"
 #include "ScintillaComponent/DocTabView.h"

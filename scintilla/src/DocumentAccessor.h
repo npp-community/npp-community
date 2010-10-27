@@ -22,9 +22,9 @@ class Document;
 
 class DocumentAccessor : public Accessor {
 	// Private so DocumentAccessor objects can not be copied
-	DocumentAccessor(const DocumentAccessor &source) : Accessor(), props(source.props) {}
+	DocumentAccessor(const DocumentAccessor &source);
 	// NPPSTART Joce 08/09/09 LintCleanup
-	const DocumentAccessor &operator=(const DocumentAccessor &) { return *this; }
+	const DocumentAccessor &operator=(const DocumentAccessor &);
 	// NPPEND
 
 protected:
@@ -70,7 +70,7 @@ public:
 	WindowID GetWindow() { return id; }
 
 	void StartAt(unsigned int start, char chMask=31);
-	void SetFlags(char chFlags_, char chWhile_) {chFlags = chFlags_; chWhile = chWhile_; };
+	void SetFlags(char chFlags_, char chWhile_) {chFlags = chFlags_; chWhile = chWhile_; }
 	unsigned int GetStartSegment() { return startSeg; }
 	void StartSegment(unsigned int pos);
 	void ColourTo(unsigned int pos, int chAttr);
