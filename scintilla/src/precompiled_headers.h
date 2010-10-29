@@ -84,5 +84,13 @@
 #include "StyleContext.h"
 #include "WordList.h"
 
+// Google Test
+#ifndef SHIPPING
+	// Sadly, Google Test compiles at /W3 and has /W4 warnings for now.
+	#pragma warning (push, 3)
+	#include "gtest/gtest.h"
+	#pragma warning (pop)
+#endif
+
 #endif // PRECOMPILED_HEADERS_H
 
