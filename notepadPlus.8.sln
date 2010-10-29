@@ -25,8 +25,8 @@ Global
 		{B1BDB077-3ED7-4C69-9A22-5A65E08C201C}.Debug|Win32.Build.0 = Debug|Win32
 		{B1BDB077-3ED7-4C69-9A22-5A65E08C201C}.Release|Win32.ActiveCfg = Release|Win32
 		{B1BDB077-3ED7-4C69-9A22-5A65E08C201C}.Release|Win32.Build.0 = Release|Win32
-		{B1BDB077-3ED7-4C69-9A22-5A65E08C201C}.Shipping|Win32.ActiveCfg = Release|Win32
-		{B1BDB077-3ED7-4C69-9A22-5A65E08C201C}.Shipping|Win32.Build.0 = Release|Win32
+		{B1BDB077-3ED7-4C69-9A22-5A65E08C201C}.Shipping|Win32.ActiveCfg = Shipping|Win32
+		{B1BDB077-3ED7-4C69-9A22-5A65E08C201C}.Shipping|Win32.Build.0 = Shipping|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
