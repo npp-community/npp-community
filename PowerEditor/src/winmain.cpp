@@ -32,6 +32,7 @@
 typedef std::vector<const TCHAR*> ParamVector;
 
 bool checkSingleFile(const TCHAR * commandLine) {
+	func_guard(guardWinMain);
 	TCHAR fullpath[MAX_PATH];
 	::GetFullPathName(commandLine, MAX_PATH, fullpath, NULL);
 	if (::PathFileExists(fullpath)) {
@@ -43,6 +44,7 @@ bool checkSingleFile(const TCHAR * commandLine) {
 
 //commandLine should contain path to n++ executable running
 void parseCommandLine(TCHAR * commandLine, ParamVector & paramVector) {
+	func_guard(guardWinMain);
 	//params.erase(params.begin());
 	//remove the first element, since thats the path the the executable (GetCommandLine does that)
 	TCHAR stopChar = TEXT(' ');
@@ -106,6 +108,7 @@ void parseCommandLine(TCHAR * commandLine, ParamVector & paramVector) {
 
 bool isInList(const TCHAR *token2Find, ParamVector & params) {
 	int nrItems = params.size();
+	func_guard(guardWinMain);
 
 	for (int i = 0; i < nrItems; i++)
 	{
@@ -120,6 +123,7 @@ bool isInList(const TCHAR *token2Find, ParamVector & params) {
 bool getParamVal(TCHAR c, ParamVector & params, generic_string & value) {
 	value = TEXT("");
 	int nrItems = params.size();
+	func_guard(guardWinMain);
 
 	for (int i = 0; i < nrItems; i++)
 	{
@@ -134,6 +138,7 @@ bool getParamVal(TCHAR c, ParamVector & params, generic_string & value) {
 }
 
 LangType getLangTypeFromParam(ParamVector & params) {
+	func_guard(guardWinMain);
 	generic_string langStr;
 	if (!getParamVal('l', params, langStr))
 		return L_EXTERNAL;
@@ -141,6 +146,7 @@ LangType getLangTypeFromParam(ParamVector & params) {
 };
 
 int getNumberFromParam(char paramName, ParamVector & params, bool & isParamePresent) {
+	func_guard(guardWinMain);
 	generic_string numStr;
 	if (!getParamVal(paramName, params, numStr))
 	{
@@ -218,6 +224,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 		return RUN_ALL_TESTS();
 	}
 #endif
+
+	func_guard(guardWinMain); // added after GTest check to not interfere with tests.
 
 	MiniDumper mdump;	//for debugging purposes.
 
@@ -448,6 +456,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR /*cmdLineAnsi*/, int /*
 }
 
 void doException(Notepad_plus_Window & notepad_plus_plus) {
+	func_guard(guardWinMain);
 	Win32Exception::removeHandler();	//disable exception handler after excpetion, we dont want corrupt data structurs to crash the exception handler
 	::MessageBox(Notepad_plus_Window::gNppHWND, TEXT("Notepad++ will attempt to save any unsaved data. However, dataloss is very likely."), TEXT("Recovery initiating"), MB_OK | MB_ICONINFORMATION);
 

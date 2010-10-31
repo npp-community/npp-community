@@ -23,6 +23,8 @@ Thumbs.db
 [Bb]in
 [Dd]ebug*/
 !PowerEditor/src/MISC/Debug/
+!scintilla/src/MISC/Debug/
+!common/MISC/Debug/
 *.lib
 *.sbr
 obj/
