@@ -94,6 +94,9 @@
 // Power Editor
 #include "MISC/Common/CommonGenerics.h"
 #include "MISC/Debug/npp_debug.h"
+#ifndef SHIPPING
+	#include "MISC/Debug/FuncGuardsImport.h"
+#endif
 #include "MISC/Common/Common.h"
 
 #endif // PRECOMPILED_HEADERS_H

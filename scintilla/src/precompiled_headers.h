@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 
+#include <tchar.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -65,6 +66,13 @@
 
 #include <zmouse.h>
 #include <ole2.h>
+
+// NPPCR
+#include "MISC/Common/CommonGenerics.h"
+#include "MISC/Debug/npp_debug.h"
+#ifndef SHIPPING
+	#include "MISC/Debug/FuncGuardsImport.h"
+#endif
 
 // Scintilla specific
 #include "ILexer.h"

@@ -27,7 +27,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				Description="Notepad++ CR Scintilla Version Generation"
-				CommandLine="CALL &quot;$(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat&quot; &quot;$(IntDir)\&quot; &quot;$(SolutionDir)scintilla\src\gen-versioninfo.h&quot;"
+				CommandLine="CALL &quot;$(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat&quot; &quot;$(IntDir)\&quot; &quot;$(SolutionDir)scintilla\src\gen-versioninfo.h&quot;&#x0D;&#x0A;IF NOT EXIST &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards.h&quot; copy &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards_skel.h&quot; &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards.h&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -50,7 +50,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\src;..\lexlib"
+				AdditionalIncludeDirectories="..\..\common;..\include;..\src;..\lexlib"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;SCILEXER7_EXPORTS;SCI_LEXER;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -134,7 +134,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				Description="Notepad++ CR Scintilla Version Generation"
-				CommandLine="CALL $(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat &quot;$(IntDir)\&quot; &quot;$(SolutionDir)scintilla\src\gen-versioninfo.h&quot;"
+				CommandLine="CALL $(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat &quot;$(IntDir)\&quot; &quot;$(SolutionDir)scintilla\src\gen-versioninfo.h&quot;&#x0D;&#x0A;IF NOT EXIST &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards.h&quot; copy &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards_skel.h&quot; &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards.h&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -159,7 +159,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\include;..\src;..\lexlib"
+				AdditionalIncludeDirectories="..\..\common;..\include;..\src;..\lexlib"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SCILEXER7_EXPORTS;SCI_LEXER;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -230,7 +230,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /Y $(TargetPath) ..\..\PowerEditor\bin&#x0D;&#x0A;SETLOCAL&#x0D;&#x0A;set PATH=%PATH%;%ENV_LIB_PATHS%;%SM_LIB_PATHS%&#x0D;&#x0A;gtest_runner.exe &quot;$(TargetPath)&quot;"
+				CommandLine="xcopy /Y $(TargetPath) ..\..\PowerEditor\bin&#x0D;&#x0A;SETLOCAL&#x0D;&#x0A;set PATH=%PATH%;%ENV_LIB_PATHS%;%SM_LIB_PATHS%&#x0D;&#x0A;gtest_runner.exe &quot;$(TargetPath)&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -271,7 +271,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\include;..\src;..\lexlib"
+				AdditionalIncludeDirectories="..\..\common;..\include;..\src;..\lexlib"
 				PreprocessorDefinitions="WIN32;NDEBUG;SHIPPING;_WINDOWS;_USRDLL;SCILEXER7_EXPORTS;SCI_LEXER;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -875,6 +875,37 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="MISC"
+				>
+				<Filter
+					Name="Debug"
+					>
+					<File
+						RelativePath="..\src\MISC\Debug\FuncGuards.cpp"
+						>
+						<FileConfiguration
+							Name="Shipping|Win32"
+							ExcludedFromBuild="true"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\common\MISC\Debug\npp_debug.cpp"
+						>
+						<FileConfiguration
+							Name="Shipping|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+							/>
+						</FileConfiguration>
+					</File>
+				</Filter>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"
@@ -1150,6 +1181,38 @@
 				RelativePath="..\tests\testCharClassify.cpp"
 				>
 			</File>
+			</Filter>
+			<Filter
+				Name="MISC"
+				>
+				<Filter
+					Name="Common"
+					>
+					<File
+						RelativePath="..\..\common\MISC\Common\CommonGenerics.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Debug"
+					>
+					<File
+						RelativePath="..\src\MISC\Debug\FuncGuards.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\MISC\Debug\FuncGuards_skel.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\MISC\Debug\FuncGuardsImport.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\common\MISC\Debug\npp_debug.h"
+						>
+					</File>
+				</Filter>
 		</Filter>
 	</Files>
 	<Globals>

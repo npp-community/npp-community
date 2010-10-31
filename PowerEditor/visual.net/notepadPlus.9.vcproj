@@ -27,7 +27,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				Description="Runtime build and version generation."
-				CommandLine="CALL &quot;$(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat&quot; &quot;$(IntDir)\&quot; &quot;$(SolutionDir)PowerEditor\src\gen-versioninfo.h&quot;"
+				CommandLine="CALL &quot;$(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat&quot; &quot;$(IntDir)\&quot; &quot;$(SolutionDir)PowerEditor\src\gen-versioninfo.h&quot;&#x0D;&#x0A;IF NOT EXIST &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards.h&quot; copy &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards_skel.h&quot; &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards.h&quot;&#x0D;&#x0A;"
 				ExcludedFromBuild="false"
 			/>
 			<Tool
@@ -45,7 +45,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\scintilla\include;..\src"
+				AdditionalIncludeDirectories="..\..\common;..\..\scintilla\include;..\src"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;TIXML_USE_STL;TIXMLA_USE_STL"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
@@ -126,7 +126,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				Description="Runtime build and version generation."
-				CommandLine="CALL $(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat &quot;$(IntDir)\&quot; &quot;$(SolutionDir)PowerEditor\src\gen-versioninfo.h&quot;"
+				CommandLine="CALL $(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat &quot;$(IntDir)\&quot; &quot;$(SolutionDir)PowerEditor\src\gen-versioninfo.h&quot;&#x0D;&#x0A;IF NOT EXIST &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards.h&quot; copy &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards_skel.h&quot; &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards.h&quot;&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -146,7 +146,7 @@
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\..\scintilla\include;..\src"
+				AdditionalIncludeDirectories="..\..\common;..\..\scintilla\include;..\src"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;TIXMLA_USE_STL"
 				StringPooling="true"
 				ExceptionHandling="2"
@@ -243,7 +243,7 @@
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\..\scintilla\include;..\src"
+				AdditionalIncludeDirectories="..\..\common;..\..\scintilla\include;..\src"
 				PreprocessorDefinitions="WIN32;NDEBUG;SHIPPING;_WINDOWS;TIXML_USE_STL;TIXMLA_USE_STL"
 				StringPooling="true"
 				ExceptionHandling="2"
@@ -436,7 +436,7 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\MISC\Common\CommonGenerics.h"
+						RelativePath="..\..\common\MISC\Common\CommonGenerics.h"
 						>
 					</File>
 					<File
@@ -460,7 +460,19 @@
 					Name="Debug"
 					>
 					<File
-						RelativePath="..\src\MISC\Debug\npp_debug.h"
+						RelativePath="..\src\MISC\Debug\FuncGuards.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\MISC\Debug\FuncGuards_skel.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\MISC\Debug\FuncGuardsImport.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\common\MISC\Debug\npp_debug.h"
 						>
 					</File>
 				</Filter>
@@ -1463,7 +1475,19 @@
 					Name="Debug"
 					>
 					<File
-						RelativePath="..\src\MISC\Debug\npp_debug.cpp"
+						RelativePath="..\src\MISC\Debug\FuncGuards.cpp"
+						>
+						<FileConfiguration
+							Name="Shipping|Win32"
+							ExcludedFromBuild="true"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\common\MISC\Debug\npp_debug.cpp"
 						>
 					</File>
 				</Filter>
