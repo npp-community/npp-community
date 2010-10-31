@@ -22,6 +22,7 @@
 
 #include "WinControls/AboutDlg/AboutDlg.h"
 #include "WinControls/ColourPicker/WordStyleDlg.h"
+#include "WinControls/ContextMenu/ExplorerContextMenu.h"
 #include "WinControls/Grid/ShortcutMapper.h"
 #include "WinControls/ImageListSet/ImageListSet.h"
 #include "WinControls/Preference/preferenceDlg.h"
@@ -2008,6 +2009,7 @@ void Notepad_plus::command(int id)
 		break;
 
 		default :
+		{
 			if (id > IDM_FILEMENU_LASTONE && id < (IDM_FILEMENU_LASTONE + _lastRecentFileList->getMaxNbLRF() + 1))
 			{
 				BufferID lastOpened = doOpen(_lastRecentFileList->getItem(id).c_str());
@@ -2060,6 +2062,14 @@ void Notepad_plus::command(int id)
 			{
 				activateDoc(id-IDM_WINDOW_MRU_FIRST);
 			}
+			else if (id >= IDM_MIN_EXPLORER_CONTEXT_MENU_ID && id <= IDM_MAX_EXPLORER_CONTEXT_MENU_ID)
+			{
+				if (_explorerContextMenu)
+				{
+					_explorerContextMenu->InvokeCommand(id);
+				}
+			}
+		}
 	}
 
 	if (_recordingMacro)

@@ -711,6 +711,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\WinControls\ContextMenu\ExplorerContextMenu.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\WinControls\OpenSaveFileDialog\FileDialog.cpp"
 					>
 				</File>
@@ -1149,6 +1153,10 @@
 				</File>
 				<File
 					RelativePath="..\src\WinControls\DockingWnd\DockingSplitter.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\WinControls\ContextMenu\ExplorerContextMenu.h"
 					>
 				</File>
 				<File

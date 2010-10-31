@@ -2862,6 +2862,22 @@ void NppParameters::feedGUIParameters(TiXmlNode *node)
 			}
 		}
 
+		else if (!lstrcmp(nm, TEXT("EnableExplorerMenuOnTabs")))
+		{
+			TiXmlNode *n = childNode->FirstChild();
+			if (n)
+			{
+				val = n->Value();
+				if (val)
+				{
+					if (!lstrcmp(val, TEXT("yes")))
+						_nppGUI._enableExplorerMenuOnTabs = true;
+					else
+						_nppGUI._enableExplorerMenuOnTabs = false;
+				}
+			}
+		}
+
 		else if (!lstrcmp(nm, TEXT("TagsMatchHighLight")))
 		{
 			TiXmlNode *n = childNode->FirstChild();
@@ -3730,6 +3746,7 @@ bool NppParameters::writeGUIParams()
 	bool smartHighLightExist = false;
 	bool tagsMatchHighLightExist = false;
 	bool mouseWheelZoomExist = false;
+	bool explorerMenuOnTabsExist = false;
 	bool caretExist = false;
     bool ScintillaGlobalSettingsExist = false;
 	bool openSaveDirExist = false;
@@ -3916,6 +3933,16 @@ bool NppParameters::writeGUIParams()
 		{
 			mouseWheelZoomExist = true;
 			const TCHAR *pStr = _nppGUI._enableMouseWheelZoom?TEXT("yes"):TEXT("no");
+			TiXmlNode *n = childNode->FirstChild();
+			if (n)
+				n->SetValue(pStr);
+			else
+				childNode->InsertEndChild(TiXmlText(pStr));
+		}
+		else if (!lstrcmp(nm, TEXT("EnableExplorerMenuOnTabs")))
+		{
+			explorerMenuOnTabsExist = true;
+			const TCHAR *pStr = _nppGUI._enableExplorerMenuOnTabs?TEXT("yes"):TEXT("no");
 			TiXmlNode *n = childNode->FirstChild();
 			if (n)
 				n->SetValue(pStr);
@@ -4147,6 +4174,10 @@ bool NppParameters::writeGUIParams()
 	if (!mouseWheelZoomExist)
 	{
 		insertGUIConfigBoolNode(GUIRoot, TEXT("EnableWheelZoom"), _nppGUI._enableMouseWheelZoom);
+	}
+	if (!explorerMenuOnTabsExist)
+	{
+		insertGUIConfigBoolNode(GUIRoot, TEXT("EnableExplorerMenuOnTabs"), _nppGUI._enableExplorerMenuOnTabs);
 	}
 	if (!tagsMatchHighLightExist)
 	{
