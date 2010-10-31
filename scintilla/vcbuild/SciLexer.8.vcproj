@@ -23,6 +23,7 @@
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="2"
+			DeleteExtensionsOnClean="*.obj;*.ilk;*.tlb;*.tli;*.tlh;*.tmp;*.rsp;*.pgc;*.pgd;$(TargetPath);GIT-VS-VERSION-FILE"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -130,6 +131,7 @@
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="2"
+			DeleteExtensionsOnClean="*.obj;*.ilk;*.tlb;*.tli;*.tlh;*.tmp;*.rsp;*.pgc;*.pgd;$(TargetPath);GIT-VS-VERSION-FILE"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -230,7 +232,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /Y $(TargetPath) ..\..\PowerEditor\bin&#x0D;&#x0A;SETLOCAL&#x0D;&#x0A;set PATH=%PATH%;%ENV_LIB_PATHS%;%SM_LIB_PATHS%&#x0D;&#x0A;gtest_runner.exe &quot;$(TargetPath)&quot;"
+				CommandLine="xcopy /Y $(TargetPath) ..\..\PowerEditor\bin&#x0D;&#x0A;SETLOCAL&#x0D;&#x0A;set PATH=%PATH%;%ENV_LIB_PATHS%;%SM_LIB_PATHS%&#x0D;&#x0A;gtest_runner.exe &quot;$(TargetPath)&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -242,6 +244,7 @@
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="2"
+			DeleteExtensionsOnClean="*.obj;*.ilk;*.tlb;*.tli;*.tlh;*.tmp;*.rsp;*.pgc;*.pgd;$(TargetPath);GIT-VS-VERSION-FILE"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"

@@ -22,6 +22,7 @@
 			ConfigurationType="1"
 			InheritedPropertySheets=".\lib_paths.8.vsprops"
 			CharacterSet="1"
+			DeleteExtensionsOnClean="*.obj;*.ilk;*.tlb;*.tli;*.tlh;*.tmp;*.rsp;*.pgc;*.pgd;$(TargetPath);GIT-VS-VERSION-FILE"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -118,6 +119,7 @@
 			ConfigurationType="1"
 			InheritedPropertySheets=".\lib_paths.8.vsprops"
 			CharacterSet="1"
+			DeleteExtensionsOnClean="*.obj;*.ilk;*.tlb;*.tli;*.tlh;*.tmp;*.rsp;*.pgc;*.pgd;$(TargetPath);GIT-VS-VERSION-FILE"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -218,6 +220,7 @@
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="1"
+			DeleteExtensionsOnClean="*.obj;*.ilk;*.tlb;*.tli;*.tlh;*.tmp;*.rsp;*.pgc;*.pgd;$(TargetPath);GIT-VS-VERSION-FILE"
 			WholeProgramOptimization="1"
 			>
 			<Tool
