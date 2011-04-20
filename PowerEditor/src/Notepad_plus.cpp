@@ -2576,7 +2576,9 @@ enum LangType Notepad_plus::menuID2LangType(int cmdID)
             return L_POWERSHELL;
         case IDM_LANG_R :
             return L_R;
-
+		case IDM_LANG_REBOL:
+            return L_REBOL;
+		
 		case IDM_LANG_USER :
             return L_USER;
 		default: {

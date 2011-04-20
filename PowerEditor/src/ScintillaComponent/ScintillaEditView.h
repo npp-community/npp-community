@@ -442,6 +442,7 @@ protected:
     void setDLexer();
     void setPowerShellLexer();
     void setRLexer();
+	void setRebolLexer();
 	void setSearchResultLexer();
 	bool isNeededFolderMargin(LangType typeDoc) const;
 //END: Lexers and Styling
