@@ -608,7 +608,9 @@ static void ColouriseRebolDoc(unsigned int startPos, int length, int initStyle, 
 		{
 			if (sc.ch == ':'){
 				if(!IsAWordChar(sc.chNext)) {
-					sc.ChangeState(SCE_REBOL_SETWORD);
+					sc.ChangeState(SCE_REBOL_SETWORD); 
+					sc.ForwardSetState(SCE_REBOL_DEFAULT);
+					continue;
 				} else if (sc.chPrev != '/') {
 					sc.ChangeState(SCE_REBOL_URL);
 				}
@@ -618,10 +620,14 @@ static void ColouriseRebolDoc(unsigned int startPos, int length, int initStyle, 
 			} else if (sc.ch == '!') {
 				if(!IsAWordChar(sc.chNext) && sc.chNext!=':') {
 					sc.ChangeState(SCE_REBOL_DATATYPE);
+					sc.ForwardSetState(SCE_REBOL_DEFAULT);
+					continue;
 				}
 			} else if (sc.ch == '?') {
 				if(!IsAWordChar(sc.chNext) && sc.chNext!=':') {
 					sc.ChangeState(SCE_REBOL_QUESTION);
+					sc.ForwardSetState(SCE_REBOL_DEFAULT);
+					continue;
 				}
 			}
 		}
@@ -917,7 +923,7 @@ static void ColouriseRebolDoc(unsigned int startPos, int length, int initStyle, 
 				}
 			}  else if (ch1 == ':') {
 				if (IsAWordStart(ch2, ch3)) {
-					sc.SetState(SCE_REBOL_SETWORD);
+					sc.SetState(SCE_REBOL_SETWORD); //actually it's GET-WORD! (:value) but the style is same!
 				} else if (sc.chPrev==')') {
 					sc.SetState(SCE_REBOL_SETWORD);
 					sc.ForwardSetState(SCE_REBOL_DEFAULT);
