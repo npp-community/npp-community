@@ -1875,6 +1875,7 @@ void Notepad_plus::command(int id)
         case IDM_LANG_R :
 		case IDM_LANG_REBOL :
         case IDM_LANG_JSP :
+		case IDM_LANG_RSP :
 		case IDM_LANG_USER :
 		{
             setLanguage(menuID2LangType(id));

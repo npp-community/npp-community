@@ -443,6 +443,7 @@ protected:
     void setPowerShellLexer();
     void setRLexer();
 	void setRebolLexer();
+	void setRSPLexer();
 	void setSearchResultLexer();
 	bool isNeededFolderMargin(LangType typeDoc) const;
 //END: Lexers and Styling

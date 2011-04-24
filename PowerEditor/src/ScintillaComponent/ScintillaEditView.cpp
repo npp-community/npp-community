@@ -133,6 +133,7 @@ LanguageName ScintillaEditView::langNames[L_EXTERNAL+1] = {
 {TEXT("r"),				TEXT("R"),					TEXT("R programming language"),							L_R,			SCLEX_R},
 {TEXT("jsp"),			TEXT("JSP"),				TEXT("JavaServer Pages script file"),					L_JSP,			SCLEX_HTML},
 {TEXT("rebol"),			TEXT("REBOL"),				TEXT("REBOL file"),										L_REBOL,		SCLEX_REBOL},
+{TEXT("rsp"),			TEXT("RSP"),				TEXT("RSP file"),										L_RSP,			SCLEX_RSP},
 {TEXT("ext"),			TEXT("External"),			TEXT("External"),										L_EXTERNAL,		SCLEX_NULL}
 };
 
@@ -1314,11 +1315,14 @@ void ScintillaEditView::defineDocType(LangType typeDoc)
         case L_R :
 			setRLexer(); break;
 			
-		case L_REBOL :
-            setRebolLexer(); break;
+	case L_REBOL :
+			setRebolLexer(); break;
 
-		case L_TEXT :
-		default :
+	case L_RSP :
+			setRSPLexer(); break;
+		
+	case L_TEXT :
+	default :
 			if (typeDoc >= L_EXTERNAL && typeDoc < NppParameters::getInstance()->L_END)
 				setExternalLexer(typeDoc);
 			else
@@ -3477,6 +3481,15 @@ void ScintillaEditView::setRubyLexer()
 void ScintillaEditView::setRebolLexer()
 {
 	setLexer(SCLEX_REBOL, L_REBOL, LIST_0 | LIST_1 | LIST_2 | LIST_3 | LIST_4 | LIST_5);
+}
+
+void ScintillaEditView::setRSPLexer()
+{
+	setLexer(SCLEX_RSP, L_RSP, LIST_0 | LIST_1 | LIST_2 | LIST_3 | LIST_4);
+	execute(SCI_STYLESETEOLFILLED, SCE_RSP_HTML_DEFAULT, true);
+	execute(SCI_STYLESETEOLFILLED, SCE_RSP_HTML_TAG, true);
+	execute(SCI_STYLESETEOLFILLED, SCE_RSP_HTML_TAGSTRING1, true);
+	execute(SCI_STYLESETEOLFILLED, SCE_RSP_HTML_TAGSTRING2, true);
 }
 	
 void ScintillaEditView::setSmalltalkLexer()

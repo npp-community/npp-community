@@ -4646,7 +4646,10 @@ int NppParameters::langTypeToCommandID(LangType lt) const
 
 		case L_REBOL :
             id = IDM_LANG_REBOL; break;
-			
+		
+		case L_RSP :
+            id = IDM_LANG_RSP; break;
+		
 		case L_SEARCHRESULT :
 			id = -1;	break;
 
