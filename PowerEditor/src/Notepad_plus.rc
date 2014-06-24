@@ -583,7 +583,9 @@ BEGIN
         MENUITEM "Properties",            IDM_LANG_PROPS
         MENUITEM "Python",                IDM_LANG_PYTHON
         MENUITEM "R",                     IDM_LANG_R
+		MENUITEM "REBOL",                 IDM_LANG_REBOL
         MENUITEM "Resource file",         IDM_LANG_RC
+		MENUITEM "RSP",                   IDM_LANG_RSP
         MENUITEM "Ruby",                  IDM_LANG_RUBY
         MENUITEM "Shell",                 IDM_LANG_BASH
         MENUITEM "Scheme",                IDM_LANG_SCHEME
@@ -673,7 +675,9 @@ BEGIN
     POPUP "R"
     BEGIN
         MENUITEM "R",                     IDM_LANG_R
+		MENUITEM "REBOL",                 IDM_LANG_REBOL
         MENUITEM "Resource file",         IDM_LANG_RC
+		MENUITEM "RSP",                   IDM_LANG_RSP
         MENUITEM "Ruby",                  IDM_LANG_RUBY
     END
     POPUP "S"

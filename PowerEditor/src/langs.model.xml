@@ -223,6 +223,22 @@
             <Keywords name="instre2"></Keywords>
             <Keywords name="type1"></Keywords>
         </Language>
+        <Language name="rebol" ext="r r2 r3 rxt reb">
+            <Keywords name="instre1">func function funco funct does has context object construct struct</Keywords>
+            <Keywords name="instre2">parse ask change-dir clean-path close confirm connected? delete dir? dirize dispatch do echo exists? get-modes info? input input? list-dir load make-dir modified? open pick poke prin print printf probe query read read-io rename resend save script? secure send set-modes set-net size? split-path suffix? to-local-file to-rebol-file update wait what-dir write write-io</Keywords>
+            <Keywords name="type1">if either unless case switch any some all not found? none? while until for forskip foreach forall loop break exit halt return to thru skip</Keywords>
+            <Keywords name="type2">reduce repend append rejoin join ajoin reform form copy insert mold tail head</Keywords>
+            <Keywords name="type3">none true false on off</Keywords>
+            <Keywords name="type4"/>
+            <Keywords name="type5"/>
+        </Language>
+        <Language name="rsp" ext="rsp">
+            <Keywords name="instre1">func function funco funct does has context object construct struct call quit halt</Keywords>
+            <Keywords name="instre2">parse ask change-dir clean-path close confirm connected? delete dir? dirize dispatch do echo exists? get-modes info? input input? list-dir load make-dir modified? open pick poke prin print printf probe query read read-io rename resend save script? secure send set-modes set-net size? split-path suffix? to-local-file to-rebol-file update wait what-dir write write-io</Keywords>
+            <Keywords name="type1">if either unless case switch any some all not found? none? while until for forskip foreach forall loop break exit halt return to thru skip none true false on off</Keywords>
+            <Keywords name="type2">reduce repend append rejoin join ajoin reform form copy insert mold tail head</Keywords>
+            <Keywords name="type3">request response validate session db-cache debug do-sql</Keywords>
+        </Language>
 <!--
         <Language name="" ext="" commentLine="" commentStart="" commentEnd="">
             <Keywords name="instre1"></Keywords>

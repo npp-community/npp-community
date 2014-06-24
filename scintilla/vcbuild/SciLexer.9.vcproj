@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="SciLexer"
 	ProjectGUID="{55121E73-EAE3-438B-A537-BABBCA29B084}"
 	RootNamespace="SciLexer"
@@ -118,7 +118,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				Description="Notepad++ CR Scintilla Version Generation"
-				CommandLine="CALL $(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat &quot;$(IntDir)\&quot; &quot;$(SolutionDir)scintilla\src\gen-versioninfo.h&quot;&#x0D;&#x0A;IF NOT EXIST &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards.h&quot; copy &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards_skel.h&quot; &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards.h&quot;"
+				CommandLine="CALL $(SolutionDir)\scripts\GIT-VS-VERSION-GEN.bat &quot;$(IntDir)\&quot; &quot;$(SolutionDir)scintilla\src\gen-versioninfo.h&quot;&#x0D;&#x0A;IF NOT EXIST &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards.h&quot; copy &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards_skel.h&quot; &quot;$(ProjectDir)..\src\MISC\Debug\FuncGuards.h&quot;&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -678,6 +678,10 @@
 				</File>
 				<File
 					RelativePath="..\lexers\LexRebol.cxx"
+					>
+				</File>
+				<File
+					RelativePath="..\lexers\LexRSP.cxx"
 					>
 				</File>
 				<File
